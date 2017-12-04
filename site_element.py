@@ -15,21 +15,31 @@ class SiteElement:
         self.element_href = the_href
         self.element_class = the_class
 
+    def loc_it(self, the_driver, sleep_time):
+        """ Identifies element on page, based on a hierarchy
+        of preferred identification methods (eg. by html element
+        id is preferrable to html element class).
+        """
+        if self.element_id is not None:
+            the_element = self.loc_by_id(the_driver, sleep_time)
+        elif self.element_href is not None:
+            the_element = self.loc_by_href(the_driver, sleep_time)
+        elif self.element_class is not None:
+            the_element = self.loc_by_class(the_driver, sleep_time)
+        elif self.element_content is not None:
+            the_element = self.loc_by_content(the_driver, sleep_time)
+        return the_element
+            
     def click_it(self, the_driver, sleep_time):
         """ Identifies element on page, based on a hierarchy
         of preferred identification methods (eg. by html element
         id is preferrable to html element class).  After identification
         the element is then clicked.
         """
-        if self.element_id is not None:
-            self.click_by_id(the_driver, sleep_time)
-        elif self.element_href is not None:
-            self.click_by_href(the_driver, sleep_time)
-        elif self.element_class is not None:
-            self.click_by_class(the_driver, sleep_time)
-        elif self.element_content is not None:
-            self.click_by_content(the_driver, sleep_time)
-        
+        the_element = self.loc_it(the_driver, sleep_time)
+        the_element.click()
+        time.sleep(sleep_time)
+            
     def scroll_by_id(self, the_driver, sleep_time):
         """ Scrolls to a div, given its id """
         driver = the_driver
@@ -38,26 +48,24 @@ class SiteElement:
         element_pin = driver.find_element_by_xpath(element_spec)
         element_pin.location_once_scrolled_into_view
         time.sleep(sleep_time)        
-        
-    def click_by_id(self, the_driver, sleep_time): #Dont call directly
+    
+    def loc_by_id(self, the_driver, sleep_time): #Dont call directly
         """ Clicks on a website element, given the element type and id """
         driver = the_driver
         element_spec = "//" + self.element_type + \
                        "[@id='" + self.element_id + "']"
         element_pin = driver.find_element_by_xpath(element_spec)
-        element_pin.click()
-        time.sleep(sleep_time)
+        return element_pin
 
-    def click_by_href(self, the_driver, sleep_time): #Dont call directly
+    def loc_by_href(self, the_driver, sleep_time): #Dont call directly
         """ Clicks on a website element, given the element type and href """
         driver = the_driver
         element_spec = "//" + self.element_type + \
                        "[contains(@href,'" + self.element_href + "')]"
         element_pin = driver.find_element_by_xpath(element_spec)
-        element_pin.click()
-        time.sleep(sleep_time)
+        return element_pin
 
-    def click_by_class(self, the_driver, sleep_time): #Dont call directly
+    def loc_by_class(self, the_driver, sleep_time): #Dont call directly
         """ Clicks on a website element, given the element class.  If
         multiple elements of the same class exist, the first one will
         be clicked
@@ -66,18 +74,16 @@ class SiteElement:
         element_spec = "//" + self.element_type + \
                        "[@class='" + self.element_class + "']"
         element_pin = driver.find_element_by_xpath(element_spec)
-        element_pin.click()
-        time.sleep(sleep_time)
+        return element_pin
 
-    def click_by_content(self, the_driver, sleep_time): #Dont call directly
+    def loc_by_content(self, the_driver, sleep_time): #Dont call directly
         """ Clicks on a website element, based the element text content """
         driver = the_driver
         element_spec = "//" + self.element_type + \
                        "[contains(text(), '" + self.element_content + "')]"
         element_pin = driver.find_element_by_xpath(element_spec)
-        element_pin.click()
-        time.sleep(sleep_time)
-
+        return element_pin
+        
     def text_by_id(self, the_driver, input_text, sleep_time):
         """ Enters text into a field or other input-capable html
         element using send keys
