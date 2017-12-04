@@ -15,18 +15,18 @@ class SiteElement:
         self.element_href = the_href
         self.element_class = the_class
 
-    def click_it(self, driver, element):
+    def click_it(self, driver, sleep_time):
         """ Identifies element on page, based on a hierarchy
         of preferred identification methods (eg. by html element
         id is preferrable to html element class).  After identification
         the element is then clicked.
         """
         if self.element_id is not None:
-            self.click_by_id(driver, SLEEP_TIME)
+            self.click_by_id(driver, sleep_time)
         elif self.element_href is not None:
-            self.click_by_href(driver, SLEEP_TIME)
+            self.click_by_href(driver, sleep_time)
         elif self.element_content is not None:
-            self.click_by_content(driver, SLEEP_TIME)
+            self.click_by_content(driver, sleep_time)
         
     def scroll_by_id(self, the_driver, sleep_time):
         """ Scrolls to a div, given its id """
