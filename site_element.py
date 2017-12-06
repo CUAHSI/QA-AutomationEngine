@@ -39,16 +39,23 @@ class SiteElement:
         the_element = self.loc_it(the_driver, sleep_time)
         the_element.click()
         time.sleep(sleep_time)
-            
-    def scroll_by_id(self, the_driver, sleep_time):
-        """ Scrolls to a div, given its id """
-        driver = the_driver
-        element_spec = "//" + self.element_type + \
-                       "[@id='" + self.element_id + "']"
-        element_pin = driver.find_element_by_xpath(element_spec)
-        element_pin.location_once_scrolled_into_view
-        time.sleep(sleep_time)        
-    
+
+    def scroll_to_it(self, the_driver, sleep_time):
+        """ After element identification, the window is scrolled
+        such that the element becomes visible in the window
+        """
+        the_element = self.loc_it(the_driver, sleep_time)
+        the_element.location_once_scrolled_into_view
+        time.sleep(sleep_time)
+
+    def text_into_it(self, the_driver, input_text, sleep_time):
+        """ Enters text into a field or other input-capable html
+        element using send keys
+        """
+        the_element = self.loc_it(the_driver, sleep_time)
+        the_element.send_keys(input_text)
+        time.sleep(sleep_time)
+        
     def loc_by_id(self, the_driver, sleep_time): #Dont call directly
         """ Clicks on a website element, given the element type and id """
         driver = the_driver
@@ -84,38 +91,20 @@ class SiteElement:
         element_pin = driver.find_element_by_xpath(element_spec)
         return element_pin
         
-    def text_by_id(self, the_driver, input_text, sleep_time):
-        """ Enters text into a field or other input-capable html
-        element using send keys
-        """
-        driver = the_driver
-        element_spec = "//" + self.element_type + \
-                       "[@id='" + self.element_id + "']"
-        element_pin = driver.find_element_by_xpath(element_spec)
-        element_pin.send_keys(input_text)
-        time.sleep(sleep_time)
 
     def contains_text(self, the_driver, substring):
         """ Checks if an element contains contains a substring
         in it's text
         """
-        driver = the_driver
-        # TODO Enable non-ID element identification
-        element_spec = "//" + self.element_type + \
-                       "[@id='" + self.element_id + "']"
-        element_pin = driver.find_element_by_xpath(element_spec)
-        return substring in element_pin.text
+        the_element = self.loc_it(the_driver, sleep_time)
+        return substring in the_element.text
 
     def download_link(self, the_driver, base_url):
         """ Returns element href link, with relative links expanded
         into an absolute link
         """
-        driver = the_driver
-        # TODO Enable non-ID element identification
-        element_spec = "//" + self.element_type + \
-                       "[@id='" + self.element_id + "']"
-        element_pin = driver.find_element_by_xpath(element_spec)
-        element_href = element_pin.get_attribute("href")
+        the_element = self.loc_it(the_driver, sleep_time)
+        element_href = the_element.get_attribute("href")
         if (element_href[0] == '/'):
             element_href = base_url + element_href
         return element_href
