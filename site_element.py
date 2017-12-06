@@ -99,7 +99,7 @@ class SiteElement:
         the_element = self.loc_it(the_driver, sleep_time)
         return substring in the_element.text
 
-    def download_link(self, the_driver, base_url):
+    def get_href(self, the_driver, base_url):
         """ Returns element href link, with relative links expanded
         into an absolute link
         """
