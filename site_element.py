@@ -15,28 +15,28 @@ class SiteElement:
         self.element_href = the_href
         self.element_class = the_class
 
-    def loc_it(self, the_driver, sleep_time):
+    def loc_it(self, the_driver):
         """ Identifies element on page, based on a hierarchy
         of preferred identification methods (eg. by html element
         id is preferrable to html element class).
         """
         if self.element_id is not None:
-            the_element = self.loc_by_id(the_driver, sleep_time)
+            the_element = self.loc_by_id(the_driver)
         elif self.element_href is not None:
-            the_element = self.loc_by_href(the_driver, sleep_time)
+            the_element = self.loc_by_href(the_driver)
         elif self.element_class is not None:
-            the_element = self.loc_by_class(the_driver, sleep_time)
+            the_element = self.loc_by_class(the_driver)
         elif self.element_content is not None:
-            the_element = self.loc_by_content(the_driver, sleep_time)
+            the_element = self.loc_by_content(the_driver)
         return the_element
-            
+
     def click_it(self, the_driver, sleep_time):
         """ Identifies element on page, based on a hierarchy
         of preferred identification methods (eg. by html element
         id is preferrable to html element class).  After identification
         the element is then clicked.
         """
-        the_element = self.loc_it(the_driver, sleep_time)
+        the_element = self.loc_it(the_driver)
         the_element.click()
         time.sleep(sleep_time)
 
@@ -44,7 +44,7 @@ class SiteElement:
         """ After element identification, the window is scrolled
         such that the element becomes visible in the window
         """
-        the_element = self.loc_it(the_driver, sleep_time)
+        the_element = self.loc_it(the_driver)
         the_element.location_once_scrolled_into_view
         time.sleep(sleep_time)
 
@@ -52,11 +52,11 @@ class SiteElement:
         """ Enters text into a field or other input-capable html
         element using send keys
         """
-        the_element = self.loc_it(the_driver, sleep_time)
+        the_element = self.loc_it(the_driver)
         the_element.send_keys(input_text)
         time.sleep(sleep_time)
-        
-    def loc_by_id(self, the_driver, sleep_time): #Dont call directly
+
+    def loc_by_id(self, the_driver): #Dont call directly
         """ Clicks on a website element, given the element type and id """
         driver = the_driver
         element_spec = "//" + self.element_type + \
@@ -64,7 +64,7 @@ class SiteElement:
         element_pin = driver.find_element_by_xpath(element_spec)
         return element_pin
 
-    def loc_by_href(self, the_driver, sleep_time): #Dont call directly
+    def loc_by_href(self, the_driver): #Dont call directly
         """ Clicks on a website element, given the element type and href """
         driver = the_driver
         element_spec = "//" + self.element_type + \
@@ -72,7 +72,7 @@ class SiteElement:
         element_pin = driver.find_element_by_xpath(element_spec)
         return element_pin
 
-    def loc_by_class(self, the_driver, sleep_time): #Dont call directly
+    def loc_by_class(self, the_driver): #Dont call directly
         """ Clicks on a website element, given the element class.  If
         multiple elements of the same class exist, the first one will
         be clicked
@@ -83,28 +83,27 @@ class SiteElement:
         element_pin = driver.find_element_by_xpath(element_spec)
         return element_pin
 
-    def loc_by_content(self, the_driver, sleep_time): #Dont call directly
+    def loc_by_content(self, the_driver): #Dont call directly
         """ Clicks on a website element, based the element text content """
         driver = the_driver
         element_spec = "//" + self.element_type + \
                        "[contains(text(), '" + self.element_content + "')]"
         element_pin = driver.find_element_by_xpath(element_spec)
         return element_pin
-        
 
     def contains_text(self, the_driver, substring):
         """ Checks if an element contains contains a substring
         in it's text
         """
-        the_element = self.loc_it(the_driver, sleep_time)
+        the_element = self.loc_it(the_driver)
         return substring in the_element.text
 
     def get_href(self, the_driver, base_url):
         """ Returns element href link, with relative links expanded
         into an absolute link
         """
-        the_element = self.loc_it(the_driver, sleep_time)
+        the_element = self.loc_it(the_driver)
         element_href = the_element.get_attribute("href")
-        if (element_href[0] == '/'):
+        if element_href[0] == '/':
             element_href = base_url + element_href
         return element_href
