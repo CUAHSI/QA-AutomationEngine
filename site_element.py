@@ -4,6 +4,59 @@ for these elements
 """
 import time
 
+def nest_loc_it(the_parent, the_child):
+    """ Idenfies nested element based on hierarchy of
+    preferred identification methods
+    """
+    if the_child.element_id is not None:
+        the_element = nest_loc_by_id(the_parent, the_child)
+    elif the_child.element_href is not None:
+        the_element = nest_loc_by_href(the_parent, the_child)
+    elif the_child.element_class is not None:
+        the_element = nest_loc_by_class(the_parent, the_child)
+    elif the_child.element_content is not None:
+        the_element = nest_loc_by_content(the_parent, the_child)
+    else:
+        the_element = nest_loc_by_nothing(the_parent, the_child)
+    return the_element
+
+def nest_loc_by_id(parent, child):
+    """ Clicks on a website element, given the element type and id """
+    element_spec = "//" + child.element_type + \
+                   "[@id='" + child.element_id + "']"
+    element_pin = parent.find_element_by_xpath(element_spec)
+    return element_pin
+
+def nest_loc_by_href(parent, child):
+    """ Clicks on a website element, given the element type and href """
+    element_spec = "//" + child.element_type + \
+                   "[contains(@href,'" + child.element_href + "')]"
+    element_pin = parent.find_element_by_xpath(element_spec)
+    return element_pin
+
+def nest_loc_by_class(parent, child):
+    """ Clicks on a website element, given the element class.  If
+    multiple elements of the same class exist, the first one will
+    be clicked
+    """
+    element_spec = "//" + child.element_type + \
+                   "[@class='" + child.element_class + "']"
+    element_pin = parent.find_element_by_xpath(element_spec)
+    return element_pin
+
+def nest_loc_by_content(parent, child):
+    """ Clicks on a website element, based the element text content """
+    element_spec = "//" + child.element_type + \
+                   "[contains(text(), '" + child.element_content + "')]"
+    element_pin = parent.find_element_by_xpath(element_spec)
+    return element_pin
+
+def nest_loc_by_nothing(parent, child):
+    """ Selects a website element based only on the tag/type """
+    element_spec = "//" + child.element_type
+    element_pin = parent.find_element_by_xpath(element_spec)
+    return element_pin
+
 class SiteElement:
     """ Defines site elements in a structured way """
 
@@ -28,6 +81,8 @@ class SiteElement:
             the_element = self.loc_by_class(the_driver)
         elif self.element_content is not None:
             the_element = self.loc_by_content(the_driver)
+        else:
+            the_element = self.loc_by_nothing(the_driver)
         return the_element
 
     def click_it(self, the_driver, sleep_time):
@@ -56,7 +111,7 @@ class SiteElement:
         the_element.send_keys(input_text)
         time.sleep(sleep_time)
 
-    def loc_by_id(self, the_driver): #Dont call directly
+    def loc_by_id(self, the_driver): #Dont call in scripts directly
         """ Clicks on a website element, given the element type and id """
         driver = the_driver
         element_spec = "//" + self.element_type + \
@@ -64,7 +119,7 @@ class SiteElement:
         element_pin = driver.find_element_by_xpath(element_spec)
         return element_pin
 
-    def loc_by_href(self, the_driver): #Dont call directly
+    def loc_by_href(self, the_driver): #Dont call in scripts directly
         """ Clicks on a website element, given the element type and href """
         driver = the_driver
         element_spec = "//" + self.element_type + \
@@ -72,7 +127,7 @@ class SiteElement:
         element_pin = driver.find_element_by_xpath(element_spec)
         return element_pin
 
-    def loc_by_class(self, the_driver): #Dont call directly
+    def loc_by_class(self, the_driver): #Dont call in scripts directly
         """ Clicks on a website element, given the element class.  If
         multiple elements of the same class exist, the first one will
         be clicked
@@ -83,11 +138,18 @@ class SiteElement:
         element_pin = driver.find_element_by_xpath(element_spec)
         return element_pin
 
-    def loc_by_content(self, the_driver): #Dont call directly
+    def loc_by_content(self, the_driver): #Dont call in scripts directly
         """ Clicks on a website element, based the element text content """
         driver = the_driver
         element_spec = "//" + self.element_type + \
                        "[contains(text(), '" + self.element_content + "')]"
+        element_pin = driver.find_element_by_xpath(element_spec)
+        return element_pin
+
+    def loc_by_nothing(self, the_driver): #Dont call in scripts directly
+        """ Selects a website element based only on the tag/type """
+        driver = the_driver
+        element_spec = "//" + self.element_type
         element_pin = driver.find_element_by_xpath(element_spec)
         return element_pin
 
@@ -105,3 +167,15 @@ class SiteElement:
         if element_href[0] == '/':
             element_href = base_url + element_href
         return element_href
+
+    def nested_click(self, the_driver, children, sleep_time):
+        """ Enables nesting specs for element identification.
+        The approach below injects the parent element as the
+        driver argument during location (consider maintainability
+        improvements as future todo)
+        """
+        the_element = self.loc_it(the_driver)
+        for i in range(0, len(children)):
+            the_element = nest_loc_it(the_element, children[i])
+        the_element.click()
+        time.sleep(sleep_time)
