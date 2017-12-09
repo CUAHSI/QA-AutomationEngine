@@ -1,4 +1,6 @@
 # cuahsi-qa-automation-engine
+
+### Scope
 Suite of automated tests for:
-data.cuahsi.org (HydroClient)
-hydroshare.org (HydroShare)
+1. data.cuahsi.org (HydroClient)
+2. hydroshare.org (HydroShare)
