@@ -50,7 +50,7 @@ class HydroshareTestCase(unittest.TestCase):
         self.browser = webdriver.Firefox()
         self.addCleanup(self.browser.quit)
 
-    def test_1_home_online(self):
+    def test_B_000001(self):
         """ Confirms homepage online via page title """
         driver = setup_driver()
         driver.get(BASE_URL)
@@ -59,7 +59,7 @@ class HydroshareTestCase(unittest.TestCase):
         self.assertIn('HydroShare', driver.title)
         driver.quit()
 
-    def test_2_discovery_online(self):
+    def test_B_000002(self):
         """ Confirms discovery page is online via navigation
         and title check
         """
@@ -70,7 +70,7 @@ class HydroshareTestCase(unittest.TestCase):
         self.assertIn('Discover', driver.title)
         driver.quit()
 
-    def test_3_beaver_divide_download(self):
+    def test_B_000003(self):
         """ Confirms Beaver Divide Air Temperature resource
         landing page is online via navigation and title check,
         then downloads the BagIt archive and confirms
@@ -101,7 +101,7 @@ class HydroshareTestCase(unittest.TestCase):
         self.assertTrue(file_size == BEAVER_DIVIDE_ZIP_SIZE)
         driver.quit()
 
-    def dontrun_test_4_date_filter_discovery(self):
+    def test_B_000004(self):
         """ Confirms date filtering functionality, as well as
         map view functionality
         """

@@ -55,7 +55,7 @@ class HydroclientTestCase(unittest.TestCase):
         self.browser = webdriver.Firefox()
         self.addCleanup(self.browser.quit)
 
-    def test_1_home_online(self):
+    def test_A_000001(self):
         """ Confirms homepage online via page title """
         driver = setup_driver()
         driver.get(BASE_URL)
@@ -64,7 +64,7 @@ class HydroclientTestCase(unittest.TestCase):
         self.assertIn('HydroClient', driver.title)
         driver.quit()
 
-    def test_2_lake_annie(self):
+    def test_A_000002(self):
         """ Confirms metadata available through
         HydroClient and that a sample of the data
         downloads successfully
@@ -102,7 +102,7 @@ class HydroclientTestCase(unittest.TestCase):
         self.assertTrue(workspace_load)
         driver.quit()
 
-    def dontrun_test_3_repeated_annie_search(self):
+    def test_A_000003(self):
         """ Confirms repeated search for Lake Annie does not result
         in problematic behavior
         """
@@ -122,7 +122,7 @@ class HydroclientTestCase(unittest.TestCase):
         self.assertTrue('51' in NUM_SEARCH_RESULTS.get_text(driver))
         driver.quit()
 
-    def dontrun_test_4_simultaneous_annie_search(self):
+    def test_A_000004(self):
         """ Confirms simultaneous searches for Lake Annie does not result
         in problematic behavior
         """
