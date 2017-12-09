@@ -91,12 +91,10 @@ class SiteElement:
         element_pin = driver.find_element_by_xpath(element_spec)
         return element_pin
 
-    def contains_text(self, the_driver, substring):
-        """ Checks if an element contains contains a substring
-        in it's text
-        """
+    def get_text(self, the_driver):
+        """ Returns content text of website element """
         the_element = self.loc_it(the_driver)
-        return substring in the_element.text
+        return the_element.text
 
     def get_href(self, the_driver, base_url):
         """ Returns element href link, with relative links expanded
