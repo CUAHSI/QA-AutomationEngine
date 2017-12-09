@@ -38,8 +38,17 @@ def add_cases(filename, config_lines):
             
     for i in range(0, len(case_lines)):
         case_line = case_lines[i]
-        if ('def test_' in case_line) or ('def off_test_' in case_line):
+        is_spec_line = False
+        if ('def test_' in case_line):
             new_config_line = '** DONE '
+            is_spec_line = True
+        if ('def off_test_' in case_line):
+            new_config_line = '** '
+            is_spec_line = True
+        if ('def todo_test_' in case_line):
+            new_config_line = '** TODO '
+            is_spec_line = True
+        if is_spec_line:
             line_parse_one = case_line.split('test_')[1]
             line_parse_two = line_parse_one.split('(')[0]
             new_config_line += line_parse_two

@@ -40,14 +40,26 @@ def update_scripts(all_suites):
         line_parse_two = line_parse_one.split('(')[0]
         case_num = line_parse_two
         status_setting = all_suites[system][case_num]
-        if (status_setting == 'TODO') or (status_setting == 'NONE'):
+        if (status_setting == 'TODO'):
+            prepend = 'todo'
+        elif (status_setting == 'NONE'):
             prepend = 'off'
         else:
             prepend = ''
         if ('off' in system_line) and (prepend == ''):
             return system_line.replace('off_test_','test_')
-        elif ('off' not in system_line) and (prepend == 'off'):
+        elif ('off' in system_line) and (prepend == 'todo'):
+            return system_line.replace('off_test_','todo_test_')
+        elif ('todo' in system_line) and (prepend == ''):
+            return system_line.replace('todo_test_','test_')
+        elif ('todo' in system_line) and (prepend == 'off'):
+            return system_line.replace('todo_test_','off_test_')
+        elif ('off' not in system_line) and ('todo' not in system_line) and \
+             (prepend == 'off'):
             return system_line.replace('test_','off_test_')
+        elif ('off' not in system_line) and ('todo' not in system_line) and \
+             (prepend == 'todo'):
+            return system_line.replace('test_','todo_test_')
         else:
             return system_line
 
@@ -58,7 +70,9 @@ def update_scripts(all_suites):
         system_lines = [x.strip('\n') for x in system_lines]
         for k in range(0, len(system_lines)):
             system_line = system_lines[k]
-            if ('def test_' in system_line) or ('def off_test_' in system_line):
+            if ('def test_' in system_line) or \
+               ('def off_test_' in system_line) or \
+               ('def todo_test_' in system_line):
                 new_lines += [update_case(all_suites, system, system_line)]
             else:
                 new_lines += [system_line]
