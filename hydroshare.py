@@ -50,31 +50,46 @@ class HydroshareTestCase(unittest.TestCase):
         self.browser = webdriver.Firefox()
         self.addCleanup(self.browser.quit)
 
-    def test_B_000001(self):
+    def todo_test_B_000001(self):
         """ Confirms homepage online via page title """
+        def oracle():
+            """ The Hydroshare homepage is online """
+            self.assertIn('HydroShare', driver.title)
+
         driver = setup_driver()
         driver.get(BASE_URL)
         time.sleep(SLEEP_TIME)
-        # Positive test case after navigation
-        self.assertIn('HydroShare', driver.title)
+        oracle()
         driver.quit()
 
-    def test_B_000002(self):
+    def todo_test_B_000002(self):
         """ Confirms discovery page is online via navigation
         and title check
         """
+        def oracle():
+            """ The discovery page can be navigated to
+            from the HydroShare homepage, using the top
+            menu tabs
+            """
+            self.assertIn('Discover', driver.title)
+
         driver = setup_driver()
         driver.get(BASE_URL)
         DISCOVERY_TAB.click_it(driver, SLEEP_TIME)
-        # Positive test case after navigation
-        self.assertIn('Discover', driver.title)
+        oracle()
         driver.quit()
 
-    def test_B_000003(self):
+    def off_test_B_000003(self):
         """ Confirms Beaver Divide Air Temperature resource
         landing page is online via navigation and title check,
         then downloads the BagIt archive and confirms
         """
+        def oracle():
+            """ The Beaver Divide BagIt zip file
+            matches expected file size
+            """
+            self.assertTrue(file_size == BEAVER_DIVIDE_ZIP_SIZE)
+
         driver = setup_driver()
         driver.get(BASE_URL)
         # Pulls up discover search page through site header
@@ -98,7 +113,7 @@ class HydroshareTestCase(unittest.TestCase):
         download_file = download_href.split('/')[-1]
         file_size = os.stat(download_file).st_size
         # Confirm the downloaded file size matches expectation
-        self.assertTrue(file_size == BEAVER_DIVIDE_ZIP_SIZE)
+        oracle()
         driver.quit()
 
     def test_B_000004(self):

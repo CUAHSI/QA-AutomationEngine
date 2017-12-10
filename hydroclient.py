@@ -57,11 +57,14 @@ class HydroclientTestCase(unittest.TestCase):
 
     def test_A_000001(self):
         """ Confirms homepage online via page title """
+        def oracle():
+            """ The HydroClient homepage is online """
+            self.assertIn('HydroClient', driver.title)
+
         driver = setup_driver()
         driver.get(BASE_URL)
         time.sleep(SLEEP_TIME)
-        # Positive test case after navigation
-        self.assertIn('HydroClient', driver.title)
+        oracle()
         driver.quit()
 
     def test_A_000002(self):
@@ -69,6 +72,18 @@ class HydroclientTestCase(unittest.TestCase):
         HydroClient and that a sample of the data
         downloads successfully
         """
+        def oracle():
+            """ The Lake Annie FL data can be successfully
+            sent to the workspace, and then is processed
+            successfully in the workspace
+            """
+            workspace_load = True
+            try:
+                SiteElement('span', the_class='glyphicon-thumbs-up')
+            except NoSuchElementException:
+                workspace_load = False
+            self.assertTrue(workspace_load)
+
         driver = setup_driver()
         driver.get(BASE_URL)
         LOCATION_SEARCH_BOX.text_into_it(driver, "Lake Annie Highlands County", SLEEP_TIME)
@@ -93,19 +108,20 @@ class HydroclientTestCase(unittest.TestCase):
         WORKSPACE_SELECTION.click_it(driver, SLEEP_TIME)
         VIEW_WORKSPACE.click_it(driver, SLEEP_TIME)
         time.sleep(60)
-        # Do all assertions here
-        workspace_load = True
-        try:
-            SiteElement('span', the_class='glyphicon-thumbs-up')
-        except NoSuchElementException:
-            workspace_load = False
-        self.assertTrue(workspace_load)
+        oracle()
         driver.quit()
 
     def test_A_000003(self):
         """ Confirms repeated search for Lake Annie does not result
         in problematic behavior
         """
+        def oracle():
+            """ 51 results show up for the Lake Annie FL data search,
+            with the "Archbold Biological Center" set as the only
+            service visible via search filtering
+            """
+            self.assertTrue('51' in NUM_SEARCH_RESULTS.get_text(driver))
+
         driver = setup_driver()
         driver.get(BASE_URL)
         LOCATION_SEARCH_BOX.text_into_it(driver, "Lake Annie Highlands County", SLEEP_TIME)
@@ -119,13 +135,16 @@ class HydroclientTestCase(unittest.TestCase):
         for i in range(0, 500):
             SEARCH_NOW.click_it(driver, SLEEP_TIME)
             time.sleep(1)
-        self.assertTrue('51' in NUM_SEARCH_RESULTS.get_text(driver))
+        oracle()
         driver.quit()
 
-    def test_A_000004(self):
+    def off_test_A_000004(self):
         """ Confirms simultaneous searches for Lake Annie does not result
         in problematic behavior
         """
+        def oracle():
+            self.assertTrue('51' in NUM_SEARCH_RESULTS.get_text(driver))
+
         # DOESNT WORK - NEED TO FIX TABS ISSUE
         driver = setup_driver()
         for i in range(0, 20):
@@ -147,7 +166,7 @@ class HydroclientTestCase(unittest.TestCase):
         for i in range(0, 20):
             SEARCH_NOW.click_it(driver, SLEEP_TIME)
             time.sleep(1)
-            self.assertTrue('51' in NUM_SEARCH_RESULTS.get_text(driver))
+            oracle()
         driver.quit()
 
 
