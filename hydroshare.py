@@ -8,7 +8,7 @@ from modes import setup_mode
 
 # Test case parameters
 MODE_SELECTION = 'demo'
-setup_mode(MODE_SELECTION)
+SLEEP_TIME = setup_mode(MODE_SELECTION)
 BASE_URL = 'http://www.hydroshare.org'
 
 # All
@@ -116,6 +116,9 @@ class HydroshareTestCase(unittest.TestCase):
         """ Confirms date filtering functionality, as well as
         map view functionality
         """
+        def oracle():
+            """ Confirms valid page returned after navigation """
+            self.assertTrue('HydroShare' in driver.title)
         driver = setup_driver()
         driver.get(BASE_URL)
         # Pulls up discover search page through site header
@@ -128,6 +131,7 @@ class HydroshareTestCase(unittest.TestCase):
         DISCOVER_MAP_SEARCH_SUBMIT.click_it(driver, SLEEP_TIME)
         DISCOVER_VIEW_LIST_TAB.click_it(driver, SLEEP_TIME)
         time.sleep(5)
+        oracle()
         driver.quit()
 
 if __name__ == '__main__':

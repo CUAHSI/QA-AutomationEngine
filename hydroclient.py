@@ -2,13 +2,13 @@
 import unittest
 import time
 from selenium import webdriver
-from site_element import SiteElement
 from selenium.webdriver.common.keys import Keys
+from site_element import SiteElement
 from modes import setup_mode
 
 # Test case parameters
 MODE_SELECTION = 'demo'
-setup_mode(MODE_SELECTION)
+SLEEP_TIME = setup_mode(MODE_SELECTION)
 BASE_URL = 'http://data.cuahsi.org'
 # Search interface
 SEARCH_NOW = SiteElement('button', the_id='btnSearchNow')
@@ -138,6 +138,7 @@ class HydroclientTestCase(unittest.TestCase):
         in problematic behavior
         """
         def oracle():
+            """ Results set is of the size 51 """
             self.assertTrue('51' in NUM_SEARCH_RESULTS.get_text(driver))
 
         # DOESNT WORK - NEED TO FIX TABS ISSUE
