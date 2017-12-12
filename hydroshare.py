@@ -4,10 +4,13 @@ import os
 import time
 from selenium import webdriver
 from site_element import SiteElement
+from modes import setup_mode
 
 # Test case parameters
 MODE_SELECTION = 'demo'
+setup_mode(MODE_SELECTION)
 BASE_URL = 'http://www.hydroshare.org'
+
 # All
 DISCOVERY_TAB = SiteElement('li', the_id='dropdown-menu-search')
 # Discover page
@@ -33,13 +36,6 @@ def setup_driver():
     profile.set_preference("general.useragent.override", "CUAHSI-QA-Selenium")
     driver = webdriver.Firefox(profile)
     return driver
-
-# Simulation parameters
-modes = {'quick' : {'sleep_time' : 1},
-         'watch' : {'sleep_time' : 2},
-         'demo' : {'sleep_time' : 3},
-         'safe-demo' : {'sleep_time' : 4}}
-SLEEP_TIME = modes[MODE_SELECTION]['sleep_time']
 
 # Test cases definition
 class HydroshareTestCase(unittest.TestCase):
@@ -79,7 +75,7 @@ class HydroshareTestCase(unittest.TestCase):
         oracle()
         driver.quit()
 
-    def off_test_B_000003(self):
+    def todo_test_B_000003(self):
         """ Confirms Beaver Divide Air Temperature resource
         landing page is online via navigation and title check,
         then downloads the BagIt archive and confirms

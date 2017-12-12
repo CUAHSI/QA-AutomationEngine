@@ -4,9 +4,11 @@ import time
 from selenium import webdriver
 from site_element import SiteElement
 from selenium.webdriver.common.keys import Keys
+from modes import setup_mode
 
 # Test case parameters
 MODE_SELECTION = 'demo'
+setup_mode(MODE_SELECTION)
 BASE_URL = 'http://data.cuahsi.org'
 # Search interface
 SEARCH_NOW = SiteElement('button', the_id='btnSearchNow')
@@ -38,13 +40,6 @@ def setup_driver():
     profile.set_preference("general.useragent.override", "CUAHSI-QA-Selenium")
     driver = webdriver.Firefox(profile)
     return driver
-
-# Simulation parameters
-modes = {'quick' : {'sleep_time' : 1},
-         'watch' : {'sleep_time' : 2},
-         'demo' : {'sleep_time' : 3},
-         'safe-demo' : {'sleep_time' : 4}}
-SLEEP_TIME = modes[MODE_SELECTION]['sleep_time']
 
 # Test cases definition
 class HydroclientTestCase(unittest.TestCase):
@@ -138,7 +133,7 @@ class HydroclientTestCase(unittest.TestCase):
         oracle()
         driver.quit()
 
-    def off_test_A_000004(self):
+    def todo_test_A_000004(self):
         """ Confirms simultaneous searches for Lake Annie does not result
         in problematic behavior
         """
