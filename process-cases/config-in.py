@@ -7,6 +7,30 @@ hydroshare_file = '../hydroshare.py'
 hydroclient_file = '../hydroclient.py'
 config_file = '../config.org'
 
+CONFIG_OS = {0:"Windows 7",
+             1:"Windows 8",
+             2:"Windows 10",
+             3:"Ubuntu",
+             4:"CentOS"}
+CONFIG_BROWSER = {0:"Chrome",
+                  1:"Chromium",
+                  2:"Firefox",
+                  3:"Internet Explorer",
+                  4:"Microsoft Edge"}
+
+CONFIG_DESC = """
+CONFIG_OS = {0:"Windows 7",
+             1:"Windows 8",
+             2:"Windows 10",
+             3:"Ubuntu",
+             4:"CentOS"}
+CONFIG_BROWSER = {0:"Chrome",
+                  1:"Chromium",
+                  2:"Firefox",
+                  3:"Internet Explorer",
+                  4:"Microsoft Edge"}
+"""
+
 def add_cases(filename, config_lines):
     
     def add_description(config_lines, case_lines, j):
@@ -32,6 +56,17 @@ def add_cases(filename, config_lines):
         if description_line != '':
             config_lines += [description_line]
 
+    def add_env(config_lines, CONFIG_OS, CONFIG_BROWSER):
+        env_line = '*** '
+        env_line += '{OS:['
+        for os_option in CONFIG_OS.keys():
+            env_line += str(os_option) + ','
+        env_line += '],BROWSER:['
+        for browser_option in CONFIG_BROWSER.keys():
+            env_line += str(browser_option) + ','
+        env_line += ']}'
+        config_lines += [env_line]
+            
     with open(filename) as cases_file:
         case_lines = cases_file.readlines()
     case_lines = [x.strip('\n') for x in case_lines]
@@ -53,9 +88,11 @@ def add_cases(filename, config_lines):
             line_parse_two = line_parse_one.split('(')[0]
             new_config_line += line_parse_two
             config_lines += [new_config_line]
+            add_env(config_lines, CONFIG_OS, CONFIG_BROWSER)
             add_description(config_lines, case_lines, i+1)
 
-config_lines = ['* HydroClient [%] [/] ((' + hydroclient_file + '))']
+config_lines = [CONFIG_DESC]
+config_lines += ['* HydroClient [%] [/] ((' + hydroclient_file + '))']
 add_cases(hydroclient_file, config_lines)
 config_lines += ['* HydroShare [%] [/] ((' + hydroshare_file + '))']
 add_cases(hydroshare_file, config_lines)
