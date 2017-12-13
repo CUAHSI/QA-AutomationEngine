@@ -1,6 +1,9 @@
 """ Establishes parameters for test execution timing """
+
 def setup_mode(mode_selection):
-    """ Sets up sleep_time (wait time between browser manipulations """
+    """ Sets up sleep_time (wait time between browser manipulations)
+    based on specified mode of execution
+    """
     modes = {'quick' : {'sleep_time' : 1},
              'watch' : {'sleep_time' : 2},
              'demo' : {'sleep_time' : 3},

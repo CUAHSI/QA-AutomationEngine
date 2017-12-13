@@ -21,6 +21,48 @@ class SiteElement:
         of preferred identification methods (eg. by html element
         id is preferrable to html element class).
         """
+        def loc_by_id(self, the_driver):
+            """ Clicks on a website element, given the element type and id """
+            driver = the_driver
+            element_spec = "//" + self.element_type + \
+                           "[@id='" + self.element_id + "']"
+            element_pin = driver.find_element_by_xpath(element_spec)
+            return element_pin
+        
+        def loc_by_href(self, the_driver):
+            """ Clicks on a website element, given the element type and href """
+            driver = the_driver
+            element_spec = "//" + self.element_type + \
+                           "[contains(@href,'" + self.element_href + "')]"
+            element_pin = driver.find_element_by_xpath(element_spec)
+            return element_pin
+        
+        def loc_by_class(self, the_driver):
+            """ Clicks on a website element, given the element class.  If
+            multiple elements of the same class exist, the first one will
+            be clicked
+            """
+            driver = the_driver
+            element_spec = "//" + self.element_type + \
+                           "[@class='" + self.element_class + "']"
+            element_pin = driver.find_element_by_xpath(element_spec)
+            return element_pin
+        
+        def loc_by_content(self, the_driver):
+            """ Clicks on a website element, based the element text content """
+            driver = the_driver
+            element_spec = "//" + self.element_type + \
+                           "[contains(text(), '" + self.element_content + "')]"
+            element_pin = driver.find_element_by_xpath(element_spec)
+            return element_pin
+        
+        def loc_by_nothing(self, the_driver):
+            """ Selects a website element based only on the tag/type """
+            driver = the_driver
+            element_spec = "//" + self.element_type
+            element_pin = driver.find_element_by_xpath(element_spec)
+            return element_pin
+        
         if self.element_id is not None:
             the_element = self.loc_by_id(the_driver)
         elif self.element_href is not None:
@@ -58,48 +100,6 @@ class SiteElement:
         the_element = self.loc_it(the_driver)
         the_element.send_keys(input_text)
         time.sleep(sleep_time)
-
-    def loc_by_id(self, the_driver): #Dont call in scripts directly
-        """ Clicks on a website element, given the element type and id """
-        driver = the_driver
-        element_spec = "//" + self.element_type + \
-                       "[@id='" + self.element_id + "']"
-        element_pin = driver.find_element_by_xpath(element_spec)
-        return element_pin
-
-    def loc_by_href(self, the_driver): #Dont call in scripts directly
-        """ Clicks on a website element, given the element type and href """
-        driver = the_driver
-        element_spec = "//" + self.element_type + \
-                       "[contains(@href,'" + self.element_href + "')]"
-        element_pin = driver.find_element_by_xpath(element_spec)
-        return element_pin
-
-    def loc_by_class(self, the_driver): #Dont call in scripts directly
-        """ Clicks on a website element, given the element class.  If
-        multiple elements of the same class exist, the first one will
-        be clicked
-        """
-        driver = the_driver
-        element_spec = "//" + self.element_type + \
-                       "[@class='" + self.element_class + "']"
-        element_pin = driver.find_element_by_xpath(element_spec)
-        return element_pin
-
-    def loc_by_content(self, the_driver): #Dont call in scripts directly
-        """ Clicks on a website element, based the element text content """
-        driver = the_driver
-        element_spec = "//" + self.element_type + \
-                       "[contains(text(), '" + self.element_content + "')]"
-        element_pin = driver.find_element_by_xpath(element_spec)
-        return element_pin
-
-    def loc_by_nothing(self, the_driver): #Dont call in scripts directly
-        """ Selects a website element based only on the tag/type """
-        driver = the_driver
-        element_spec = "//" + self.element_type
-        element_pin = driver.find_element_by_xpath(element_spec)
-        return element_pin
 
     def get_text(self, the_driver):
         """ Returns content text of website element """

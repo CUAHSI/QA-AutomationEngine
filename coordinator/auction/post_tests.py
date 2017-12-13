@@ -6,7 +6,7 @@ XML_FILE = 'auction_page/templates/auctions.xml'
 class TestCase:
     """ Test case class for storing status and env information """
 
-    def __init__(self, test_id, status=None, op_sys=None, browser=None):
+    def __init__(self, test_id=None, status=None, op_sys=None, browser=None):
         self.test_id = test_id
         self.status = status
         self.op_sys = op_sys
@@ -32,29 +32,31 @@ class TestCase:
         print('Browser', second_split[-1].split(',')[0:-1])
         self.browser = second_split[-1].split(',')[0:-1]
 
+    def pull_id(self, line_with_id):
+        """ Parse config file line and set id property """
+        space_split = line_with_id.split(' ')
+        self.test_id = space_split[-1]
+        
+    def pull_status(self, line_with_status):
+        """ Parse config file line and set status property """
+        space_split = line_with_status.split(' ')
+        if 'TODO' in space_split:
+            self.status = 'TODO'
+        elif 'DONE' in space_split:
+            self.status = 'DONE'
+        else:
+            self.status = 'NONE'
 
-def pull_states(config_lines, j):
+def system_cases(config_lines, j):
     """ Pulls state and environment information from configuration file
     lines
     """
-
-    def get_state(config_line):
-        """ Get the test case state from config file """
-        space_split = config_line.split(' ')
-        test_case_id = space_split[-1]
-        new_case = TestCase(test_case_id)
-        if 'TODO' in space_split:
-            new_case.status = 'TODO'
-        elif 'DONE' in space_split:
-            new_case.status = 'DONE'
-        else:
-            new_case.status = 'NONE'
-        return new_case
-
     state_set = []
     while config_lines[j].split(' ')[0] != '*': # System line
         if config_lines[j].split(' ')[0] == '**': # Case line
-            state_set += [get_state(config_lines[j])]
+            state_set += [TestCase()]
+            state_set[-1].pull_id(config_lines[j])
+            state_set[-1].pull_status(config_lines[j])
         elif config_lines[j].split(' ')[0] == '***': # Env/desc line
             if ('BROWSER' in config_lines[j]) and ('OS' in config_lines[j]):
                 state_set[-1].pull_os(config_lines[j])
@@ -72,7 +74,7 @@ def system_sets(config_lines):
             config_line_1 = config_lines[i].split('((')[1]
             config_line_2 = config_line_1.split('))')[0]
             system_filename = config_line_2
-            case_states = pull_states(config_lines, i+1)
+            case_states = system_cases(config_lines, i+1)
             all_suites.update({system_filename:case_states})
     return all_suites
 
