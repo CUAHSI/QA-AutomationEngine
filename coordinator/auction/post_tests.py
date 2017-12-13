@@ -19,7 +19,6 @@ class TestCase:
             line_with_os = line_with_os.replace(string_to_remove, '')
         first_split = line_with_os.split('OS:')[-1]
         second_split = first_split.split(',BROWSER:')
-        print('OS', second_split[0].split(',')[0:-1])
         self.op_sys = second_split[0].split(',')[0:-1]
 
     def pull_browser(self, line_with_browser):
@@ -29,7 +28,6 @@ class TestCase:
             line_with_browser = line_with_browser.replace(string_to_remove, '')
         first_split = line_with_browser.split('OS:')[-1]
         second_split = first_split.split(',BROWSER:')
-        print('Browser', second_split[-1].split(',')[0:-1])
         self.browser = second_split[-1].split(',')[0:-1]
 
     def pull_id(self, line_with_id):
