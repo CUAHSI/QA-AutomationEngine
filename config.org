@@ -1,0 +1,38 @@
+
+CONFIG_OS = {0:"Windows 7",
+             1:"Windows 8",
+             2:"Windows 10",
+             3:"Ubuntu",
+             4:"CentOS"}
+CONFIG_BROWSER = {0:"Chrome",
+                  1:"Chromium",
+                  2:"Firefox",
+                  3:"Internet Explorer",
+                  4:"Microsoft Edge"}
+
+* HydroClient [75%] [3/4] ((../hydroclient.py))
+** DONE A_000001
+*** {OS:[0,1,2,3,4,],BROWSER:[0,1,2,3,4,]}
+*** Confirms homepage online via page title 
+** DONE A_000002
+*** {OS:[0,1,2,3,4,],BROWSER:[0,1,2,3,4,]}
+*** Confirms metadata available through HydroClient and that a sample of the data downloads successfully 
+** DONE A_000003
+*** {OS:[0,1,2,3,4,],BROWSER:[0,1,2,3,4,]}
+*** Confirms repeated search for Lake Annie does not result in problematic behavior 
+** TODO A_000004
+*** {OS:[0,1,2,3,4,],BROWSER:[0,1,2,3,4,]}
+*** Confirms simultaneous searches for Lake Annie does not result in problematic behavior 
+* HydroShare [25%] [1/4] ((../hydroshare.py))
+** TODO B_000001
+*** {OS:[0,1,2,3,4,],BROWSER:[0,1,2,3,4,]}
+*** Confirms homepage online via page title 
+** TODO B_000002
+*** {OS:[0,1,2,3,4,],BROWSER:[0,1,2,3,4,]}
+*** Confirms discovery page is online via navigation and title check 
+** TODO B_000003
+*** {OS:[0,1,2,3,4,],BROWSER:[0,1,2,3,4,]}
+*** Confirms Beaver Divide Air Temperature resource landing page is online via navigation and title check, then downloads the BagIt archive and confirms 
+** DONE B_000004
+*** {OS:[0,1,2,3,4,],BROWSER:[0,1,2,3,4,]}
+*** Confirms date filtering functionality, as well as map view functionality 
