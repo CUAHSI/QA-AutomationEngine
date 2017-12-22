@@ -9,7 +9,7 @@ from modes import setup_mode
 # Test case parameters
 MODE_SELECTION = 'demo'
 SLEEP_TIME = setup_mode(MODE_SELECTION)
-BASE_URL = 'http://www.hydroshare.org'
+BASE_URL = parser.addoption("--url", action="store", default="http://www.hydroshare.org", help="url")
 
 # All
 DISCOVERY_TAB = SiteElement('li', the_id='dropdown-menu-search')
