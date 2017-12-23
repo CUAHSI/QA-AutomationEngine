@@ -11,12 +11,13 @@ class SiteElement:
     """
 
     def __init__(self, el_type=None, el_id=None, el_content=None,
-                 el_href=None, el_class=None):
+                 el_href=None, el_class=None, el_dom=None):
         self.el_type = el_type
         self.el_id = el_id
         self.el_content = el_content
         self.el_href = el_href
         self.el_class = el_class
+        self.el_dom = el_dom
 
     def loc_it(self, the_driver):
         """ Identifies element on page, based on a hierarchy
@@ -54,6 +55,13 @@ class SiteElement:
                            "[contains(text(), '" + self.el_content + "')]"
             target_element = driver.find_element_by_xpath(element_xpath)
             return target_element
+
+        def loc_by_dom(self, the_driver):
+            """ Locates a website element given DOM path to element """
+            driver = the_driver
+            element_xpath = self.el_dom
+            target_element = driver.find_element_by_xpath(element_xpath)
+            return target_element
         
         def loc_by_nothing(self, the_driver):
             """ Locates a website element based only on the tag/type """
@@ -70,6 +78,8 @@ class SiteElement:
             target_element = self.loc_by_class(the_driver)
         elif self.el_content is not None:
             target_element = self.loc_by_content(the_driver)
+        elif self.el_dom is not None:
+            target_element = self.loc_by_dom(the_driver)
         else:
             target_element = self.loc_by_nothing(the_driver)
         return target_element
