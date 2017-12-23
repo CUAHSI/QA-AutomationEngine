@@ -24,7 +24,7 @@ class SiteElement:
         of preferred identification methods (eg. by html element
         id is preferrable to html element class).
         """
-        def loc_by_id(self, the_driver):
+        def loc_by_id(the_driver):
             """ Locates a website element, given the element type and id """
             driver = the_driver
             element_xpath = "//" + self.el_type + \
@@ -32,7 +32,7 @@ class SiteElement:
             target_element = driver.find_element_by_xpath(element_xpath)
             return target_element
         
-        def loc_by_href(self, the_driver):
+        def loc_by_href(the_driver):
             """ Locates a website element, given the element type and href """
             driver = the_driver
             element_xpath = "//" + self.el_type + \
@@ -40,7 +40,7 @@ class SiteElement:
             target_element = driver.find_element_by_xpath(element_xpath)
             return target_element
         
-        def loc_by_class(self, the_driver):
+        def loc_by_class(the_driver):
             """ Locates a website element, given the element class """
             driver = the_driver
             element_xpath = "//" + self.el_type + \
@@ -48,7 +48,7 @@ class SiteElement:
             target_element = driver.find_element_by_xpath(element_xpath)
             return target_element
         
-        def loc_by_content(self, the_driver):
+        def loc_by_content(the_driver):
             """ Locates a website element, based the element text content """
             driver = the_driver
             element_xpath = "//" + self.el_type + \
@@ -56,14 +56,14 @@ class SiteElement:
             target_element = driver.find_element_by_xpath(element_xpath)
             return target_element
 
-        def loc_by_dom(self, the_driver):
+        def loc_by_dom(the_driver):
             """ Locates a website element given DOM path to element """
             driver = the_driver
             element_xpath = self.el_dom
             target_element = driver.find_element_by_xpath(element_xpath)
             return target_element
         
-        def loc_by_nothing(self, the_driver):
+        def loc_by_nothing(the_driver):
             """ Locates a website element based only on the tag/type """
             driver = the_driver
             element_xpath = "//" + self.el_type
@@ -71,17 +71,17 @@ class SiteElement:
             return target_element
         
         if self.el_id is not None:
-            target_element = self.loc_by_id(the_driver)
+            target_element = loc_by_id(the_driver)
         elif self.el_href is not None:
-            target_element = self.loc_by_href(the_driver)
+            target_element = loc_by_href(the_driver)
         elif self.el_class is not None:
-            target_element = self.loc_by_class(the_driver)
+            target_element = loc_by_class(the_driver)
         elif self.el_content is not None:
-            target_element = self.loc_by_content(the_driver)
+            target_element = loc_by_content(the_driver)
         elif self.el_dom is not None:
-            target_element = self.loc_by_dom(the_driver)
+            target_element = loc_by_dom(the_driver)
         else:
-            target_element = self.loc_by_nothing(the_driver)
+            target_element = loc_by_nothing(the_driver)
         return target_element
 
     def click_it(self, the_driver, sleep_time):

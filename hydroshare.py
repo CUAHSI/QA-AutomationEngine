@@ -2,6 +2,7 @@
 import unittest
 import os
 import time
+# import argparse
 from selenium import webdriver
 from site_element import SiteElement
 from modes import setup_mode
@@ -9,24 +10,29 @@ from modes import setup_mode
 # Test case parameters
 MODE_SELECTION = 'demo'
 SLEEP_TIME = setup_mode(MODE_SELECTION)
-BASE_URL = parser.addoption("--url", action="store", default="http://www.hydroshare.org", help="url")
+# PARSER = argparse.ArgumentParser(description='Run hydroshare test suite.')
+# PARSER.add_argument('-u', '--url', required=False, help='URL for testing')
+# ARGS = PARSER.parse_args()
+# BASE_URL = ARGS.url
+# if BASE_URL is None:
+BASE_URL = "http://www.hydroshare.org" # Default
 
 # All
-DISCOVERY_TAB = SiteElement('li', the_id='dropdown-menu-search')
+DISCOVERY_TAB = SiteElement('li', el_id='dropdown-menu-search')
 # Discover page
-DISCOVER_START_DATE = SiteElement('input', the_id='id_start_date')
-DISCOVER_END_DATE = SiteElement('input', the_id='id_end_date')
-DISCOVER_VIEW_MAP_TAB = SiteElement('a', the_href='map-view')
-DISCOVER_MAP_SEARCH = SiteElement('input', the_id='geocoder-address')
-DISCOVER_MAP_SEARCH_SUBMIT = SiteElement('a', the_id='geocoder-submit')
-DISCOVER_VIEW_LIST_TAB = SiteElement('a', the_content='List')
-IUTAH_SUBJECTS_FILTER = SiteElement('input', the_id='subjects-iUTAH')
-GENERIC_RESOURCE_TYPE_FILTER = SiteElement('input', the_id='resource_type-Generic')
-IS_DISCOVERABLE_FILTER = SiteElement('input', the_id='discoverable-true')
-IS_PUBLIC_FILTER = SiteElement('input', the_id='public-true')
-BEAVER_DIVIDE_RESC = SiteElement('a', the_content='Beaver Divide Air Temperature')
+DISCOVER_START_DATE = SiteElement('input', el_id='id_start_date')
+DISCOVER_END_DATE = SiteElement('input', el_id='id_end_date')
+DISCOVER_VIEW_MAP_TAB = SiteElement('a', el_href='map-view')
+DISCOVER_MAP_SEARCH = SiteElement('input', el_id='geocoder-address')
+DISCOVER_MAP_SEARCH_SUBMIT = SiteElement('a', el_id='geocoder-submit')
+DISCOVER_VIEW_LIST_TAB = SiteElement('a', el_content='List')
+IUTAH_SUBJECTS_FILTER = SiteElement('input', el_id='subjects-iUTAH')
+GENERIC_RESOURCE_TYPE_FILTER = SiteElement('input', el_id='resource_type-Generic')
+IS_DISCOVERABLE_FILTER = SiteElement('input', el_id='discoverable-true')
+IS_PUBLIC_FILTER = SiteElement('input', el_id='public-true')
+BEAVER_DIVIDE_RESC = SiteElement('a', el_content='Beaver Divide Air Temperature')
 # Resource landing page from Discover
-DOWNLOAD_BAGIT = SiteElement('a', the_id='btn-download-all', the_content=\
+DOWNLOAD_BAGIT = SiteElement('a', el_id='btn-download-all', el_content=\
                              'Download All Content as Zipped BagIt Archive')
 BEAVER_DIVIDE_ZIP_SIZE = 512000
 
@@ -46,7 +52,7 @@ class HydroshareTestCase(unittest.TestCase):
         self.browser = webdriver.Firefox()
         self.addCleanup(self.browser.quit)
 
-    def todo_test_B_000001(self):
+    def test_B_000001(self):
         """ Confirms homepage online via page title """
         def oracle():
             """ The Hydroshare homepage is online """
@@ -58,7 +64,7 @@ class HydroshareTestCase(unittest.TestCase):
         oracle()
         driver.quit()
 
-    def todo_test_B_000002(self):
+    def test_B_000002(self):
         """ Confirms discovery page is online via navigation
         and title check
         """

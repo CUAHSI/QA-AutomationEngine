@@ -11,26 +11,26 @@ MODE_SELECTION = 'demo'
 SLEEP_TIME = setup_mode(MODE_SELECTION)
 BASE_URL = 'http://data.cuahsi.org'
 # Search interface
-SEARCH_NOW = SiteElement('button', the_id='btnSearchNow')
-FILTER_RESULTS = SiteElement('button', the_id='btnSearchSummary')
-LOCATION_SEARCH_BOX = SiteElement('input', the_id='pac-input')
-SERVICE_SEARCH = SiteElement('button', the_id='btnSelectDataServices',
-                             the_content='Data Service(s)...')
-SERVICE_ORGANIZATION_SORT = SiteElement('th', the_content='Organization')
+SEARCH_NOW = SiteElement('button', el_id='btnSearchNow')
+FILTER_RESULTS = SiteElement('button', el_id='btnSearchSummary')
+LOCATION_SEARCH_BOX = SiteElement('input', el_id='pac-input')
+SERVICE_SEARCH = SiteElement('button', el_id='btnSelectDataServices',
+                             el_content='Data Service(s)...')
+SERVICE_ORGANIZATION_SORT = SiteElement('th', el_content='Organization')
 SERVICE_ARCHBOLD_SEARCH = SiteElement('td',
-                                      the_content='Archbold Biological Station')
-SERVICE_SEARCH_SAVE = SiteElement('button', the_id='btnServicesModalSave')
-NUM_SEARCH_RESULTS = SiteElement('span', the_id='timeseriesFoundOrFilteredCount')
+                                      el_content='Archbold Biological Station')
+SERVICE_SEARCH_SAVE = SiteElement('button', el_id='btnServicesModalSave')
+NUM_SEARCH_RESULTS = SiteElement('span', el_id='timeseriesFoundOrFilteredCount')
 # Filter interface
-FILTER_COL_DATA_TYPE = SiteElement('th', the_content='Data Type')
-SELECT_ACTION = SiteElement('div', the_id='ddActionsDSR')
-WORKSPACE_SELECTION = SiteElement('a', the_id='anchorAddSelectionsToWorkspaceDSR')
-VIEW_EXPORTS = SiteElement('button', the_id='tableModal-DownloadMgrSearchSummary')
-VIEW_WORKSPACE = SiteElement('button', the_id='tableModal-DataMgrSearchSummary')
-CLOSE_FILTER = SiteElement('button', the_id='closeSearchSummary')
-FILTER_TABLE = SiteElement('table', the_id='tblDetailedSearchResults')
+FILTER_COL_DATA_TYPE = SiteElement('th', el_content='Data Type')
+SELECT_ACTION = SiteElement('div', el_id='ddActionsDSR')
+WORKSPACE_SELECTION = SiteElement('a', el_id='anchorAddSelectionsToWorkspaceDSR')
+VIEW_EXPORTS = SiteElement('button', el_id='tableModal-DownloadMgrSearchSummary')
+VIEW_WORKSPACE = SiteElement('button', el_id='tableModal-DataMgrSearchSummary')
+CLOSE_FILTER = SiteElement('button', el_id='closeSearchSummary')
+FILTER_TABLE = SiteElement('table', el_id='tblDetailedSearchResults')
 FILTER_TABLE_DIVE = [SiteElement('tbody'),
-                     SiteElement('tr', the_class='disable-selection even'),
+                     SiteElement('tr', el_class='disable-selection even'),
                      SiteElement('td'),
                      SiteElement('div')]
 
@@ -106,7 +106,7 @@ class HydroclientTestCase(unittest.TestCase):
         oracle()
         driver.quit()
 
-    def test_A_000003(self):
+    def todo_test_A_000003(self):
         """ Confirms repeated search for Lake Annie does not result
         in problematic behavior
         """
