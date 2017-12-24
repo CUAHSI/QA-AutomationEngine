@@ -40,8 +40,8 @@ def setup_driver():
     """ Setup driver for use in automation tests """
     profile = webdriver.FirefoxProfile()
     profile.set_preference("general.useragent.override", "CUAHSI-QA-Selenium")
-    driver = webdriver.Remote(command_executor='http://http://10.202.2.166:4444/wd/hub',
-                              desired_capabilities={'browserName': 'firefox', 'javascriptEnabled': True})
+    driver = webdriver.Remote(command_executor='http://10.202.2.166:4444/wd/hub',
+                              desired_capabilities={'browserName': 'firefox'})
     return driver
 
 # Test cases definition
@@ -50,8 +50,8 @@ class HydroshareTestCase(unittest.TestCase):
 
     def setUp(self):
         """ Sets up browser for future tests """
-        self.browser = webdriver.Firefox()
-        self.addCleanup(self.browser.quit)
+        # self.browser = webdriver.Firefox()
+        # self.addCleanup(self.browser.quit)
 
     def test_B_000001(self):
         """ Confirms homepage online via page title """
