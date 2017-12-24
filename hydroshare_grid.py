@@ -40,7 +40,8 @@ def setup_driver():
     """ Setup driver for use in automation tests """
     profile = webdriver.FirefoxProfile()
     profile.set_preference("general.useragent.override", "CUAHSI-QA-Selenium")
-    driver = webdriver.Firefox(profile)
+    driver = webdriver.Remote(command_executor='http://http://10.202.2.166:4444/wd/hub',
+                              desired_capabilities={'browserName': 'firefox', 'javascriptEnabled': True})
     return driver
 
 # Test cases definition
