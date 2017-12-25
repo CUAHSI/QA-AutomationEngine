@@ -10,12 +10,7 @@ from modes import setup_mode
 # Test case parameters
 MODE_SELECTION = 'demo'
 SLEEP_TIME = setup_mode(MODE_SELECTION)
-# PARSER = argparse.ArgumentParser(description='Run hydroshare test suite.')
-# PARSER.add_argument('-u', '--url', required=False, help='URL for testing')
-# ARGS = PARSER.parse_args()
-# BASE_URL = ARGS.url
-# if BASE_URL is None:
-BASE_URL = "http://www.hydroshare.org" # Default
+BASE_URL = "http://www.hydroshare.org"
 
 # All
 DISCOVERY_TAB = SiteElement('li', el_id='dropdown-menu-search')
@@ -34,7 +29,7 @@ BEAVER_DIVIDE_RESC = SiteElement('a', el_content='Beaver Divide Air Temperature'
 # Resource landing page from Discover
 DOWNLOAD_BAGIT = SiteElement('a', el_id='btn-download-all', el_content=\
                              'Download All Content as Zipped BagIt Archive')
-BEAVER_DIVIDE_ZIP_SIZE = 512000
+BEAVER_DIVIDE_ZIP_SIZE = 512000 # Bytes
 
 def setup_driver():
     """ Setup driver for use in automation tests """
@@ -44,14 +39,12 @@ def setup_driver():
                               desired_capabilities={'browserName': 'firefox'})
     return driver
 
+def teardown_driver(driver):
+    driver.quit()
+
 # Test cases definition
 class HydroshareTestCase(unittest.TestCase):
     """ Python unittest setup for smoke tests """
-
-    def setUp(self):
-        """ Sets up browser for future tests """
-        # self.browser = webdriver.Firefox()
-        # self.addCleanup(self.browser.quit)
 
     def test_B_000001(self):
         """ Confirms homepage online via page title """
@@ -63,7 +56,7 @@ class HydroshareTestCase(unittest.TestCase):
         driver.get(BASE_URL)
         time.sleep(SLEEP_TIME)
         oracle()
-        driver.quit()
+        teardown_driver(driver)
 
     def test_B_000002(self):
         """ Confirms discovery page is online via navigation
@@ -80,7 +73,7 @@ class HydroshareTestCase(unittest.TestCase):
         driver.get(BASE_URL)
         DISCOVERY_TAB.click_it(driver, SLEEP_TIME)
         oracle()
-        driver.quit()
+        teardown_driver(driver)
 
     def todo_test_B_000003(self):
         """ Confirms Beaver Divide Air Temperature resource
@@ -117,7 +110,7 @@ class HydroshareTestCase(unittest.TestCase):
         file_size = os.stat(download_file).st_size
         # Confirm the downloaded file size matches expectation
         oracle()
-        driver.quit()
+        teardown_driver(driver)
 
     def test_B_000004(self):
         """ Confirms date filtering functionality, as well as
@@ -139,7 +132,7 @@ class HydroshareTestCase(unittest.TestCase):
         DISCOVER_VIEW_LIST_TAB.click_it(driver, SLEEP_TIME)
         time.sleep(5)
         oracle()
-        driver.quit()
+        teardown_driver(driver)
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)
