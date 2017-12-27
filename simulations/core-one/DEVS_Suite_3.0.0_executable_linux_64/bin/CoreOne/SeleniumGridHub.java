@@ -15,25 +15,34 @@ import model.simulation.*;
 import view.modeling.ViewableAtomic;
 import view.simView.*;
 
-public class hub extends ViewableAtomic {// ViewableAtomic is used instead
+public class SeleniumGridHub extends ViewableAtomic {// ViewableAtomic is used instead
     // of atomic due to its
     // graphics capability
     protected Queue jobs_queue;
     protected int number_nodes;
     protected int number_jobs;
     protected int node_ready;
+    protected int jobs_complete;
     protected entity next_job;
     
-    public hub() {
-	this("hub", 3, 10);
+    public SeleniumGridHub() {
+	this("SeleniumGridHub", 3, 10);
     }
     
-    public hub(String name, int Number_nodes, int Number_jobs) {
+    public SeleniumGridHub(String name, int Number_nodes, int Number_jobs) {
 	super(name);
-	for (int i=0; i<number_nodes; i++){
-	    addOutport("out"+Integer.toString(i));
-	    addInport("status"+Integer.toString(i));
-	}
+	addInport("control");
+	addInport("status0");
+	addInport("status1");
+	addInport("status2");
+	addOutport("out0");
+	addOutport("out1");
+	addOutport("out2");
+	// for (int i=0; i<number_nodes; i++){
+	//     addInport("status"+Integer.toString(i));
+	//     addOutport("out"+Integer.toString(i));
+	// }
+	addOutport("suite-status");
 	number_nodes = Number_nodes;
 	number_jobs = Number_jobs;
 	addTestInput("status1", new entity("free"));
@@ -41,10 +50,11 @@ public class hub extends ViewableAtomic {// ViewableAtomic is used instead
     }
 
     public void initialize() {
-	phase = "initials";
-	sigma = 0;
+	phase = "passive";
+	sigma = INFINITY;
 	jobs_queue = new Queue();
 	node_ready = 1;
+	jobs_complete = 0;
 	for (int i=0; i<number_jobs; i++){
 	    entity job = new entity("job"+Integer.toString(i));
 	    jobs_queue.add(job);
@@ -55,12 +65,22 @@ public class hub extends ViewableAtomic {// ViewableAtomic is used instead
     public void deltext(double e, message x) {
 	Continue(e);
 
-	for (int i=0; i<x.getLength(); i++)
+	for (int i=0; i<x.getLength(); i++) {
 	    for (int j=0; j<number_nodes; j++)
 		if (messageOnPort(x, "status"+Integer.toString(j), i)) {
 		    node_ready = j;
-		    holdIn("transmitting", 0);
+		    jobs_complete += 1;
+		    System.out.println(jobs_complete);
+		    System.out.println(number_nodes);
+		    if (jobs_complete == number_jobs) {
+			holdIn("done", 0);
+		    } else {
+			holdIn("transmitting", 0);
+		    }
 		}
+	    if (messageOnPort(x, "control", i))
+		holdIn("initials", 0);
+	}
     }
 
     
@@ -83,12 +103,14 @@ public class hub extends ViewableAtomic {// ViewableAtomic is used instead
 		    m.add(makeContent("out"+Integer.toString(i), next_job));
 		}
 	    }
-	}
-	if (phaseIs("transmitting")){
+	} else if (phaseIs("transmitting")){
 	    if (jobs_queue.size() > 0) {
 		next_job = (entity)jobs_queue.remove();
 		m.add(makeContent("out"+Integer.toString(node_ready), next_job));
 	    }
+	} else if (phaseIs("done")){
+	    entity completion = new entity("Done");
+	    m.add(makeContent("suite-status", completion));
 	}
 	return m;
     }

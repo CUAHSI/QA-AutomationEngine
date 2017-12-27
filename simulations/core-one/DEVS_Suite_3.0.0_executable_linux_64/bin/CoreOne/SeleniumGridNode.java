@@ -18,17 +18,17 @@ import model.simulation.*;
 import view.modeling.ViewableAtomic;
 import view.simView.*;
 
-public class executor extends ViewableAtomic {// ViewableAtomic is used instead
+public class SeleniumGridNode extends ViewableAtomic {// ViewableAtomic is used instead
 	// of atomic due to its
 	// graphics capability
 	protected entity job;
 	protected double processing_fitness;
 
-	public executor() {
-	    this("executor", 1);
+	public SeleniumGridNode() {
+	    this("SeleniumGridNode", 1);
 	}
 
-	public executor(String name, double Processing_fitness) {
+	public SeleniumGridNode(String name, double Processing_fitness) {
 		super(name);
 		addInport("in");
 		addOutport("out");

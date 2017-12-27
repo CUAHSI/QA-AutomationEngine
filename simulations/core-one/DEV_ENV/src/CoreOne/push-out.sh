@@ -1,18 +1,38 @@
-javac -classpath .:.. executor.java
-javac -classpath .:.. hub.java
-javac -classpath .:.. AutomatedTestingEngine.java
-chmod 755 executor.java
-chmod 755 executor.class
-chmod 755 hub.java
-chmod 755 hub.class
-chmod 755 AutomatedTestingEngine.java
-chmod 755 AutomatedTestingEngine.class
-cp executor.java ../../../DEVS_Suite_3.0.0_executable_linux_64/bin/CoreOne/
-cp executor.java ../../../DEVS_Suite_3.0.0_executable_linux_64/src/CoreOne/
-cp executor.class ../../../DEVS_Suite_3.0.0_executable_linux_64/src/CoreOne/
-cp hub.java ../../../DEVS_Suite_3.0.0_executable_linux_64/bin/CoreOne/
-cp hub.java ../../../DEVS_Suite_3.0.0_executable_linux_64/src/CoreOne/
-cp hub.class ../../../DEVS_Suite_3.0.0_executable_linux_64/src/CoreOne/
-cp AutomatedTestingEngine.java ../../../DEVS_Suite_3.0.0_executable_linux_64/bin/CoreOne/
-cp AutomatedTestingEngine.java ../../../DEVS_Suite_3.0.0_executable_linux_64/src/CoreOne/
-cp AutomatedTestingEngine.class ../../../DEVS_Suite_3.0.0_executable_linux_64/src/CoreOne/
+javac -classpath .:.. SeleniumGridNode.java
+javac -classpath .:.. SeleniumGridHub.java
+javac -classpath .:.. TestingEngine.java
+javac -classpath .:.. Jenkins.java
+javac -classpath .:.. GithubRepo.java
+javac -classpath .:.. JenkinsCoord.java
+chmod 755 SeleniumGridNode.java
+chmod 755 SeleniumGridNode.class
+chmod 755 SeleniumGridHub.java
+chmod 755 SeleniumGridHub.class
+chmod 755 TestingEngine.java
+chmod 755 TestingEngine.class
+chmod 755 Jenkins.java
+chmod 755 Jenkins.class
+chmod 755 GithubRepo.java
+chmod 755 GithubRepo.class
+chmod 755 JenkinsCoord.java
+chmod 755 JenkinsCoord.class
+rm ../../../DEVS_Suite_3.0.0_executable_linux_64/bin/CoreOne/*
+rm ../../../DEVS_Suite_3.0.0_executable_linux_64/src/CoreOne/*
+cp SeleniumGridNode.java ../../../DEVS_Suite_3.0.0_executable_linux_64/bin/CoreOne/
+cp SeleniumGridNode.java ../../../DEVS_Suite_3.0.0_executable_linux_64/src/CoreOne/
+cp SeleniumGridNode.class ../../../DEVS_Suite_3.0.0_executable_linux_64/src/CoreOne/
+cp SeleniumGridHub.java ../../../DEVS_Suite_3.0.0_executable_linux_64/bin/CoreOne/
+cp SeleniumGridHub.java ../../../DEVS_Suite_3.0.0_executable_linux_64/src/CoreOne/
+cp SeleniumGridHub.class ../../../DEVS_Suite_3.0.0_executable_linux_64/src/CoreOne/
+cp TestingEngine.java ../../../DEVS_Suite_3.0.0_executable_linux_64/bin/CoreOne/
+cp TestingEngine.java ../../../DEVS_Suite_3.0.0_executable_linux_64/src/CoreOne/
+cp TestingEngine.class ../../../DEVS_Suite_3.0.0_executable_linux_64/src/CoreOne/
+cp Jenkins.java ../../../DEVS_Suite_3.0.0_executable_linux_64/bin/CoreOne/
+cp Jenkins.java ../../../DEVS_Suite_3.0.0_executable_linux_64/src/CoreOne/
+cp Jenkins.class ../../../DEVS_Suite_3.0.0_executable_linux_64/src/CoreOne/
+cp GithubRepo.java ../../../DEVS_Suite_3.0.0_executable_linux_64/bin/CoreOne/
+cp GithubRepo.java ../../../DEVS_Suite_3.0.0_executable_linux_64/src/CoreOne/
+cp GithubRepo.class ../../../DEVS_Suite_3.0.0_executable_linux_64/src/CoreOne/
+cp JenkinsCoord.java ../../../DEVS_Suite_3.0.0_executable_linux_64/bin/CoreOne/
+cp JenkinsCoord.java ../../../DEVS_Suite_3.0.0_executable_linux_64/src/CoreOne/
+cp JenkinsCoord.class ../../../DEVS_Suite_3.0.0_executable_linux_64/src/CoreOne/
