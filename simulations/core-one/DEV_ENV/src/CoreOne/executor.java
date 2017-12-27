@@ -9,7 +9,7 @@
  *  "jobs" to be processed.  The processing time for the received job is set as a random integer (0,300) multiplied by
  *  the executors "fitness" (default value of 1).
  */
-package ;
+package CoreOne;
 
 import java.util.Random;
 import GenCol.*;
