@@ -1,10 +1,15 @@
 /*     
- *    
- *  Author     : Savitha and Anindita ACIMS(Arizona Centre for Integrative Modeling & Simulation)
- *  Version    : DEVSJAVA 2.7 
- *  Date       : 15-April-2012
+ *  Module Author         : Neal DeBuhr
+ *  Module Date           : 27-December-2017  
+ *  DEVS Suite Author     : Savitha and Anindita ACIMS(Arizona Centre for Integrative Modeling & Simulation)
+ *  DEVS Version          : DEVSJAVA 2.7 
+ *  DEVS Date             : 15-April-2012
+ *
+ *  This component system acts as a test case executor, for example a Selenium Grid node.  The test cases are modeled as
+ *  "jobs" to be processed.  The processing time for the received job is set as a random integer (0,300) multiplied by
+ *  the executors "fitness" (default value of 1).
  */
-package DjangoXml;
+package ;
 
 import java.util.Random;
 import GenCol.*;
@@ -59,7 +64,7 @@ public class executor extends ViewableAtomic {// ViewableAtomic is used instead
 					int processing_time = randomGenerator.nextInt(300);
 					processing_time *= processing_fitness
 					holdIn("busy", processing_time);
-					System.out.println("processing tiem of proc is"
+					System.out.println("processing time of proc is"
 							+ processing_time);
 				}
 		
@@ -74,6 +79,8 @@ public class executor extends ViewableAtomic {// ViewableAtomic is used instead
 	}
 
 	public void deltcon(double e, message x) {
+	    // Job finishes processing before receiving next job, should
+	    // these events be scheduled for the same time
 		System.out.println("confluent");
 		deltint();
 		deltext(0, x);
