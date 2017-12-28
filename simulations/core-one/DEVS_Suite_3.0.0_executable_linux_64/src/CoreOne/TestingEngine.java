@@ -33,22 +33,26 @@ public class TestingEngine extends ViewableDigraph {
 	ViewableAtomic node0 = new SeleniumGridNode("SeleniumGridNode0", 1);
 	ViewableAtomic node1 = new SeleniumGridNode("SeleniumGridNode1", 1);
 	ViewableAtomic node2 = new SeleniumGridNode("SeleniumGridNode2", 1);
+	ViewableAtomic site = new SimpleDjangoSite();
 	
 	add(jenkins);
 	add(github);
 	add(node0);
 	add(node1);
 	add(node2);
+	add(site);
 	
-	addCoupling(github, "out", jenkins, "GithubIn");
-	addCoupling(jenkins, "GithubOut", github, "in");
+	addCoupling(github, "out", jenkins, "github-in");
+	addCoupling(jenkins, "github-out", github, "in");
 
-	addCoupling(node0, "out", jenkins, "executor0in");
-	addCoupling(node1, "out", jenkins, "executor1in");
-	addCoupling(node2, "out", jenkins, "executor2in");
-	addCoupling(jenkins, "executor0out", node0, "in");
-	addCoupling(jenkins, "executor1out", node1, "in");
-	addCoupling(jenkins, "executor2out", node2, "in");
+	addCoupling(node0, "out", jenkins, "executor0-in");
+	addCoupling(node1, "out", jenkins, "executor1-in");
+	addCoupling(node2, "out", jenkins, "executor2-in");
+	addCoupling(jenkins, "executor0-out", node0, "in");
+	addCoupling(jenkins, "executor1-out", node1, "in");
+	addCoupling(jenkins, "executor2-out", node2, "in");
+
+	addCoupling(jenkins, "results", site, "in");
     }
     
     /**
@@ -57,7 +61,12 @@ public class TestingEngine extends ViewableDigraph {
      */
     public void layoutForSimView()
     {
-        preferredSize = new Dimension(591, 269);
-	
+        preferredSize = new Dimension(1124, 597);
+        ((ViewableComponent)withName("SimpleDjangoSite")).setPreferredLocation(new Point(760, 493));
+        ((ViewableComponent)withName("Jenkins")).setPreferredLocation(new Point(25, 20));
+        ((ViewableComponent)withName("SeleniumGridNode1")).setPreferredLocation(new Point(793, 99));
+        ((ViewableComponent)withName("SeleniumGridNode2")).setPreferredLocation(new Point(790, 216));
+        ((ViewableComponent)withName("SeleniumGridNode0")).setPreferredLocation(new Point(789, 9));
+        ((ViewableComponent)withName("GithubRepo")).setPreferredLocation(new Point(258, 545));
     }
 }

@@ -47,12 +47,6 @@ public class SeleniumGridNode extends ViewableAtomic {// ViewableAtomic is used 
 	public void deltext(double e, message x) {
 		Continue(e);
 
-		System.out.println("The elapsed time of the processor is" + e);
-		System.out.println("*****************************************");
-		System.out.println("external-Phase before: "+phase);
-		
-		
-			
 		if (phaseIs("passive"))
 			for (int i = 0; i < x.getLength(); i++)
 				if (messageOnPort(x, "in", i)) {
@@ -61,18 +55,12 @@ public class SeleniumGridNode extends ViewableAtomic {// ViewableAtomic is used 
 					int processing_time = randomGenerator.nextInt(300);
 					processing_time *= processing_fitness;
 					holdIn("busy", processing_time);
-					System.out.println("processing time of proc is"
-							+ processing_time);
 				}
-		
-		System.out.println("external-Phase after: "+phase);
 	}
 
 	public void deltint() {
-		System.out.println("Internal-Phase before: "+phase);
 		passivate();
 		job = new entity("none");
-		System.out.println("Internal-Phase after: "+phase);
 	}
 
 	public void deltcon(double e, message x) {

@@ -15,20 +15,18 @@ import model.simulation.*;
 import view.modeling.ViewableAtomic;
 import view.simView.*;
 
-public class GithubRepo extends ViewableAtomic {
+public class SimpleDjangoSite extends ViewableAtomic {
     // ViewableAtomic is used instead
     // of atomic due to its
     // graphics capability
-    protected String repository_name;
     
-    public GithubRepo() {
-	this("GithubRepo", "CUAHSI QA Automation Engine");
+    public SimpleDjangoSite() {
+	this("SimpleDjangoSite");
     }
     
-    public GithubRepo(String name, String Repository_name) {
+    public SimpleDjangoSite(String name) {
 	super(name);
 	addInport("in");
-	addOutport("out");
     }
     
     public void initialize() {
@@ -40,8 +38,8 @@ public class GithubRepo extends ViewableAtomic {
     public void deltext(double e, message x) {
 	Continue(e);
 	
-	holdIn("clone request", 0);
-	System.out.println("Git Clone Request Received");
+	holdIn("results online", INFINITY);
+	System.out.println("Results Posted to Local CUAHSI Site");
     }
     
     public void deltint() {
@@ -56,10 +54,6 @@ public class GithubRepo extends ViewableAtomic {
     
     public message out() {
 	message m = new message();
-	if (phaseIs("clone request")) {
-	    entity repo_object = new entity("repository");
-	    m.add(makeContent("out", repo_object));
-	}
 	return m;
     }
     

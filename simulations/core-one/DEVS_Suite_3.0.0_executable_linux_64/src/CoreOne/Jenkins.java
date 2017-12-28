@@ -28,34 +28,37 @@ public class Jenkins extends ViewableDigraph {
 	
 	ViewableAtomic hub = new SeleniumGridHub("SeleniumGridHub", number_nodes, number_jobs);
 	ViewableAtomic coord = new JenkinsCoord();
+	ViewableAtomic email = new NealEmail();
 	
 	add(hub);
 	add(coord);
+	add(email);
 
 	addInport("trigger");
-	addInport("executor0in");
-	addInport("executor1in");
-	addInport("executor2in");
-	addInport("GithubIn");
+	addInport("executor0-in");
+	addInport("executor1-in");
+	addInport("executor2-in");
+	addInport("github-in");
 	
-	addOutport("executor0out");
-	addOutport("executor1out");
-	addOutport("executor2out");
-	addOutport("GithubOut");
+	addOutport("executor0-out");
+	addOutport("executor1-out");
+	addOutport("executor2-out");
+	addOutport("github-out");
 	addOutport("results");
 
 	addCoupling(this, "trigger", coord, "setup-in");
-	addCoupling(coord, "setup-out", this, "GithubOut");
-	addCoupling(this, "GithubIn", hub, "control");
+	addCoupling(coord, "setup-out", this, "github-out");
+	addCoupling(this, "github-in", hub, "code");
 	addCoupling(hub, "suite-status", coord, "results-in");
 	addCoupling(coord, "results-out", this, "results");
+	addCoupling(coord, "results-out", email, "in");
 	
-	addCoupling(this, "executor0in", hub, "status0");
-	addCoupling(this, "executor1in", hub, "status1");
-	addCoupling(this, "executor2in", hub, "status2");
-	addCoupling(hub, "out0", this, "executor0out");
-	addCoupling(hub, "out1", this, "executor1out");
-	addCoupling(hub, "out2", this, "executor2out");
+	addCoupling(this, "executor0-in", hub, "status0");
+	addCoupling(this, "executor1-in", hub, "status1");
+	addCoupling(this, "executor2-in", hub, "status2");
+	addCoupling(hub, "out0", this, "executor0-out");
+	addCoupling(hub, "out1", this, "executor1-out");
+	addCoupling(hub, "out2", this, "executor2-out");
 
 	addTestInput("trigger", new entity("GitHub Pull Request"), 0);
 	addTestInput("trigger", new entity("Beta System Deployment"), 0);
@@ -68,7 +71,9 @@ public class Jenkins extends ViewableDigraph {
      */
     public void layoutForSimView()
     {
-        preferredSize = new Dimension(591, 269);
-	
+        preferredSize = new Dimension(710, 477);
+        ((ViewableComponent)withName("JenkinsCoord")).setPreferredLocation(new Point(109, 392));
+        ((ViewableComponent)withName("NealEmail")).setPreferredLocation(new Point(287, 335));
+        ((ViewableComponent)withName("SeleniumGridHub")).setPreferredLocation(new Point(120, 247));
     }
 }

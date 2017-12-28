@@ -42,10 +42,10 @@ public class JenkinsCoord extends ViewableAtomic {
 	Continue(e);
 	for (int i=0; i<x.getLength(); i++) {
 	    if (messageOnPort(x, "setup-in", i)) {
-		holdIn("get-repo", 0);
+		holdIn("get repo", 0);
 		System.out.println("Jenkins Job Initiated");
 	    } else if (messageOnPort(x, "results-in", i)) {
-		holdIn("send-results", 0);
+		holdIn("send results", 0);
 	    }
 	}
     }
@@ -62,10 +62,10 @@ public class JenkinsCoord extends ViewableAtomic {
     
     public message out() {
 	message m = new message();
-	if (phaseIs("get-repo")) {
+	if (phaseIs("get repo")) {
 	    entity repo_object = new entity("clone request");
 	    m.add(makeContent("setup-out", repo_object));
-	} else if (phaseIs("send-results")) {
+	} else if (phaseIs("send results")) {
 	    entity results_object = new entity("test results");
 	    m.add(makeContent("results-out", results_object));
 	}

@@ -15,20 +15,19 @@ import model.simulation.*;
 import view.modeling.ViewableAtomic;
 import view.simView.*;
 
-public class GithubRepo extends ViewableAtomic {
+public class NealEmail extends ViewableAtomic {
     // ViewableAtomic is used instead
     // of atomic due to its
     // graphics capability
-    protected String repository_name;
+    protected String email_address;
     
-    public GithubRepo() {
-	this("GithubRepo", "CUAHSI QA Automation Engine");
+    public NealEmail() {
+	this("NealEmail", "ndebuhr@cuahsi.org");
     }
     
-    public GithubRepo(String name, String Repository_name) {
+    public NealEmail(String name, String Email_address) {
 	super(name);
 	addInport("in");
-	addOutport("out");
     }
     
     public void initialize() {
@@ -40,8 +39,8 @@ public class GithubRepo extends ViewableAtomic {
     public void deltext(double e, message x) {
 	Continue(e);
 	
-	holdIn("clone request", 0);
-	System.out.println("Git Clone Request Received");
+	holdIn("email sent", INFINITY);
+	System.out.println("Test Results Email Sent");
     }
     
     public void deltint() {
@@ -56,10 +55,6 @@ public class GithubRepo extends ViewableAtomic {
     
     public message out() {
 	message m = new message();
-	if (phaseIs("clone request")) {
-	    entity repo_object = new entity("repository");
-	    m.add(makeContent("out", repo_object));
-	}
 	return m;
     }
     

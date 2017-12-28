@@ -31,7 +31,7 @@ public class SeleniumGridHub extends ViewableAtomic {// ViewableAtomic is used i
     
     public SeleniumGridHub(String name, int Number_nodes, int Number_jobs) {
 	super(name);
-	addInport("control");
+	addInport("code");
 	addInport("status0");
 	addInport("status1");
 	addInport("status2");
@@ -70,15 +70,13 @@ public class SeleniumGridHub extends ViewableAtomic {// ViewableAtomic is used i
 		if (messageOnPort(x, "status"+Integer.toString(j), i)) {
 		    node_ready = j;
 		    jobs_complete += 1;
-		    System.out.println(jobs_complete);
-		    System.out.println(number_nodes);
 		    if (jobs_complete == number_jobs) {
 			holdIn("done", 0);
 		    } else {
 			holdIn("transmitting", 0);
 		    }
 		}
-	    if (messageOnPort(x, "control", i))
+	    if (messageOnPort(x, "code", i))
 		holdIn("initials", 0);
 	}
     }

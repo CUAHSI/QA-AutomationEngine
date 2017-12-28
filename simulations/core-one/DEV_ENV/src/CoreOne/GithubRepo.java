@@ -40,7 +40,7 @@ public class GithubRepo extends ViewableAtomic {
     public void deltext(double e, message x) {
 	Continue(e);
 	
-	holdIn("clone-request", 0);
+	holdIn("clone request", 0);
 	System.out.println("Git Clone Request Received");
     }
     
@@ -56,7 +56,7 @@ public class GithubRepo extends ViewableAtomic {
     
     public message out() {
 	message m = new message();
-	if (phaseIs("clone-request")) {
+	if (phaseIs("clone request")) {
 	    entity repo_object = new entity("repository");
 	    m.add(makeContent("out", repo_object));
 	}
