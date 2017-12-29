@@ -11,7 +11,7 @@ class SiteElement:
     """
 
     def __init__(self, el_type=None, el_id=None, el_content=None,
-                 el_href=None, el_class=None, el_dom=None):
+                 el_href=None, el_class=None, el_dom=None, el_name=None):
         self.el_type = el_type
         self.el_id = el_id
         self.el_content = el_content
@@ -32,6 +32,14 @@ class SiteElement:
             target_element = driver.find_element_by_xpath(element_xpath)
             return target_element
         
+        def loc_by_name(the_driver):
+            """ Locates a website element, given the name attribute """
+            driver = the_driver
+            element_xpath = "//" + self.el_type + \
+                            "[@name='" + self.el_name + "']"
+            target_element = driver.find_element_by_xpath(element_xpath)
+            return target_element
+        
         def loc_by_href(the_driver):
             """ Locates a website element, given the element type and href """
             driver = the_driver
@@ -39,7 +47,7 @@ class SiteElement:
                            "[contains(@href,'" + self.el_href + "')]"
             target_element = driver.find_element_by_xpath(element_xpath)
             return target_element
-        
+
         def loc_by_class(the_driver):
             """ Locates a website element, given the element class """
             driver = the_driver
@@ -72,6 +80,8 @@ class SiteElement:
         
         if self.el_id is not None:
             target_element = loc_by_id(the_driver)
+        elif self.el_name is not None:
+            target_element = loc_by_name(the_driver)
         elif self.el_href is not None:
             target_element = loc_by_href(the_driver)
         elif self.el_class is not None:

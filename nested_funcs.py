@@ -13,7 +13,14 @@ def nest_loc_it(parent_element, child_element):
     def nest_loc_by_id(parent_element, child_element):
         """ Locates a website element, given the element type and id """
         child_xpath = "//" + child_element.el_type + \
-                       "[@id='" + child_element.el_id + "']"
+                      "[@id='" + child_element.el_id + "']"
+        result_element = parent_element.find_element_by_xpath(child_xpath)
+        return result_element
+
+    def nest_loc_by_name(parent_element, child_element):
+        """ Locates a website element, given the element name attribute """
+        child_xpath = "//" + child_element.el_type + \
+                      "[@name='" + child_element.el_name + "']"
         result_element = parent_element.find_element_by_xpath(child_xpath)
         return result_element
 
@@ -51,6 +58,8 @@ def nest_loc_it(parent_element, child_element):
 
     if child_element.el_id is not None:
         target_element = nest_loc_by_id(parent_element, child_element)
+    elif child_element.el_name is not None:
+        target_element = nest_loc_by_name(parent_element, child_element)
     elif child_element.el_href is not None:
         target_element = nest_loc_by_href(parent_element, child_element)
     elif child_element.el_class is not None:
