@@ -3,6 +3,9 @@ parameters.  The class methods faciltate easy manipulation
  of these elements
 """
 import time
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support.select import Select
 from nested_funcs import *
 
 class SiteElement:
@@ -18,6 +21,7 @@ class SiteElement:
         self.el_href = el_href
         self.el_class = el_class
         self.el_dom = el_dom
+        self.el_name = el_name
 
     def loc_it(self, the_driver):
         """ Identifies element on page, based on a hierarchy
@@ -102,6 +106,34 @@ class SiteElement:
         target_element.click()
         time.sleep(sleep_time)
 
+    def passive_click_it(self, the_driver, sleep_time):
+        """ Identifies an element on the page.  After identification
+        the element is then clicked, regardless if it is "interactable"
+        or not
+        """
+        target_element = self.loc_it(the_driver)
+        actions = ActionChains(the_driver)
+        actions.move_to_element(target_element)
+        actions.click(target_element)
+        actions.perform()
+        time.sleep(sleep_time)
+        
+    def clear_it(self, the_driver, size, sleep_time):
+        """ Uses backspace to clear text from a field """
+        target_element = self.loc_it(the_driver)
+        target_element.send_keys(Keys.END)
+        for i in range(0, size):
+            target_element.send_keys(Keys.BACK_SPACE)
+            time.sleep(sleep_time/size)
+        time.sleep(sleep_time)
+
+    def select_from_it(self, the_driver, select_option, sleep_time):
+        """ Selects an option from a dropdown element """
+        target_element = self.loc_it(the_driver)
+        select_element = Select(target_element)
+        select_element.select_by_value(select_option)
+        time.sleep(sleep_time)
+        
     def scroll_to_it(self, the_driver, sleep_time):
         """ After element identification, the window is scrolled
         such that the element becomes visible in the window
