@@ -147,7 +147,9 @@ class SiteElement:
         element using send keys
         """
         target_element = self.loc_it(the_driver)
-        target_element.send_keys(input_text)
+        for i in range(0, len(input_text)):
+            target_element.send_keys(input_text[i])
+            time.sleep(sleep_time/len(input_text))
         time.sleep(sleep_time)
 
     def get_text(self, the_driver):
