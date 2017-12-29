@@ -49,6 +49,7 @@ def nest_loc_it(parent_element, child_element):
         """ Locates a website element, based on DOM path to element """
         child_xpath = child_element.el_dom
         result_element = parent_element.find_element_by_xpath(child_xpath)
+        return result_element
     
     def nest_loc_by_nothing(parent_element, child_element):
         """ Locates a website element based only on the tag/type """
