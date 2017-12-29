@@ -106,6 +106,18 @@ class SiteElement:
         target_element.click()
         time.sleep(sleep_time)
 
+    def multi_click_it(self, the_driver, sleep_time):
+        """ Clicks an element while holding the control key, as to enable
+        a multi-selection
+        """
+        target_element = self.loc_it(the_driver)
+        actions = ActionChains(the_driver)
+        actions.key_down(Keys.LEFT_CONTROL)
+        actions.click(target_element)
+        actions.key_up(Keys.LEFT_CONTROL)
+        actions.perform()
+        time.sleep(sleep_time)
+        
     def passive_click_it(self, the_driver, sleep_time):
         """ Identifies an element on the page.  After identification
         the element is then clicked, regardless if it is "interactable"
@@ -177,4 +189,42 @@ class SiteElement:
         for i in range(0, len(children)):
             target_element = nest_loc_it(target_element, children[i])
         target_element.click()
+        time.sleep(sleep_time)
+
+    def nested_multi_click(self, the_driver, children, sleep_time):
+        """ Enables nesting specs for element identification.
+        The approach below injects the parent element as the
+        driver argument during location (consider maintainability
+        improvements as future todo)
+        """
+        target_element = self.loc_it(the_driver)
+        for i in range(0, len(children)):
+            target_element = nest_loc_it(target_element, children[i])
+        actions = ActionChains(the_driver)
+        actions.key_down(Keys.LEFT_CONTROL)
+        actions.click(target_element)
+        actions.key_up(Keys.LEFT_CONTROL)
+        actions.perform()
+        time.sleep(sleep_time)
+
+    def nested_scroll(self, the_driver, children, sleep_time):
+        """ After element identification, the window is scrolled
+        such that the element becomes visible in the window
+        """
+        target_element = self.loc_it(the_driver)
+        for i in range(0, len(children)):
+            target_element = nest_loc_it(target_element, children[i])
+        target_element.location_once_scrolled_into_view
+        time.sleep(sleep_time)
+        
+    def nested_text_into(self, the_driver, children, input_text, sleep_time):
+        """ Enters text into a field or other input-capable html
+        element using send keys
+        """
+        target_element = self.loc_it(the_driver)
+        for i in range(0, len(children)):
+            target_element = nest_loc_it(target_element, children[i])
+        for i in range(0, len(input_text)):
+            target_element.send_keys(input_text[i])
+            time.sleep(sleep_time/len(input_text))
         time.sleep(sleep_time)
