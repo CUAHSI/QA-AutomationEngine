@@ -52,18 +52,6 @@ class HydroshareTestCase(unittest.TestCase):
         self.browser = webdriver.Firefox()
         self.addCleanup(self.browser.quit)
 
-    def test_B_000001(self):
-        """ Confirms homepage online via page title """
-        def oracle():
-            """ The Hydroshare homepage is online """
-            self.assertIn('HydroShare', driver.title)
-
-        driver = setup_driver()
-        driver.get(BASE_URL)
-        time.sleep(SLEEP_TIME)
-        oracle()
-        driver.quit()
-
     def test_B_000002(self):
         """ Confirms discovery page is online via navigation
         and title check

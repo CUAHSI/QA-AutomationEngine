@@ -84,18 +84,6 @@ class HydroclientTestCase(unittest.TestCase):
         self.browser = webdriver.Firefox()
         self.addCleanup(self.browser.quit)
 
-    def test_A_000001(self):
-        """ Confirms homepage online via page title """
-        def oracle():
-            """ The HydroClient homepage is online """
-            self.assertIn('HydroClient', driver.title)
-
-        driver = setup_driver()
-        driver.get(BASE_URL)
-        driver.implicitly_wait(10)
-        oracle()
-        driver.quit()
-
     def test_A_000002(self):
         """ Confirms metadata available through
         HydroClient and that a sample of the data
