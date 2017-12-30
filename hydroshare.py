@@ -65,7 +65,7 @@ class HydroshareTestCase(unittest.TestCase):
 
         driver = setup_driver()
         driver.get(BASE_URL)
-        DISCOVERY_TAB.click_it(driver, SLEEP_TIME)
+        DISCOVERY_TAB.click(driver, SLEEP_TIME)
         oracle()
         driver.quit()
 
@@ -83,16 +83,16 @@ class HydroshareTestCase(unittest.TestCase):
         driver = setup_driver()
         driver.get(BASE_URL)
         # Pulls up discover search page through site header
-        DISCOVERY_TAB.click_it(driver, SLEEP_TIME)
+        DISCOVERY_TAB.click(driver, SLEEP_TIME)
         # Filters by subject of iUTAH in left panel
-        IUTAH_SUBJECTS_FILTER.click_it(driver, SLEEP_TIME)
+        IUTAH_SUBJECTS_FILTER.click(driver, SLEEP_TIME)
         # Filters by resouce type of Generic in left panel
-        GENERIC_RESOURCE_TYPE_FILTER.click_it(driver, SLEEP_TIME)
+        GENERIC_RESOURCE_TYPE_FILTER.click(driver, SLEEP_TIME)
         # Filters by availability of Discoverable or Public
-        IS_DISCOVERABLE_FILTER.click_it(driver, SLEEP_TIME)
-        IS_PUBLIC_FILTER.click_it(driver, SLEEP_TIME)
+        IS_DISCOVERABLE_FILTER.click(driver, SLEEP_TIME)
+        IS_PUBLIC_FILTER.click(driver, SLEEP_TIME)
         # Clicks specific resourse - Beaver Divide Air Temperaure
-        BEAVER_DIVIDE_RESC.click_it(driver, SLEEP_TIME)
+        BEAVER_DIVIDE_RESC.click(driver, SLEEP_TIME)
         # Checks download button exists with text for "Download" and "BagIt"
         self.assertTrue(('Download' in DOWNLOAD_BAGIT.get_text(driver)) and \
                         ('BagIt' in DOWNLOAD_BAGIT.get_text(driver)))
@@ -116,14 +116,14 @@ class HydroshareTestCase(unittest.TestCase):
         driver = setup_driver()
         driver.get(BASE_URL)
         # Pulls up discover search page through site header
-        DISCOVERY_TAB.click_it(driver, SLEEP_TIME)
-        DISCOVER_START_DATE.text_into_it(driver, "01/01/2014", SLEEP_TIME)
-        DISCOVER_END_DATE.text_into_it(driver, "12/31/2014", SLEEP_TIME)
+        DISCOVERY_TAB.click(driver, SLEEP_TIME)
+        DISCOVER_START_DATE.inject_text(driver, "01/01/2014", SLEEP_TIME)
+        DISCOVER_END_DATE.inject_text(driver, "12/31/2014", SLEEP_TIME)
         # TODO fix element identification issue
-        DISCOVER_VIEW_MAP_TAB.click_it(driver, SLEEP_TIME)
-        DISCOVER_MAP_SEARCH.text_into_it(driver, "Salt Lake City", SLEEP_TIME)
-        DISCOVER_MAP_SEARCH_SUBMIT.click_it(driver, SLEEP_TIME)
-        DISCOVER_VIEW_LIST_TAB.click_it(driver, SLEEP_TIME)
+        DISCOVER_VIEW_MAP_TAB.click(driver, SLEEP_TIME)
+        DISCOVER_MAP_SEARCH.inject_text(driver, "Salt Lake City", SLEEP_TIME)
+        DISCOVER_MAP_SEARCH_SUBMIT.click(driver, SLEEP_TIME)
+        DISCOVER_VIEW_LIST_TAB.click(driver, SLEEP_TIME)
         time.sleep(5)
         oracle()
         driver.quit()

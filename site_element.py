@@ -11,7 +11,6 @@ class SiteElement:
     """ Defines site elements in a structured way and provides a convenient means
     for element manipulations (clicking, entering text, etc.)
     """
-
     def __init__(self, el_type=None, el_id=None, el_content=None,
                  el_href=None, el_class=None, el_dom=None, el_name=None,
                  recursive_loc=None):
@@ -30,6 +29,9 @@ class SiteElement:
         id is preferrable to html element class).
         """
         def next_el_loc(loc_base, loc_child=None):
+            """ Locates the "next" element through absolute (loc_child==None)
+            or relative (loc_child!=None) means
+            """
             def loc_by_id(loc_base, loc_child):
                 """ Locates a website element, given the element type and id """
                 if loc_child is None:
@@ -108,10 +110,12 @@ class SiteElement:
                 return target_element
 
             if loc_child is None:
-                defining_el = self
+                defining_el = self # For absolute identification
             else:
-                defining_el = loc_child
+                defining_el = loc_child # For relative identification
 
+            # Hierarcy for identification using element attributes is
+            # id->name->href->class->content->DOM->type(no attributes)
             if defining_el.el_id is not None:
                 target_element = loc_by_id(loc_base, loc_child)
             elif defining_el.el_name is not None:
@@ -129,9 +133,9 @@ class SiteElement:
             return target_element
 
         
-        if self.recursive_loc is None:
+        if self.recursive_loc is None: # Use basic/single identification
             target_element = next_el_loc(the_driver)
-        else:
+        else: # Use recursive identification
             target_element = next_el_loc(the_driver)
             for i in range(0, len(self.recursive_loc)):
                 target_element = next_el_loc(target_element,
@@ -139,7 +143,7 @@ class SiteElement:
         return target_element
         
 
-    def click_it(self, the_driver, sleep_time):
+    def click(self, the_driver, sleep_time):
         """ Identifies an element on the page.  After identification
         the element is then clicked.
         """
@@ -147,7 +151,7 @@ class SiteElement:
         target_element.click()
         time.sleep(sleep_time)
 
-    def multi_click_it(self, the_driver, sleep_time):
+    def multi_click(self, the_driver, sleep_time):
         """ Clicks an element while holding the control key, as to enable
         a multi-selection
         """
@@ -159,7 +163,7 @@ class SiteElement:
         actions.perform()
         time.sleep(sleep_time)
         
-    def passive_click_it(self, the_driver, sleep_time):
+    def passive_click(self, the_driver, sleep_time):
         """ Identifies an element on the page.  After identification
         the element is then clicked, regardless if it is "interactable"
         or not
@@ -171,7 +175,7 @@ class SiteElement:
         actions.perform()
         time.sleep(sleep_time)
         
-    def clear_it(self, the_driver, size, sleep_time):
+    def clear_text(self, the_driver, size, sleep_time):
         """ Uses backspace to clear text from a field """
         target_element = self.loc_it(the_driver)
         target_element.send_keys(Keys.END)
@@ -180,14 +184,14 @@ class SiteElement:
             time.sleep(sleep_time/size)
         time.sleep(sleep_time)
 
-    def select_from_it(self, the_driver, select_option, sleep_time):
+    def select_option(self, the_driver, select_option, sleep_time):
         """ Selects an option from a dropdown element """
         target_element = self.loc_it(the_driver)
         select_element = Select(target_element)
         select_element.select_by_value(select_option)
         time.sleep(sleep_time)
         
-    def scroll_to_it(self, the_driver, sleep_time):
+    def scroll_to(self, the_driver, sleep_time):
         """ After element identification, the window is scrolled
         such that the element becomes visible in the window
         """
@@ -195,7 +199,7 @@ class SiteElement:
         target_element.location_once_scrolled_into_view
         time.sleep(sleep_time)
 
-    def text_into_it(self, the_driver, input_text, sleep_time):
+    def inject_text(self, the_driver, input_text, sleep_time):
         """ Enters text into a field or other input-capable html
         element using send keys
         """
