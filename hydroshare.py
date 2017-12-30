@@ -1,5 +1,7 @@
 """ Runs various smoke tests for the hydroshare.org """
 import unittest
+import argparse
+import sys
 import os
 import time
 # import argparse
@@ -45,7 +47,12 @@ class HydroshareTestCase(unittest.TestCase):
         profile = webdriver.FirefoxProfile()
         profile.set_preference("general.useragent.override", "CUAHSI-QA-Selenium")
         global driver
-        driver = webdriver.Firefox(profile)
+        if infrastructure == 'grid':
+            driver = webdriver.Remote(command_executor='http://' + \
+                                      grid_hub_ip + ':4444/wd/hub',
+                                      desired_capabilities={'browserName': 'firefox'})
+        else:
+            driver = webdriver.Firefox(profile)
         driver.get(BASE_URL)
         driver.implicitly_wait(10)
 
@@ -106,4 +113,17 @@ class HydroshareTestCase(unittest.TestCase):
         oracle()
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--grid')
+    parser.add_argument('unittest_args', nargs='*')
+    
+    args = parser.parse_args()
+    if args.grid is None:
+        infrastructure = 'standalone'
+    else:
+        infrastructure = 'grid'
+        grid_hub_ip = args.grid
+        
+    # Set the sys.argv to the unittest_args (leaving sys.argv[0] alone)
+    sys.argv[1:] = args.unittest_args
     unittest.main(verbosity=2)
