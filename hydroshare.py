@@ -53,19 +53,6 @@ class HydroshareTestCase(unittest.TestCase):
         """ Tear down test environment after execution """
         driver.quit()
 
-    def test_B_000002(self):
-        """ Confirms discovery page is online via navigation
-        and title check
-        """
-        def oracle():
-            """ The discovery page can be navigated to
-            from the HydroShare homepage, using the top
-            menu tabs
-            """
-            self.assertIn('Discover', driver.title)
-        DISCOVERY_TAB.click(driver, SLEEP_TIME)
-        oracle()
-
     def test_B_000003(self):
         """ Confirms Beaver Divide Air Temperature resource
         landing page is online via navigation and title check,
