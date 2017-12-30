@@ -6,7 +6,6 @@ import time
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.select import Select
-from nested_funcs import *
 
 class SiteElement:
     """ Defines site elements in a structured way and provides a convenient means
@@ -14,7 +13,8 @@ class SiteElement:
     """
 
     def __init__(self, el_type=None, el_id=None, el_content=None,
-                 el_href=None, el_class=None, el_dom=None, el_name=None):
+                 el_href=None, el_class=None, el_dom=None, el_name=None,
+                 recursive_loc=None):
         self.el_type = el_type
         self.el_id = el_id
         self.el_content = el_content
@@ -22,81 +22,122 @@ class SiteElement:
         self.el_class = el_class
         self.el_dom = el_dom
         self.el_name = el_name
+        self.recursive_loc = recursive_loc
 
     def loc_it(self, the_driver):
         """ Identifies element on page, based on a hierarchy
         of preferred identification methods (eg. by html element
         id is preferrable to html element class).
         """
-        def loc_by_id(the_driver):
-            """ Locates a website element, given the element type and id """
-            driver = the_driver
-            element_xpath = "//" + self.el_type + \
-                           "[@id='" + self.el_id + "']"
-            target_element = driver.find_element_by_xpath(element_xpath)
-            return target_element
+        def next_el_loc(loc_base, loc_child=None):
+            def loc_by_id(loc_base, loc_child):
+                """ Locates a website element, given the element type and id """
+                if loc_child is None:
+                    element_xpath = "//" + self.el_type + \
+                                    "[@id='" + self.el_id + "']"
+                else:
+                    element_xpath = ".//" + loc_child.el_type + \
+                                    "[@id='" + loc_child.el_id + "']"
+                target_element = loc_base.find_element_by_xpath(element_xpath)
+                return target_element
+                
+            def loc_by_name(loc_base, loc_child):
+                """ Locates a website element, given the name attribute """
+                if loc_child is None:
+                    element_xpath = "//" + self.el_type + \
+                                    "[@name='" + self.el_name + "']"
+                else:
+                    element_xpath = ".//" + loc_child.el_type + \
+                                    "[@name='" + loc_child.el_name + "']"
+                target_element = loc_base.find_element_by_xpath(element_xpath)
+                return target_element
         
-        def loc_by_name(the_driver):
-            """ Locates a website element, given the name attribute """
-            driver = the_driver
-            element_xpath = "//" + self.el_type + \
-                            "[@name='" + self.el_name + "']"
-            target_element = driver.find_element_by_xpath(element_xpath)
-            return target_element
+            def loc_by_href(loc_base, loc_child):
+                """ Locates a website element, given the element type
+                and href 
+                """
+                if loc_child is None:
+                    element_xpath = "//" + self.el_type + \
+                                    "[contains(@href,'" + self.el_href + "')]"
+                else:
+                    element_xpath = ".//" + loc_child.el_type + \
+                                    "[contains(@href,'" + loc_child.el_href + "')]"
+                target_element = loc_base.find_element_by_xpath(element_xpath)
+                return target_element
+
+            def loc_by_class(loc_base, loc_child):
+                """ Locates a website element, given the element class """
+                if loc_child is None:
+                    element_xpath = "//" + self.el_type + \
+                                    "[@class='" + self.el_class + "']"
+                else:
+                    element_xpath = ".//" + loc_child.el_type + \
+                                    "[@class='" + loc_child.el_class + "']"
+                target_element = loc_base.find_element_by_xpath(element_xpath)
+                return target_element
         
-        def loc_by_href(the_driver):
-            """ Locates a website element, given the element type and href """
-            driver = the_driver
-            element_xpath = "//" + self.el_type + \
-                           "[contains(@href,'" + self.el_href + "')]"
-            target_element = driver.find_element_by_xpath(element_xpath)
+            def loc_by_content(loc_base, loc_child):
+                """ Locates a website element, based the element text content """
+                if loc_child is None:
+                    element_xpath = "//" + self.el_type + \
+                                    "[contains(text(), '" + \
+                                    self.el_content + "')]"
+                else:
+                    element_xpath = ".//" + loc_child.el_type + \
+                                    "[contains(text(), '" + \
+                                    loc_child.el_content + "')]"
+                target_element = loc_base.find_element_by_xpath(element_xpath)
+                return target_element
+
+            def loc_by_dom(loc_base, loc_child):
+                """ Locates a website element given DOM path to element """
+                if loc_child is None:
+                    element_xpath = self.el_dom
+                else:
+                    element_xpath = loc_child.el_dom
+                target_element = loc_base.find_element_by_xpath(element_xpath)
+                return target_element
+        
+            def loc_by_nothing(loc_base, loc_child):
+                """ Locates a website element based only on the tag/type """
+                if loc_child is None:
+                    element_xpath = "//" + self.el_type
+                else:
+                    element_xpath = ".//" + loc_child.el_type
+                target_element = loc_base.find_element_by_xpath(element_xpath)
+                return target_element
+
+            if loc_child is None:
+                defining_el = self
+            else:
+                defining_el = loc_child
+
+            if defining_el.el_id is not None:
+                target_element = loc_by_id(loc_base, loc_child)
+            elif defining_el.el_name is not None:
+                target_element = loc_by_name(loc_base, loc_child)
+            elif defining_el.el_href is not None:
+                target_element = loc_by_href(loc_base, loc_child)
+            elif defining_el.el_class is not None:
+                target_element = loc_by_class(loc_base, loc_child)
+            elif defining_el.el_content is not None:
+                target_element = loc_by_content(loc_base, loc_child)
+            elif defining_el.el_dom is not None:
+                target_element = loc_by_dom(loc_base, loc_child)
+            else:
+                target_element = loc_by_nothing(loc_base, loc_child)
             return target_element
 
-        def loc_by_class(the_driver):
-            """ Locates a website element, given the element class """
-            driver = the_driver
-            element_xpath = "//" + self.el_type + \
-                           "[@class='" + self.el_class + "']"
-            target_element = driver.find_element_by_xpath(element_xpath)
-            return target_element
         
-        def loc_by_content(the_driver):
-            """ Locates a website element, based the element text content """
-            driver = the_driver
-            element_xpath = "//" + self.el_type + \
-                           "[contains(text(), '" + self.el_content + "')]"
-            target_element = driver.find_element_by_xpath(element_xpath)
-            return target_element
-
-        def loc_by_dom(the_driver):
-            """ Locates a website element given DOM path to element """
-            driver = the_driver
-            element_xpath = self.el_dom
-            target_element = driver.find_element_by_xpath(element_xpath)
-            return target_element
-        
-        def loc_by_nothing(the_driver):
-            """ Locates a website element based only on the tag/type """
-            driver = the_driver
-            element_xpath = "//" + self.el_type
-            target_element = driver.find_element_by_xpath(element_xpath)
-            return target_element
-        
-        if self.el_id is not None:
-            target_element = loc_by_id(the_driver)
-        elif self.el_name is not None:
-            target_element = loc_by_name(the_driver)
-        elif self.el_href is not None:
-            target_element = loc_by_href(the_driver)
-        elif self.el_class is not None:
-            target_element = loc_by_class(the_driver)
-        elif self.el_content is not None:
-            target_element = loc_by_content(the_driver)
-        elif self.el_dom is not None:
-            target_element = loc_by_dom(the_driver)
+        if self.recursive_loc is None:
+            target_element = next_el_loc(the_driver)
         else:
-            target_element = loc_by_nothing(the_driver)
+            target_element = next_el_loc(the_driver)
+            for i in range(0, len(self.recursive_loc)):
+                target_element = next_el_loc(target_element,
+                                             self.recursive_loc[i])
         return target_element
+        
 
     def click_it(self, the_driver, sleep_time):
         """ Identifies an element on the page.  After identification
@@ -178,53 +219,3 @@ class SiteElement:
         if element_href[0] == '/':
             element_href = base_url + element_href
         return element_href
-
-    def nested_click(self, the_driver, children, sleep_time):
-        """ Enables nesting specs for element identification.
-        The approach below injects the parent element as the
-        driver argument during location (consider maintainability
-        improvements as future todo)
-        """
-        target_element = self.loc_it(the_driver)
-        for i in range(0, len(children)):
-            target_element = nest_loc_it(target_element, children[i])
-        target_element.click()
-        time.sleep(sleep_time)
-
-    def nested_multi_click(self, the_driver, children, sleep_time):
-        """ Enables nesting specs for element identification.
-        The approach below injects the parent element as the
-        driver argument during location (consider maintainability
-        improvements as future todo)
-        """
-        target_element = self.loc_it(the_driver)
-        for i in range(0, len(children)):
-            target_element = nest_loc_it(target_element, children[i])
-        actions = ActionChains(the_driver)
-        actions.key_down(Keys.LEFT_CONTROL)
-        actions.click(target_element)
-        actions.key_up(Keys.LEFT_CONTROL)
-        actions.perform()
-        time.sleep(sleep_time)
-
-    def nested_scroll(self, the_driver, children, sleep_time):
-        """ After element identification, the window is scrolled
-        such that the element becomes visible in the window
-        """
-        target_element = self.loc_it(the_driver)
-        for i in range(0, len(children)):
-            target_element = nest_loc_it(target_element, children[i])
-        target_element.location_once_scrolled_into_view
-        time.sleep(sleep_time)
-        
-    def nested_text_into(self, the_driver, children, input_text, sleep_time):
-        """ Enters text into a field or other input-capable html
-        element using send keys
-        """
-        target_element = self.loc_it(the_driver)
-        for i in range(0, len(children)):
-            target_element = nest_loc_it(target_element, children[i])
-        for i in range(0, len(input_text)):
-            target_element.send_keys(input_text[i])
-            time.sleep(sleep_time/len(input_text))
-        time.sleep(sleep_time)

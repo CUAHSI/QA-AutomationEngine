@@ -81,7 +81,7 @@ class HydroshareTestCase(unittest.TestCase):
         oracle()
         driver.quit()
 
-    def todo_test_B_000003(self):
+    def test_B_000003(self):
         """ Confirms Beaver Divide Air Temperature resource
         landing page is online via navigation and title check,
         then downloads the BagIt archive and confirms
@@ -118,7 +118,7 @@ class HydroshareTestCase(unittest.TestCase):
         oracle()
         driver.quit()
 
-    def test_B_000004(self):
+    def todo_test_B_000004(self):
         """ Confirms date filtering functionality, as well as
         map view functionality
         """

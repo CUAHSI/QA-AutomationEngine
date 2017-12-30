@@ -32,16 +32,18 @@ SERVICE_SEARCH_SEARCH = SiteElement('button', el_id='btnServicesModalSearch')
 SERVICE_TABLE_COUNT = SiteElement('select', el_name='tblDataServices_length')
 SERVICE_ARCHBOLD_SEARCH = SiteElement('td',
                                       el_content='Archbold Biological Station')
-SERVICE_NWIS_UV_SEARCH = SiteElement('a', el_content='NWIS Unit Values')
-SERVICE_NWIS_UV_SEARCH_DIVE = [SiteElement(el_dom='./../..'),
-                               SiteElement(el_dom='./td[1]')]
-
-SERVICE_NASA_NOAH = SiteElement('a', el_content='NLDAS Hourly NOAH Data')
-SERVICE_NASA_NOAH_DIVE = [SiteElement(el_dom='./../..'),
-                          SiteElement(el_dom='./td[1]')]
-SERVICE_NASA_PRIMARY_FORCING = SiteElement('a', el_content='NLDAS Hourly Primary Forcing Data')
-SERVICE_NASA_PRIMARY_FORCING_DIVE = [SiteElement(el_dom='./../..'),
-                                     SiteElement(el_dom='./td[1]')]
+SERVICE_NWIS_UV_SEARCH = SiteElement('a',
+                                     el_content='NWIS Unit Values',
+                                     recursive_loc=[SiteElement(el_dom='./../..'),
+                                                    SiteElement(el_dom='./td[1]')])
+SERVICE_NASA_NOAH = SiteElement('a',
+                                el_content='NLDAS Hourly NOAH Data',
+                                recursive_loc=[SiteElement(el_dom='./../..'),
+                                               SiteElement(el_dom='./td[1]')])
+SERVICE_NASA_PRIMARY_FORCING = SiteElement('a',
+                                           el_content='NLDAS Hourly Primary Forcing Data',
+                                           recursive_loc=[SiteElement(el_dom='./../..'),
+                                                          SiteElement(el_dom='./td[1]')])
 
 # Filter interface
 SELECT_ACTION = SiteElement('div', el_id='ddActionsDSR')
@@ -50,18 +52,21 @@ WORKSPACE_SELECTION = SiteElement('a', el_id='anchorAddSelectionsToWorkspaceDSR'
 VIEW_EXPORTS = SiteElement('button', el_id='tableModal-DownloadMgrSearchSummary')
 VIEW_WORKSPACE = SiteElement('button', el_id='tableModal-DataMgrSearchSummary')
 CLOSE_FILTER = SiteElement('button', el_id='closeSearchSummary')
-FILTER_TABLE_SEARCH = SiteElement('div', el_id='tblDetailedSearchResults_filter')
-FILTER_TABLE_SEARCH_DIVE = [SiteElement(el_dom='./label'),
-                     SiteElement(el_dom='./input')]
-FILTER_TABLE = SiteElement('table', el_id='tblDetailedSearchResults')
-FILTER_TABLE_DIVE = [SiteElement(el_dom='./tbody'),
-                     SiteElement(el_dom='./tr'),
-                     SiteElement(el_dom='./td'),
-                     SiteElement(el_dom='./div')]
+FILTER_TABLE_SEARCH = SiteElement('div',
+                                  el_id='tblDetailedSearchResults_filter',
+                                  recursive_loc=[SiteElement(el_dom='./label'),
+                                                 SiteElement(el_dom='./input')])
+FILTER_TABLE = SiteElement('table',
+                           el_id='tblDetailedSearchResults',
+                           recursive_loc=[SiteElement(el_dom='./tbody'),
+                                          SiteElement(el_dom='./tr'),
+                                          SiteElement(el_dom='./td'),
+                                          SiteElement(el_dom='./div')])
 FILTER_DERIVED_VALUE_ROW = SiteElement('td', el_content='Derived Value')
 FILTER_MODEL_SIM_RESULT_ROW = SiteElement('td', el_content='Model Simulation Result')
-FILTER_BY_SERVICE = SiteElement('div', el_id='tblDetailedSearchResults_wrapper')
-FILTER_BY_SERVICE_DIVE = [SiteElement('th', el_content='Service Title')]
+FILTER_BY_SERVICE = SiteElement('div',
+                                el_id='tblDetailedSearchResults_wrapper',
+                                recursive_loc=[SiteElement('th', el_content='Service Title')])
 
 def setup_driver():
     """ Setup driver, including profile config, for test executions """
@@ -79,7 +84,7 @@ class HydroclientTestCase(unittest.TestCase):
         self.browser = webdriver.Firefox()
         self.addCleanup(self.browser.quit)
 
-    def no_test_A_000001(self):
+    def test_A_000001(self):
         """ Confirms homepage online via page title """
         def oracle():
             """ The HydroClient homepage is online """
@@ -91,7 +96,7 @@ class HydroclientTestCase(unittest.TestCase):
         oracle()
         driver.quit()
 
-    def no_test_A_000002(self):
+    def test_A_000002(self):
         """ Confirms metadata available through
         HydroClient and that a sample of the data
         downloads successfully
@@ -126,7 +131,7 @@ class HydroclientTestCase(unittest.TestCase):
         driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
         time.sleep(SLEEP_TIME)
         CLOSE_FILTER.scroll_to_it(driver, SLEEP_TIME)
-        FILTER_TABLE.nested_click(driver, FILTER_TABLE_DIVE, SLEEP_TIME)
+        FILTER_TABLE.click_it(driver, SLEEP_TIME)
         SELECT_ACTION.click_it(driver, SLEEP_TIME)
         WORKSPACE_SELECTION.click_it(driver, SLEEP_TIME)
         VIEW_WORKSPACE.click_it(driver, SLEEP_TIME)
@@ -134,7 +139,7 @@ class HydroclientTestCase(unittest.TestCase):
         oracle()
         driver.quit()
 
-    def no_test_A_000003(self):
+    def test_A_000003(self):
         """ Confirms repeated search for Lake Annie data does not result
         in problematic behavior
         """
@@ -162,7 +167,7 @@ class HydroclientTestCase(unittest.TestCase):
         oracle()
         driver.quit()
 
-    def no_test_A_000004(self):
+    def test_A_000004(self):
         """ Confirms date filtering of NWIS UV data service is maintained
         throughout search and workspace export workflow
         """
@@ -181,7 +186,7 @@ class HydroclientTestCase(unittest.TestCase):
         LOCATION_SEARCH_BOX.text_into_it(driver, Keys.RETURN, SLEEP_TIME)
         SERVICE_SEARCH.click_it(driver, SLEEP_TIME)
         SERVICE_TABLE_COUNT.select_from_it(driver, '100', SLEEP_TIME)
-        SERVICE_NWIS_UV_SEARCH.nested_click(driver, SERVICE_NWIS_UV_SEARCH_DIVE, SLEEP_TIME)
+        SERVICE_NWIS_UV_SEARCH.click_it(driver, SLEEP_TIME)
         SERVICE_SEARCH_SAVE.click_it(driver, SLEEP_TIME)
         DATE_FILTER_ON.click_it(driver, SLEEP_TIME)
         DATE_FILTER_START.clear_it(driver, 12, SLEEP_TIME)
@@ -217,20 +222,16 @@ class HydroclientTestCase(unittest.TestCase):
         LOCATION_SEARCH_BOX.text_into_it(driver, Keys.RETURN, SLEEP_TIME)
         SERVICE_SEARCH.click_it(driver, SLEEP_TIME)
         SERVICE_TABLE_COUNT.select_from_it(driver, '100', SLEEP_TIME)
-        SERVICE_NASA_NOAH.nested_click(driver, SERVICE_NASA_NOAH_DIVE, SLEEP_TIME)
-        SERVICE_NASA_PRIMARY_FORCING.nested_scroll(driver, SERVICE_NASA_PRIMARY_FORCING_DIVE, SLEEP_TIME)
-        SERVICE_NASA_PRIMARY_FORCING.nested_multi_click(driver, SERVICE_NASA_PRIMARY_FORCING_DIVE, SLEEP_TIME)
+        SERVICE_NASA_NOAH.click_it(driver, SLEEP_TIME)
+        SERVICE_NASA_PRIMARY_FORCING.scroll_to_it(driver, SLEEP_TIME)
+        SERVICE_NASA_PRIMARY_FORCING.multi_click_it(driver, SLEEP_TIME)
         SERVICE_SEARCH_SEARCH.click_it(driver, SLEEP_TIME)
         FILTER_RESULTS.click_it(driver, SLEEP_TIME)
-        FILTER_TABLE_SEARCH.nested_text_into(driver,
-                                             FILTER_TABLE_SEARCH_DIVE,
-                                             'X416-Y130',
-                                             SLEEP_TIME)
-        
-        FILTER_BY_SERVICE.nested_click(driver, FILTER_BY_SERVICE_DIVE, SLEEP_TIME)
+        FILTER_TABLE_SEARCH.text_into_it(driver, 'X416-Y130', SLEEP_TIME)
+        FILTER_BY_SERVICE.click_it(driver, SLEEP_TIME)
         FILTER_TABLE_COUNT.select_from_it(driver, '100', SLEEP_TIME)
         FILTER_MODEL_SIM_RESULT_ROW.click_it(driver, SLEEP_TIME)
-        FILTER_BY_SERVICE.nested_click(driver, FILTER_BY_SERVICE_DIVE, SLEEP_TIME)
+        FILTER_BY_SERVICE.click_it(driver, SLEEP_TIME)
         FILTER_DERIVED_VALUE_ROW.scroll_to_it(driver, SLEEP_TIME)
         FILTER_DERIVED_VALUE_ROW.multi_click_it(driver, SLEEP_TIME)
         SELECT_ACTION.click_it(driver, SLEEP_TIME)
