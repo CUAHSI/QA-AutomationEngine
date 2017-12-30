@@ -68,21 +68,22 @@ FILTER_BY_SERVICE = SiteElement('div',
                                 el_id='tblDetailedSearchResults_wrapper',
                                 recursive_loc=[SiteElement('th', el_content='Service Title')])
 
-def setup_driver():
-    """ Setup driver, including profile config, for test executions """
-    profile = webdriver.FirefoxProfile()
-    profile.set_preference("general.useragent.override", "CUAHSI-QA-Selenium")
-    driver = webdriver.Firefox(profile)
-    return driver
-
 # Test cases definition
 class HydroclientTestCase(unittest.TestCase):
     """ Python unittest setup for smoke tests """
 
     def setUp(self):
-        """ Sets up browser for future tests """
-        self.browser = webdriver.Firefox()
-        self.addCleanup(self.browser.quit)
+        """ Setup driver for use in automation tests """
+        profile = webdriver.FirefoxProfile()
+        profile.set_preference("general.useragent.override", "CUAHSI-QA-Selenium")
+        global driver
+        driver = webdriver.Firefox(profile)
+        driver.get(BASE_URL)
+        driver.implicitly_wait(10)
+
+    def tearDown(self):
+        """ Tear down test environment after execution """
+        driver.quit()
 
     def test_A_000002(self):
         """ Confirms metadata available through
@@ -100,10 +101,6 @@ class HydroclientTestCase(unittest.TestCase):
             except NoSuchElementException:
                 workspace_load = False
             self.assertTrue(workspace_load)
-
-        driver = setup_driver()
-        driver.get(BASE_URL)
-        driver.implicitly_wait(10)
         LOCATION_SEARCH_BOX.inject_text(driver, "Lake Annie Highlands County", SLEEP_TIME)
         time.sleep(SLEEP_TIME)
         LOCATION_SEARCH_BOX.inject_text(driver, Keys.ARROW_DOWN, SLEEP_TIME)
@@ -125,7 +122,6 @@ class HydroclientTestCase(unittest.TestCase):
         VIEW_WORKSPACE.click(driver, SLEEP_TIME)
         time.sleep(60)
         oracle()
-        driver.quit()
 
     def test_A_000003(self):
         """ Confirms repeated search for Lake Annie data does not result
@@ -137,10 +133,6 @@ class HydroclientTestCase(unittest.TestCase):
             service visible via search filtering
             """
             self.assertTrue('51' in NUM_SEARCH_RESULTS.get_text(driver))
-
-        driver = setup_driver()
-        driver.get(BASE_URL)
-        driver.implicitly_wait(10)
         LOCATION_SEARCH_BOX.inject_text(driver, "Lake Annie Highlands County", SLEEP_TIME)
         time.sleep(SLEEP_TIME)
         LOCATION_SEARCH_BOX.inject_text(driver, Keys.ARROW_DOWN, SLEEP_TIME)
@@ -153,7 +145,6 @@ class HydroclientTestCase(unittest.TestCase):
             SEARCH_NOW.click(driver, SLEEP_TIME)
             time.sleep(1)
         oracle()
-        driver.quit()
 
     def test_A_000004(self):
         """ Confirms date filtering of NWIS UV data service is maintained
@@ -165,10 +156,6 @@ class HydroclientTestCase(unittest.TestCase):
             """
             self.assertIn('2015-12-01', driver.page_source)
             self.assertIn('2015-12-30', driver.page_source)
-
-        driver = setup_driver()
-        driver.get(BASE_URL)
-        driver.implicitly_wait(10)
         LOCATION_SEARCH_BOX.inject_text(driver, 'Tampa ', 2*SLEEP_TIME)
         LOCATION_SEARCH_BOX.inject_text(driver, Keys.ARROW_DOWN, SLEEP_TIME)
         LOCATION_SEARCH_BOX.inject_text(driver, Keys.RETURN, SLEEP_TIME)
@@ -191,7 +178,6 @@ class HydroclientTestCase(unittest.TestCase):
         time.sleep(10*SLEEP_TIME)
         VIEW_WORKSPACE.click(driver, SLEEP_TIME)
         oracle()
-        driver.quit()
 
     def test_A_000005(self):
         """ Confirms New Haven CT Site X416-Y130 metadata and data are
@@ -201,10 +187,6 @@ class HydroclientTestCase(unittest.TestCase):
             """ Export to workspace is successfull
             """
             self.assertTrue(driver.page_source.count('<em> Completed</em>') == 2)
-
-        driver = setup_driver()
-        driver.get(BASE_URL)
-        driver.implicitly_wait(10)
         LOCATION_SEARCH_BOX.inject_text(driver, 'New Haven ', SLEEP_TIME)
         LOCATION_SEARCH_BOX.inject_text(driver, Keys.ARROW_DOWN, SLEEP_TIME)
         LOCATION_SEARCH_BOX.inject_text(driver, Keys.RETURN, SLEEP_TIME)
@@ -227,8 +209,6 @@ class HydroclientTestCase(unittest.TestCase):
         VIEW_WORKSPACE.click(driver, SLEEP_TIME)
         time.sleep(60*SLEEP_TIME)
         oracle()
-        driver.quit()
-
         
 if __name__ == '__main__':
     unittest.main(verbosity=2)

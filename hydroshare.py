@@ -36,21 +36,22 @@ DOWNLOAD_BAGIT = SiteElement('a', el_id='btn-download-all', el_content=\
                              'Download All Content as Zipped BagIt Archive')
 BEAVER_DIVIDE_ZIP_SIZE = 512000
 
-def setup_driver():
-    """ Setup driver for use in automation tests """
-    profile = webdriver.FirefoxProfile()
-    profile.set_preference("general.useragent.override", "CUAHSI-QA-Selenium")
-    driver = webdriver.Firefox(profile)
-    return driver
-
 # Test cases definition
 class HydroshareTestCase(unittest.TestCase):
     """ Python unittest setup for smoke tests """
 
     def setUp(self):
-        """ Sets up browser for future tests """
-        self.browser = webdriver.Firefox()
-        self.addCleanup(self.browser.quit)
+        """ Setup driver for use in automation tests """
+        profile = webdriver.FirefoxProfile()
+        profile.set_preference("general.useragent.override", "CUAHSI-QA-Selenium")
+        global driver
+        driver = webdriver.Firefox(profile)
+        driver.get(BASE_URL)
+        driver.implicitly_wait(10)
+
+    def tearDown(self):
+        """ Tear down test environment after execution """
+        driver.quit()
 
     def test_B_000002(self):
         """ Confirms discovery page is online via navigation
@@ -62,12 +63,8 @@ class HydroshareTestCase(unittest.TestCase):
             menu tabs
             """
             self.assertIn('Discover', driver.title)
-
-        driver = setup_driver()
-        driver.get(BASE_URL)
         DISCOVERY_TAB.click(driver, SLEEP_TIME)
         oracle()
-        driver.quit()
 
     def test_B_000003(self):
         """ Confirms Beaver Divide Air Temperature resource
@@ -79,9 +76,6 @@ class HydroshareTestCase(unittest.TestCase):
             matches expected file size
             """
             self.assertTrue(file_size == BEAVER_DIVIDE_ZIP_SIZE)
-
-        driver = setup_driver()
-        driver.get(BASE_URL)
         # Pulls up discover search page through site header
         DISCOVERY_TAB.click(driver, SLEEP_TIME)
         # Filters by subject of iUTAH in left panel
@@ -104,7 +98,6 @@ class HydroshareTestCase(unittest.TestCase):
         file_size = os.stat(download_file).st_size
         # Confirm the downloaded file size matches expectation
         oracle()
-        driver.quit()
 
     def todo_test_B_000004(self):
         """ Confirms date filtering functionality, as well as
@@ -113,8 +106,6 @@ class HydroshareTestCase(unittest.TestCase):
         def oracle():
             """ Confirms valid page returned after navigation """
             self.assertTrue('HydroShare' in driver.title)
-        driver = setup_driver()
-        driver.get(BASE_URL)
         # Pulls up discover search page through site header
         DISCOVERY_TAB.click(driver, SLEEP_TIME)
         DISCOVER_START_DATE.inject_text(driver, "01/01/2014", SLEEP_TIME)
@@ -126,7 +117,6 @@ class HydroshareTestCase(unittest.TestCase):
         DISCOVER_VIEW_LIST_TAB.click(driver, SLEEP_TIME)
         time.sleep(5)
         oracle()
-        driver.quit()
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)
