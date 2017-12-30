@@ -6,69 +6,13 @@ import time
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.keys import Keys
-from site_element import SiteElement
+from hydroclient_elements import *
 from modes import setup_mode
 
 # Test case parameters
 MODE_SELECTION = 'demo'
 SLEEP_TIME = setup_mode(MODE_SELECTION)
 BASE_URL = 'http://data.cuahsi.org'
-
-# Search interface
-SEARCH_NOW = SiteElement('button', el_id='btnSearchNow')
-FILTER_RESULTS = SiteElement('button', el_id='btnSearchSummary')
-LOCATION_SEARCH_BOX = SiteElement('input', el_id='pac-input')
-SERVICE_SEARCH = SiteElement('button', el_id='btnSelectDataServices',
-                             el_content='Data Service(s)...')
-NUM_SEARCH_RESULTS = SiteElement('span', el_id='timeseriesFoundOrFilteredCount')
-DATE_FILTER_ON = SiteElement('*', el_id='optionsDatesRange')
-DATE_FILTER_START = SiteElement('*', el_id='startDateModal')
-DATE_FILTER_END = SiteElement('*', el_id='endDateModal')
-DATE_FILTER_CLICKOUT = SiteElement('h3',
-                                   el_content='Please select your date range:')
-DATE_FILTER_SAVE = SiteElement('*', el_id='btnDateRangeModalSave')
-# Service search
-SERVICE_ORGANIZATION_SORT = SiteElement('th', el_content='Organization')
-SERVICE_SEARCH_SAVE = SiteElement('button', el_id='btnServicesModalSave')
-SERVICE_SEARCH_SEARCH = SiteElement('button', el_id='btnServicesModalSearch')
-SERVICE_TABLE_COUNT = SiteElement('select', el_name='tblDataServices_length')
-SERVICE_ARCHBOLD_SEARCH = SiteElement('td',
-                                      el_content='Archbold Biological Station')
-SERVICE_NWIS_UV_SEARCH = SiteElement('a',
-                                     el_content='NWIS Unit Values',
-                                     recursive_loc=[SiteElement(el_dom='./../..'),
-                                                    SiteElement(el_dom='./td[1]')])
-SERVICE_NASA_NOAH = SiteElement('a',
-                                el_content='NLDAS Hourly NOAH Data',
-                                recursive_loc=[SiteElement(el_dom='./../..'),
-                                               SiteElement(el_dom='./td[1]')])
-SERVICE_NASA_PRIMARY_FORCING = SiteElement('a',
-                                           el_content='NLDAS Hourly Primary Forcing Data',
-                                           recursive_loc=[SiteElement(el_dom='./../..'),
-                                                          SiteElement(el_dom='./td[1]')])
-
-# Filter interface
-SELECT_ACTION = SiteElement('div', el_id='ddActionsDSR')
-FILTER_TABLE_COUNT = SiteElement('select', el_name='tblDetailedSearchResults_length')
-WORKSPACE_SELECTION = SiteElement('a', el_id='anchorAddSelectionsToWorkspaceDSR')
-VIEW_EXPORTS = SiteElement('button', el_id='tableModal-DownloadMgrSearchSummary')
-VIEW_WORKSPACE = SiteElement('button', el_id='tableModal-DataMgrSearchSummary')
-CLOSE_FILTER = SiteElement('button', el_id='closeSearchSummary')
-FILTER_TABLE_SEARCH = SiteElement('div',
-                                  el_id='tblDetailedSearchResults_filter',
-                                  recursive_loc=[SiteElement(el_dom='./label'),
-                                                 SiteElement(el_dom='./input')])
-FILTER_TABLE = SiteElement('table',
-                           el_id='tblDetailedSearchResults',
-                           recursive_loc=[SiteElement(el_dom='./tbody'),
-                                          SiteElement(el_dom='./tr'),
-                                          SiteElement(el_dom='./td'),
-                                          SiteElement(el_dom='./div')])
-FILTER_DERIVED_VALUE_ROW = SiteElement('td', el_content='Derived Value')
-FILTER_MODEL_SIM_RESULT_ROW = SiteElement('td', el_content='Model Simulation Result')
-FILTER_BY_SERVICE = SiteElement('div',
-                                el_id='tblDetailedSearchResults_wrapper',
-                                recursive_loc=[SiteElement('th', el_content='Service Title')])
 
 # Test cases definition
 class HydroclientTestCase(unittest.TestCase):
@@ -108,25 +52,25 @@ class HydroclientTestCase(unittest.TestCase):
             except NoSuchElementException:
                 workspace_load = False
             self.assertTrue(workspace_load)
-        LOCATION_SEARCH_BOX.inject_text(driver, "Lake Annie Highlands County", SLEEP_TIME)
+        SearchPage.location_search.inject_text(driver, "Lake Annie Highlands County", SLEEP_TIME)
         time.sleep(SLEEP_TIME)
-        LOCATION_SEARCH_BOX.inject_text(driver, Keys.ARROW_DOWN, SLEEP_TIME)
-        LOCATION_SEARCH_BOX.inject_text(driver, Keys.RETURN, SLEEP_TIME)
-        SERVICE_SEARCH.click(driver, SLEEP_TIME)
-        SERVICE_ORGANIZATION_SORT.click(driver, SLEEP_TIME)
-        SERVICE_ARCHBOLD_SEARCH.click(driver, SLEEP_TIME)
-        SERVICE_SEARCH_SAVE.click(driver, SLEEP_TIME)
-        SEARCH_NOW.click(driver, SLEEP_TIME)
+        SearchPage.location_search.inject_text(driver, Keys.ARROW_DOWN, SLEEP_TIME)
+        SearchPage.location_search.inject_text(driver, Keys.RETURN, SLEEP_TIME)
+        SearchPage.service_filter.click(driver, SLEEP_TIME)
+        ServiceSearch.sort_organization.click(driver, SLEEP_TIME)
+        ServiceSearch.archbold.click(driver, SLEEP_TIME)
+        ServiceSearch.save.click(driver, SLEEP_TIME)
+        SearchPage.search_now.click(driver, SLEEP_TIME)
         time.sleep(10)
-        FILTER_RESULTS.click(driver, SLEEP_TIME)
+        SearchPage.filter_results.click(driver, SLEEP_TIME)
         time.sleep(SLEEP_TIME)
         driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
         time.sleep(SLEEP_TIME)
-        CLOSE_FILTER.scroll_to(driver, SLEEP_TIME)
-        FILTER_TABLE.click(driver, SLEEP_TIME)
-        SELECT_ACTION.click(driver, SLEEP_TIME)
-        WORKSPACE_SELECTION.click(driver, SLEEP_TIME)
-        VIEW_WORKSPACE.click(driver, SLEEP_TIME)
+        FilterResults.nav_close.scroll_to(driver, SLEEP_TIME)
+        FilterResults.select_any.click(driver, SLEEP_TIME)
+        FilterResults.choose_action.click(driver, SLEEP_TIME)
+        FilterResults.export_workspace.click(driver, SLEEP_TIME)
+        FilterResults.nav_workspace.click(driver, SLEEP_TIME)
         time.sleep(60)
         oracle()
 
@@ -139,17 +83,17 @@ class HydroclientTestCase(unittest.TestCase):
             with the "Archbold Biological Center" set as the only
             service visible via search filtering
             """
-            self.assertTrue('51' in NUM_SEARCH_RESULTS.get_text(driver))
-        LOCATION_SEARCH_BOX.inject_text(driver, "Lake Annie Highlands County", SLEEP_TIME)
+            self.assertTrue('51' in SearchPage.results_found.get_text(driver))
+        SearchPage.location_search.inject_text(driver, "Lake Annie Highlands County", SLEEP_TIME)
         time.sleep(SLEEP_TIME)
-        LOCATION_SEARCH_BOX.inject_text(driver, Keys.ARROW_DOWN, SLEEP_TIME)
-        LOCATION_SEARCH_BOX.inject_text(driver, Keys.RETURN, SLEEP_TIME)
-        SERVICE_SEARCH.click(driver, SLEEP_TIME)
-        SERVICE_ORGANIZATION_SORT.click(driver, SLEEP_TIME)
-        SERVICE_ARCHBOLD_SEARCH.click(driver, SLEEP_TIME)
-        SERVICE_SEARCH_SAVE.click(driver, SLEEP_TIME)
+        SearchPage.location_search.inject_text(driver, Keys.ARROW_DOWN, SLEEP_TIME)
+        SearchPage.location_search.inject_text(driver, Keys.RETURN, SLEEP_TIME)
+        SearchPage.service_filter.click(driver, SLEEP_TIME)
+        ServiceSearch.sort_organization.click(driver, SLEEP_TIME)
+        ServiceSearch.archbold.click(driver, SLEEP_TIME)
+        ServiceSearch.save.click(driver, SLEEP_TIME)
         for i in range(0, 60):
-            SEARCH_NOW.click(driver, SLEEP_TIME)
+            SearchPage.search_now.click(driver, SLEEP_TIME)
             time.sleep(1)
         oracle()
 
@@ -163,27 +107,27 @@ class HydroclientTestCase(unittest.TestCase):
             """
             self.assertIn('2015-12-01', driver.page_source)
             self.assertIn('2015-12-30', driver.page_source)
-        LOCATION_SEARCH_BOX.inject_text(driver, 'Tampa ', 2*SLEEP_TIME)
-        LOCATION_SEARCH_BOX.inject_text(driver, Keys.ARROW_DOWN, SLEEP_TIME)
-        LOCATION_SEARCH_BOX.inject_text(driver, Keys.RETURN, SLEEP_TIME)
-        SERVICE_SEARCH.click(driver, SLEEP_TIME)
-        SERVICE_TABLE_COUNT.select_option(driver, '100', SLEEP_TIME)
-        SERVICE_NWIS_UV_SEARCH.click(driver, SLEEP_TIME)
-        SERVICE_SEARCH_SAVE.click(driver, SLEEP_TIME)
-        DATE_FILTER_ON.click(driver, SLEEP_TIME)
-        DATE_FILTER_START.clear_text(driver, 12, SLEEP_TIME)
-        DATE_FILTER_START.inject_text(driver, '12/01/2015', SLEEP_TIME)
-        DATE_FILTER_CLICKOUT.passive_click(driver, SLEEP_TIME)
-        DATE_FILTER_END.clear_text(driver, 12, SLEEP_TIME)
-        DATE_FILTER_END.inject_text(driver, '12/30/2015', SLEEP_TIME)
-        DATE_FILTER_SAVE.click(driver, SLEEP_TIME)
-        SEARCH_NOW.click(driver, SLEEP_TIME)
-        FILTER_RESULTS.click(driver, SLEEP_TIME)
-        FILTER_DERIVED_VALUE_ROW.click(driver, SLEEP_TIME)
-        SELECT_ACTION.click(driver, SLEEP_TIME)
-        WORKSPACE_SELECTION.click(driver, SLEEP_TIME)
+        SearchPage.location_search.inject_text(driver, 'Tampa ', 2*SLEEP_TIME)
+        SearchPage.location_search.inject_text(driver, Keys.ARROW_DOWN, SLEEP_TIME)
+        SearchPage.location_search.inject_text(driver, Keys.RETURN, SLEEP_TIME)
+        SearchPage.service_filter.click(driver, SLEEP_TIME)
+        ServiceSearch.table_count.select_option(driver, '100', SLEEP_TIME)
+        ServiceSearch.nwis_uv.click(driver, SLEEP_TIME)
+        ServiceSearch.save.click(driver, SLEEP_TIME)
+        SearchPage.date_filter.click(driver, SLEEP_TIME)
+        SearchPage.date_start.clear_text(driver, 12, SLEEP_TIME)
+        SearchPage.date_start.inject_text(driver, '12/01/2015', SLEEP_TIME)
+        SearchPage.date_clickout.passive_click(driver, SLEEP_TIME)
+        SearchPage.date_end.clear_text(driver, 12, SLEEP_TIME)
+        SearchPage.date_end.inject_text(driver, '12/30/2015', SLEEP_TIME)
+        SearchPage.date_save.click(driver, SLEEP_TIME)
+        SearchPage.search_now.click(driver, SLEEP_TIME)
+        SearchPage.filter_results.click(driver, SLEEP_TIME)
+        FilterResults.select_derived_value.click(driver, SLEEP_TIME)
+        FilterResults.choose_action.click(driver, SLEEP_TIME)
+        FilterResults.export_workspace.click(driver, SLEEP_TIME)
         time.sleep(10*SLEEP_TIME)
-        VIEW_WORKSPACE.click(driver, SLEEP_TIME)
+        FilterResults.nav_workspace.click(driver, SLEEP_TIME)
         oracle()
 
     def test_A_000005(self):
@@ -194,26 +138,26 @@ class HydroclientTestCase(unittest.TestCase):
             """ Export to workspace is successfull
             """
             self.assertTrue(driver.page_source.count('<em> Completed</em>') == 2)
-        LOCATION_SEARCH_BOX.inject_text(driver, 'New Haven ', SLEEP_TIME)
-        LOCATION_SEARCH_BOX.inject_text(driver, Keys.ARROW_DOWN, SLEEP_TIME)
-        LOCATION_SEARCH_BOX.inject_text(driver, Keys.RETURN, SLEEP_TIME)
-        SERVICE_SEARCH.click(driver, SLEEP_TIME)
-        SERVICE_TABLE_COUNT.select_option(driver, '100', SLEEP_TIME)
-        SERVICE_NASA_NOAH.click(driver, SLEEP_TIME)
-        SERVICE_NASA_PRIMARY_FORCING.scroll_to(driver, SLEEP_TIME)
-        SERVICE_NASA_PRIMARY_FORCING.multi_click(driver, SLEEP_TIME)
-        SERVICE_SEARCH_SEARCH.click(driver, SLEEP_TIME)
-        FILTER_RESULTS.click(driver, SLEEP_TIME)
-        FILTER_TABLE_SEARCH.inject_text(driver, 'X416-Y130', SLEEP_TIME)
-        FILTER_BY_SERVICE.click(driver, SLEEP_TIME)
-        FILTER_TABLE_COUNT.select_option(driver, '100', SLEEP_TIME)
-        FILTER_MODEL_SIM_RESULT_ROW.click(driver, SLEEP_TIME)
-        FILTER_BY_SERVICE.click(driver, SLEEP_TIME)
-        FILTER_DERIVED_VALUE_ROW.scroll_to(driver, SLEEP_TIME)
-        FILTER_DERIVED_VALUE_ROW.multi_click(driver, SLEEP_TIME)
-        SELECT_ACTION.click(driver, SLEEP_TIME)
-        WORKSPACE_SELECTION.click(driver, SLEEP_TIME)
-        VIEW_WORKSPACE.click(driver, SLEEP_TIME)
+        SearchPage.location_search.inject_text(driver, 'New Haven ', SLEEP_TIME)
+        SearchPage.location_search.inject_text(driver, Keys.ARROW_DOWN, SLEEP_TIME)
+        SearchPage.location_search.inject_text(driver, Keys.RETURN, SLEEP_TIME)
+        SearchPage.service_filter.click(driver, SLEEP_TIME)
+        ServiceSearch.table_count.select_option(driver, '100', SLEEP_TIME)
+        ServiceSearch.nasa_noah.click(driver, SLEEP_TIME)
+        ServiceSearch.nasa_forcing.scroll_to(driver, SLEEP_TIME)
+        ServiceSearch.nasa_forcing.multi_click(driver, SLEEP_TIME)
+        ServiceSearch.search.click(driver, SLEEP_TIME)
+        SearchPage.filter_results.click(driver, SLEEP_TIME)
+        FilterResults.search.inject_text(driver, 'X416-Y130', SLEEP_TIME)
+        FilterResults.sort_service.click(driver, SLEEP_TIME)
+        FilterResults.table_count.select_option(driver, '100', SLEEP_TIME)
+        FilterResults.select_model_sim.click(driver, SLEEP_TIME)
+        FilterResults.sort_service.click(driver, SLEEP_TIME)
+        FilterResults.select_derived_value.scroll_to(driver, SLEEP_TIME)
+        FilterResults.select_derived_value.multi_click(driver, SLEEP_TIME)
+        FilterResults.choose_action.click(driver, SLEEP_TIME)
+        FilterResults.export_workspace.click(driver, SLEEP_TIME)
+        FilterResults.nav_workspace.click(driver, SLEEP_TIME)
         time.sleep(60*SLEEP_TIME)
         oracle()
         

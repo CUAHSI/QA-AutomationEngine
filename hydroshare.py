@@ -4,39 +4,14 @@ import argparse
 import sys
 import os
 import time
-# import argparse
-from selenium import webdriver
-from site_element import SiteElement
 from modes import setup_mode
+from selenium import webdriver
+from hydroshare_elements import *
 
 # Test case parameters
 MODE_SELECTION = 'demo'
 SLEEP_TIME = setup_mode(MODE_SELECTION)
-# PARSER = argparse.ArgumentParser(description='Run hydroshare test suite.')
-# PARSER.add_argument('-u', '--url', required=False, help='URL for testing')
-# ARGS = PARSER.parse_args()
-# BASE_URL = ARGS.url
-# if BASE_URL is None:
 BASE_URL = "http://www.hydroshare.org" # Default
-
-# All
-DISCOVERY_TAB = SiteElement('li', el_id='dropdown-menu-search')
-# Discover page
-DISCOVER_START_DATE = SiteElement('input', el_id='id_start_date')
-DISCOVER_END_DATE = SiteElement('input', el_id='id_end_date')
-DISCOVER_VIEW_MAP_TAB = SiteElement('a', el_href='map-view')
-DISCOVER_MAP_SEARCH = SiteElement('input', el_id='geocoder-address')
-DISCOVER_MAP_SEARCH_SUBMIT = SiteElement('a', el_id='geocoder-submit')
-DISCOVER_VIEW_LIST_TAB = SiteElement('a', el_content='List')
-IUTAH_SUBJECTS_FILTER = SiteElement('input', el_id='subjects-iUTAH')
-GENERIC_RESOURCE_TYPE_FILTER = SiteElement('input', el_id='resource_type-Generic')
-IS_DISCOVERABLE_FILTER = SiteElement('input', el_id='discoverable-true')
-IS_PUBLIC_FILTER = SiteElement('input', el_id='public-true')
-BEAVER_DIVIDE_RESC = SiteElement('a', el_content='Beaver Divide Air Temperature')
-# Resource landing page from Discover
-DOWNLOAD_BAGIT = SiteElement('a', el_id='btn-download-all', el_content=\
-                             'Download All Content as Zipped BagIt Archive')
-BEAVER_DIVIDE_ZIP_SIZE = 512000
 
 # Test cases definition
 class HydroshareTestCase(unittest.TestCase):
@@ -69,22 +44,20 @@ class HydroshareTestCase(unittest.TestCase):
             """ The Beaver Divide BagIt zip file
             matches expected file size
             """
-            self.assertTrue(file_size == BEAVER_DIVIDE_ZIP_SIZE)
+            self.assertTrue(file_size == 512000)
         # Pulls up discover search page through site header
-        DISCOVERY_TAB.click(driver, SLEEP_TIME)
+        HomePage.discover_tab.click(driver, SLEEP_TIME)
         # Filters by subject of iUTAH in left panel
-        IUTAH_SUBJECTS_FILTER.click(driver, SLEEP_TIME)
+        DiscoverPage.filter_iutah_subject.click(driver, SLEEP_TIME)
         # Filters by resouce type of Generic in left panel
-        GENERIC_RESOURCE_TYPE_FILTER.click(driver, SLEEP_TIME)
+        DiscoverPage.filter_generic_resource.click(driver, SLEEP_TIME)
         # Filters by availability of Discoverable or Public
-        IS_DISCOVERABLE_FILTER.click(driver, SLEEP_TIME)
-        IS_PUBLIC_FILTER.click(driver, SLEEP_TIME)
+        DiscoverPage.filter_is_discoverable.click(driver, SLEEP_TIME)
+        DiscoverPage.filter_is_public.click(driver, SLEEP_TIME)
         # Clicks specific resourse - Beaver Divide Air Temperaure
-        BEAVER_DIVIDE_RESC.click(driver, SLEEP_TIME)
+        DiscoverPage.beaver_divide.click(driver, SLEEP_TIME)
         # Checks download button exists with text for "Download" and "BagIt"
-        self.assertTrue(('Download' in DOWNLOAD_BAGIT.get_text(driver)) and \
-                        ('BagIt' in DOWNLOAD_BAGIT.get_text(driver)))
-        download_href = DOWNLOAD_BAGIT.get_href(driver, BASE_URL)
+        download_href = ResourceLanding.download_bagit.get_href(driver, BASE_URL)
         # Download the BagIt zip file
         os.system('wget ' + download_href)
         # Get the files size of the downloaded BagIt zip file
@@ -101,14 +74,14 @@ class HydroshareTestCase(unittest.TestCase):
             """ Confirms valid page returned after navigation """
             self.assertTrue('HydroShare' in driver.title)
         # Pulls up discover search page through site header
-        DISCOVERY_TAB.click(driver, SLEEP_TIME)
-        DISCOVER_START_DATE.inject_text(driver, "01/01/2014", SLEEP_TIME)
-        DISCOVER_END_DATE.inject_text(driver, "12/31/2014", SLEEP_TIME)
+        HomePage.discover_tab.click(driver, SLEEP_TIME)
+        DiscoverPage.start_date.inject_text(driver, "01/01/2014", SLEEP_TIME)
+        DiscoverPage.end_date.inject_text(driver, "12/31/2014", SLEEP_TIME)
         # TODO fix element identification issue
-        DISCOVER_VIEW_MAP_TAB.click(driver, SLEEP_TIME)
-        DISCOVER_MAP_SEARCH.inject_text(driver, "Salt Lake City", SLEEP_TIME)
-        DISCOVER_MAP_SEARCH_SUBMIT.click(driver, SLEEP_TIME)
-        DISCOVER_VIEW_LIST_TAB.click(driver, SLEEP_TIME)
+        DiscoverPage.map_tab.click(driver, SLEEP_TIME)
+        DiscoverPage.map_search.inject_text(driver, "Salt Lake City", SLEEP_TIME)
+        DiscoverPage.map_submit.click(driver, SLEEP_TIME)
+        DiscoverPage.list_tab.click(driver, SLEEP_TIME)
         time.sleep(5)
         oracle()
 
