@@ -1,0 +1,102 @@
+% document class:
+\documentclass[10pt]{article}
+
+\usepackage{subfigure} % for subfigures
+\usepackage{amsmath}
+\usepackage{amssymb} % for math symbols
+\usepackage{graphicx} % image formats
+\usepackage[top=2cm,bottom=2cm,left=2cm,right=2cm]{geometry} % define page set up
+\usepackage{float}
+\usepackage{listings}
+%% \usepackage{columbidaeTitle}
+%% \usepackage{dirtree}
+\usepackage[normalem]{ulem}
+\usepackage{lscape}
+\usepackage{csvsimple}
+\usepackage{multicol}
+
+% color package:
+\usepackage{color}
+\newcommand{\edit}{\textcolor{red}} % marker to designate areas that need future attention
+
+\definecolor{passgreen}{rgb}{0,0.5,0}
+\definecolor{failred}{rgb}{0.5,0,0}
+
+\newcommand{\tableheader}{\textbf}
+\newcommand{\subtitleaccent}{\textsuperscript{\line(1,0){40}}}
+\newcommand{\usecase}{\large\underline}
+\newcommand{\testscenario}{\normalsize}
+\newcommand{\testcase}{\small\textit}
+\newcommand{\passtest}{\textcolor{passgreen}}
+\newcommand{\failtest}{\textcolor{failred}}
+
+\usepackage{setspace}
+%% \doublespacing
+\singlespacing
+
+% set to zero indent length
+\setlength\parindent{0pt}
+
+\definecolor{mygray}{rgb}{0.98,0.98,0.98}
+\lstset{ %
+  backgroundcolor=\color{mygray},
+  frame=single
+}
+
+\newenvironment{changemargin}[2]{%
+  \begin{list}{}{%
+      \setlength{\topsep}{0pt}%
+      \setlength{\leftmargin}{#1}%
+      \setlength{\rightmargin}{#2}%
+      \setlength{\listparindent}{\parindent}%
+      \setlength{\itemindent}{\parindent}%
+      \setlength{\parsep}{\parskip}%
+    }%
+  \item[]}{\end{list}}
+
+%% \DTsetlength{0.2em}{3em}{0.2em}{0.4pt}{1.6pt}
+
+\title{%
+  Automated Testing Engine Approach \\
+  {\large \subtitleaccent~~CUAHSI Inc.~~\subtitleaccent}}
+\author{Prepared by Neal DeBuhr}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\newpage
+\section{System Diagram}
+
+\subsection{Infrastructure}
+
+
+
+\subsection{Test Suite}
+\begin{figure}[H]
+\begin{center}
+\begin{tabular}{| c | p{6cm} | c | } \hline
+  \fbox{Test Case Scripts} & CUAHSI Test Cases & Minimum Complexity \\
+  $\downarrow$ & & \\
+  \fbox{Workflow Layer} & CUAHSI High-Level Framework & \\
+  $\downarrow$ & & $\downarrow$ \\
+  \fbox{Site Element Layer} & CUAHSI Low-Level Framework & \\
+  $\downarrow$ & & \\
+  \fbox{Selenium} & Off-the-shelf Selenium & Maximum Complexity\\ \hline
+  $\downarrow \uparrow$ & & \\
+  {Software Product} & CUAHSI Software Product & \\
+\end{tabular}
+\end{center}
+\caption{Test Suite Framework}
+\label{fig:tesSuiFra}
+\end{figure}
+
+Important Notes:
+\begin{itemize}
+\item Whenever possible, complexity should be pushed down the layers (closer to the Selenium layer)
+\item The test cases themselves (top level) should in particular be very low complexity.  Ideally, business users should be able to easily understand and perhaps even write these scripts
+\item Each level only interacts with one level below it (eg. the Workflow layer should not have Selenium commands)
+\end{itemize}
+
+\end{document}
