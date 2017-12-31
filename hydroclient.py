@@ -3,15 +3,11 @@ import unittest
 import argparse
 import sys
 import time
+from hc_macros import *
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
-from selenium.webdriver.common.keys import Keys
-from hydroclient_elements import *
-from modes import setup_mode
 
 # Test case parameters
-MODE_SELECTION = 'demo'
-SLEEP_TIME = setup_mode(MODE_SELECTION)
 BASE_URL = 'http://data.cuahsi.org'
 
 # Test cases definition
@@ -30,6 +26,7 @@ class HydroclientTestCase(unittest.TestCase):
         else:
             driver = webdriver.Firefox(profile)
         driver.get(BASE_URL)
+        time.sleep(5)
         driver.implicitly_wait(10)
 
     def tearDown(self):
@@ -46,32 +43,11 @@ class HydroclientTestCase(unittest.TestCase):
             sent to the workspace, and then is processed
             successfully in the workspace
             """
-            workspace_load = True
-            try:
-                SiteElement('span', el_class='glyphicon-thumbs-up')
-            except NoSuchElementException:
-                workspace_load = False
-            self.assertTrue(workspace_load)
-        SearchPage.location_search.inject_text(driver, "Lake Annie Highlands County", SLEEP_TIME)
-        time.sleep(SLEEP_TIME)
-        SearchPage.location_search.inject_text(driver, Keys.ARROW_DOWN, SLEEP_TIME)
-        SearchPage.location_search.inject_text(driver, Keys.RETURN, SLEEP_TIME)
-        SearchPage.service_filter.click(driver, SLEEP_TIME)
-        ServiceSearch.sort_organization.click(driver, SLEEP_TIME)
-        ServiceSearch.archbold.click(driver, SLEEP_TIME)
-        ServiceSearch.save.click(driver, SLEEP_TIME)
-        SearchPage.search_now.click(driver, SLEEP_TIME)
-        time.sleep(10)
-        SearchPage.filter_results.click(driver, SLEEP_TIME)
-        time.sleep(SLEEP_TIME)
-        driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-        time.sleep(SLEEP_TIME)
-        FilterResults.nav_close.scroll_to(driver, SLEEP_TIME)
-        FilterResults.select_any.click(driver, SLEEP_TIME)
-        FilterResults.choose_action.click(driver, SLEEP_TIME)
-        FilterResults.export_workspace.click(driver, SLEEP_TIME)
-        FilterResults.nav_workspace.click(driver, SLEEP_TIME)
-        time.sleep(60)
+            self.assertTrue(Workspace.completed_count(driver) == 1)
+
+        Search.location_search(driver, 'Lake Annie Highlands County')
+        ServiceSearch.filter_services(driver, organizations='Archbold Biological Station')
+        FilterResults.any_to_workspace(driver)
         oracle()
 
     def test_A_000003(self):
@@ -83,15 +59,9 @@ class HydroclientTestCase(unittest.TestCase):
             with the "Archbold Biological Center" set as the only
             service visible via search filtering
             """
-            self.assertTrue('51' in SearchPage.results_found.get_text(driver))
-        SearchPage.location_search.inject_text(driver, "Lake Annie Highlands County", SLEEP_TIME)
-        time.sleep(SLEEP_TIME)
-        SearchPage.location_search.inject_text(driver, Keys.ARROW_DOWN, SLEEP_TIME)
-        SearchPage.location_search.inject_text(driver, Keys.RETURN, SLEEP_TIME)
-        SearchPage.service_filter.click(driver, SLEEP_TIME)
-        ServiceSearch.sort_organization.click(driver, SLEEP_TIME)
-        ServiceSearch.archbold.click(driver, SLEEP_TIME)
-        ServiceSearch.save.click(driver, SLEEP_TIME)
+            self.assertTrue('51' in Search.results_count(driver))
+        Search.location_search(driver, 'Lake Annie Highlands County')
+        ServiceSearch.filter_services(driver, organizations='Archbold Biological Station')
         for i in range(0, 60):
             SearchPage.search_now.click(driver, SLEEP_TIME)
             time.sleep(1)
@@ -105,29 +75,11 @@ class HydroclientTestCase(unittest.TestCase):
             """ Start date and end date in workspace match the initial
             date filtering values established in the Search interface
             """
-            self.assertIn('2015-12-01', driver.page_source)
-            self.assertIn('2015-12-30', driver.page_source)
-        SearchPage.location_search.inject_text(driver, 'Tampa ', 2*SLEEP_TIME)
-        SearchPage.location_search.inject_text(driver, Keys.ARROW_DOWN, SLEEP_TIME)
-        SearchPage.location_search.inject_text(driver, Keys.RETURN, SLEEP_TIME)
-        SearchPage.service_filter.click(driver, SLEEP_TIME)
-        ServiceSearch.table_count.select_option(driver, '100', SLEEP_TIME)
-        ServiceSearch.nwis_uv.click(driver, SLEEP_TIME)
-        ServiceSearch.save.click(driver, SLEEP_TIME)
-        SearchPage.date_filter.click(driver, SLEEP_TIME)
-        SearchPage.date_start.clear_text(driver, 12, SLEEP_TIME)
-        SearchPage.date_start.inject_text(driver, '12/01/2015', SLEEP_TIME)
-        SearchPage.date_clickout.passive_click(driver, SLEEP_TIME)
-        SearchPage.date_end.clear_text(driver, 12, SLEEP_TIME)
-        SearchPage.date_end.inject_text(driver, '12/30/2015', SLEEP_TIME)
-        SearchPage.date_save.click(driver, SLEEP_TIME)
-        SearchPage.search_now.click(driver, SLEEP_TIME)
-        SearchPage.filter_results.click(driver, SLEEP_TIME)
-        FilterResults.select_derived_value.click(driver, SLEEP_TIME)
-        FilterResults.choose_action.click(driver, SLEEP_TIME)
-        FilterResults.export_workspace.click(driver, SLEEP_TIME)
-        time.sleep(10*SLEEP_TIME)
-        FilterResults.nav_workspace.click(driver, SLEEP_TIME)
+            self.assertTrue(Workspace.in_results(driver,['2015-12-01','2015-12-30']))
+        Search.location_search(driver, 'Tampa ')
+        ServiceSearch.filter_services(driver, titles='NWIS Unit Values')
+        Search.date_filter(driver, '12/01/2015', '12/30/2015')
+        FilterResults.derived_value_to_workspace(driver)
         oracle()
 
     def test_A_000005(self):
@@ -137,28 +89,11 @@ class HydroclientTestCase(unittest.TestCase):
         def oracle():
             """ Export to workspace is successfull
             """
-            self.assertTrue(driver.page_source.count('<em> Completed</em>') == 2)
-        SearchPage.location_search.inject_text(driver, 'New Haven ', SLEEP_TIME)
-        SearchPage.location_search.inject_text(driver, Keys.ARROW_DOWN, SLEEP_TIME)
-        SearchPage.location_search.inject_text(driver, Keys.RETURN, SLEEP_TIME)
-        SearchPage.service_filter.click(driver, SLEEP_TIME)
-        ServiceSearch.table_count.select_option(driver, '100', SLEEP_TIME)
-        ServiceSearch.nasa_noah.click(driver, SLEEP_TIME)
-        ServiceSearch.nasa_forcing.scroll_to(driver, SLEEP_TIME)
-        ServiceSearch.nasa_forcing.multi_click(driver, SLEEP_TIME)
-        ServiceSearch.search.click(driver, SLEEP_TIME)
-        SearchPage.filter_results.click(driver, SLEEP_TIME)
-        FilterResults.search.inject_text(driver, 'X416-Y130', SLEEP_TIME)
-        FilterResults.sort_service.click(driver, SLEEP_TIME)
-        FilterResults.table_count.select_option(driver, '100', SLEEP_TIME)
-        FilterResults.select_model_sim.click(driver, SLEEP_TIME)
-        FilterResults.sort_service.click(driver, SLEEP_TIME)
-        FilterResults.select_derived_value.scroll_to(driver, SLEEP_TIME)
-        FilterResults.select_derived_value.multi_click(driver, SLEEP_TIME)
-        FilterResults.choose_action.click(driver, SLEEP_TIME)
-        FilterResults.export_workspace.click(driver, SLEEP_TIME)
-        FilterResults.nav_workspace.click(driver, SLEEP_TIME)
-        time.sleep(60*SLEEP_TIME)
+            self.assertTrue(Workspace.completed_count(driver) == 2)
+        Search.location_search(driver, 'New Haven ')
+        ServiceSearch.filter_services(driver, titles=['NLDAS Hourly NOAH Data','NLDAS Hourly Primary Forcing Data'])
+        FilterResults.search_filter_table(driver, 'X416-Y130')
+        FilterResults.model_sim_and_derived_value_to_workspace(driver)
         oracle()
         
 if __name__ == '__main__':

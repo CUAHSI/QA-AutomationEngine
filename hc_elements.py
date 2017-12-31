@@ -13,7 +13,11 @@ class SearchPage:
         self.date_clickout = SiteElement('h3', el_content='Please select your date range:')
         self.date_save = SiteElement('*', el_id='btnDateRangeModalSave')
 
-class ServiceSearch:
+    def goto_service_filter(self, driver, SLEEP_TIME):
+        self.service_filter.click(driver, SLEEP_TIME)
+
+        
+class ServiceSearchPage:
     def __init__(self):
         self.sort_organization = SiteElement('th', el_content='Organization')
         self.save = SiteElement('button', el_id='btnServicesModalSave')
@@ -24,7 +28,13 @@ class ServiceSearch:
         self.nasa_noah = SiteElement('a', el_content='NLDAS Hourly NOAH Data', recursive_loc=[SiteElement(el_dom='./../..'), SiteElement(el_dom='./td[1]')])
         self.nasa_forcing = SiteElement('a', el_content='NLDAS Hourly Primary Forcing Data', recursive_loc=[SiteElement(el_dom='./../..'), SiteElement(el_dom='./td[1]')])
 
-class FilterResults:
+    def select_organization(self, service_organization):
+        return SiteElement('td', el_content=service_organization)
+
+    def select_title(self, service_title):
+        return SiteElement('a', el_content=service_title, recursive_loc=[SiteElement(el_dom='./../..'), SiteElement(el_dom='./td[1]')])
+        
+class FilterResultsPage:
     def __init__(self):
         self.choose_action = SiteElement('div', el_id='ddActionsDSR')
         self.table_count = SiteElement('select', el_name='tblDetailedSearchResults_length')
@@ -39,7 +49,7 @@ class FilterResults:
         self.sort_service = SiteElement('div', el_id='tblDetailedSearchResults_wrapper', recursive_loc=[SiteElement('th', el_content='Service Title')])
 
 SearchPage = SearchPage()
-ServiceSearch = ServiceSearch()
-FilterResults = FilterResults()
+ServiceSearchPage = ServiceSearchPage()
+FilterResultsPage = FilterResultsPage()
 
 

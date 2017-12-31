@@ -2,16 +2,14 @@
 import unittest
 import argparse
 import sys
-import os
 import time
-from modes import setup_mode
 from selenium import webdriver
-from hydroshare_elements import *
+from hs_macros import *
+from hs_elements import *
 
 # Test case parameters
-MODE_SELECTION = 'demo'
-SLEEP_TIME = setup_mode(MODE_SELECTION)
 BASE_URL = "http://www.hydroshare.org" # Default
+
 
 # Test cases definition
 class HydroshareTestCase(unittest.TestCase):
@@ -44,26 +42,9 @@ class HydroshareTestCase(unittest.TestCase):
             """ The Beaver Divide BagIt zip file
             matches expected file size
             """
-            self.assertTrue(file_size == 512000)
-        # Pulls up discover search page through site header
-        HomePage.discover_tab.click(driver, SLEEP_TIME)
-        # Filters by subject of iUTAH in left panel
-        DiscoverPage.filter_iutah_subject.click(driver, SLEEP_TIME)
-        # Filters by resouce type of Generic in left panel
-        DiscoverPage.filter_generic_resource.click(driver, SLEEP_TIME)
-        # Filters by availability of Discoverable or Public
-        DiscoverPage.filter_is_discoverable.click(driver, SLEEP_TIME)
-        DiscoverPage.filter_is_public.click(driver, SLEEP_TIME)
-        # Clicks specific resourse - Beaver Divide Air Temperaure
-        DiscoverPage.beaver_divide.click(driver, SLEEP_TIME)
-        # Checks download button exists with text for "Download" and "BagIt"
-        download_href = ResourceLanding.download_bagit.get_href(driver, BASE_URL)
-        # Download the BagIt zip file
-        os.system('wget ' + download_href)
-        # Get the files size of the downloaded BagIt zip file
-        download_file = download_href.split('/')[-1]
-        file_size = os.stat(download_file).st_size
-        # Confirm the downloaded file size matches expectation
+            self.assertTrue(ResourceLanding.download_size(driver, BASE_URL) == 512000)
+        Discover.discover_resources(driver, subject='iUTAH', resource_type='Generic', availability=['discoverable','public'])
+        Discover.open_resource(driver, 'Beaver Divide Air Temperature')
         oracle()
 
     def todo_test_B_000004(self):

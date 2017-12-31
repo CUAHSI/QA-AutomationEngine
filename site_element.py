@@ -8,8 +8,8 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.select import Select
 
 class SiteElement:
-    """ Defines site elements in a structured way and provides a convenient means
-    for element manipulations (clicking, entering text, etc.)
+    """ Defines site elements in a structured way and provides a convenient
+    means for element manipulations (clicking, entering text, etc.)
     """
     def __init__(self, el_type=None, el_id=None, el_content=None,
                  el_href=None, el_class=None, el_dom=None, el_name=None,
