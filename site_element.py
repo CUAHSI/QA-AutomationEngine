@@ -221,6 +221,11 @@ class SiteElement:
             time.sleep(sleep_time/len(input_text))
         time.sleep(sleep_time)
 
+    def get_attribute(self, the_driver, attribute):
+        """ Returns any attribute of website element """
+        target_element = self.loc_it(the_driver)
+        return target_element.get_attribute(attribute)
+        
     def get_text(self, the_driver):
         """ Returns content text of website element """
         target_element = self.loc_it(the_driver)

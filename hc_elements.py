@@ -12,7 +12,14 @@ class SearchPage:
         self.date_end = SiteElement('*', el_id='endDateModal')
         self.date_clickout = SiteElement('h3', el_content='Please select your date range:')
         self.date_save = SiteElement('*', el_id='btnDateRangeModalSave')
+        self.layer_control = SiteElement('*', el_id='Layer Control')
+        self.legend_tab = SiteElement('a', el_content='LEGENDS')
+        self.search_tab = SiteElement('a', el_content='SEARCH')
+        self.legend = SiteElement('*', el_id='nlcdColorClassUpdate')
 
+    def map_layer(self, name):
+        return SiteElement('label', el_content=name)
+        
     def map_indicator(self, results_count):
         return SiteElement('div', el_content=results_count)
         

@@ -13,9 +13,22 @@ SLEEP_TIME = setup_mode(MODE_SELECTION)
 class Search:
     """ Main search interface macros """
 
+    def legend_visible(self, driver):
+        SearchPage.legend_tab.click(driver, SLEEP_TIME)
+        legend_display = SearchPage.legend.get_attribute(driver, 'style')
+        legend_display = legend_display.split(':')[-1]
+        legend_display = legend_display.split(';')[0]
+        legend_display = legend_display.split(' ')[-1]
+        SearchPage.search_tab.click(driver, SLEEP_TIME)
+        return (legend_display != 'none')
+    
     def search(self, driver, count=1):
         for i in range(0, count):
             SearchPage.search_now.click(driver, SLEEP_TIME)
+
+    def layer_toggle_landcover(self, driver):
+        SearchPage.layer_control.click(driver, SLEEP_TIME)
+        SearchPage.map_layer('USGS LandCover 2011').click(driver, SLEEP_TIME)
 
     def map_icon_open(self, driver, results_count):
         SearchPage.map_indicator(results_count).click(driver, SLEEP_TIME)

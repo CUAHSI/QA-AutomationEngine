@@ -33,7 +33,7 @@ class HydroclientTestCase(unittest.TestCase):
         """ Tear down test environment after execution """
         driver.quit()
 
-    def test_A_000002(self):
+    def no_test_A_000002(self):
         """ Confirms metadata available through
         HydroClient and that a sample of the data
         downloads successfully
@@ -50,7 +50,7 @@ class HydroclientTestCase(unittest.TestCase):
         FilterResults.any_to_workspace(driver)
         oracle()
 
-    def test_A_000003(self):
+    def no_test_A_000003(self):
         """ Confirms repeated search for Lake Annie data does not result
         in problematic behavior
         """
@@ -65,7 +65,7 @@ class HydroclientTestCase(unittest.TestCase):
         Search.search(driver, 60)
         oracle()
 
-    def test_A_000004(self):
+    def no_test_A_000004(self):
         """ Confirms date filtering of NWIS UV data service is maintained
         throughout search and workspace export workflow
         """
@@ -80,7 +80,7 @@ class HydroclientTestCase(unittest.TestCase):
         FilterResults.derived_value_to_workspace(driver)
         oracle()
 
-    def test_A_000005(self):
+    def no_test_A_000005(self):
         """ Confirms New Haven CT Site X416-Y130 metadata and data are
         available for NASA Goddard Earth Sciences services
         """
@@ -94,7 +94,7 @@ class HydroclientTestCase(unittest.TestCase):
         FilterResults.model_sim_and_derived_value_to_workspace(driver)
         oracle()
 
-    def test_A_000006(self):
+    def no_test_A_000006(self):
         """ Confirms Prague data is online for a site near Köln
         Germany
         """
@@ -106,6 +106,22 @@ class HydroclientTestCase(unittest.TestCase):
         Search.map_icon_open(driver, '4')
         MapMarker.all_to_workspace(driver)
         oracle()
+
+    def test_A_000007(self):
+        """ Confirms visibility of the legend when the USGS Landcover
+        layer is turned on within the search interface
+        """
+        def oracle():
+            """ Export to workspace is successful """
+            self.assertTrue(Search.legend_visible(driver))
+            Search.layer_toggle_landcover(driver)
+            self.assertFalse(Search.legend_visible(driver))
+        Search.location_search(driver, 'Anchorage ')
+        Search.layer_toggle_landcover(driver)
+        oracle()
+        
+        
+
         
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
