@@ -33,7 +33,7 @@ class HydroclientTestCase(unittest.TestCase):
         """ Tear down test environment after execution """
         driver.quit()
 
-    def no_test_A_000002(self):
+    def test_A_000002(self):
         """ Confirms metadata available through
         HydroClient and that a sample of the data
         downloads successfully
@@ -43,14 +43,14 @@ class HydroclientTestCase(unittest.TestCase):
             sent to the workspace, and then is processed
             successfully in the workspace
             """
-            self.assertTrue(Workspace.completed_count(driver) == 1)
+            self.assertEqual(Workspace.completed_count(driver), 1)
 
         Search.location_search(driver, 'Lake Annie Highlands County')
         ServiceSearch.filter_services(driver, organizations='Archbold Biological Station')
         FilterResults.any_to_workspace(driver)
         oracle()
 
-    def no_test_A_000003(self):
+    def test_A_000003(self):
         """ Confirms repeated search for Lake Annie data does not result
         in problematic behavior
         """
@@ -59,13 +59,13 @@ class HydroclientTestCase(unittest.TestCase):
             with the "Archbold Biological Center" set as the only
             service visible via search filtering
             """
-            self.assertTrue('51' in Search.results_count(driver))
+            self.assertIn('51', Search.results_count(driver))
         Search.location_search(driver, 'Lake Annie Highlands County')
         ServiceSearch.filter_services(driver, organizations='Archbold Biological Station')
         Search.search(driver, 60)
         oracle()
 
-    def no_test_A_000004(self):
+    def test_A_000004(self):
         """ Confirms date filtering of NWIS UV data service is maintained
         throughout search and workspace export workflow
         """
@@ -80,27 +80,27 @@ class HydroclientTestCase(unittest.TestCase):
         FilterResults.derived_value_to_workspace(driver)
         oracle()
 
-    def no_test_A_000005(self):
+    def test_A_000005(self):
         """ Confirms New Haven CT Site X416-Y130 metadata and data are
         available for NASA Goddard Earth Sciences services
         """
         def oracle():
             """ Export to workspace is successful
             """
-            self.assertTrue(Workspace.completed_count(driver) == 2)
+            self.assertEqual(Workspace.completed_count(driver), 2)
         Search.location_search(driver, 'New Haven ')
         ServiceSearch.filter_services(driver, titles=['NLDAS Hourly NOAH Data','NLDAS Hourly Primary Forcing Data'])
         FilterResults.search_filter_table(driver, 'X416-Y130')
         FilterResults.model_sim_and_derived_value_to_workspace(driver)
         oracle()
 
-    def no_test_A_000006(self):
+    def test_A_000006(self):
         """ Confirms Prague data is online for a site near Köln
         Germany
         """
         def oracle():
             """ Export to workspace is successful """
-            self.assertTrue(Workspace.completed_count(driver) == 4)
+            self.assertEqual(Workspace.completed_count(driver), 4)
         Search.location_search(driver, 'Köln ')
         Search.search(driver)
         Search.map_icon_open(driver, '4')

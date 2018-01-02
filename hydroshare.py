@@ -42,7 +42,7 @@ class HydroshareTestCase(unittest.TestCase):
             """ The Beaver Divide BagIt zip file
             matches expected file size
             """
-            self.assertTrue(ResourceLanding.download_size(driver, BASE_URL) == 512000)
+            self.assertEqual(ResourceLanding.download_size(driver, BASE_URL), 512000) #Bytes
         Discover.discover_resources(driver, subject='iUTAH', resource_type='Generic', availability=['discoverable','public'])
         Discover.open_resource(driver, 'Beaver Divide Air Temperature')
         oracle()
@@ -53,7 +53,7 @@ class HydroshareTestCase(unittest.TestCase):
         """
         def oracle():
             """ Confirms valid page returned after navigation """
-            self.assertTrue('HydroShare' in driver.title)
+            self.assertIn('HydroShare', driver.title)
         # Pulls up discover search page through site header
         HomePage.discover_tab.click(driver, SLEEP_TIME)
         DiscoverPage.start_date.inject_text(driver, "01/01/2014", SLEEP_TIME)
