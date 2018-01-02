@@ -12,7 +12,9 @@ SLEEP_TIME = setup_mode(MODE_SELECTION)
 
 class Search:
     """ Main search interface macros """
-
+    def quick_start(self, driver):
+        SearchPage.quickstart.click(driver, SLEEP_TIME)
+    
     def legend_visible(self, driver):
         SearchPage.legend_tab.click(driver, SLEEP_TIME)
         legend_display = SearchPage.legend.get_attribute(driver, 'style')
@@ -26,9 +28,9 @@ class Search:
         for i in range(0, count):
             SearchPage.search_now.click(driver, SLEEP_TIME)
 
-    def layer_toggle_landcover(self, driver):
+    def layer_toggle(self, driver, layer_name):
         SearchPage.layer_control.click(driver, SLEEP_TIME)
-        SearchPage.map_layer('USGS LandCover 2011').click(driver, SLEEP_TIME)
+        SearchPage.map_layer(layer_name).click(driver, SLEEP_TIME)
 
     def map_icon_open(self, driver, results_count):
         SearchPage.map_indicator(results_count).click(driver, SLEEP_TIME)
@@ -145,9 +147,33 @@ class MapMarker:
         MapMarkerPage.choose_action.click(driver, SLEEP_TIME)
         MapMarkerPage.export_workspace.click(driver, SLEEP_TIME)
         MapMarkerPage.nav_workspace.click(driver, SLEEP_TIME)
+
+class QuickStart:
+    def full_page(self, driver):
+        return driver.page_source
     
+    def help_expand(self, driver, help_item):
+        QuickStartPage.help_item(help_item).click(driver, SLEEP_TIME)
+
+    def help_more(self, driver, link_text):
+        QuickStartPage.more_info(link_text).click(driver, SLEEP_TIME)
+
+class External:
+    def switch_new_page(self, driver):
+        win_handle = driver.window_handles[-1]
+        driver.switch_to_window(win_handle)
+
+    def switch_old_page(self, driver):
+        win_handle = driver.window_handles[-2]
+        driver.switch_to_window(win_handle)
+        
+    def full_page(self, driver):
+        return driver.page_source
+        
 Search = Search()
 ServiceSearch = ServiceSearch()
 FilterResults = FilterResults()
 Workspace = Workspace()
 MapMarker = MapMarker()
+QuickStart = QuickStart()
+External = External()

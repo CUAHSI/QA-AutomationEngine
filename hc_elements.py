@@ -16,6 +16,7 @@ class SearchPage:
         self.legend_tab = SiteElement('a', el_content='LEGENDS')
         self.search_tab = SiteElement('a', el_content='SEARCH')
         self.legend = SiteElement('*', el_id='nlcdColorClassUpdate')
+        self.quickstart = SiteElement('*', el_id='quickStartModalTab')
 
     def map_layer(self, name):
         return SiteElement('label', el_content=name)
@@ -65,9 +66,25 @@ class MapMarkerPage:
         self.sort_data_type = SiteElement('div', el_id='tblMapMarker_wrapper', recursive_loc=[SiteElement('div', el_class='dataTables_scroll'), SiteElement('div', el_class='dataTables_scrollHead'), SiteElement('div', el_class='dataTables_scrollHeadInner'), SiteElement('table'), SiteElement('thead'), SiteElement('tr'), SiteElement('th', el_content='Data Type')])
         self.select_any = SiteElement('table', el_id='tblMapMarker', recursive_loc=[SiteElement(el_dom='./tbody'), SiteElement(el_dom='./tr'), SiteElement(el_dom='./td'), SiteElement(el_dom='./div')])
         self.nav_workspace = SiteElement('button', el_id='tableModal-DataMgr')
+
+class QuickStartPage:
+    def __init__(self):
+        self.full = SiteElement('body')
+    
+    def help_item(self, name):
+        return SiteElement('a', el_content=name)
+
+    def more_info(self, name):
+        return SiteElement('a', el_content=name)
+
+class ExternalPage:
+    def __init__(self):
+        self.full = SiteElement('body')
     
 SearchPage = SearchPage()
 ServiceSearchPage = ServiceSearchPage()
 FilterResultsPage = FilterResultsPage()
 MapMarkerPage = MapMarkerPage()
+QuickStartPage = QuickStartPage()
+ExternalPage = ExternalPage()
 
