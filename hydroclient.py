@@ -107,7 +107,7 @@ class HydroclientTestCase(unittest.TestCase):
         MapMarker.all_to_workspace(driver)
         oracle()
 
-    def no_test_A_000007(self):
+    def test_A_000007(self):
         """ Confirms visibility of the legend when the USGS Landcover
         layer is turned on within the search interface
         """
@@ -116,10 +116,10 @@ class HydroclientTestCase(unittest.TestCase):
             and not visible when the layer is off
             """
             self.assertTrue(Search.legend_visible(driver))
-            Search.layer_toggle_landcover(driver)
+            Search.layer_toggle(driver, 'USGS LandCover 2011')
             self.assertFalse(Search.legend_visible(driver))
         Search.location_search(driver, 'Anchorage ')
-        Search.layer_toggle_landcover(driver)
+        Search.layer_toggle(driver, 'USGS LandCover 2011')
         oracle()
         
     def test_A_000008(self):
