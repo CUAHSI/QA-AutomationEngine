@@ -162,6 +162,18 @@ class SiteElement:
         actions.key_up(Keys.LEFT_CONTROL)
         actions.perform()
         time.sleep(sleep_time)
+
+    def range_click(self, the_driver, sleep_time):
+        """ Clicks an element while holding the control key, as to enable
+        a range selection
+        """
+        target_element = self.loc_it(the_driver)
+        actions = ActionChains(the_driver)
+        actions.key_down(Keys.LEFT_SHIFT)
+        actions.click(target_element)
+        actions.key_up(Keys.LEFT_SHIFT)
+        actions.perform()
+        time.sleep(sleep_time)
         
     def passive_click(self, the_driver, sleep_time):
         """ Identifies an element on the page.  After identification

@@ -12,6 +12,14 @@ SLEEP_TIME = setup_mode(MODE_SELECTION)
 
 class Search:
     """ Main search interface macros """
+
+    def search(self, driver, count=1):
+        for i in range(0, count):
+            SearchPage.search_now.click(driver, SLEEP_TIME)
+
+    def map_icon_open(self, driver, results_count):
+        SearchPage.map_indicator(results_count).click(driver, SLEEP_TIME)
+            
     def location_search(self, driver, location):
         SearchPage.location_search.inject_text(driver, location, SLEEP_TIME)
         SearchPage.location_search.inject_text(driver, Keys.ARROW_DOWN, SLEEP_TIME)
@@ -68,6 +76,7 @@ class FilterResults:
         FilterResultsPage.select_any.click(driver, SLEEP_TIME)
         FilterResultsPage.choose_action.click(driver, SLEEP_TIME)
         FilterResultsPage.export_workspace.click(driver, SLEEP_TIME)
+        FilterResultsPage.nav_workspace.click(driver, SLEEP_TIME)
 
     def model_sim_and_derived_value_to_workspace(self, driver):
         SearchPage.filter_results.click(driver, SLEEP_TIME)
@@ -78,6 +87,7 @@ class FilterResults:
         FilterResultsPage.select_derived_value.multi_click(driver, SLEEP_TIME)
         FilterResultsPage.choose_action.click(driver, SLEEP_TIME)
         FilterResultsPage.export_workspace.click(driver, SLEEP_TIME)
+        FilterResultsPage.nav_workspace.click(driver, SLEEP_TIME)
         
     def derived_value_to_workspace(self, driver):
         SearchPage.filter_results.click(driver, SLEEP_TIME)
@@ -85,6 +95,7 @@ class FilterResults:
         FilterResultsPage.select_derived_value.click(driver, SLEEP_TIME)
         FilterResultsPage.choose_action.click(driver, SLEEP_TIME)
         FilterResultsPage.export_workspace.click(driver, SLEEP_TIME)
+        FilterResultsPage.nav_workspace.click(driver, SLEEP_TIME)
         
     def search_filter_table(self, driver, search_string):
         SearchPage.filter_results.click(driver, SLEEP_TIME)
@@ -93,12 +104,9 @@ class FilterResults:
         FilterResultsPage.table_count.select_option(driver, '100', SLEEP_TIME)
         FilterResultsPage.nav_close.click(driver, SLEEP_TIME)
         
-        
-        
 class Workspace:
     """ Macros related to workspace page/modal """
     def completed_count(self, driver):
-        FilterResultsPage.nav_workspace.click(driver, SLEEP_TIME)
         time.sleep(50*SLEEP_TIME)
         return driver.page_source.count('<em> Completed</em>')
 
@@ -113,8 +121,20 @@ class Workspace:
             if strings not in driver.page_source:
                 return False
         return True
+
+class MapMarker:
+    def all_to_workspace(self, driver):
+        MapMarkerPage.sort_data_type.click(driver, SLEEP_TIME)
+        MapMarkerPage.select_any.click(driver, SLEEP_TIME)
+        MapMarkerPage.sort_data_type.click(driver, SLEEP_TIME)
+        MapMarkerPage.select_any.scroll_to(driver, SLEEP_TIME)
+        MapMarkerPage.select_any.range_click(driver, SLEEP_TIME)
+        MapMarkerPage.choose_action.click(driver, SLEEP_TIME)
+        MapMarkerPage.export_workspace.click(driver, SLEEP_TIME)
+        MapMarkerPage.nav_workspace.click(driver, SLEEP_TIME)
     
 Search = Search()
 ServiceSearch = ServiceSearch()
 FilterResults = FilterResults()
 Workspace = Workspace()
+MapMarker = MapMarker()

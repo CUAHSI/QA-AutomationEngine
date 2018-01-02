@@ -13,6 +13,9 @@ class SearchPage:
         self.date_clickout = SiteElement('h3', el_content='Please select your date range:')
         self.date_save = SiteElement('*', el_id='btnDateRangeModalSave')
 
+    def map_indicator(self, results_count):
+        return SiteElement('div', el_content=results_count)
+        
     def goto_service_filter(self, driver, SLEEP_TIME):
         self.service_filter.click(driver, SLEEP_TIME)
 
@@ -48,8 +51,16 @@ class FilterResultsPage:
         self.select_model_sim = SiteElement('td', el_content='Model Simulation Result')
         self.sort_service = SiteElement('div', el_id='tblDetailedSearchResults_wrapper', recursive_loc=[SiteElement('th', el_content='Service Title')])
 
+class MapMarkerPage:
+    def __init__(self):
+        self.choose_action = SiteElement('div', el_id='ddActionsMM')
+        self.export_workspace = SiteElement('a', el_id='anchorAddSelectionsToWorkspaceMM')
+        self.sort_data_type = SiteElement('div', el_id='tblMapMarker_wrapper', recursive_loc=[SiteElement('div', el_class='dataTables_scroll'), SiteElement('div', el_class='dataTables_scrollHead'), SiteElement('div', el_class='dataTables_scrollHeadInner'), SiteElement('table'), SiteElement('thead'), SiteElement('tr'), SiteElement('th', el_content='Data Type')])
+        self.select_any = SiteElement('table', el_id='tblMapMarker', recursive_loc=[SiteElement(el_dom='./tbody'), SiteElement(el_dom='./tr'), SiteElement(el_dom='./td'), SiteElement(el_dom='./div')])
+        self.nav_workspace = SiteElement('button', el_id='tableModal-DataMgr')
+    
 SearchPage = SearchPage()
 ServiceSearchPage = ServiceSearchPage()
 FilterResultsPage = FilterResultsPage()
-
+MapMarkerPage = MapMarkerPage()
 

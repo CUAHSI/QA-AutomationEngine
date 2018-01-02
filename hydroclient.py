@@ -62,9 +62,7 @@ class HydroclientTestCase(unittest.TestCase):
             self.assertTrue('51' in Search.results_count(driver))
         Search.location_search(driver, 'Lake Annie Highlands County')
         ServiceSearch.filter_services(driver, organizations='Archbold Biological Station')
-        for i in range(0, 60):
-            SearchPage.search_now.click(driver, SLEEP_TIME)
-            time.sleep(1)
+        Search.search(driver, 60)
         oracle()
 
     def test_A_000004(self):
@@ -87,13 +85,26 @@ class HydroclientTestCase(unittest.TestCase):
         available for NASA Goddard Earth Sciences services
         """
         def oracle():
-            """ Export to workspace is successfull
+            """ Export to workspace is successful
             """
             self.assertTrue(Workspace.completed_count(driver) == 2)
         Search.location_search(driver, 'New Haven ')
         ServiceSearch.filter_services(driver, titles=['NLDAS Hourly NOAH Data','NLDAS Hourly Primary Forcing Data'])
         FilterResults.search_filter_table(driver, 'X416-Y130')
         FilterResults.model_sim_and_derived_value_to_workspace(driver)
+        oracle()
+
+    def test_A_000006(self):
+        """ Confirms Prague data is online for a site near Köln
+        Germany
+        """
+        def oracle():
+            """ Export to workspace is successful """
+            self.assertTrue(Workspace.completed_count(driver) == 4)
+        Search.location_search(driver, 'Köln ')
+        Search.search(driver)
+        Search.map_icon_open(driver, '4')
+        MapMarker.all_to_workspace(driver)
         oracle()
         
 if __name__ == '__main__':
