@@ -12,6 +12,17 @@ SLEEP_TIME = setup_mode(MODE_SELECTION)
 
 class Search:
     """ Main search interface macros """
+    def zendesk_help(self, driver, search_text, article_text):
+        SearchPage.zendesk_iframe.iframe_in(driver)
+        SearchPage.zendesk_help.click(driver, SLEEP_TIME)
+        SearchPage.zendesk_iframe.iframe_out(driver)
+        SearchPage.zendesk_results.iframe_in(driver)
+        SearchPage.zendesk_search.inject_text(driver, search_text, SLEEP_TIME)
+        SearchPage.zendesk_search.inject_text(driver, Keys.RETURN, SLEEP_TIME)
+        SearchPage.zendesk_return(article_text).click(driver, SLEEP_TIME)
+        SearchPage.zendesk_more.scroll_to(driver, SLEEP_TIME)
+        SearchPage.zendesk_more.click(driver, SLEEP_TIME)
+        
     def quick_start(self, driver):
         SearchPage.quickstart.click(driver, SLEEP_TIME)
     
@@ -36,6 +47,8 @@ class Search:
         SearchPage.map_indicator(results_count).click(driver, SLEEP_TIME)
             
     def location_search(self, driver, location):
+        SearchPage.location_search.click(driver, SLEEP_TIME)
+        SearchPage.location_search.clear_all_text(driver, SLEEP_TIME)
         SearchPage.location_search.inject_text(driver, location, SLEEP_TIME)
         SearchPage.location_search.inject_text(driver, Keys.ARROW_DOWN, SLEEP_TIME)
         SearchPage.location_search.inject_text(driver, Keys.RETURN, SLEEP_TIME)
@@ -161,15 +174,18 @@ class QuickStart:
 class External:
     def switch_new_page(self, driver):
         win_handle = driver.window_handles[-1]
-        driver.switch_to_window(win_handle)
+        driver.switch_to.window(win_handle)
 
     def switch_old_page(self, driver):
         win_handle = driver.window_handles[-2]
-        driver.switch_to_window(win_handle)
+        driver.switch_to.window(win_handle)
         
     def full_page(self, driver):
         return driver.page_source
-        
+
+    def title(self, driver):
+        return driver.title
+    
 Search = Search()
 ServiceSearch = ServiceSearch()
 FilterResults = FilterResults()

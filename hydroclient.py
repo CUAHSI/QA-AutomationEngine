@@ -152,10 +152,18 @@ class HydroclientTestCase(unittest.TestCase):
         External.switch_new_page(driver)
         oracle_2()
         
-        
-                
-        
+    def test_A_000009(self):
+        """ Layers help documentation available through ZenDesk help
+        overlay button/widget
+        """
+        def oracle():
+            self.assertIn('Help Center', External.title(driver))
 
+        Search.location_search(driver, 'San Diego')
+        Search.location_search(driver, 'Amsterdam')
+        Search.zendesk_help(driver, 'Layers', 'Using the Layer Control')
+        External.switch_new_page(driver)
+        oracle()
         
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

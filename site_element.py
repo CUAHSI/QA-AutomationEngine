@@ -13,7 +13,7 @@ class SiteElement:
     """
     def __init__(self, el_type=None, el_id=None, el_content=None,
                  el_href=None, el_class=None, el_dom=None, el_name=None,
-                 recursive_loc=None):
+                 el_placeholder=None, recursive_loc=None):
         self.el_type = el_type
         self.el_id = el_id
         self.el_content = el_content
@@ -21,6 +21,7 @@ class SiteElement:
         self.el_class = el_class
         self.el_dom = el_dom
         self.el_name = el_name
+        self.el_placeholder = el_placeholder
         self.recursive_loc = recursive_loc
 
     def loc_it(self, the_driver):
@@ -53,7 +54,20 @@ class SiteElement:
                                     "[@name='" + loc_child.el_name + "']"
                 target_element = loc_base.find_element_by_xpath(element_xpath)
                 return target_element
-        
+
+            def loc_by_placeholder(loc_base, loc_child):
+                """ Locates a website element, given the placeholder
+                attribute
+                """
+                if loc_child is None:
+                    element_xpath = "//" + self.el_type + \
+                                    "[@placeholder='" + self.el_placeholder + "']"
+                else:
+                    element_xpath = ".//" + loc_child.el_type + \
+                                    "[@placeholder='" + loc_child.el_placeholder + "']"
+                target_element = loc_base.find_element_by_xpath(element_xpath)
+                return target_element
+            
             def loc_by_href(loc_base, loc_child):
                 """ Locates a website element, given the element type
                 and href 
@@ -120,6 +134,8 @@ class SiteElement:
                 target_element = loc_by_id(loc_base, loc_child)
             elif defining_el.el_name is not None:
                 target_element = loc_by_name(loc_base, loc_child)
+            elif defining_el.el_placeholder is not None:
+                target_element = loc_by_placeholder(loc_base, loc_child)
             elif defining_el.el_href is not None:
                 target_element = loc_by_href(loc_base, loc_child)
             elif defining_el.el_class is not None:
@@ -186,7 +202,28 @@ class SiteElement:
         actions.click(target_element)
         actions.perform()
         time.sleep(sleep_time)
-        
+
+    def clear_all_text(self, the_driver, sleep_time):
+        """ Uses the END and HOME to select all text before using
+        BACKSPACE key to delete it
+        """
+        target_element = self.loc_it(the_driver)
+        actions = ActionChains(the_driver)
+        actions.key_down(Keys.HOME)
+        actions.key_up(Keys.HOME)
+        actions.perform()
+        time.sleep(sleep_time/3)
+        actions.key_down(Keys.LEFT_SHIFT)
+        actions.key_down(Keys.END)
+        actions.key_up(Keys.END)
+        actions.key_up(Keys.LEFT_SHIFT)
+        actions.perform()
+        time.sleep(sleep_time/3)
+        actions.key_down(Keys.BACK_SPACE)
+        actions.key_up(Keys.BACK_SPACE)
+        actions.perform()
+        time.sleep(sleep_time/3)
+    
     def clear_text(self, the_driver, size, sleep_time):
         """ Uses backspace to clear text from a field """
         target_element = self.loc_it(the_driver)
@@ -240,3 +277,15 @@ class SiteElement:
         if element_href[0] == '/':
             element_href = base_url + element_href
         return element_href
+
+    def iframe_in(self, the_driver):
+        """ Switches driver focus to an iframe within a page """
+        target_element = self.loc_it(the_driver)
+        page_frame = the_driver.switch_to.frame(target_element)
+
+    def iframe_out(self, the_driver):
+        """ Switches driver focus out of iframe and back to the 
+        main page
+        """
+        the_driver.switch_to.parent_frame()
+

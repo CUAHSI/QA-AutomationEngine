@@ -17,7 +17,15 @@ class SearchPage:
         self.search_tab = SiteElement('a', el_content='SEARCH')
         self.legend = SiteElement('*', el_id='nlcdColorClassUpdate')
         self.quickstart = SiteElement('*', el_id='quickStartModalTab')
+        self.zendesk_iframe = SiteElement('*', el_id='launcher')
+        self.zendesk_help = SiteElement('div', el_id='Embed')
+        self.zendesk_results = SiteElement('*', el_id='webWidget')
+        self.zendesk_search = SiteElement('input', el_placeholder='How can we help?')
+        self.zendesk_more = SiteElement('div', el_content='View original article')
 
+    def zendesk_return(self, text):
+        return SiteElement('a', el_content=text)
+    
     def map_layer(self, name):
         return SiteElement('label', el_content=name)
         
