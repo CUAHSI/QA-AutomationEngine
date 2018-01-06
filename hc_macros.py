@@ -73,7 +73,6 @@ class ServiceSearch:
     macros
     """
     def filter_services(self, driver, organizations=None, titles=None):
-        SearchPage.goto_service_filter(driver, SLEEP_TIME)
         SearchPage.service_filter.click(driver, SLEEP_TIME)
         ServiceSearchPage.table_count.select_option(driver, '100', SLEEP_TIME)
         ServiceSearchPage.sort_organization.click(driver, SLEEP_TIME)
@@ -93,6 +92,24 @@ class ServiceSearch:
         SearchPage.search_now.click(driver, SLEEP_TIME)
         time.sleep(10)
 
+class KeywordSearch:
+    def root_keywords(self, driver, keywords):
+        SearchPage.keyword_filter.click(driver, SLEEP_TIME)
+        KeywordSearchPage.full_list_tab.click(driver, SLEEP_TIME)
+        for keyword in keywords:
+            KeywordSearchPage.full_list_checkbox(keyword).click(driver, SLEEP_TIME)
+        KeywordSearchPage.search.click(driver, SLEEP_TIME)
+
+class AdvancedSearch:
+    def all_value_type(self, driver):
+        SearchPage.advanced_search.click(driver, SLEEP_TIME)
+        AdvancedSearchPage.value_type_tab.click(driver, SLEEP_TIME)
+        AdvancedSearchPage.value_type_term_sort.click(driver, SLEEP_TIME)
+        AdvancedSearchPage.value_type_first.click(driver, SLEEP_TIME)
+        AdvancedSearchPage.value_type_term_sort.click(driver, SLEEP_TIME)
+        AdvancedSearchPage.value_type_first.range_click(driver, SLEEP_TIME)
+        AdvancedSearchPage.search.click(driver, SLEEP_TIME)
+            
 class FilterResults:
     """ Detailed results view by pressing "Filter Results" button
     associated macros
@@ -185,11 +202,18 @@ class External:
 
     def title(self, driver):
         return driver.title
+
+class Utils:
+    def extra_map_wait(self):
+        time.sleep(3*SLEEP_TIME)
     
 Search = Search()
 ServiceSearch = ServiceSearch()
+KeywordSearch = KeywordSearch()
+AdvancedSearch = AdvancedSearch()
 FilterResults = FilterResults()
 Workspace = Workspace()
 MapMarker = MapMarker()
 QuickStart = QuickStart()
 External = External()
+Utils = Utils()

@@ -6,6 +6,8 @@ class SearchPage:
         self.filter_results = SiteElement('button', el_id='btnSearchSummary')
         self.location_search = SiteElement('input', el_id='pac-input')
         self.service_filter = SiteElement('button', el_id='btnSelectDataServices', el_content='Data Service(s)...')
+        self.keyword_filter = SiteElement('button', el_id='btnSelectKeywords')
+        self.advanced_search = SiteElement('button', el_id='btnAdvancedSearch')
         self.results_found = SiteElement('span', el_id='timeseriesFoundOrFilteredCount')
         self.date_filter = SiteElement('*', el_id='optionsDatesRange')
         self.date_start = SiteElement('*', el_id='startDateModal')
@@ -31,11 +33,25 @@ class SearchPage:
         
     def map_indicator(self, results_count):
         return SiteElement('div', el_content=results_count)
-        
-    def goto_service_filter(self, driver, SLEEP_TIME):
-        self.service_filter.click(driver, SLEEP_TIME)
 
-        
+class KeywordSearchPage:
+    def __init__(self):
+        self.full_list_tab = SiteElement('a', el_href='#tab2')
+        self.search = SiteElement('*', el_id='btnFullKeywordModalSearch')
+
+    def full_list_checkbox(self, item_name):
+        return SiteElement('div', el_id='keywordTree', recursive_loc=[SiteElement('ul'), SiteElement('span', el_content=item_name), SiteElement(el_dom='./..'), SiteElement('span', el_class='fancytree-checkbox')])
+
+    def full_list_expand(self, item_name):
+        return SiteElement('div', el_id='keywordTree', recursive_loc=[SiteElement('ul'), SiteElement('span', el_content=item_name), SiteElement(el_dom='./..'), SiteElement('span', el_class='fancytree-expander')])
+
+class AdvancedSearchPage:
+    def __init__(self):
+        self.value_type_tab = SiteElement('a', el_href='#valueTypePane')
+        self.value_type_term_sort = SiteElement('table', el_id='tblCvValueType', recursive_loc=[SiteElement('thead'), SiteElement('tr'), SiteElement('th', el_content='Term')])
+        self.value_type_first = SiteElement('table', el_id='tblCvValueType', recursive_loc=[SiteElement('tbody'), SiteElement('tr'), SiteElement('td')])
+        self.search = SiteElement('*', el_id='btnAdvancedSearchModalSearch')
+    
 class ServiceSearchPage:
     def __init__(self):
         self.sort_organization = SiteElement('th', el_content='Organization')
@@ -91,6 +107,8 @@ class ExternalPage:
     
 SearchPage = SearchPage()
 ServiceSearchPage = ServiceSearchPage()
+KeywordSearchPage = KeywordSearchPage()
+AdvancedSearchPage = AdvancedSearchPage()
 FilterResultsPage = FilterResultsPage()
 MapMarkerPage = MapMarkerPage()
 QuickStartPage = QuickStartPage()

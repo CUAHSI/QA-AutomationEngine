@@ -33,7 +33,7 @@ class HydroclientTestCase(unittest.TestCase):
         """ Tear down test environment after execution """
         driver.quit()
 
-    def no_test_A_000002(self):
+    def test_A_000002(self):
         """ Confirms metadata available through
         HydroClient and that a sample of the data
         downloads successfully
@@ -50,7 +50,7 @@ class HydroclientTestCase(unittest.TestCase):
         FilterResults.any_to_workspace(driver)
         oracle()
 
-    def no_test_A_000003(self):
+    def test_A_000003(self):
         """ Confirms repeated search for Lake Annie data does not result
         in problematic behavior
         """
@@ -65,7 +65,7 @@ class HydroclientTestCase(unittest.TestCase):
         Search.search(driver, 60)
         oracle()
 
-    def no_test_A_000004(self):
+    def test_A_000004(self):
         """ Confirms date filtering of NWIS UV data service is maintained
         throughout search and workspace export workflow
         """
@@ -80,7 +80,7 @@ class HydroclientTestCase(unittest.TestCase):
         FilterResults.derived_value_to_workspace(driver)
         oracle()
 
-    def no_test_A_000005(self):
+    def test_A_000005(self):
         """ Confirms New Haven CT Site X416-Y130 metadata and data are
         available for NASA Goddard Earth Sciences services
         """
@@ -94,7 +94,7 @@ class HydroclientTestCase(unittest.TestCase):
         FilterResults.model_sim_and_derived_value_to_workspace(driver)
         oracle()
 
-    def no_test_A_000006(self):
+    def test_A_000006(self):
         """ Confirms Prague data is online for a site near Köln
         Germany
         """
@@ -157,6 +157,7 @@ class HydroclientTestCase(unittest.TestCase):
         overlay button/widget
         """
         def oracle():
+            """ Test center results load without error """
             self.assertIn('Help Center', External.title(driver))
 
         Search.location_search(driver, 'San Diego')
@@ -164,6 +165,34 @@ class HydroclientTestCase(unittest.TestCase):
         Search.zendesk_help(driver, 'Layers', 'Using the Layer Control')
         External.switch_new_page(driver)
         oracle()
+
+    def test_A_000010(self):
+        """ Confirms that filtering by all keywords and all data types
+        returns the same number of results as if no search parameters
+        were applied
+        """
+        def oracle():
+            """ Searches return same number of results as initial search
+            without parameters
+            """
+            self.assertTrue(all(x == rio_counts[0] for x in rio_counts))
+            self.assertTrue(all(x == dallas_counts[0] for x in dallas_counts))
+        rio_counts = []
+        dallas_counts = []
+        Search.location_search(driver, 'Rio De Janeiro')
+        rio_counts.append(Search.results_count(driver))
+        KeywordSearch.root_keywords(driver, ['Biological', 'Chemical', 'Physical'])
+        rio_counts.append(Search.results_count(driver))
+        AdvancedSearch.all_value_type(driver)
+        rio_counts.append(Search.results_count(driver))
+
+        Search.location_search(driver, 'Dallas')
+        dallas_counts.append(Search.results_count(driver))
+        KeywordSearch.root_keywords(driver, ['Biological', 'Chemical', 'Physical'])
+        dallas_counts.append(Search.results_count(driver))
+        Utils.extra_map_wait()
+        AdvancedSearch.all_value_type(driver)
+        dallas_counts.append(Search.results_count(driver))
         
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
