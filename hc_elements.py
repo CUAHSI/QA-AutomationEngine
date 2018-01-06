@@ -3,6 +3,7 @@ from site_element import SiteElement
 class SearchPage:
     def __init__(self):
         self.search_now = SiteElement('button', el_id='btnSearchNow')
+        self.reset = SiteElement('button', el_id='btnSetDefaults')
         self.filter_results = SiteElement('button', el_id='btnSearchSummary')
         self.location_search = SiteElement('input', el_id='pac-input')
         self.service_filter = SiteElement('button', el_id='btnSelectDataServices', el_content='Data Service(s)...')

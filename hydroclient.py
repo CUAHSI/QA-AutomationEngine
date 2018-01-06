@@ -185,13 +185,15 @@ class HydroclientTestCase(unittest.TestCase):
         rio_counts.append(Search.results_count(driver))
         AdvancedSearch.all_value_type(driver)
         rio_counts.append(Search.results_count(driver))
-
+        Search.reset_params(driver)
+        
         Search.location_search(driver, 'Dallas')
         dallas_counts.append(Search.results_count(driver))
         KeywordSearch.root_keywords(driver, ['Biological', 'Chemical', 'Physical'])
         dallas_counts.append(Search.results_count(driver))
         Utils.extra_map_wait()
         AdvancedSearch.all_value_type(driver)
+        Utils.extra_map_wait()
         dallas_counts.append(Search.results_count(driver))
         
 if __name__ == '__main__':

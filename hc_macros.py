@@ -66,7 +66,9 @@ class Search:
         SearchPage.date_end.inject_text(driver, end_date, SLEEP_TIME)
         SearchPage.date_save.click(driver, SLEEP_TIME)
         SearchPage.search_now.click(driver, SLEEP_TIME)
-        
+
+    def reset_params(self, driver):
+        SearchPage.reset.click(driver, SLEEP_TIME)
     
 class ServiceSearch:
     """ Narrow search results through service selections - associated
