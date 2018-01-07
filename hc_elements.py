@@ -2,6 +2,7 @@ from site_element import SiteElement
 
 class SearchPage:
     def __init__(self):
+        self.map_area = SiteElement('div', el_id='map-canvas')
         self.search_now = SiteElement('button', el_id='btnSearchNow')
         self.reset = SiteElement('button', el_id='btnSetDefaults')
         self.filter_results = SiteElement('button', el_id='btnSearchSummary')

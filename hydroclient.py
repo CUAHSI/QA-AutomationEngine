@@ -198,7 +198,7 @@ class HydroclientTestCase(unittest.TestCase):
 
     def test_A_000011(self):
         """ Confirms About dropdown links successfully open up the
-        associated resource in new tab and do not show a 404 Errror
+        associated resource in new tab and do not show a 404 Error
         """
         def oracle():
             """ No 404 Errors exist in external page sources """
@@ -216,6 +216,18 @@ class HydroclientTestCase(unittest.TestCase):
         Search.about_license_repo_inline(driver)
         external_sources += External.source_new_page(driver)
         External.close_new_page(driver)
+        oracle()
+
+    def test_A_000012(self):
+        """ Confirms repeated map scrolls do not cause issues in
+        subsequent map searches
+        """
+        def oracle():
+            """ Results count is nonzero after map navigations """
+            self.assertNotEqual(Search.results_count(driver), '0')
+        Search.map_scroll(driver, 25)
+        Search.location_search(driver, 'Raleigh')
+        Search.search(driver)
         oracle()
         
 if __name__ == '__main__':

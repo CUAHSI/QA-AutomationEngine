@@ -12,6 +12,11 @@ SLEEP_TIME = setup_mode(MODE_SELECTION)
 
 class Search:
     """ Main search interface macros """
+    def map_scroll(self, driver, count=1):
+        SearchPage.map_area.click(driver, SLEEP_TIME)
+        for i in range(0, count):
+            SearchPage.map_area.scroll_right(driver, SLEEP_TIME/count)
+    
     def about_helpcenter(self, driver):
         SearchPage.about.click(driver, SLEEP_TIME)
         SearchPage.about_helpcenter.click(driver, SLEEP_TIME)

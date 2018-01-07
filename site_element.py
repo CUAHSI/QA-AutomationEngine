@@ -157,7 +157,6 @@ class SiteElement:
                 target_element = next_el_loc(target_element,
                                              self.recursive_loc[i])
         return target_element
-        
 
     def click(self, the_driver, sleep_time):
         """ Identifies an element on the page.  After identification
@@ -248,6 +247,21 @@ class SiteElement:
         target_element.location_once_scrolled_into_view
         time.sleep(sleep_time)
 
+    def scroll_right(self, the_driver, sleep_time):
+        """ Scroll right using Keys.ARROW_RIGHT
+        and a hold of one second
+        """
+        target_element = self.loc_it(the_driver)
+        actions = ActionChains(the_driver)
+        actions.move_to_element(target_element)
+        actions.key_down(Keys.ARROW_RIGHT)
+        actions.perform()
+        time.sleep(1)
+        actions = ActionChains(the_driver)
+        actions.key_up(Keys.ARROW_RIGHT)
+        actions.perform()
+        time.sleep(sleep_time/2)
+        
     def inject_text(self, the_driver, input_text, sleep_time):
         """ Enters text into a field or other input-capable html
         element using send keys
