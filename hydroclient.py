@@ -195,6 +195,28 @@ class HydroclientTestCase(unittest.TestCase):
         AdvancedSearch.all_value_type(driver)
         Utils.extra_map_wait()
         dallas_counts.append(Search.results_count(driver))
+
+    def test_A_000011(self):
+        """ Confirms About dropdown links successfully open up the
+        associated resource in new tab and do not show a 404 Errror
+        """
+        def oracle():
+            """ No 404 Errors exist in external page sources """
+            self.assertNotIn('404 Error', external_sources)
+        external_sources = ''
+        Search.about_helpcenter(driver)
+        external_sources += External.source_new_page(driver)
+        External.close_new_page(driver)
+        Search.about_license_repo_top(driver)
+        external_sources += External.source_new_page(driver)
+        External.close_new_page(driver)
+        Search.about_contact(driver)
+        external_sources += External.source_new_page(driver)
+        External.close_new_page(driver)
+        Search.about_license_repo_inline(driver)
+        external_sources += External.source_new_page(driver)
+        External.close_new_page(driver)
+        oracle()
         
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

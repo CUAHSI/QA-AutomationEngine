@@ -12,6 +12,28 @@ SLEEP_TIME = setup_mode(MODE_SELECTION)
 
 class Search:
     """ Main search interface macros """
+    def about_helpcenter(self, driver):
+        SearchPage.about.click(driver, SLEEP_TIME)
+        SearchPage.about_helpcenter.click(driver, SLEEP_TIME)
+
+    def about_license_repo_top(self, driver):
+        SearchPage.about.click(driver, SLEEP_TIME)
+        SearchPage.about_license.click(driver, SLEEP_TIME)
+        SearchPage.about_license_repo_top.click(driver, SLEEP_TIME)
+        SearchPage.about_license_close.click(driver, SLEEP_TIME)
+
+    def about_license_repo_inline(self, driver):
+        SearchPage.about.click(driver, SLEEP_TIME)
+        SearchPage.about_license.click(driver, SLEEP_TIME)
+        SearchPage.about_license_repo_inline.click(driver, SLEEP_TIME)
+        SearchPage.about_license_close.click(driver, SLEEP_TIME)
+
+    def about_contact(self, driver):
+        SearchPage.about.click(driver, SLEEP_TIME)
+        SearchPage.about_contact.click(driver, SLEEP_TIME)
+        SearchPage.about_contact_help.click(driver, SLEEP_TIME)
+        SearchPage.about_contact_close.click(driver, SLEEP_TIME)
+    
     def zendesk_help(self, driver, search_text, article_text):
         SearchPage.zendesk_iframe.iframe_in(driver)
         SearchPage.zendesk_help.click(driver, SLEEP_TIME)
@@ -194,10 +216,29 @@ class External:
     def switch_new_page(self, driver):
         win_handle = driver.window_handles[-1]
         driver.switch_to.window(win_handle)
+        time.sleep(SLEEP_TIME)
 
     def switch_old_page(self, driver):
         win_handle = driver.window_handles[-2]
         driver.switch_to.window(win_handle)
+        time.sleep(SLEEP_TIME)
+
+    def close_new_page(self, driver):
+        orig_handle = driver.current_window_handle
+        new_handle = driver.window_handles[-1]
+        driver.switch_to.window(new_handle)
+        driver.close()
+        driver.switch_to.window(orig_handle)
+        time.sleep(SLEEP_TIME)
+
+    def source_new_page(self, driver):
+        orig_handle = driver.current_window_handle
+        new_handle = driver.window_handles[-1]
+        driver.switch_to.window(new_handle)
+        source = driver.page_source
+        driver.switch_to.window(orig_handle)
+        time.sleep(SLEEP_TIME/3)
+        return source
         
     def full_page(self, driver):
         return driver.page_source
