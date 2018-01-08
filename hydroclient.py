@@ -229,6 +229,29 @@ class HydroclientTestCase(unittest.TestCase):
         Search.location_search(driver, 'Raleigh')
         Search.search(driver)
         oracle()
+
+    def test_A_000013(self):
+        """ Confirms operations and button clicks on an empty workspace
+        do not result in errors
+        """
+        def oracle():
+            """ Page has not been redirected and no fatal errors have
+            been raised
+            """
+            self.assertIn('HydroClient', Hydroclient.title(driver))
+        Workspace.goto_from_search(driver)
+        Workspace.select_all(driver)
+        Workspace.clear_selected(driver)
+        Workspace.remove_selected(driver)
+        Workspace.clear_selected(driver)
+        Workspace.select_all(driver)
+        Workspace.remove_selected(driver)
+        Workspace.export_csv(driver)
+        Workspace.export_data_viewer(driver)
+        Workspace.export_none(driver)
+        Workspace.export_data_viewer(driver)
+        Workspace.export_csv(driver)
+        oracle()
         
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

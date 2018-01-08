@@ -2,6 +2,7 @@ from site_element import SiteElement
 
 class SearchPage:
     def __init__(self):
+        self.workspace = SiteElement('*', el_id='tabbedDataMgrTab')
         self.map_area = SiteElement('div', el_id='map-canvas')
         self.search_now = SiteElement('button', el_id='btnSearchNow')
         self.reset = SiteElement('button', el_id='btnSetDefaults')
@@ -112,6 +113,17 @@ class QuickStartPage:
     def more_info(self, name):
         return SiteElement('a', el_content=name)
 
+class WorkspacePage:
+    def __init__(self):
+        self.selections_dropdown = SiteElement('*', el_id='dropdownMenu1')
+        self.select_all = SiteElement('*', el_id='anchorAllSelectionsDataMgr')
+        self.select_clear = SiteElement('*', el_id='spanClearSelectionsDM')
+        self.select_delete = SiteElement('*', el_id='spanRemoveSelectionsDM')
+        self.select_tool = SiteElement('*', el_id='ddHydrodataToolDataMgr')
+        self.save_csv = SiteElement('*', el_id='idDownloadToClient')
+        self.data_viewer = SiteElement('li', el_id='byuApps', recursive_loc=[SiteElement('ul'), SiteElement('li'), SiteElement('a')])
+        self.export_none = SiteElement('*', el_id='idNone')
+    
 class ExternalPage:
     def __init__(self):
         self.full = SiteElement('body')
@@ -123,5 +135,6 @@ AdvancedSearchPage = AdvancedSearchPage()
 FilterResultsPage = FilterResultsPage()
 MapMarkerPage = MapMarkerPage()
 QuickStartPage = QuickStartPage()
+WorkspacePage = WorkspacePage()
 ExternalPage = ExternalPage()
 

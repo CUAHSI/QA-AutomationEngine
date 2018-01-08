@@ -180,6 +180,33 @@ class FilterResults:
         
 class Workspace:
     """ Macros related to workspace page/modal """
+    def goto_from_search(self, driver):
+        SearchPage.workspace.click(driver, SLEEP_TIME)
+
+    def select_all(self, driver):
+        WorkspacePage.selections_dropdown.passive_click(driver, SLEEP_TIME)
+        WorkspacePage.select_all.click(driver, SLEEP_TIME)
+
+    def clear_selected(self, driver):
+        WorkspacePage.selections_dropdown.passive_click(driver, SLEEP_TIME)
+        WorkspacePage.select_clear.click(driver, SLEEP_TIME)
+    
+    def remove_selected(self, driver):
+        WorkspacePage.selections_dropdown.passive_click(driver, SLEEP_TIME)
+        WorkspacePage.select_delete.click(driver, SLEEP_TIME)
+
+    def export_csv(self, driver):
+        WorkspacePage.select_tool.passive_click(driver, SLEEP_TIME)
+        WorkspacePage.save_csv.click(driver, SLEEP_TIME)
+
+    def export_data_viewer(self, driver):
+        WorkspacePage.select_tool.passive_click(driver, SLEEP_TIME)
+        WorkspacePage.data_viewer.click(driver, SLEEP_TIME)
+
+    def export_none(self, driver):
+        WorkspacePage.select_tool.passive_click(driver, SLEEP_TIME)
+        WorkspacePage.export_none.click(driver, SLEEP_TIME)
+        
     def completed_count(self, driver):
         time.sleep(50*SLEEP_TIME)
         return driver.page_source.count('<em> Completed</em>')
@@ -254,6 +281,10 @@ class External:
 class Utils:
     def extra_map_wait(self):
         time.sleep(3*SLEEP_TIME)
+
+class Hydroclient:
+    def title(self, driver):
+        return driver.title
     
 Search = Search()
 ServiceSearch = ServiceSearch()
@@ -265,3 +296,4 @@ MapMarker = MapMarker()
 QuickStart = QuickStart()
 External = External()
 Utils = Utils()
+Hydroclient = Hydroclient()
