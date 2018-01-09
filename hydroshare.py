@@ -3,13 +3,12 @@ import unittest
 import argparse
 import sys
 import time
-from selenium import webdriver
 from hs_macros import *
-from hs_elements import *
+from utils import *
+from selenium import webdriver
 
 # Test case parameters
-BASE_URL = "http://www.hydroshare.org" # Default
-
+BASE_URL = "http://www.hydroshare.org"
 
 # Test cases definition
 class HydroshareTestCase(unittest.TestCase):
@@ -63,7 +62,7 @@ class HydroshareTestCase(unittest.TestCase):
         DiscoverPage.map_search.inject_text(driver, "Salt Lake City", SLEEP_TIME)
         DiscoverPage.map_submit.click(driver, SLEEP_TIME)
         DiscoverPage.list_tab.click(driver, SLEEP_TIME)
-        time.sleep(5)
+        TestSystem.wait(5)
         oracle()
 
 if __name__ == '__main__':

@@ -6,7 +6,7 @@ from hc_elements import *
 from modes import setup_mode
 
 # Testing parameters
-MODE_SELECTION = 'demo'
+MODE_SELECTION = 'demo' #quick, watch, demo, or safe-demo
 global SLEEP_TIME
 SLEEP_TIME = setup_mode(MODE_SELECTION)
 
@@ -122,6 +122,7 @@ class ServiceSearch:
         time.sleep(10)
 
 class KeywordSearch:
+    """ Macros for the keyword search filtering modal """
     def root_keywords(self, driver, keywords):
         SearchPage.keyword_filter.click(driver, SLEEP_TIME)
         KeywordSearchPage.full_list_tab.click(driver, SLEEP_TIME)
@@ -130,6 +131,7 @@ class KeywordSearch:
         KeywordSearchPage.search.click(driver, SLEEP_TIME)
 
 class AdvancedSearch:
+    """ Macros for all tabs within the advanced search modal """
     def all_value_type(self, driver):
         SearchPage.advanced_search.click(driver, SLEEP_TIME)
         AdvancedSearchPage.value_type_tab.click(driver, SLEEP_TIME)
@@ -224,6 +226,7 @@ class Workspace:
         return True
 
 class MapMarker:
+    """ Macros for map-opened search results """
     def all_to_workspace(self, driver):
         MapMarkerPage.sort_data_type.click(driver, SLEEP_TIME)
         MapMarkerPage.select_any.click(driver, SLEEP_TIME)
@@ -235,57 +238,13 @@ class MapMarker:
         MapMarkerPage.nav_workspace.click(driver, SLEEP_TIME)
 
 class QuickStart:
-    def full_page(self, driver):
-        return driver.page_source
-    
+    """ Macros for the QuickStart modal """
     def help_expand(self, driver, help_item):
         QuickStartPage.help_item(help_item).click(driver, SLEEP_TIME)
 
     def help_more(self, driver, link_text):
         QuickStartPage.more_info(link_text).click(driver, SLEEP_TIME)
 
-class External:
-    def switch_new_page(self, driver):
-        win_handle = driver.window_handles[-1]
-        driver.switch_to.window(win_handle)
-        time.sleep(SLEEP_TIME)
-
-    def switch_old_page(self, driver):
-        win_handle = driver.window_handles[-2]
-        driver.switch_to.window(win_handle)
-        time.sleep(SLEEP_TIME)
-
-    def close_new_page(self, driver):
-        orig_handle = driver.current_window_handle
-        new_handle = driver.window_handles[-1]
-        driver.switch_to.window(new_handle)
-        driver.close()
-        driver.switch_to.window(orig_handle)
-        time.sleep(SLEEP_TIME)
-
-    def source_new_page(self, driver):
-        orig_handle = driver.current_window_handle
-        new_handle = driver.window_handles[-1]
-        driver.switch_to.window(new_handle)
-        source = driver.page_source
-        driver.switch_to.window(orig_handle)
-        time.sleep(SLEEP_TIME/3)
-        return source
-        
-    def full_page(self, driver):
-        return driver.page_source
-
-    def title(self, driver):
-        return driver.title
-
-class Utils:
-    def extra_map_wait(self):
-        time.sleep(3*SLEEP_TIME)
-
-class Hydroclient:
-    def title(self, driver):
-        return driver.title
-    
 Search = Search()
 ServiceSearch = ServiceSearch()
 KeywordSearch = KeywordSearch()
@@ -294,6 +253,3 @@ FilterResults = FilterResults()
 Workspace = Workspace()
 MapMarker = MapMarker()
 QuickStart = QuickStart()
-External = External()
-Utils = Utils()
-Hydroclient = Hydroclient()

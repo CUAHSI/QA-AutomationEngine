@@ -13,7 +13,7 @@ class SiteElement:
     """
     def __init__(self, el_type=None, el_id=None, el_content=None,
                  el_href=None, el_class=None, el_dom=None, el_name=None,
-                 el_placeholder=None, recursive_loc=None):
+                 el_placeholder=None, el_recursive=None):
         self.el_type = el_type
         self.el_id = el_id
         self.el_content = el_content
@@ -22,19 +22,21 @@ class SiteElement:
         self.el_dom = el_dom
         self.el_name = el_name
         self.el_placeholder = el_placeholder
-        self.recursive_loc = recursive_loc
+        self.el_recursive = el_recursive
 
-    def loc_it(self, the_driver):
+    def loc_it(self, el_driver):
         """ Identifies element on page, based on a hierarchy
         of preferred identification methods (eg. by html element
         id is preferrable to html element class).
         """
-        def next_el_loc(loc_base, loc_child=None):
+        def loc_next(loc_base, loc_child=None):
             """ Locates the "next" element through absolute (loc_child==None)
             or relative (loc_child!=None) means
             """
             def loc_by_id(loc_base, loc_child):
-                """ Locates a website element, given the element type and id """
+                """ Locates a website element, given the element type and 
+                id 
+                """
                 if loc_child is None:
                     element_xpath = "//" + self.el_type + \
                                     "[@id='" + self.el_id + "']"
@@ -93,7 +95,9 @@ class SiteElement:
                 return target_element
         
             def loc_by_content(loc_base, loc_child):
-                """ Locates a website element, based the element text content """
+                """ Locates a website element, based the element
+                text content 
+                """
                 if loc_child is None:
                     element_xpath = "//" + self.el_type + \
                                     "[contains(text(), '" + \
@@ -149,65 +153,65 @@ class SiteElement:
             return target_element
 
         
-        if self.recursive_loc is None: # Use basic/single identification
-            target_element = next_el_loc(the_driver)
+        if self.el_recursive is None: # Use basic/single identification
+            target_element = loc_next(el_driver)
         else: # Use recursive identification
-            target_element = next_el_loc(the_driver)
-            for i in range(0, len(self.recursive_loc)):
-                target_element = next_el_loc(target_element,
-                                             self.recursive_loc[i])
+            target_element = loc_next(el_driver)
+            for i in range(0, len(self.el_recursive)):
+                target_element = loc_next(target_element,
+                                             self.el_recursive[i])
         return target_element
 
-    def click(self, the_driver, sleep_time):
+    def click(self, el_driver, sleep_time):
         """ Identifies an element on the page.  After identification
         the element is then clicked.
         """
-        target_element = self.loc_it(the_driver)
+        target_element = self.loc_it(el_driver)
         target_element.click()
         time.sleep(sleep_time)
 
-    def multi_click(self, the_driver, sleep_time):
+    def multi_click(self, el_driver, sleep_time):
         """ Clicks an element while holding the control key, as to enable
         a multi-selection
         """
-        target_element = self.loc_it(the_driver)
-        actions = ActionChains(the_driver)
+        target_element = self.loc_it(el_driver)
+        actions = ActionChains(el_driver)
         actions.key_down(Keys.LEFT_CONTROL)
         actions.click(target_element)
         actions.key_up(Keys.LEFT_CONTROL)
         actions.perform()
         time.sleep(sleep_time)
 
-    def range_click(self, the_driver, sleep_time):
+    def range_click(self, el_driver, sleep_time):
         """ Clicks an element while holding the control key, as to enable
         a range selection
         """
-        target_element = self.loc_it(the_driver)
-        actions = ActionChains(the_driver)
+        target_element = self.loc_it(el_driver)
+        actions = ActionChains(el_driver)
         actions.key_down(Keys.LEFT_SHIFT)
         actions.click(target_element)
         actions.key_up(Keys.LEFT_SHIFT)
         actions.perform()
         time.sleep(sleep_time)
         
-    def passive_click(self, the_driver, sleep_time):
+    def passive_click(self, el_driver, sleep_time):
         """ Identifies an element on the page.  After identification
         the element is then clicked, regardless if it is "interactable"
         or not
         """
-        target_element = self.loc_it(the_driver)
-        actions = ActionChains(the_driver)
+        target_element = self.loc_it(el_driver)
+        actions = ActionChains(el_driver)
         actions.move_to_element(target_element)
         actions.click(target_element)
         actions.perform()
         time.sleep(sleep_time)
 
-    def clear_all_text(self, the_driver, sleep_time):
+    def clear_all_text(self, el_driver, sleep_time):
         """ Uses the END and HOME to select all text before using
         BACKSPACE key to delete it
         """
-        target_element = self.loc_it(the_driver)
-        actions = ActionChains(the_driver)
+        target_element = self.loc_it(el_driver)
+        actions = ActionChains(el_driver)
         actions.key_down(Keys.HOME)
         actions.key_up(Keys.HOME)
         actions.perform()
@@ -223,83 +227,83 @@ class SiteElement:
         actions.perform()
         time.sleep(sleep_time/3)
     
-    def clear_text(self, the_driver, size, sleep_time):
+    def clear_text(self, el_driver, size, sleep_time):
         """ Uses backspace to clear text from a field """
-        target_element = self.loc_it(the_driver)
+        target_element = self.loc_it(el_driver)
         target_element.send_keys(Keys.END)
         for i in range(0, size):
             target_element.send_keys(Keys.BACK_SPACE)
             time.sleep(sleep_time/size)
         time.sleep(sleep_time)
 
-    def select_option(self, the_driver, select_option, sleep_time):
+    def select_option(self, el_driver, select_choice, sleep_time):
         """ Selects an option from a dropdown element """
-        target_element = self.loc_it(the_driver)
+        target_element = self.loc_it(el_driver)
         select_element = Select(target_element)
-        select_element.select_by_value(select_option)
+        select_element.select_by_value(select_choice)
         time.sleep(sleep_time)
         
-    def scroll_to(self, the_driver, sleep_time):
+    def scroll_to(self, el_driver, sleep_time):
         """ After element identification, the window is scrolled
         such that the element becomes visible in the window
         """
-        target_element = self.loc_it(the_driver)
+        target_element = self.loc_it(el_driver)
         target_element.location_once_scrolled_into_view
         time.sleep(sleep_time)
 
-    def scroll_right(self, the_driver, sleep_time):
+    def scroll_right(self, el_driver, sleep_time):
         """ Scroll right using Keys.ARROW_RIGHT
         and a hold of one second
         """
-        target_element = self.loc_it(the_driver)
-        actions = ActionChains(the_driver)
+        target_element = self.loc_it(el_driver)
+        actions = ActionChains(el_driver)
         actions.move_to_element(target_element)
         actions.key_down(Keys.ARROW_RIGHT)
         actions.perform()
         time.sleep(1)
-        actions = ActionChains(the_driver)
+        actions = ActionChains(el_driver)
         actions.key_up(Keys.ARROW_RIGHT)
         actions.perform()
         time.sleep(sleep_time/2)
         
-    def inject_text(self, the_driver, input_text, sleep_time):
+    def inject_text(self, el_driver, field_text, sleep_time):
         """ Enters text into a field or other input-capable html
         element using send keys
         """
-        target_element = self.loc_it(the_driver)
-        for i in range(0, len(input_text)):
-            target_element.send_keys(input_text[i])
-            time.sleep(sleep_time/len(input_text))
+        target_element = self.loc_it(el_driver)
+        for i in range(0, len(field_text)):
+            target_element.send_keys(field_text[i])
+            time.sleep(sleep_time/len(field_text))
         time.sleep(sleep_time)
 
-    def get_attribute(self, the_driver, attribute):
+    def iframe_in(self, el_driver):
+        """ Switches driver focus to an iframe within a page """
+        target_element = self.loc_it(el_driver)
+        page_frame = el_driver.switch_to.frame(target_element)
+
+    def iframe_out(self, el_driver):
+        """ Switches driver focus out of iframe and back to the 
+        main page
+        """
+        el_driver.switch_to.parent_frame()
+
+    def get_attribute(self, el_driver, attribute):
         """ Returns any attribute of website element """
-        target_element = self.loc_it(the_driver)
+        target_element = self.loc_it(el_driver)
         return target_element.get_attribute(attribute)
         
-    def get_text(self, the_driver):
+    def get_text(self, el_driver):
         """ Returns content text of website element """
-        target_element = self.loc_it(the_driver)
+        target_element = self.loc_it(el_driver)
         return target_element.text
 
-    def get_href(self, the_driver, base_url):
+    def get_href(self, el_driver, base_url):
         """ Returns element href link, with relative links expanded
         into an absolute link
         """
-        target_element = self.loc_it(the_driver)
+        target_element = self.loc_it(el_driver)
         element_href = target_element.get_attribute("href")
         if element_href[0] == '/':
             element_href = base_url + element_href
         return element_href
-
-    def iframe_in(self, the_driver):
-        """ Switches driver focus to an iframe within a page """
-        target_element = self.loc_it(the_driver)
-        page_frame = the_driver.switch_to.frame(target_element)
-
-    def iframe_out(self, the_driver):
-        """ Switches driver focus out of iframe and back to the 
-        main page
-        """
-        the_driver.switch_to.parent_frame()
 

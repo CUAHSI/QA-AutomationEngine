@@ -4,6 +4,7 @@ import argparse
 import sys
 import time
 from hc_macros import *
+from utils import *
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
 
@@ -131,13 +132,13 @@ class HydroclientTestCase(unittest.TestCase):
             naming within the HydroClient search interface
             """
             for layer in layers:
-                self.assertIn('<li>' + layer + '</li>', QuickStart.full_page(driver))
+                self.assertIn('<li>' + layer + '</li>', TestSystem.page_source(driver))
         def oracle_2():
             """ Layer naming in the help documentation page matches the 
             naming within the HydroClient search interface
             """
             for layer in layers:
-                self.assertIn('<h2>' + layer + '</h2>', External.full_page(driver))
+                self.assertIn('<h2>' + layer + '</h2>', TestSystem.page_source(driver))
                 
         layers = ['USGS Stream Gages', 'Nationalmap Hydrology',
                   'EPA Watersheds', 'USGS LandCover 2011']
@@ -158,7 +159,7 @@ class HydroclientTestCase(unittest.TestCase):
         """
         def oracle():
             """ Test center results load without error """
-            self.assertIn('Help Center', External.title(driver))
+            self.assertIn('Help Center', TestSystem.title(driver))
 
         Search.location_search(driver, 'San Diego')
         Search.location_search(driver, 'Amsterdam')
@@ -191,9 +192,9 @@ class HydroclientTestCase(unittest.TestCase):
         dallas_counts.append(Search.results_count(driver))
         KeywordSearch.root_keywords(driver, ['Biological', 'Chemical', 'Physical'])
         dallas_counts.append(Search.results_count(driver))
-        Utils.extra_map_wait()
+        TestSystem.wait(3) #sec
         AdvancedSearch.all_value_type(driver)
-        Utils.extra_map_wait()
+        TestSystem.wait(3) #sec
         dallas_counts.append(Search.results_count(driver))
 
     def test_A_000011(self):
@@ -238,7 +239,7 @@ class HydroclientTestCase(unittest.TestCase):
             """ Page has not been redirected and no fatal errors have
             been raised
             """
-            self.assertIn('HydroClient', Hydroclient.title(driver))
+            self.assertIn('HydroClient', TestSystem.title(driver))
         Workspace.goto_from_search(driver)
         Workspace.select_all(driver)
         Workspace.clear_selected(driver)
