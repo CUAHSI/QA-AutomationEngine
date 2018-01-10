@@ -14,6 +14,12 @@
 \usepackage{lscape}
 \usepackage{csvsimple}
 \usepackage{multicol}
+% for dependency chart
+\usepackage{prerex}
+\usetikzlibrary{fit}
+
+% For dependency chart
+\setcounter{diagheight}{50}
 
 % color package:
 \usepackage{color}
@@ -67,13 +73,11 @@
 \maketitle
 
 \newpage
-\section{System Diagram}
-
-\subsection{Infrastructure}
+\section{Infrastructure}
 
 
-
-\subsection{Test Suite}
+\section{Test Suite}
+\subsection{Abstraction Layers}
 \begin{figure}[H]
 \begin{center}
 \begin{tabular}{| c | p{6cm} | c | } \hline
@@ -96,7 +100,46 @@ Important Notes:
 \begin{itemize}
 \item Whenever possible, complexity should be pushed down the layers (closer to the Selenium layer)
 \item The test cases themselves (top level) should in particular be very low complexity.  Ideally, business users should be able to easily understand and perhaps even write these scripts
-\item Each level only interacts with one level below it (eg. the Workflow layer should not have Selenium commands)
+\item Each level should only interact with one level below it (eg. the Workflow layer should not have Selenium commands)
 \end{itemize}
+
+\subsection{Layers Implementation}
+\begin{chart}%\grid
+  \reqhalfcourse 45,45:{hydroclient.py}{Hydroclient Test Cases}{}
+
+  \reqhalfcourse 35,36:{hc\_macros.py}{Hydroclient Macros}{}
+
+  \reqhalfcourse 35,27:{hc\_elements.py}{Hydroclient Elements}{}
+  \reqhalfcourse 55,27:{utils.py}{Test System Utilities}{}
+
+  \reqhalfcourse 35,18:{site\_element.py}{Test System Element Class}{}
+
+  \reqhalfcourse 45,9:{}{Selenium Driver}{}
+
+  \reqhalfcourse 45,0:{}{CUAHSI Software Product}{}
+
+  \prereq 45,45,35,36:
+  \prereq 35,36,35,18:
+  \prereq 35,18,45,9:
+
+  \prereq 45,45,55,27:
+  \prereq 55,27,45,9:
+
+  \coreq 45,9,45,0:
+
+  %% \prereqc 45,45,35,27;-30:
+  %% \prereqc 45,45,55,27;-30:
+  %% \prereqc 35,27,45,9;0:
+  %% \prereqc 68,18,45,9;0:
+  %% \prereqc 68,27,45,9;0:
+
+  %% \coreq 55,27,68,27:
+  %% \coreq 35,36,35,27:
+  %% \coreq 35,36,55,27:
+
+  %% \begin{pgfonlayer}{courses}
+  %%   \draw[dashed] ([shift={(-1mm,-1mm)}]x55y27.south west) rectangle ([shift={(1mm,1mm)}]x68y27.north east);
+  %% \end{pgfonlayer}
+\end{chart}
 
 \end{document}
