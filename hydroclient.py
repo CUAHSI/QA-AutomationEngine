@@ -26,6 +26,7 @@ class HydroclientTestCase(unittest.TestCase):
                                       desired_capabilities={'browserName': 'firefox'})
         else:
             driver = webdriver.Firefox(profile)
+        driver.maximize_window()
         driver.get(BASE_URL)
         time.sleep(5)
         driver.implicitly_wait(10)
