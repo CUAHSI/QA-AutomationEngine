@@ -47,4 +47,4 @@ class TestSystem:
         return driver.page_source
 
 External = External()
-Hydroclient = Hydroclient()
+TestSystem = TestSystem()
