@@ -8,7 +8,6 @@
  */
 package CoreOne;
 
-import java.util.Random;
 import GenCol.*;
 import model.modeling.*;
 import model.simulation.*;
@@ -29,6 +28,7 @@ public class GithubRepo extends ViewableAtomic {
 	super(name);
 	addInport("in");
 	addOutport("out");
+	repository_name = Repository_name;
     }
     
     public void initialize() {
@@ -68,6 +68,6 @@ public class GithubRepo extends ViewableAtomic {
     }
     
     public String getTooltipText() {
-	return super.getTooltipText();
+	return super.getTooltipText() + "\n" + "repo: " + repository_name;
     }
 }
