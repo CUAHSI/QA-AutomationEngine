@@ -5,7 +5,7 @@ from selenium.webdriver.common.keys import Keys
 from hc_elements import *
 from modes import setup_mode
 
-# Testing parameters
+# Hydroclient testing parameters
 MODE_SELECTION = 'safe-demo' #quick, watch, demo, or safe-demo
 global SLEEP_TIME
 SLEEP_TIME = setup_mode(MODE_SELECTION)

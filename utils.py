@@ -3,6 +3,12 @@
 directly with the Selenium driver
 """
 import time
+from modes import setup_mode
+
+# General testing parameters
+MODE_SELECTION = 'safe-demo' #quick, watch, demo, or safe-demo
+global SLEEP_TIME
+SLEEP_TIME = setup_mode(MODE_SELECTION)
 
 class External:
     """ Utilities for handling new tabs/windows """
