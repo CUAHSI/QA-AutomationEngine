@@ -20,32 +20,46 @@ import view.simView.*;
 public class Jenkins extends ViewableDigraph {
     protected int number_nodes;
     protected int number_jobs;
+    private ViewableAtomic hub;
+    private ViewableAtomic coord;
+    private ViewableAtomic email;
     
     public Jenkins(){
 	super("Jenkins");
 	number_nodes = 3;
 	number_jobs = 10;
 	
-	ViewableAtomic hub = new SeleniumGridHub("SeleniumGridHub", number_nodes, number_jobs);
-	ViewableAtomic coord = new JenkinsCoord();
-	ViewableAtomic email = new NealEmail();
+	hub = new SeleniumGridHub("SeleniumGridHub", number_nodes, number_jobs);
+	coord = new JenkinsCoord();
+	email = new NealEmail();
 	
 	add(hub);
 	add(coord);
 	add(email);
 
+	addInports();
+	addOutports();
+	addCouplings();
+	addTestInputs();
+    }
+
+    private void addInports(){
 	addInport("trigger");
 	addInport("executor0-in");
 	addInport("executor1-in");
 	addInport("executor2-in");
 	addInport("github-in");
-	
+    }
+    
+    private void addOutports(){
 	addOutport("executor0-out");
 	addOutport("executor1-out");
 	addOutport("executor2-out");
 	addOutport("github-out");
 	addOutport("results");
-
+    }
+   
+    private void addCouplings(){
 	addCoupling(this, "trigger", coord, "setup-in");
 	addCoupling(coord, "setup-out", this, "github-out");
 	addCoupling(this, "github-in", hub, "code");
@@ -59,7 +73,9 @@ public class Jenkins extends ViewableDigraph {
 	addCoupling(hub, "out0", this, "executor0-out");
 	addCoupling(hub, "out1", this, "executor1-out");
 	addCoupling(hub, "out2", this, "executor2-out");
+    }
 
+    private void addTestInputs(){
 	addTestInput("trigger", new entity("GitHub Pull Request"), 0);
 	addTestInput("trigger", new entity("Beta System Deployment"), 0);
 	addTestInput("trigger", new entity("Scheduled Suite Execution"), 0);

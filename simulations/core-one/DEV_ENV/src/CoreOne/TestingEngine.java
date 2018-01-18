@@ -20,20 +20,24 @@ import view.simView.*;
 public class TestingEngine extends ViewableDigraph {
     protected int number_nodes;
     protected int number_jobs;
-    // protected Array executors;
+    private ViewableDigraph jenkins;
+    private ViewableAtomic github;
+    private ViewableAtomic node0;
+    private ViewableAtomic node1;
+    private ViewableAtomic node2;
+    private ViewableAtomic site;
     
     public TestingEngine(){
 	super("TestingEngine");
 	number_nodes = 3;
 	number_jobs = 10;
 	
-	ViewableDigraph jenkins = new Jenkins();
-	ViewableAtomic github = new GithubRepo();
-	// Fix below later for extensibility
-	ViewableAtomic node0 = new SeleniumGridNode("SeleniumGridNode0", 1);
-	ViewableAtomic node1 = new SeleniumGridNode("SeleniumGridNode1", 1);
-	ViewableAtomic node2 = new SeleniumGridNode("SeleniumGridNode2", 1);
-	ViewableAtomic site = new SimpleDjangoSite();
+	jenkins = new Jenkins();
+	github = new GithubRepo();
+	node0 = new SeleniumGridNode("SeleniumGridNode0", 1);
+	node1 = new SeleniumGridNode("SeleniumGridNode1", 1);
+	node2 = new SeleniumGridNode("SeleniumGridNode2", 1);
+	site = new SimpleDjangoSite();
 	
 	add(jenkins);
 	add(github);
@@ -41,7 +45,11 @@ public class TestingEngine extends ViewableDigraph {
 	add(node1);
 	add(node2);
 	add(site);
-	
+
+	addCouplings();
+    }
+    
+    private void addCouplings(){
 	addCoupling(github, "out", jenkins, "github-in");
 	addCoupling(jenkins, "github-out", github, "in");
 
