@@ -8,7 +8,6 @@
  */
 package CoreOne;
 
-import java.util.Random;
 import GenCol.*;
 import model.modeling.*;
 import model.simulation.*;
