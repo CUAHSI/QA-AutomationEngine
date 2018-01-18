@@ -15,6 +15,9 @@ import view.modeling.ViewableAtomic;
 import view.simView.*;
 
 public class JenkinsCoord extends ViewableAtomic {
+    protected entity repoObject;
+    protected entity resultsObject;
+
     public JenkinsCoord() {
 	this("JenkinsCoord");
     }
@@ -66,10 +69,10 @@ public class JenkinsCoord extends ViewableAtomic {
     public message out() {
 	message m = new message();
 	if (phaseIs("get repo")) {
-	    entity repoObject = new entity("clone request");
+	    repoObject = new entity("clone request");
 	    m.add(makeContent("setup-out", repoObject));
 	} else if (phaseIs("send results")) {
-	    entity resultsObject = new entity("test results");
+	    resultsObject = new entity("test results");
 	    m.add(makeContent("results-out", resultsObject));
 	}
 	return m;

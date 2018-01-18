@@ -22,6 +22,7 @@ public class SeleniumGridHub extends ViewableAtomic {
     protected int nodeReady;
     protected int jobsComplete;
     protected entity nextJob;
+    protected entity completion;
     
     public SeleniumGridHub() {
 	this("SeleniumGridHub", 3, 10);
@@ -113,7 +114,7 @@ public class SeleniumGridHub extends ViewableAtomic {
 		m.add(makeContent("out"+Integer.toString(nodeReady), nextJob));
 	    }
 	} else if (phaseIs("done")){
-	    entity completion = new entity("Done");
+	    completion = new entity("Done");
 	    m.add(makeContent("suite-status", completion));
 	}
 	return m;

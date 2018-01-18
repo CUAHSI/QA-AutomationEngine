@@ -16,6 +16,7 @@ import view.simView.*;
 
 public class GithubRepo extends ViewableAtomic {
     protected String repositoryName;
+    protected entity repoObject;
     
     public GithubRepo() {
 	this("GithubRepo", "CUAHSI QA Automation Engine");
@@ -62,7 +63,7 @@ public class GithubRepo extends ViewableAtomic {
     public message out() {
 	message m = new message();
 	if (phaseIs("clone request")) {
-	    entity repoObject = new entity("repository");
+	    repoObject = new entity("repository");
 	    m.add(makeContent("out", repoObject));
 	}
 	return m;

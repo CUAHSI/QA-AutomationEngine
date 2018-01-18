@@ -21,6 +21,8 @@ import view.simView.*;
 public class SeleniumGridNode extends ViewableAtomic {
     protected entity job;
     protected double processingFitness;
+    protected Random randomGenerator;
+    protected int processingTime;
     
     public SeleniumGridNode() {
 	this("SeleniumGridNode", 1);
@@ -61,8 +63,8 @@ public class SeleniumGridNode extends ViewableAtomic {
 	    for (int i = 0; i < x.getLength(); i++)
 		if (messageOnPort(x, "in", i)) {
 		    job = x.getValOnPort("in", i);
-		    Random randomGenerator = new Random();
-		    int processingTime = randomGenerator.nextInt(300);
+		    randomGenerator = new Random();
+		    processingTime = randomGenerator.nextInt(300);
 		    processingTime *= processingFitness;
 		    holdIn("busy", processingTime);
 		}
