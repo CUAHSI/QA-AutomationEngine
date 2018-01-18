@@ -26,9 +26,17 @@ public class GithubRepo extends ViewableAtomic {
     
     public GithubRepo(String name, String Repository_name) {
 	super(name);
-	addInport("in");
-	addOutport("out");
 	repository_name = Repository_name;
+	addInports();
+	addOutports();
+    }
+
+    private void addInports(){
+	addInport("in");
+    }
+
+    private void addOutports(){
+	addOutport("out");
     }
     
     public void initialize() {

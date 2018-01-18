@@ -26,8 +26,12 @@ public class SimpleDjangoSite extends ViewableAtomic {
     
     public SimpleDjangoSite(String name) {
 	super(name);
-	addInport("in");
+	addInports();
     }
+
+    private void addInports(){
+	addInport("in");
+    }	
     
     public void initialize() {
 	phase = "passive";

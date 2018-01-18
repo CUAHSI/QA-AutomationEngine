@@ -15,7 +15,8 @@ import model.simulation.*;
 import view.modeling.ViewableAtomic;
 import view.simView.*;
 
-public class SeleniumGridHub extends ViewableAtomic {// ViewableAtomic is used instead
+public class SeleniumGridHub extends ViewableAtomic {
+    // ViewableAtomic is used instead
     // of atomic due to its
     // graphics capability
     protected Queue jobs_queue;
@@ -31,20 +32,28 @@ public class SeleniumGridHub extends ViewableAtomic {// ViewableAtomic is used i
     
     public SeleniumGridHub(String name, int Number_nodes, int Number_jobs) {
 	super(name);
+	number_nodes = Number_nodes;
+	number_jobs = Number_jobs;
+	addInports();
+	addOutports();
+	addTestInputs();
+    }
+    
+    private void addInports(){
 	addInport("code");
 	addInport("status0");
 	addInport("status1");
 	addInport("status2");
+    }
+
+    private void addOutports(){
 	addOutport("out0");
 	addOutport("out1");
 	addOutport("out2");
-	// for (int i=0; i<number_nodes; i++){
-	//     addInport("status"+Integer.toString(i));
-	//     addOutport("out"+Integer.toString(i));
-	// }
 	addOutport("suite-status");
-	number_nodes = Number_nodes;
-	number_jobs = Number_jobs;
+    }
+
+    private void addTestInputs(){
 	addTestInput("status1", new entity("free"));
 	addTestInput("status1", new entity("free"), 20);
     }

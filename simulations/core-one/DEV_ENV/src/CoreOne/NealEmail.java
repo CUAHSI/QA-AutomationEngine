@@ -27,8 +27,13 @@ public class NealEmail extends ViewableAtomic {
     
     public NealEmail(String name, String Email_address) {
 	super(name);
-	addInport("in");
+	email_address = Email_address;
+	addInports();
     }
+
+    private void addInports(){
+	addInport("in");
+    }	
     
     public void initialize() {
 	phase = "passive";
@@ -63,6 +68,6 @@ public class NealEmail extends ViewableAtomic {
     }
     
     public String getTooltipText() {
-	return super.getTooltipText();
+	return super.getTooltipText() + "\n" + "email: " + email_address;
     }
 }

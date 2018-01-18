@@ -8,7 +8,6 @@
  */
 package CoreOne;
 
-import java.util.Random;
 import GenCol.*;
 import model.modeling.*;
 import model.simulation.*;
@@ -26,11 +25,19 @@ public class JenkinsCoord extends ViewableAtomic {
     
     public JenkinsCoord(String name) {
 	super(name);
-	addInport("setup-in");
-	addOutport("setup-out");
-	addInport("results-in");
-	addOutport("results-out");
+	addInports();
+	addOutports();
     }
+
+    private void addInports(){
+	addInport("setup-in");
+	addInport("results-in");
+    }
+
+    private void addOutports(){
+	addOutport("setup-out");
+	addOutport("results-out");
+    }	
     
     public void initialize() {
 	phase = "passive";
