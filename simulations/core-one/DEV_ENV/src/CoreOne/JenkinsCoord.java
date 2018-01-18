@@ -70,11 +70,11 @@ public class JenkinsCoord extends ViewableAtomic {
     public message out() {
 	message m = new message();
 	if (phaseIs("get repo")) {
-	    entity repo_object = new entity("clone request");
-	    m.add(makeContent("setup-out", repo_object));
+	    entity repoObject = new entity("clone request");
+	    m.add(makeContent("setup-out", repoObject));
 	} else if (phaseIs("send results")) {
-	    entity results_object = new entity("test results");
-	    m.add(makeContent("results-out", results_object));
+	    entity resultsObject = new entity("test results");
+	    m.add(makeContent("results-out", resultsObject));
 	}
 	return m;
     }

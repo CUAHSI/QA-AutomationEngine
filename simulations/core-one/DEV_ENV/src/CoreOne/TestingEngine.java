@@ -18,8 +18,8 @@ import view.modeling.ViewableDigraph;
 import view.simView.*;
 
 public class TestingEngine extends ViewableDigraph {
-    protected int number_nodes;
-    protected int number_jobs;
+    protected int numberNodes;
+    protected int numberJobs;
     private ViewableDigraph jenkins;
     private ViewableAtomic github;
     private ViewableAtomic node0;
@@ -29,8 +29,8 @@ public class TestingEngine extends ViewableDigraph {
     
     public TestingEngine(){
 	super("TestingEngine");
-	number_nodes = 3;
-	number_jobs = 10;
+	numberNodes = 3; //For later extensibility
+	numberJobs = 10; //For later extensibility
 	
 	jenkins = new Jenkins();
 	github = new GithubRepo();

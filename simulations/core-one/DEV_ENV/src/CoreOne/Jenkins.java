@@ -18,18 +18,18 @@ import view.modeling.ViewableDigraph;
 import view.simView.*;
 
 public class Jenkins extends ViewableDigraph {
-    protected int number_nodes;
-    protected int number_jobs;
+    protected int numberNodes;
+    protected int numberJobs;
     private ViewableAtomic hub;
     private ViewableAtomic coord;
     private ViewableAtomic email;
     
     public Jenkins(){
 	super("Jenkins");
-	number_nodes = 3;
-	number_jobs = 10;
+	numberNodes = 3; //For later extensibility
+	numberJobs = 10; //For later extensibility
 	
-	hub = new SeleniumGridHub("SeleniumGridHub", number_nodes, number_jobs);
+	hub = new SeleniumGridHub("SeleniumGridHub", numberNodes, numberJobs);
 	coord = new JenkinsCoord();
 	email = new NealEmail();
 	

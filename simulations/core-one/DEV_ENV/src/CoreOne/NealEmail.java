@@ -18,15 +18,15 @@ public class NealEmail extends ViewableAtomic {
     // ViewableAtomic is used instead
     // of atomic due to its
     // graphics capability
-    protected String email_address;
+    protected String emailAddress;
     
     public NealEmail() {
 	this("NealEmail", "ndebuhr@cuahsi.org");
     }
     
-    public NealEmail(String name, String Email_address) {
+    public NealEmail(String name, String email_address) {
 	super(name);
-	email_address = Email_address;
+	emailAddress = email_address;
 	addInports();
     }
 
@@ -67,6 +67,6 @@ public class NealEmail extends ViewableAtomic {
     }
     
     public String getTooltipText() {
-	return super.getTooltipText() + "\n" + "email: " + email_address;
+	return super.getTooltipText() + "\n" + "email: " + emailAddress;
     }
 }

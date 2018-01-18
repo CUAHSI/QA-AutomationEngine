@@ -23,15 +23,15 @@ public class SeleniumGridNode extends ViewableAtomic {
     // of atomic due to its
     // graphics capability
     protected entity job;
-    protected double processing_fitness;
+    protected double processingFitness;
     
     public SeleniumGridNode() {
 	this("SeleniumGridNode", 1);
     }
     
-    public SeleniumGridNode(String name, double Processing_fitness) {
+    public SeleniumGridNode(String name, double processing_fitness) {
 	super(name);
-	processing_fitness = Processing_fitness;
+	processingFitness = processing_fitness;
 	addInports();
 	addOutports();
 	addTestInputs();
@@ -65,9 +65,9 @@ public class SeleniumGridNode extends ViewableAtomic {
 		if (messageOnPort(x, "in", i)) {
 		    job = x.getValOnPort("in", i);
 		    Random randomGenerator = new Random();
-		    int processing_time = randomGenerator.nextInt(300);
-		    processing_time *= processing_fitness;
-		    holdIn("busy", processing_time);
+		    int processingTime = randomGenerator.nextInt(300);
+		    processingTime *= processingFitness;
+		    holdIn("busy", processingTime);
 		}
     }
     

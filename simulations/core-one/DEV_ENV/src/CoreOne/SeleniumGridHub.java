@@ -19,21 +19,21 @@ public class SeleniumGridHub extends ViewableAtomic {
     // ViewableAtomic is used instead
     // of atomic due to its
     // graphics capability
-    protected Queue jobs_queue;
-    protected int number_nodes;
-    protected int number_jobs;
-    protected int node_ready;
-    protected int jobs_complete;
-    protected entity next_job;
+    protected Queue jobsQueue;
+    protected int numberNodes;
+    protected int numberJobs;
+    protected int nodeReady;
+    protected int jobsComplete;
+    protected entity nextJob;
     
     public SeleniumGridHub() {
 	this("SeleniumGridHub", 3, 10);
     }
     
-    public SeleniumGridHub(String name, int Number_nodes, int Number_jobs) {
+    public SeleniumGridHub(String name, int number_nodes, int number_jobs) {
 	super(name);
-	number_nodes = Number_nodes;
-	number_jobs = Number_jobs;
+	numberNodes = number_nodes;
+	numberJobs = number_jobs;
 	addInports();
 	addOutports();
 	addTestInputs();
@@ -61,12 +61,12 @@ public class SeleniumGridHub extends ViewableAtomic {
     public void initialize() {
 	phase = "passive";
 	sigma = INFINITY;
-	jobs_queue = new Queue();
-	node_ready = 1;
-	jobs_complete = 0;
-	for (int i=0; i<number_jobs; i++){
+	jobsQueue = new Queue();
+	nodeReady = 1;
+	jobsComplete = 0;
+	for (int i=0; i<numberJobs; i++){
 	    entity job = new entity("job"+Integer.toString(i));
-	    jobs_queue.add(job);
+	    jobsQueue.add(job);
 	}
 	super.initialize();
     }
@@ -75,11 +75,11 @@ public class SeleniumGridHub extends ViewableAtomic {
 	Continue(e);
 
 	for (int i=0; i<x.getLength(); i++) {
-	    for (int j=0; j<number_nodes; j++)
+	    for (int j=0; j<numberNodes; j++)
 		if (messageOnPort(x, "status"+Integer.toString(j), i)) {
-		    node_ready = j;
-		    jobs_complete += 1;
-		    if (jobs_complete == number_jobs) {
+		    nodeReady = j;
+		    jobsComplete += 1;
+		    if (jobsComplete == numberJobs) {
 			holdIn("done", 0);
 		    } else {
 			holdIn("transmitting", 0);
@@ -104,16 +104,16 @@ public class SeleniumGridHub extends ViewableAtomic {
     public message out() {
 	message m = new message();
 	if (phaseIs("initials")){
-	    for (int i=0; i<number_nodes; i++){
-		if (jobs_queue.size() > 0) {
-		    next_job = (entity)jobs_queue.remove();
-		    m.add(makeContent("out"+Integer.toString(i), next_job));
+	    for (int i=0; i<numberNodes; i++){
+		if (jobsQueue.size() > 0) {
+		    nextJob = (entity)jobsQueue.remove();
+		    m.add(makeContent("out"+Integer.toString(i), nextJob));
 		}
 	    }
 	} else if (phaseIs("transmitting")){
-	    if (jobs_queue.size() > 0) {
-		next_job = (entity)jobs_queue.remove();
-		m.add(makeContent("out"+Integer.toString(node_ready), next_job));
+	    if (jobsQueue.size() > 0) {
+		nextJob = (entity)jobsQueue.remove();
+		m.add(makeContent("out"+Integer.toString(nodeReady), nextJob));
 	    }
 	} else if (phaseIs("done")){
 	    entity completion = new entity("Done");
