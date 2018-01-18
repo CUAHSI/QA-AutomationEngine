@@ -15,10 +15,6 @@ import view.modeling.ViewableAtomic;
 import view.simView.*;
 
 public class SimpleDjangoSite extends ViewableAtomic {
-    // ViewableAtomic is used instead
-    // of atomic due to its
-    // graphics capability
-    
     public SimpleDjangoSite() {
 	this("SimpleDjangoSite");
     }
@@ -27,7 +23,7 @@ public class SimpleDjangoSite extends ViewableAtomic {
 	super(name);
 	addInports();
     }
-
+    
     private void addInports(){
 	addInport("in");
     }	

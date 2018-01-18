@@ -16,9 +16,6 @@ import view.modeling.ViewableAtomic;
 import view.simView.*;
 
 public class SeleniumGridHub extends ViewableAtomic {
-    // ViewableAtomic is used instead
-    // of atomic due to its
-    // graphics capability
     protected Queue jobsQueue;
     protected int numberNodes;
     protected int numberJobs;
@@ -124,7 +121,6 @@ public class SeleniumGridHub extends ViewableAtomic {
     
     public void showState() {
 	super.showState();
-	// System.out.println("job: " + job.getName());
     }
     
     public String getTooltipText() {

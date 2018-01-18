@@ -15,9 +15,6 @@ import view.modeling.ViewableAtomic;
 import view.simView.*;
 
 public class GithubRepo extends ViewableAtomic {
-    // ViewableAtomic is used instead
-    // of atomic due to its
-    // graphics capability
     protected String repositoryName;
     
     public GithubRepo() {
@@ -65,8 +62,8 @@ public class GithubRepo extends ViewableAtomic {
     public message out() {
 	message m = new message();
 	if (phaseIs("clone request")) {
-	    entity repo_object = new entity("repository");
-	    m.add(makeContent("out", repo_object));
+	    entity repoObject = new entity("repository");
+	    m.add(makeContent("out", repoObject));
 	}
 	return m;
     }

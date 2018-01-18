@@ -15,9 +15,6 @@ import view.modeling.ViewableAtomic;
 import view.simView.*;
 
 public class NealEmail extends ViewableAtomic {
-    // ViewableAtomic is used instead
-    // of atomic due to its
-    // graphics capability
     protected String emailAddress;
     
     public NealEmail() {
@@ -29,7 +26,7 @@ public class NealEmail extends ViewableAtomic {
 	emailAddress = email_address;
 	addInports();
     }
-
+    
     private void addInports(){
 	addInport("in");
     }	
@@ -42,7 +39,6 @@ public class NealEmail extends ViewableAtomic {
     
     public void deltext(double e, message x) {
 	Continue(e);
-	
 	holdIn("email sent", INFINITY);
 	System.out.println("Test Results Email Sent");
     }

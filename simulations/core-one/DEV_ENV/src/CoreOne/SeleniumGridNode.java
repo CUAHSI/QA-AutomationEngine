@@ -19,9 +19,6 @@ import view.modeling.ViewableAtomic;
 import view.simView.*;
 
 public class SeleniumGridNode extends ViewableAtomic {
-    // ViewableAtomic is used instead
-    // of atomic due to its
-    // graphics capability
     protected entity job;
     protected double processingFitness;
     
@@ -77,8 +74,6 @@ public class SeleniumGridNode extends ViewableAtomic {
     }
     
     public void deltcon(double e, message x) {
-	// Job finishes processing before receiving next job, should
-	// these events be scheduled for the same time
 	System.out.println("confluent");
 	deltint();
 	deltext(0, x);
@@ -94,7 +89,6 @@ public class SeleniumGridNode extends ViewableAtomic {
     
     public void showState() {
 	super.showState();
-	// System.out.println("job: " + job.getName());
     }
     
     public String getTooltipText() {

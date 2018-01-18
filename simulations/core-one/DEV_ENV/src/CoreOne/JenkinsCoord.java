@@ -15,10 +15,6 @@ import view.modeling.ViewableAtomic;
 import view.simView.*;
 
 public class JenkinsCoord extends ViewableAtomic {
-    // ViewableAtomic is used instead
-    // of atomic due to its
-    // graphics capability
-    
     public JenkinsCoord() {
 	this("JenkinsCoord");
     }
@@ -28,12 +24,12 @@ public class JenkinsCoord extends ViewableAtomic {
 	addInports();
 	addOutports();
     }
-
+    
     private void addInports(){
 	addInport("setup-in");
 	addInport("results-in");
     }
-
+    
     private void addOutports(){
 	addOutport("setup-out");
 	addOutport("results-out");
