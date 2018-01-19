@@ -1,3 +1,4 @@
+propsfile
 settings.py
 db.sqlite3
 *.log
