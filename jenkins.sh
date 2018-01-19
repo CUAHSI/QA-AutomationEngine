@@ -18,5 +18,6 @@ while read test; do
     done
     CRUMB=$(curl -k -s "http://$JENKINSIP:8080/crumbIssuer/api/xml?xpath=concat(//crumbRequestField,\":\",//crumb)" --user "$USERNAME":"$USERPASS")
     curl -X POST "http://$JENKINSIP:8080/job/$TESTSUITE-thread$i/buildWithParameters?delay=0sec&TESTCASE=$test&token=$APITOKEN" -k -H "$CRUMB" --user "$USERNAME":"$USERPASS"
+    echo "Test $TESTCASE sent to Thread $i"
     sleep 1
 done <"$TESTSUITE.conf"
