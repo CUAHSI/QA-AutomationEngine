@@ -24,6 +24,7 @@
 % color package:
 \usepackage{color}
 \newcommand{\edit}{\textcolor{red}} % marker to designate areas that need future attention
+\newcommand{\callemp}{\textcolor{purple}}
 
 \definecolor{passgreen}{rgb}{0,0.5,0}
 \definecolor{failred}{rgb}{0.5,0,0}
@@ -73,9 +74,6 @@
 \maketitle
 
 \newpage
-\section{Infrastructure}
-
-
 \section{Test Suite}
 \subsection{Abstraction Layers}
 \begin{figure}[H]
@@ -104,19 +102,20 @@ Important Notes:
 \end{itemize}
 
 \subsection{Layers Implementation}
+For the HydroClient system, the CUAHSI Test Suite Framework approach is implemented using the following layers (with module names noted).  While this is specific to HydroClient, other CUAHSI systems follow the same general approach.
 \begin{chart}%\grid
-  \reqhalfcourse 45,45:{hydroclient.py}{Hydroclient Test Cases}{}
+  \reqhalfcourse 45,45:{hydroclient.py}{\callemp{Hydroclient Test Cases}}{}
 
-  \reqhalfcourse 35,36:{hc\_macros.py}{Hydroclient Macros}{}
+  \reqhalfcourse 35,36:{hc\_macros.py}{\callemp{Hydroclient Macros}}{}
 
-  \reqhalfcourse 35,27:{hc\_elements.py}{Hydroclient Elements}{}
+  \reqhalfcourse 35,27:{hc\_elements.py}{\callemp{Hydroclient Elements}}{}
   \reqhalfcourse 55,27:{utils.py}{Test System Utilities}{}
 
   \reqhalfcourse 35,18:{site\_element.py}{Test System Element Class}{}
 
   \reqhalfcourse 45,9:{}{Selenium Driver}{}
 
-  \reqhalfcourse 45,0:{}{CUAHSI Software Product}{}
+  \reqhalfcourse 45,0:{}{\callemp{HydroClient System Itself}}{}
 
   \prereq 45,45,35,36:
   \prereq 35,36,35,18:
