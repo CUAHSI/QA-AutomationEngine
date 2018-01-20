@@ -60,7 +60,7 @@ public class SeleniumGridNode extends ViewableAtomic {
 	Continue(e);
 	
 	if (phaseIs("passive"))
-	    for (int i = 0; i < x.getLength(); i++)
+	    for (int i=0; i<x.getLength(); i++)
 		if (messageOnPort(x, "in", i)) {
 		    job = x.getValOnPort("in", i);
 		    randomGenerator = new Random();

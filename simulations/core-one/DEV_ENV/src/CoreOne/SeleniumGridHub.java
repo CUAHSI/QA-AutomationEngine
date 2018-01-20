@@ -63,7 +63,7 @@ public class SeleniumGridHub extends ViewableAtomic {
 	nodeReady = 1;
 	jobsComplete = 0;
 	for (int i=0; i<numberJobs; i++){
-	    entity job = new entity("job"+Integer.toString(i));
+	    entity job = new entity("job" + Integer.toString(i));
 	    jobsQueue.add(job);
 	}
 	super.initialize();
@@ -74,7 +74,7 @@ public class SeleniumGridHub extends ViewableAtomic {
 
 	for (int i=0; i<x.getLength(); i++) {
 	    for (int j=0; j<numberNodes; j++)
-		if (messageOnPort(x, "status"+Integer.toString(j), i)) {
+		if (messageOnPort(x, "status" + Integer.toString(j), i)) {
 		    nodeReady = j;
 		    jobsComplete += 1;
 		    if (jobsComplete == numberJobs) {
@@ -105,13 +105,13 @@ public class SeleniumGridHub extends ViewableAtomic {
 	    for (int i=0; i<numberNodes; i++){
 		if (jobsQueue.size() > 0) {
 		    nextJob = (entity)jobsQueue.remove();
-		    m.add(makeContent("out"+Integer.toString(i), nextJob));
+		    m.add(makeContent("out" + Integer.toString(i), nextJob));
 		}
 	    }
 	} else if (phaseIs("transmitting")){
 	    if (jobsQueue.size() > 0) {
 		nextJob = (entity)jobsQueue.remove();
-		m.add(makeContent("out"+Integer.toString(nodeReady), nextJob));
+		m.add(makeContent("out" + Integer.toString(nodeReady), nextJob));
 	    }
 	} else if (phaseIs("done")){
 	    completion = new entity("Done");
