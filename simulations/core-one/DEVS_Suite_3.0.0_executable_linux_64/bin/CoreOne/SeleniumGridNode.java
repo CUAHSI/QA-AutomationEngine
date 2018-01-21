@@ -19,19 +19,18 @@ import view.modeling.ViewableAtomic;
 import view.simView.*;
 
 public class SeleniumGridNode extends ViewableAtomic {
-    // ViewableAtomic is used instead
-    // of atomic due to its
-    // graphics capability
     protected entity job;
-    protected double processing_fitness;
+    protected double processingFitness;
+    protected Random randomGenerator;
+    protected int processingTime;
     
     public SeleniumGridNode() {
 	this("SeleniumGridNode", 1);
     }
     
-    public SeleniumGridNode(String name, double Processing_fitness) {
+    public SeleniumGridNode(String name, double processing_fitness) {
 	super(name);
-	processing_fitness = Processing_fitness;
+	processingFitness = processing_fitness;
 	addInports();
 	addOutports();
 	addTestInputs();
@@ -61,13 +60,13 @@ public class SeleniumGridNode extends ViewableAtomic {
 	Continue(e);
 	
 	if (phaseIs("passive"))
-	    for (int i = 0; i < x.getLength(); i++)
+	    for (int i=0; i<x.getLength(); i++)
 		if (messageOnPort(x, "in", i)) {
 		    job = x.getValOnPort("in", i);
-		    Random randomGenerator = new Random();
-		    int processing_time = randomGenerator.nextInt(300);
-		    processing_time *= processing_fitness;
-		    holdIn("busy", processing_time);
+		    randomGenerator = new Random();
+		    processingTime = randomGenerator.nextInt(300);
+		    processingTime *= processingFitness;
+		    holdIn("busy", processingTime);
 		}
     }
     
@@ -77,8 +76,6 @@ public class SeleniumGridNode extends ViewableAtomic {
     }
     
     public void deltcon(double e, message x) {
-	// Job finishes processing before receiving next job, should
-	// these events be scheduled for the same time
 	System.out.println("confluent");
 	deltint();
 	deltext(0, x);
@@ -94,7 +91,6 @@ public class SeleniumGridNode extends ViewableAtomic {
     
     public void showState() {
 	super.showState();
-	// System.out.println("job: " + job.getName());
     }
     
     public String getTooltipText() {

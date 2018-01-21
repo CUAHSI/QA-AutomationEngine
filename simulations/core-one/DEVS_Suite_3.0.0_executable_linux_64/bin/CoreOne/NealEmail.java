@@ -8,7 +8,6 @@
  */
 package CoreOne;
 
-import java.util.Random;
 import GenCol.*;
 import model.modeling.*;
 import model.simulation.*;
@@ -16,21 +15,18 @@ import view.modeling.ViewableAtomic;
 import view.simView.*;
 
 public class NealEmail extends ViewableAtomic {
-    // ViewableAtomic is used instead
-    // of atomic due to its
-    // graphics capability
-    protected String email_address;
+    protected String emailAddress;
     
     public NealEmail() {
 	this("NealEmail", "ndebuhr@cuahsi.org");
     }
     
-    public NealEmail(String name, String Email_address) {
+    public NealEmail(String name, String email_address) {
 	super(name);
-	email_address = Email_address;
+	emailAddress = email_address;
 	addInports();
     }
-
+    
     private void addInports(){
 	addInport("in");
     }	
@@ -43,7 +39,6 @@ public class NealEmail extends ViewableAtomic {
     
     public void deltext(double e, message x) {
 	Continue(e);
-	
 	holdIn("email sent", INFINITY);
 	System.out.println("Test Results Email Sent");
     }
@@ -68,6 +63,6 @@ public class NealEmail extends ViewableAtomic {
     }
     
     public String getTooltipText() {
-	return super.getTooltipText() + "\n" + "email: " + email_address;
+	return super.getTooltipText() + "\n" + "email: " + emailAddress;
     }
 }

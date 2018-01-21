@@ -21,6 +21,7 @@ public class SeleniumGridHub extends ViewableAtomic {
     protected int numberJobs;
     protected int nodeReady;
     protected int jobsComplete;
+    protected entity job;
     protected entity nextJob;
     protected entity completion;
     
@@ -38,7 +39,6 @@ public class SeleniumGridHub extends ViewableAtomic {
     }
     
     private void addInports(){
-	addInport("code");
 	addInport("status0");
 	addInport("status1");
 	addInport("status2");
@@ -63,7 +63,7 @@ public class SeleniumGridHub extends ViewableAtomic {
 	nodeReady = 1;
 	jobsComplete = 0;
 	for (int i=0; i<numberJobs; i++){
-	    entity job = new entity("job" + Integer.toString(i));
+	    job = new entity("job" + Integer.toString(i));
 	    jobsQueue.add(job);
 	}
 	super.initialize();
@@ -83,8 +83,6 @@ public class SeleniumGridHub extends ViewableAtomic {
 			holdIn("transmitting", 0);
 		    }
 		}
-	    if (messageOnPort(x, "code", i))
-		holdIn("initials", 0);
 	}
     }
 

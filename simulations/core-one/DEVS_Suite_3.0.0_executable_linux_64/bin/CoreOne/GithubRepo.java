@@ -15,18 +15,16 @@ import view.modeling.ViewableAtomic;
 import view.simView.*;
 
 public class GithubRepo extends ViewableAtomic {
-    // ViewableAtomic is used instead
-    // of atomic due to its
-    // graphics capability
-    protected String repository_name;
+    protected String repositoryName;
+    protected entity repoObject;
     
     public GithubRepo() {
 	this("GithubRepo", "CUAHSI QA Automation Engine");
     }
     
-    public GithubRepo(String name, String Repository_name) {
+    public GithubRepo(String name, String repository_name) {
 	super(name);
-	repository_name = Repository_name;
+	repositoryName = repository_name;
 	addInports();
 	addOutports();
     }
@@ -65,8 +63,8 @@ public class GithubRepo extends ViewableAtomic {
     public message out() {
 	message m = new message();
 	if (phaseIs("clone request")) {
-	    entity repo_object = new entity("repository");
-	    m.add(makeContent("out", repo_object));
+	    repoObject = new entity("repository");
+	    m.add(makeContent("out", repoObject));
 	}
 	return m;
     }
@@ -76,6 +74,6 @@ public class GithubRepo extends ViewableAtomic {
     }
     
     public String getTooltipText() {
-	return super.getTooltipText() + "\n" + "repo: " + repository_name;
+	return super.getTooltipText() + "\n" + "repo: " + repositoryName;
     }
 }

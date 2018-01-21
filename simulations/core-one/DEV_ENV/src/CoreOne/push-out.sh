@@ -6,6 +6,9 @@ javac -classpath .:.. GithubRepo.java
 javac -classpath .:.. JenkinsCoord.java
 javac -classpath .:.. NealEmail.java
 javac -classpath .:.. SimpleDjangoSite.java
+javac -classpath .:.. JenkinsJobTestcase.java
+javac -classpath .:.. GitHub.java
+javac -classpath .:.. JenkinsOnline.java
 chmod 755 SeleniumGridNode.java
 chmod 755 SeleniumGridNode.class
 chmod 755 SeleniumGridHub.java
@@ -22,6 +25,12 @@ chmod 755 NealEmail.java
 chmod 755 NealEmail.class
 chmod 755 SimpleDjangoSite.java
 chmod 755 SimpleDjangoSite.class
+chmod 755 JenkinsJobTestcase.java
+chmod 755 JenkinsJobTestcase.class
+chmod 755 GitHub.java
+chmod 755 GitHub.class
+chmod 755 JenkinsOnline.java
+chmod 755 JenkinsOnline.class
 rm ../../../DEVS_Suite_3.0.0_executable_linux_64/bin/CoreOne/*
 rm ../../../DEVS_Suite_3.0.0_executable_linux_64/src/CoreOne/*
 cp SeleniumGridNode.java ../../../DEVS_Suite_3.0.0_executable_linux_64/bin/CoreOne/
@@ -48,3 +57,12 @@ cp NealEmail.class ../../../DEVS_Suite_3.0.0_executable_linux_64/src/CoreOne/
 cp SimpleDjangoSite.java ../../../DEVS_Suite_3.0.0_executable_linux_64/bin/CoreOne/
 cp SimpleDjangoSite.java ../../../DEVS_Suite_3.0.0_executable_linux_64/src/CoreOne/
 cp SimpleDjangoSite.class ../../../DEVS_Suite_3.0.0_executable_linux_64/src/CoreOne/
+cp JenkinsJobTestcase.java ../../../DEVS_Suite_3.0.0_executable_linux_64/bin/CoreOne/
+cp JenkinsJobTestcase.java ../../../DEVS_Suite_3.0.0_executable_linux_64/src/CoreOne/
+cp JenkinsJobTestcase.class ../../../DEVS_Suite_3.0.0_executable_linux_64/src/CoreOne/
+cp GitHub.java ../../../DEVS_Suite_3.0.0_executable_linux_64/bin/CoreOne/
+cp GitHub.java ../../../DEVS_Suite_3.0.0_executable_linux_64/src/CoreOne/
+cp GitHub.class ../../../DEVS_Suite_3.0.0_executable_linux_64/src/CoreOne/
+cp JenkinsOnline.java ../../../DEVS_Suite_3.0.0_executable_linux_64/bin/CoreOne/
+cp JenkinsOnline.java ../../../DEVS_Suite_3.0.0_executable_linux_64/src/CoreOne/
+cp JenkinsOnline.class ../../../DEVS_Suite_3.0.0_executable_linux_64/src/CoreOne/

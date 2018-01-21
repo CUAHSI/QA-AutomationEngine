@@ -15,8 +15,7 @@ import view.modeling.ViewableAtomic;
 import view.simView.*;
 
 public class JenkinsCoord extends ViewableAtomic {
-    protected entity repoObject;
-    protected entity resultsObject;
+    protected entity nextJob;
 
     public JenkinsCoord() {
 	this("JenkinsCoord");
@@ -29,13 +28,13 @@ public class JenkinsCoord extends ViewableAtomic {
     }
     
     private void addInports(){
-	addInport("setup-in");
-	addInport("results-in");
+	addInport("github-response");
+	addInport("trigger");
     }
     
     private void addOutports(){
-	addOutport("setup-out");
-	addOutport("results-out");
+	addOutport("github-request");
+	addOutport("jenkins-api");
     }	
     
     public void initialize() {
@@ -47,33 +46,32 @@ public class JenkinsCoord extends ViewableAtomic {
     public void deltext(double e, message x) {
 	Continue(e);
 	for (int i=0; i<x.getLength(); i++) {
-	    if (messageOnPort(x, "setup-in", i)) {
-		holdIn("get repo", 0);
-		System.out.println("Jenkins Job Initiated");
-	    } else if (messageOnPort(x, "results-in", i)) {
-		holdIn("send results", 0);
+	    if (messageOnPort(x, "trigger", i)) {
+		holdIn("Cloning", 0);
+	    } else if (messageOnPort(x, "github-response", i)) {
+		holdIn("Running", 0);
 	    }
 	}
     }
-    
+
     public void deltint() {
 	passivate();
     }
-    
+
     public void deltcon(double e, message x) {
 	System.out.println("confluent");
 	deltint();
 	deltext(0, x);
     }
-    
+
     public message out() {
 	message m = new message();
-	if (phaseIs("get repo")) {
-	    repoObject = new entity("clone request");
-	    m.add(makeContent("setup-out", repoObject));
-	} else if (phaseIs("send results")) {
-	    resultsObject = new entity("test results");
-	    m.add(makeContent("results-out", resultsObject));
+	if (phaseIs("Cloning")) {
+	    nextJob = new entity("Repo Request");
+	    m.add(makeContent("github-request", nextJob));
+	} else if (phaseIs("Running")) {
+	    nextJob = new entity("Job Initiation");
+	    m.add(makeContent("jenkins-api", nextJob));
 	}
 	return m;
     }

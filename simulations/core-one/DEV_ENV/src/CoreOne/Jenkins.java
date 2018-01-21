@@ -18,24 +18,28 @@ import view.modeling.ViewableDigraph;
 import view.simView.*;
 
 public class Jenkins extends ViewableDigraph {
-    protected int numberNodes;
-    protected int numberJobs;
-    private ViewableAtomic hub;
     private ViewableAtomic coord;
-    private ViewableAtomic email;
+    private ViewableAtomic job0;
+    private ViewableAtomic job1;
+    private ViewableAtomic job2;
+    private ViewableAtomic job3;
+    private ViewableAtomic job4;
     
     public Jenkins(){
 	super("Jenkins");
-	numberNodes = 3; //For later extensibility
-	numberJobs = 10; //For later extensibility
-	
-	hub = new SeleniumGridHub("SeleniumGridHub", numberNodes, numberJobs);
 	coord = new JenkinsCoord();
-	email = new NealEmail();
-	
-	add(hub);
+	job0 = new JenkinsJobTestcase("Test Case 0");
+	job1 = new JenkinsJobTestcase("Test Case 1");
+	job2 = new JenkinsJobTestcase("Test Case 2");
+	job3 = new JenkinsJobTestcase("Test Case 3");
+	job4 = new JenkinsJobTestcase("Test Case 4");
+
 	add(coord);
-	add(email);
+	add(job0);
+	add(job1);
+	add(job2);
+	add(job3);
+	add(job4);
 
 	addInports();
 	addOutports();
@@ -44,41 +48,74 @@ public class Jenkins extends ViewableDigraph {
     }
 
     private void addInports(){
-	addInport("trigger");
-	addInport("executor0-in");
-	addInport("executor1-in");
-	addInport("executor2-in");
-	addInport("github-in");
+	addInport("coord-trigger");
+	addInport("coord-github-response");
+	addInport("job0-grid-in");
+	addInport("job0-github-response");
+	addInport("job1-grid-in");
+	addInport("job1-github-response");
+	addInport("job2-grid-in");
+	addInport("job2-github-response");
+	addInport("job3-grid-in");
+	addInport("job3-github-response");
+	addInport("job4-grid-in");
+	addInport("job4-github-response");
     }
     
     private void addOutports(){
-	addOutport("executor0-out");
-	addOutport("executor1-out");
-	addOutport("executor2-out");
-	addOutport("github-out");
+	addOutport("coord-github-request");
+	addOutport("job0-grid-out");
+	addOutport("job0-github-request");
+	addOutport("job1-grid-out");
+	addOutport("job1-github-request");
+	addOutport("job2-grid-out");
+	addOutport("job2-github-request");
+	addOutport("job3-grid-out");
+	addOutport("job3-github-request");
+	addOutport("job4-grid-out");
+	addOutport("job4-github-request");
 	addOutport("results");
     }
    
     private void addCouplings(){
-	addCoupling(this, "trigger", coord, "setup-in");
-	addCoupling(coord, "setup-out", this, "github-out");
-	addCoupling(this, "github-in", hub, "code");
-	addCoupling(hub, "suite-status", coord, "results-in");
-	addCoupling(coord, "results-out", this, "results");
-	addCoupling(coord, "results-out", email, "in");
-	
-	addCoupling(this, "executor0-in", hub, "status0");
-	addCoupling(this, "executor1-in", hub, "status1");
-	addCoupling(this, "executor2-in", hub, "status2");
-	addCoupling(hub, "out0", this, "executor0-out");
-	addCoupling(hub, "out1", this, "executor1-out");
-	addCoupling(hub, "out2", this, "executor2-out");
+	addCoupling(this, "job0-grid-in", job0, "results");
+	addCoupling(this, "job0-github-response", job0, "github-response");
+	addCoupling(this, "job1-grid-in", job1, "results");
+	addCoupling(this, "job1-github-response", job1, "github-response");
+	addCoupling(this, "job2-grid-in", job2, "results");
+	addCoupling(this, "job2-github-response", job2, "github-response");
+	addCoupling(this, "job3-grid-in", job3, "results");
+	addCoupling(this, "job3-github-response", job3, "github-response");
+	addCoupling(this, "job4-grid-in", job4, "results");
+	addCoupling(this, "job4-github-response", job4, "github-response");
+	addCoupling(job0, "github-request", this, "job0-github-request");
+	addCoupling(job0, "to-grid", this, "job0-grid-out");
+	addCoupling(job1, "github-request", this, "job1-github-request");
+	addCoupling(job1, "to-grid", this, "job1-grid-out");
+	addCoupling(job2, "github-request", this, "job2-github-request");
+	addCoupling(job2, "to-grid", this, "job2-grid-out");
+	addCoupling(job3, "github-request", this, "job3-github-request");
+	addCoupling(job3, "to-grid", this, "job3-grid-out");
+	addCoupling(job4, "github-request", this, "job4-github-request");
+	addCoupling(job4, "to-grid", this, "job4-grid-out");
+
+	addCoupling(this, "coord-github-response", coord, "github-response");
+	addCoupling(coord, "github-request", this, "coord-github-request");
+
+	addCoupling(this, "coord-trigger", coord, "trigger");
+	addCoupling(coord, "jenkins-api", job0, "trigger");
+	addCoupling(coord, "jenkins-api", job1, "trigger");
+	addCoupling(coord, "jenkins-api", job2, "trigger");
+	addCoupling(coord, "jenkins-api", job3, "trigger");
+	addCoupling(coord, "jenkins-api", job4, "trigger");
     }
 
     private void addTestInputs(){
-	addTestInput("trigger", new entity("GitHub Pull Request"), 0);
-	addTestInput("trigger", new entity("Beta System Deployment"), 0);
-	addTestInput("trigger", new entity("Scheduled Suite Execution"), 0);
+	addTestInput("coord-trigger", new entity("GitHub Pull Request"), 0);
+	addTestInput("coord-trigger", new entity("Beta System Deployment"), 0);
+	addTestInput("coord-trigger", new entity("Scheduled Suite Execution"), 0);
+	addTestInput("coord-github-response", new entity("Repo"), 0);
+	addTestInput("job0-github-response", new entity("Repo"), 0);
     }
     
     /**

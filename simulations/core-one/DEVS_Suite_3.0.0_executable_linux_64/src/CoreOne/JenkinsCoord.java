@@ -15,10 +15,8 @@ import view.modeling.ViewableAtomic;
 import view.simView.*;
 
 public class JenkinsCoord extends ViewableAtomic {
-    // ViewableAtomic is used instead
-    // of atomic due to its
-    // graphics capability
-    
+    protected entity nextJob;
+
     public JenkinsCoord() {
 	this("JenkinsCoord");
     }
@@ -28,15 +26,15 @@ public class JenkinsCoord extends ViewableAtomic {
 	addInports();
 	addOutports();
     }
-
+    
     private void addInports(){
-	addInport("setup-in");
-	addInport("results-in");
+	addInport("github-response");
+	addInport("trigger");
     }
-
+    
     private void addOutports(){
-	addOutport("setup-out");
-	addOutport("results-out");
+	addOutport("github-request");
+	addOutport("jenkins-api");
     }	
     
     public void initialize() {
@@ -48,33 +46,32 @@ public class JenkinsCoord extends ViewableAtomic {
     public void deltext(double e, message x) {
 	Continue(e);
 	for (int i=0; i<x.getLength(); i++) {
-	    if (messageOnPort(x, "setup-in", i)) {
-		holdIn("get repo", 0);
-		System.out.println("Jenkins Job Initiated");
-	    } else if (messageOnPort(x, "results-in", i)) {
-		holdIn("send results", 0);
+	    if (messageOnPort(x, "trigger", i)) {
+		holdIn("Cloning", 0);
+	    } else if (messageOnPort(x, "github-response", i)) {
+		holdIn("Running", 0);
 	    }
 	}
     }
-    
+
     public void deltint() {
 	passivate();
     }
-    
+
     public void deltcon(double e, message x) {
 	System.out.println("confluent");
 	deltint();
 	deltext(0, x);
     }
-    
+
     public message out() {
 	message m = new message();
-	if (phaseIs("get repo")) {
-	    entity repo_object = new entity("clone request");
-	    m.add(makeContent("setup-out", repo_object));
-	} else if (phaseIs("send results")) {
-	    entity results_object = new entity("test results");
-	    m.add(makeContent("results-out", results_object));
+	if (phaseIs("Cloning")) {
+	    nextJob = new entity("Repo Request");
+	    m.add(makeContent("github-request", nextJob));
+	} else if (phaseIs("Running")) {
+	    nextJob = new entity("Job Initiation");
+	    m.add(makeContent("jenkins-api", nextJob));
 	}
 	return m;
     }

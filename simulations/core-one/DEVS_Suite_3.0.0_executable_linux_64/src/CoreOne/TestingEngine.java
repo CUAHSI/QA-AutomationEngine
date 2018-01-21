@@ -18,33 +18,36 @@ import view.modeling.ViewableDigraph;
 import view.simView.*;
 
 public class TestingEngine extends ViewableDigraph {
-    protected int number_nodes;
-    protected int number_jobs;
+    protected int numberNodes;
+    protected int numberJobs;
     private ViewableDigraph jenkins;
     private ViewableAtomic github;
+    private ViewableAtomic hub;
     private ViewableAtomic node0;
     private ViewableAtomic node1;
     private ViewableAtomic node2;
-    private ViewableAtomic site;
+    private ViewableAtomic email;
     
     public TestingEngine(){
 	super("TestingEngine");
-	number_nodes = 3;
-	number_jobs = 10;
+	numberNodes = 3; //For later extensibility
+	numberJobs = 10; //For later extensibility
 	
 	jenkins = new Jenkins();
 	github = new GithubRepo();
+	hub = new SeleniumGridHub("SeleniumGridHub", numberNodes, numberJobs);
 	node0 = new SeleniumGridNode("SeleniumGridNode0", 1);
 	node1 = new SeleniumGridNode("SeleniumGridNode1", 1);
 	node2 = new SeleniumGridNode("SeleniumGridNode2", 1);
-	site = new SimpleDjangoSite();
+	email = new NealEmail();
 	
 	add(jenkins);
 	add(github);
+	add(hub);
 	add(node0);
 	add(node1);
 	add(node2);
-	add(site);
+	add(email);
 
 	addCouplings();
     }
@@ -60,7 +63,7 @@ public class TestingEngine extends ViewableDigraph {
 	addCoupling(jenkins, "executor1-out", node1, "in");
 	addCoupling(jenkins, "executor2-out", node2, "in");
 
-	addCoupling(jenkins, "results", site, "in");
+	addCoupling(jenkins, "results", email, "in");
     }
     
     /**
