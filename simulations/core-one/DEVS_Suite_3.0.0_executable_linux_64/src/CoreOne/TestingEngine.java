@@ -30,8 +30,8 @@ public class TestingEngine extends ViewableDigraph {
     
     public TestingEngine(){
 	super("TestingEngine");
-	numberNodes = 3; //For later extensibility
-	numberJobs = 10; //For later extensibility
+	numberNodes = 3; // For later extensibility
+	numberJobs = 10; // For later extensibility
 	
 	jenkins = new Jenkins();
 	github = new GithubRepo();
