@@ -72,7 +72,7 @@ public class JenkinsJobTestcase extends ViewableAtomic {
 		ready = 1;
 		jobsComplete += 1;
 		randomGenerator = new Random();
-		testResult = randomGenerator.nextInt(1);
+		testResult = randomGenerator.nextInt(2);
 		if (testResult == 1) {
 		    holdIn("SUCCESS", INFINITY);
 		} else {

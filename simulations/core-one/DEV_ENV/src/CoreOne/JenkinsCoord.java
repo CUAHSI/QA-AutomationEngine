@@ -67,10 +67,10 @@ public class JenkinsCoord extends ViewableAtomic {
     public message out() {
 	message m = new message();
 	if (phaseIs("Cloning")) {
-	    nextJob = new entity("Repo Request");
+	    nextJob = new entity("repo-request");
 	    m.add(makeContent("github-request", nextJob));
 	} else if (phaseIs("Running")) {
-	    nextJob = new entity("Job Initiation");
+	    nextJob = new entity("job-initiation");
 	    m.add(makeContent("jenkins-api", nextJob));
 	}
 	return m;

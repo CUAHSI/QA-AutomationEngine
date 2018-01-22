@@ -17,7 +17,8 @@ CLASSES = \
 	JenkinsOnline.java \
 	Empty.java \
 	EmptyUnit.java \
-	TestingEngine.java
+	TestingEngine.java \
+	TestingEngineProgress.java
 
 default: classes
 

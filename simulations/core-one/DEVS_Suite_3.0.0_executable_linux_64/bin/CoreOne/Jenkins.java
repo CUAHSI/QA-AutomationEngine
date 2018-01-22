@@ -26,7 +26,7 @@ public class Jenkins extends ViewableDigraph {
     private ViewableAtomic job4;
     
     public Jenkins(){
-	super("Jenkins");
+	super("JenkinsJobs");
 	coord = new JenkinsCoord();
 	job0 = new JenkinsJobTestcase("Test Case 0");
 	job1 = new JenkinsJobTestcase("Test Case 1");
@@ -108,6 +108,12 @@ public class Jenkins extends ViewableDigraph {
 	addCoupling(coord, "jenkins-api", job2, "trigger");
 	addCoupling(coord, "jenkins-api", job3, "trigger");
 	addCoupling(coord, "jenkins-api", job4, "trigger");
+
+	addCoupling(job0, "status", this, "results");
+	addCoupling(job1, "status", this, "results");
+	addCoupling(job2, "status", this, "results");
+	addCoupling(job3, "status", this, "results");
+	addCoupling(job4, "status", this, "results");
     }
 
     private void addTestInputs(){
@@ -124,12 +130,12 @@ public class Jenkins extends ViewableDigraph {
      */
     public void layoutForSimView()
     {
-        preferredSize = new Dimension(887, 412);
-        ((ViewableComponent)withName("Test Case 1")).setPreferredLocation(new Point(313, 165));
-        ((ViewableComponent)withName("Test Case 2")).setPreferredLocation(new Point(288, 229));
-        ((ViewableComponent)withName("JenkinsCoord")).setPreferredLocation(new Point(11, 29));
-        ((ViewableComponent)withName("Test Case 3")).setPreferredLocation(new Point(243, 293));
-        ((ViewableComponent)withName("Test Case 0")).setPreferredLocation(new Point(321, 100));
-        ((ViewableComponent)withName("Test Case 4")).setPreferredLocation(new Point(176, 357));
+        preferredSize = new Dimension(726, 412);
+        ((ViewableComponent)withName("Test Case 3")).setPreferredLocation(new Point(164, 301));
+        ((ViewableComponent)withName("JenkinsCoord")).setPreferredLocation(new Point(0, 69));
+        ((ViewableComponent)withName("Test Case 1")).setPreferredLocation(new Point(165, 189));
+        ((ViewableComponent)withName("Test Case 2")).setPreferredLocation(new Point(167, 243));
+        ((ViewableComponent)withName("Test Case 0")).setPreferredLocation(new Point(167, 136));
+        ((ViewableComponent)withName("Test Case 4")).setPreferredLocation(new Point(163, 358));
     }
 }

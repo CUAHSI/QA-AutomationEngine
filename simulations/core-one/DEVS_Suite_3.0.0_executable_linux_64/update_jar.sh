@@ -12,3 +12,4 @@ jar uf DEVS_Suite_3.0.0.jar -C bin CoreOne/GitHub.class
 jar uf DEVS_Suite_3.0.0.jar -C bin CoreOne/JenkinsOnline.class
 jar uf DEVS_Suite_3.0.0.jar -C bin CoreOne/Empty.class
 jar uf DEVS_Suite_3.0.0.jar -C bin CoreOne/EmptyUnit.class
+jar uf DEVS_Suite_3.0.0.jar -C bin CoreOne/TestingEngineProgress.class
