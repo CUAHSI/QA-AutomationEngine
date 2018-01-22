@@ -99,11 +99,11 @@ public class JenkinsJobTestcase extends ViewableAtomic {
     public message out() {
 	message m = new message();
 	if (phaseIs("Cloning")){
-	    nextJob = new entity("Repo Request");
+	    nextJob = new entity("repo-request");
 	    m.add(makeContent("github-request", nextJob));
 	}
 	if (phaseIs("Running")){
-	    nextJob = new entity("Test Case");
+	    nextJob = new entity("test-case");
 	    m.add(makeContent("to-grid", nextJob));
 	}
 	return m;

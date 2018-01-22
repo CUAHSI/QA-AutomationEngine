@@ -9,6 +9,8 @@ javac -classpath .:.. SimpleDjangoSite.java
 javac -classpath .:.. JenkinsJobTestcase.java
 javac -classpath .:.. GitHub.java
 javac -classpath .:.. JenkinsOnline.java
+javac -classpath .:.. Empty.java
+javac -classpath .:.. EmptyUnit.java
 chmod 755 SeleniumGridNode.java
 chmod 755 SeleniumGridNode.class
 chmod 755 SeleniumGridHub.java
@@ -31,6 +33,10 @@ chmod 755 GitHub.java
 chmod 755 GitHub.class
 chmod 755 JenkinsOnline.java
 chmod 755 JenkinsOnline.class
+chmod 755 Empty.java
+chmod 755 Empty.class
+chmod 755 EmptyUnit.java
+chmod 755 EmptyUnit.class
 rm ../../../DEVS_Suite_3.0.0_executable_linux_64/bin/CoreOne/*
 rm ../../../DEVS_Suite_3.0.0_executable_linux_64/src/CoreOne/*
 cp SeleniumGridNode.java ../../../DEVS_Suite_3.0.0_executable_linux_64/bin/CoreOne/
@@ -66,3 +72,9 @@ cp GitHub.class ../../../DEVS_Suite_3.0.0_executable_linux_64/src/CoreOne/
 cp JenkinsOnline.java ../../../DEVS_Suite_3.0.0_executable_linux_64/bin/CoreOne/
 cp JenkinsOnline.java ../../../DEVS_Suite_3.0.0_executable_linux_64/src/CoreOne/
 cp JenkinsOnline.class ../../../DEVS_Suite_3.0.0_executable_linux_64/src/CoreOne/
+cp Empty.java ../../../DEVS_Suite_3.0.0_executable_linux_64/bin/CoreOne/
+cp Empty.java ../../../DEVS_Suite_3.0.0_executable_linux_64/src/CoreOne/
+cp Empty.class ../../../DEVS_Suite_3.0.0_executable_linux_64/src/CoreOne/
+cp EmptyUnit.java ../../../DEVS_Suite_3.0.0_executable_linux_64/bin/CoreOne/
+cp EmptyUnit.java ../../../DEVS_Suite_3.0.0_executable_linux_64/src/CoreOne/
+cp EmptyUnit.class ../../../DEVS_Suite_3.0.0_executable_linux_64/src/CoreOne/

@@ -124,7 +124,12 @@ public class Jenkins extends ViewableDigraph {
      */
     public void layoutForSimView()
     {
-        preferredSize = new Dimension(591, 269);
-	
+        preferredSize = new Dimension(887, 412);
+        ((ViewableComponent)withName("Test Case 1")).setPreferredLocation(new Point(313, 165));
+        ((ViewableComponent)withName("Test Case 2")).setPreferredLocation(new Point(288, 229));
+        ((ViewableComponent)withName("JenkinsCoord")).setPreferredLocation(new Point(11, 29));
+        ((ViewableComponent)withName("Test Case 3")).setPreferredLocation(new Point(243, 293));
+        ((ViewableComponent)withName("Test Case 0")).setPreferredLocation(new Point(321, 100));
+        ((ViewableComponent)withName("Test Case 4")).setPreferredLocation(new Point(176, 357));
     }
 }
