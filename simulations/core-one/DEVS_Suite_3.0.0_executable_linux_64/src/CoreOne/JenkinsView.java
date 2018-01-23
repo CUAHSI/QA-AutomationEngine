@@ -50,54 +50,54 @@ public class JenkinsView extends ViewableDigraph {
     private void addInports(){
 	addInport("coord-trigger");
 	addInport("coord-github-response");
-	addInport("job0-grid-in");
-	addInport("job0-github-response");
-	addInport("job1-grid-in");
-	addInport("job1-github-response");
-	addInport("job2-grid-in");
-	addInport("job2-github-response");
-	addInport("job3-grid-in");
-	addInport("job3-github-response");
-	addInport("job4-grid-in");
-	addInport("job4-github-response");
+	addInport("job-0-grid-in");
+	addInport("job-0-github-response");
+	addInport("job-1-grid-in");
+	addInport("job-1-github-response");
+	addInport("job-2-grid-in");
+	addInport("job-2-github-response");
+	addInport("job-3-grid-in");
+	addInport("job-3-github-response");
+	addInport("job-4-grid-in");
+	addInport("job-4-github-response");
     }
     
     private void addOutports(){
 	addOutport("coord-github-request");
-	addOutport("job0-grid-out");
-	addOutport("job0-github-request");
-	addOutport("job1-grid-out");
-	addOutport("job1-github-request");
-	addOutport("job2-grid-out");
-	addOutport("job2-github-request");
-	addOutport("job3-grid-out");
-	addOutport("job3-github-request");
-	addOutport("job4-grid-out");
-	addOutport("job4-github-request");
+	addOutport("job-0-grid-out");
+	addOutport("job-0-github-request");
+	addOutport("job-1-grid-out");
+	addOutport("job-1-github-request");
+	addOutport("job-2-grid-out");
+	addOutport("job-2-github-request");
+	addOutport("job-3-grid-out");
+	addOutport("job-3-github-request");
+	addOutport("job-4-grid-out");
+	addOutport("job-4-github-request");
 	addOutport("results");
     }
    
     private void addCouplings(){
-	addCoupling(this, "job0-grid-in", job0, "results");
-	addCoupling(this, "job0-github-response", job0, "github-response");
-	addCoupling(this, "job1-grid-in", job1, "results");
-	addCoupling(this, "job1-github-response", job1, "github-response");
-	addCoupling(this, "job2-grid-in", job2, "results");
-	addCoupling(this, "job2-github-response", job2, "github-response");
-	addCoupling(this, "job3-grid-in", job3, "results");
-	addCoupling(this, "job3-github-response", job3, "github-response");
-	addCoupling(this, "job4-grid-in", job4, "results");
-	addCoupling(this, "job4-github-response", job4, "github-response");
-	addCoupling(job0, "github-request", this, "job0-github-request");
-	addCoupling(job0, "to-grid", this, "job0-grid-out");
-	addCoupling(job1, "github-request", this, "job1-github-request");
-	addCoupling(job1, "to-grid", this, "job1-grid-out");
-	addCoupling(job2, "github-request", this, "job2-github-request");
-	addCoupling(job2, "to-grid", this, "job2-grid-out");
-	addCoupling(job3, "github-request", this, "job3-github-request");
-	addCoupling(job3, "to-grid", this, "job3-grid-out");
-	addCoupling(job4, "github-request", this, "job4-github-request");
-	addCoupling(job4, "to-grid", this, "job4-grid-out");
+	addCoupling(this, "job-0-grid-in", job0, "results");
+	addCoupling(this, "job-0-github-response", job0, "github-response");
+	addCoupling(this, "job-1-grid-in", job1, "results");
+	addCoupling(this, "job-1-github-response", job1, "github-response");
+	addCoupling(this, "job-2-grid-in", job2, "results");
+	addCoupling(this, "job-2-github-response", job2, "github-response");
+	addCoupling(this, "job-3-grid-in", job3, "results");
+	addCoupling(this, "job-3-github-response", job3, "github-response");
+	addCoupling(this, "job-4-grid-in", job4, "results");
+	addCoupling(this, "job-4-github-response", job4, "github-response");
+	addCoupling(job0, "github-request", this, "job-0-github-request");
+	addCoupling(job0, "to-grid", this, "job-0-grid-out");
+	addCoupling(job1, "github-request", this, "job-1-github-request");
+	addCoupling(job1, "to-grid", this, "job-1-grid-out");
+	addCoupling(job2, "github-request", this, "job-2-github-request");
+	addCoupling(job2, "to-grid", this, "job-2-grid-out");
+	addCoupling(job3, "github-request", this, "job-3-github-request");
+	addCoupling(job3, "to-grid", this, "job-3-grid-out");
+	addCoupling(job4, "github-request", this, "job-4-github-request");
+	addCoupling(job4, "to-grid", this, "job-4-grid-out");
 
 	addCoupling(this, "coord-github-response", coord, "github-response");
 	addCoupling(coord, "github-request", this, "coord-github-request");
@@ -121,7 +121,7 @@ public class JenkinsView extends ViewableDigraph {
 	addTestInput("coord-trigger", new entity("Beta System Deployment"), 0);
 	addTestInput("coord-trigger", new entity("Scheduled Suite Execution"), 0);
 	addTestInput("coord-github-response", new entity("Repo"), 0);
-	addTestInput("job0-github-response", new entity("Repo"), 0);
+	addTestInput("job-0-github-response", new entity("Repo"), 0);
     }
     
     /**

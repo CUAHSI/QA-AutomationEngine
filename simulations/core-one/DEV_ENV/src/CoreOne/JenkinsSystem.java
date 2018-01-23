@@ -66,32 +66,32 @@ public class JenkinsSystem extends ViewableDigraph {
    
     private void addCouplings(){
 	addCoupling(jenkins, "coord-github-request", this, "github-0-out");
-	addCoupling(jenkins, "job0-github-request", this, "github-1-out");
-	addCoupling(jenkins, "job1-github-request", this, "github-2-out");
-	addCoupling(jenkins, "job2-github-request", this, "github-3-out");
-	addCoupling(jenkins, "job3-github-request", this, "github-4-out");
-	addCoupling(jenkins, "job4-github-request", this, "github-5-out");
+	addCoupling(jenkins, "job-0-github-request", this, "github-1-out");
+	addCoupling(jenkins, "job-1-github-request", this, "github-2-out");
+	addCoupling(jenkins, "job-2-github-request", this, "github-3-out");
+	addCoupling(jenkins, "job-3-github-request", this, "github-4-out");
+	addCoupling(jenkins, "job-4-github-request", this, "github-5-out");
 
 	addCoupling(this, "github-0-in", jenkins, "coord-github-response");
-	addCoupling(this, "github-1-in", jenkins, "job0-github-response");
-	addCoupling(this, "github-2-in", jenkins, "job1-github-response");
-	addCoupling(this, "github-3-in", jenkins, "job2-github-response");
-	addCoupling(this, "github-4-in", jenkins, "job3-github-response");
-	addCoupling(this, "github-5-in", jenkins, "job4-github-response");
+	addCoupling(this, "github-1-in", jenkins, "job-0-github-response");
+	addCoupling(this, "github-2-in", jenkins, "job-1-github-response");
+	addCoupling(this, "github-3-in", jenkins, "job-2-github-response");
+	addCoupling(this, "github-4-in", jenkins, "job-3-github-response");
+	addCoupling(this, "github-5-in", jenkins, "job-4-github-response");
 
 	addCoupling(jenkins, "results", email, "in");
 
-	addCoupling(this, "grid-0-in", jenkins, "job0-grid-in");
-	addCoupling(this, "grid-1-in", jenkins, "job1-grid-in");
-	addCoupling(this, "grid-2-in", jenkins, "job2-grid-in");
-	addCoupling(this, "grid-3-in", jenkins, "job3-grid-in");
-	addCoupling(this, "grid-4-in", jenkins, "job4-grid-in");
+	addCoupling(this, "grid-0-in", jenkins, "job-0-grid-in");
+	addCoupling(this, "grid-1-in", jenkins, "job-1-grid-in");
+	addCoupling(this, "grid-2-in", jenkins, "job-2-grid-in");
+	addCoupling(this, "grid-3-in", jenkins, "job-3-grid-in");
+	addCoupling(this, "grid-4-in", jenkins, "job-4-grid-in");
 
-	addCoupling(jenkins, "job0-grid-out", this, "grid-0-out");
-	addCoupling(jenkins, "job1-grid-out", this, "grid-1-out");
-	addCoupling(jenkins, "job2-grid-out", this, "grid-2-out");
-	addCoupling(jenkins, "job3-grid-out", this, "grid-3-out");
-	addCoupling(jenkins, "job4-grid-out", this, "grid-4-out");
+	addCoupling(jenkins, "job-0-grid-out", this, "grid-0-out");
+	addCoupling(jenkins, "job-1-grid-out", this, "grid-1-out");
+	addCoupling(jenkins, "job-2-grid-out", this, "grid-2-out");
+	addCoupling(jenkins, "job-3-grid-out", this, "grid-3-out");
+	addCoupling(jenkins, "job-4-grid-out", this, "grid-4-out");
     }
 
     /**
