@@ -28,11 +28,11 @@ public class JenkinsView extends ViewableDigraph {
     public JenkinsView(){
 	super("JenkinsView");
 	coord = new JenkinsJobCoord();
-	job0 = new JenkinsJob("Jenkins Job 000002");
-	job1 = new JenkinsJob("Jenkins Job 000005");
-	job2 = new JenkinsJob("Jenkins Job 000006");
-	job3 = new JenkinsJob("Jenkins Job 000007");
-	job4 = new JenkinsJob("Jenkins Job 000009");
+	job0 = new JenkinsJob("JenkinsJob000002");
+	job1 = new JenkinsJob("JenkinsJob000005");
+	job2 = new JenkinsJob("JenkinsJob000006");
+	job3 = new JenkinsJob("JenkinsJob000007");
+	job4 = new JenkinsJob("JenkinsJob000009");
 
 	add(coord);
 	add(job0);
@@ -131,11 +131,11 @@ public class JenkinsView extends ViewableDigraph {
     public void layoutForSimView()
     {
         preferredSize = new Dimension(726, 412);
-        ((ViewableComponent)withName("Jenkins Job 000007")).setPreferredLocation(new Point(96, 272));
-        ((ViewableComponent)withName("Jenkins Job 000005")).setPreferredLocation(new Point(116, 158));
-        ((ViewableComponent)withName("Jenkins Job 000002")).setPreferredLocation(new Point(127, 104));
-        ((ViewableComponent)withName("Jenkins Job 000006")).setPreferredLocation(new Point(109, 215));
+        ((ViewableComponent)withName("JenkinsJob000007")).setPreferredLocation(new Point(96, 272));
+        ((ViewableComponent)withName("JenkinsJob000005")).setPreferredLocation(new Point(116, 158));
+        ((ViewableComponent)withName("JenkinsJob000002")).setPreferredLocation(new Point(127, 104));
+        ((ViewableComponent)withName("JenkinsJob000006")).setPreferredLocation(new Point(109, 215));
         ((ViewableComponent)withName("JenkinsJobCoord")).setPreferredLocation(new Point(-14, 37));
-        ((ViewableComponent)withName("Jenkins Job 000009")).setPreferredLocation(new Point(77, 330));
+        ((ViewableComponent)withName("JenkinsJob000009")).setPreferredLocation(new Point(77, 330));
     }
 }
