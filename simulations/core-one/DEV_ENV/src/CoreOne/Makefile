@@ -11,13 +11,9 @@ CLASSES = \
 	GithubRepo.java \
 	JenkinsCoord.java \
 	NealEmail.java \
-	SimpleDjangoSite.java \
 	JenkinsJobTestcase.java \
 	GitHub.java \
 	JenkinsOnline.java \
-	Empty.java \
-	EmptyUnit.java \
-	TestingEngine.java \
 	TestingEngineProgress.java
 
 default: classes
