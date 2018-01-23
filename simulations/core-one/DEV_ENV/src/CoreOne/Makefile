@@ -5,16 +5,16 @@ JC = javac
 	$(JC) $(JFLAGS) $*.java
 
 CLASSES = \
-	SeleniumGridNode.java \
+	AutomatedTestingEngine.java \
+	Github.java \
+	GithubThread.java \
+	JenkinsEmailPlugin.java \
+	JenkinsJob.java \
+	JenkinsJobCoord.java \
+	JenkinsSystem.java \
+	JenkinsView.java \
 	SeleniumGridHub.java \
-	Jenkins.java \
-	GithubRepo.java \
-	JenkinsCoord.java \
-	NealEmail.java \
-	JenkinsJobTestcase.java \
-	GitHub.java \
-	JenkinsOnline.java \
-	TestingEngineProgress.java
+	SeleniumGridNode.java
 
 default: classes
 
