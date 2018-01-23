@@ -39,7 +39,7 @@ public class JenkinsEmailPlugin extends ViewableAtomic {
     
     public void deltext(double e, message x) {
 	Continue(e);
-	holdIn("email sent", INFINITY);
+	holdIn("email-sent", INFINITY);
 	System.out.println("Test Results Email Sent");
     }
     

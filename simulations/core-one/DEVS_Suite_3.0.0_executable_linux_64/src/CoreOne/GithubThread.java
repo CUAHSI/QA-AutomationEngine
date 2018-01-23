@@ -45,9 +45,7 @@ public class GithubThread extends ViewableAtomic {
     
     public void deltext(double e, message x) {
 	Continue(e);
-	
-	holdIn("clone request", 0);
-	System.out.println("Git Clone Request Received");
+	holdIn("clone-request", 0);
     }
     
     public void deltint() {
@@ -62,7 +60,7 @@ public class GithubThread extends ViewableAtomic {
     
     public message out() {
 	message m = new message();
-	if (phaseIs("clone request")) {
+	if (phaseIs("clone-request")) {
 	    repoObject = new entity("repository");
 	    m.add(makeContent("out", repoObject));
 	}

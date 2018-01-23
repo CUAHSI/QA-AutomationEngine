@@ -47,9 +47,9 @@ public class JenkinsJobCoord extends ViewableAtomic {
 	Continue(e);
 	for (int i=0; i<x.getLength(); i++) {
 	    if (messageOnPort(x, "trigger", i)) {
-		holdIn("Cloning", 0);
+		holdIn("cloning", 0);
 	    } else if (messageOnPort(x, "github-response", i)) {
-		holdIn("Running", 0);
+		holdIn("running", 0);
 	    }
 	}
     }
@@ -66,10 +66,10 @@ public class JenkinsJobCoord extends ViewableAtomic {
 
     public message out() {
 	message m = new message();
-	if (phaseIs("Cloning")) {
+	if (phaseIs("cloning")) {
 	    nextJob = new entity("repo-request");
 	    m.add(makeContent("github-request", nextJob));
-	} else if (phaseIs("Running")) {
+	} else if (phaseIs("running")) {
 	    nextJob = new entity("job-initiation");
 	    m.add(makeContent("jenkins-api", nextJob));
 	}

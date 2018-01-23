@@ -80,9 +80,9 @@ public class JenkinsJob extends ViewableAtomic {
 		}
 	    }
 	    if (messageOnPort(x, "github-response", i))
-		holdIn("Running", 0);
+		holdIn("running", 0);
 	    if (messageOnPort(x, "trigger", i))
-		holdIn("Cloning", 0);
+		holdIn("cloning", 0);
 	}
     }
     
@@ -98,11 +98,11 @@ public class JenkinsJob extends ViewableAtomic {
     
     public message out() {
 	message m = new message();
-	if (phaseIs("Cloning")){
+	if (phaseIs("cloning")){
 	    nextJob = new entity("repo-request");
 	    m.add(makeContent("github-request", nextJob));
 	}
-	if (phaseIs("Running")){
+	if (phaseIs("running")){
 	    nextJob = new entity("test-case");
 	    m.add(makeContent("to-grid", nextJob));
 	}

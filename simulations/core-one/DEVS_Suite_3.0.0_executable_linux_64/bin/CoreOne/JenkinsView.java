@@ -131,11 +131,11 @@ public class JenkinsView extends ViewableDigraph {
     public void layoutForSimView()
     {
         preferredSize = new Dimension(726, 412);
-        ((ViewableComponent)withName("Test Case 3")).setPreferredLocation(new Point(164, 301));
-        ((ViewableComponent)withName("JenkinsJobCoord")).setPreferredLocation(new Point(0, 69));
-        ((ViewableComponent)withName("Test Case 1")).setPreferredLocation(new Point(165, 189));
-        ((ViewableComponent)withName("Test Case 2")).setPreferredLocation(new Point(167, 243));
-        ((ViewableComponent)withName("Test Case 0")).setPreferredLocation(new Point(167, 136));
-        ((ViewableComponent)withName("Test Case 4")).setPreferredLocation(new Point(163, 358));
+        ((ViewableComponent)withName("Jenkins Job 000007")).setPreferredLocation(new Point(96, 272));
+        ((ViewableComponent)withName("Jenkins Job 000005")).setPreferredLocation(new Point(116, 158));
+        ((ViewableComponent)withName("Jenkins Job 000002")).setPreferredLocation(new Point(127, 104));
+        ((ViewableComponent)withName("Jenkins Job 000006")).setPreferredLocation(new Point(109, 215));
+        ((ViewableComponent)withName("JenkinsJobCoord")).setPreferredLocation(new Point(-14, 37));
+        ((ViewableComponent)withName("Jenkins Job 000009")).setPreferredLocation(new Point(77, 330));
     }
 }
