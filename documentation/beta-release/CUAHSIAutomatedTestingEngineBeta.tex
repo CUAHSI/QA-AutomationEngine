@@ -1,0 +1,209 @@
+% document class:
+\documentclass[10pt]{article}
+
+\usepackage{subfigure} % for subfigures
+\usepackage{amsmath}
+\usepackage{amssymb} % for math symbols
+\usepackage{graphicx} % image formats
+\usepackage[top=2cm,bottom=2cm,left=2cm,right=2cm]{geometry} % define page set up
+\usepackage{float}
+\usepackage{listings}
+%% \usepackage{columbidaeTitle}
+%% \usepackage{dirtree}
+\usepackage[normalem]{ulem}
+\usepackage{lscape}
+\usepackage{csvsimple}
+\usepackage{multicol}
+% for dependency chart
+\usepackage{prerex}
+\usetikzlibrary{fit}
+
+% For dependency chart
+\setcounter{diagheight}{50}
+
+% color package:
+\usepackage{color}
+\newcommand{\edit}{\textcolor{red}} % marker to designate areas that need future attention
+\newcommand{\callemp}{\textcolor{purple}}
+
+\definecolor{passgreen}{rgb}{0,0.5,0}
+\definecolor{failred}{rgb}{0.5,0,0}
+
+\newcommand{\tableheader}{\textbf}
+\newcommand{\subtitleaccent}{\textsuperscript{\line(1,0){40}}}
+\newcommand{\usecase}{\large\underline}
+\newcommand{\testscenario}{\normalsize}
+\newcommand{\testcase}{\small\textit}
+\newcommand{\passtest}{\textcolor{passgreen}}
+\newcommand{\failtest}{\textcolor{failred}}
+
+\usepackage{setspace}
+%% \doublespacing
+\singlespacing
+
+% set to zero indent length
+\setlength\parindent{0pt}
+
+\definecolor{mygray}{rgb}{0.98,0.98,0.98}
+\lstset{ %
+  backgroundcolor=\color{mygray},
+  frame=single
+}
+
+\newenvironment{changemargin}[2]{%
+  \begin{list}{}{%
+      \setlength{\topsep}{0pt}%
+      \setlength{\leftmargin}{#1}%
+      \setlength{\rightmargin}{#2}%
+      \setlength{\listparindent}{\parindent}%
+      \setlength{\itemindent}{\parindent}%
+      \setlength{\parsep}{\parskip}%
+    }%
+  \item[]}{\end{list}}
+
+%% \DTsetlength{0.2em}{3em}{0.2em}{0.4pt}{1.6pt}
+
+\title{%
+  Automated Testing Engine \\
+  {\large \subtitleaccent~~CUAHSI Inc.~~\subtitleaccent}}
+\author{Prepared by Neal DeBuhr}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\newpage
+\section{Infrastructure}
+While continuous integration and continuous delivery workflows are the ideal situation for CUAHSI software systems, intermediate steps must be taken as the team builds up the necessary infrastructure and knowledge.  The CUAHSI Automated Testing Engine seeks to support future CI/CD needs, while being reliant only on existing infrastructure and staffing resources.  The engine starts with Jenkins, which is used as a ``cron on steriods''.  Future adaptation to a Jenkins CI/CD workflow is not trivial, but relatively simple.  The Jenkins system is used for test initiation, results processing, and historical test results data analysis.  The Jenkins system communicates with the Selenium Grid hub over the network, which in turn communicates with a network of Selenium Grid nodes.  The Selenium Grid hub and Selenium Grid nodes all run on independent virtual machines.  When a node is available, a single test case is sent to the node for execution.  Upon test completion, the results are funneled back through the hub to the Jenkins job which initiated the test.
+
+\begin{center}
+  \begin{figure}[H]
+    \begin{center}
+      \begin{Large}
+        {\large Test Initiation - 3 Node Example} \\ \vspace{0.2cm}
+        \begin{tabular}{c c c c c}
+          & & & & \fbox{Selenium Grid Node} \\
+          \fbox{Jenkins} & $\rightarrow$ & \fbox{Selenium Grid Hub} & $\rightarrow$ & \fbox{Selenium Grid Node} \\
+          & & & & \fbox{Selenium Grid Node} \\
+        \end{tabular}
+        \vspace{1cm}
+        
+        {\large Transmitting Test Results - 3 Node Example} \\ \vspace{0.2cm}
+        \begin{tabular}{c c c c c}
+          & & & & \fbox{Selenium Grid Node} \\
+          \fbox{Jenkins} & $\leftarrow$ & \fbox{Selenium Grid Hub} & $\leftarrow$ & \fbox{Selenium Grid Node} \\
+          & & & & \fbox{Selenium Grid Node} \\
+        \end{tabular}
+      \end{Large}
+    \end{center}
+    \caption{Infrastructure - Network Communication}
+    \label{fig:infNetCom}
+  \end{figure}
+\end{center}
+
+\subsection{Jenkins}
+While scheduled execution and manual execution serve as the baseline trigger mechanisms for the Jenkins system, more sophisticated trigger mechanisms can easily be added, such as GitHub-based triggers.  Upon triggering the ``core'' Jenkins job for a specific test suite, the public cuahsi-qa-automation-engine repository is pulled from GitHub.  Reading the associated test suite configuration file determines which tests should be executed in the current batch of automated tests.  Using a configuration file which is separate from the test suite itself enables test scripts to be developed, fixed, or improved within the repository, without the pressure of pending scheduled execution.  With knowledge of the tests to run, the core Jenkins job then makes a series of API calls to:
+\begin{enumerate}
+\item Create a Jenkins job for any testcases which do not already have an established Jenkins job.  A testcase job template is used to drive the configuration of the new job.
+\item Initiate the necessary testcase jobs.  
+\end{enumerate}
+Jobs will be queued, within Jenkins, if the number of testcases exceeds the number of executors available.  The executors are not running the tests and have negligible resource requirements.  As such, the number of executors can be set to a relatively high number.  Each testcase job communicates over TCP port 4444 to the Selenium Grid hub for initiating tests and receiving results.
+
+The core job, the testcase template job, and the testcase jobs are all grouped within a Jenkins view.  This view uses RegExp to dynamically group the tests.  This approach to Jenkins view creation removes the need to manually categorize, configure, or otherwise setup new testcase jobs.  In fact, creating the testcase script within the GitHub repository and adding it to the configuration file is all that is necessary to bring the testcase into operation.  In the unlikely event that a testcase job needs to be removed from Jenkins, that would need to be done within the GUI or by a one-off API call.  Testcases can be pulled from operation by simply removing the testcase from the configuration file, so normal use should not involve deleting Jenkins testcase jobs.  Testcase numbers need to be carefully maintained.  Reuse or renumbering will cause problems for historical results analysis, while duplicate numbering will result in tests not being ran correctly.  The testcase number should be thought of as a database primary key in this system.
+
+Upon completion of each test case, the results will be reported in standard Jenkins fashion.  The Jenkins view for the specific test suite will serve as a nice dashboard for understanding the overall health of a CUAHSI software system.  Building out the the Jenkins reporting mechanisms will be a subject of further development.  Ideally, test execution reports are clean, user-friendly, and automatically delivered in an appropriate manner.
+
+\subsection{Selenium Grid}
+The Selenium Grid hub runs on a virtual machine within CUAHSI development infrastructure.  The hub is an Ubuntu machine which, upon startup:
+\begin{enumerate}
+  \item Automatically login to cuahsi user, using systemctl graphical-target default
+  \item Start up a Java Runtime Environment and load the Selenium Server jar file
+  \item Acknowledge any registration requests from Selenium Grid nodes
+\end{enumerate}
+The Selenium Grid nodes each run on a virtual machine within CUAHSI development infrastructure.  The Selenium Grid nodes can and should use varying operating systems and browsers.  A wide variety of node configurations will facilitate the discovery of configuration-related bugs.  Additionally, all the nodes should take minimal work to startup and enable for test execution.  Automatic login and JRE execution are handled differently for different operating systems.  For existing Ubuntu Linux nodes, the steps include: 
+\begin{enumerate}
+  \item Automatically login to cuahsi user, using systemctl graphical-target default
+  \item Start up a Java Runtime Environment and load the Selenium Server jar file
+  \item Register with the Selenium Grid hub - registration requests will go out on port 5555 every few seconds until acknowledged
+\end{enumerate}
+
+Virtual machines were chosen, as opposed to Docker images or Jenkins environments, because virtual machines more closely match up with real user environments.  Ideally of course, the Selenium Grid nodes are distributed across the world on a wide variety of consumer-grade hardware.  The virtual machines approach seems to strike the right balance of test environment validity vs. efficiency.  Alternative test environment approaches can be explored in future work.  Given the modularity of the system, migration to an alternative test environment approach would not be especially difficult.
+
+Screencapture videos have traditionally been helpful to the CUAHSI team in understanding bugs and undesirable behavior identified through QA.  To extend this practice from manual testing to automated testing, the Selenium Grid nodes have been outfitted with a video capture system.  All running Ubuntu Linux nodes will continually check the system processes for signs of test execution (eg. a geckodriver process).  Next, the recordmydesktop tool is automatically launched by bash script to capture the screen while the test runs.  When the test has finished (eg. no geckodriver process), the bash script executes a gentle process kill.  Upon receiving the kill request, recordmydesktop stops recording and starts encoding.  The system process ends automatically after encoding.  To enable these video captures and to more closely simulate real user activity, the CUAHSI Automated Testing Engine does not utilize headless test execution.
+
+Video files are named automatically using epoc timestamps.  Future development will involve a more direct approach to testcase video identification - something better than manually matching up timestamps.  While the system currently establishes a 1080p screen for test execution, the xrandr tool can be used to change the screen resolution for Linux test environments.  The test environment ``screen'' here is not an actual display or output, but rather an abstract object that handles pre-output graphical content.  The Selenium Grid nodes do not have any physical display.
+
+\section{Test Suite}
+\subsection{Abstraction Layers}
+\begin{figure}[H]
+\begin{center}
+  \begin{tabular}{| p{3.5cm} | p{6cm} p{3.5cm} |} \hline
+      \centering{\fbox{Test Case Scripts}} & CUAHSI Test Cases & \textit{Minimum Complexity}\\
+      \centering{$\downarrow$} & & \\
+      \centering{\fbox{Workflow Layer}} & CUAHSI High-Level Framework & \\
+      \centering{$\downarrow$} & & \hspace{1.5cm}$\downarrow$ \\
+      \centering{\fbox{Site Element Layer}} & CUAHSI Low-Level Framework & \\
+      \centering{$\downarrow$} & & \\
+      \centering{\fbox{Selenium}} & Off-the-shelf Selenium & \textit{Maximum Complexity}\\ \hline
+    \end{tabular}
+    \begin{tabular}{p{3.5cm} p{6cm} p{3.5cm}}
+      \centering{$\downarrow \uparrow$} & & ~\\
+      \centering{Software Product} & CUAHSI Software Product & ~\\
+    \end{tabular}
+  \end{center}
+  \caption{Test Suite Framework}
+  \label{fig:tesSuiFra}
+\end{figure}
+
+Important Notes:
+\begin{itemize}
+\item Whenever possible, complexity should be pushed down the layers (closer to the Selenium layer)
+\item The test cases themselves (top level) should in particular be very low complexity.  Ideally, business users should be able to easily understand and perhaps even write these scripts
+\item Each level should only interact with one level below it (eg. the workflow layer should not have Selenium commands)
+\end{itemize}
+
+\subsection{Layers Implementation}
+For the HydroClient system, the CUAHSI Test Suite Framework approach is implemented using the following layers (with module names noted).  While this is specific to HydroClient, other CUAHSI systems follow the same general approach.
+\begin{figure}[H]
+\begin{chart}%\grid
+  \reqhalfcourse 45,45:{hydroclient.py}{\callemp{Hydroclient Test Cases}}{}
+
+  \reqhalfcourse 35,36:{hc\_macros.py}{\callemp{Hydroclient Macros}}{}
+
+  \reqhalfcourse 35,27:{hc\_elements.py}{\callemp{Hydroclient Elements}}{}
+  \reqhalfcourse 55,27:{utils.py}{Test System Utilities}{}
+
+  \reqhalfcourse 35,18:{site\_element.py}{Test System Element Class}{}
+
+  \reqhalfcourse 45,9:{}{Selenium Driver}{}
+
+  \reqhalfcourse 45,0:{}{\callemp{HydroClient System Itself}}{}
+
+  \prereq 45,45,35,36:
+  \prereq 35,36,35,18:
+  \prereq 35,18,45,9:
+
+  \prereq 45,45,55,27:
+  \prereq 55,27,45,9:
+
+  \coreq 45,9,45,0:
+
+  %% \prereqc 45,45,35,27;-30:
+  %% \prereqc 45,45,55,27;-30:
+  %% \prereqc 35,27,45,9;0:
+  %% \prereqc 68,18,45,9;0:
+  %% \prereqc 68,27,45,9;0:
+
+  %% \coreq 55,27,68,27:
+  %% \coreq 35,36,35,27:
+  %% \coreq 35,36,55,27:
+
+  %% \begin{pgfonlayer}{courses}
+  %%   \draw[dashed] ([shift={(-1mm,-1mm)}]x55y27.south west) rectangle ([shift={(1mm,1mm)}]x68y27.north east);
+  %% \end{pgfonlayer}
+\end{chart}
+\caption{HydroClient Test Suite Framework}
+\label{fig:hydTesSuiFra}
+\end{figure}
+\end{document}
