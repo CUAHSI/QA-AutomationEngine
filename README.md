@@ -16,10 +16,10 @@ The Selenium Grid system uses VMs which run on CUAHSI hardware.  The number and 
 
 ### Usage
 The test suite can ran without the Jenkins and Selenium Grid infrastructure for test script development and test suite debugging purposes.  To run all test cases (not just those defined in the configuration file):
-{code:bash}
+```bash
 python3 hydroclient.py
-{code}
+```
 Specific tests can be ran by including the class and method names, for example:
-{code:bash}
+```bash
 python3 hydroclient.py HydroclientTestCase.test_A_000001
-{code}
+```

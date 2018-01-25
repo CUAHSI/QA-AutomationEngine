@@ -87,11 +87,12 @@ class HydroclientTestCase(unittest.TestCase):
         available for NASA Goddard Earth Sciences services
         """
         def oracle():
-            """ Export to workspace is successful
-            """
+            """ Export to workspace is successful """
             self.assertEqual(Workspace.completed_count(driver), 2)
         Search.location_search(driver, 'New Haven ')
-        ServiceSearch.filter_services(driver, titles=['NLDAS Hourly NOAH Data','NLDAS Hourly Primary Forcing Data'])
+        ServiceSearch.filter_services(driver,
+                                      titles=['NLDAS Hourly NOAH Data',
+                                              'NLDAS Hourly Primary Forcing Data'])
         FilterResults.search_filter_table(driver, 'X416-Y130')
         FilterResults.model_sim_and_derived_value_to_workspace(driver)
         oracle()
