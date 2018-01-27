@@ -1,6 +1,6 @@
 # CUAHSI QA Automation Engine
 
-> TODO PUT THE GITHUB REPO DESCRIPTION HERE
+> Automated test suites for multiple CUAHSI software systems, along with associated tools and infrastructure
 
 This repository contains:
 
@@ -10,7 +10,7 @@ This repository contains:
 4. A simulation to characterize and communicate the parallel test execution process.
 5. Additional documentation to explain the theory and purpose of the testing system.
 
-The test suites are designed to run within a [Jenkins](TODO) plus [Selenium Grid](TODO) environment on CUAHSI-managed hardware.  Test initiation and results interpretation are handled by Jenkins.  Meanwhile, the test case execution is handled by Selenium Grid.  
+The test suites are designed to run within a [Jenkins](https://jenkins.io/) plus [Selenium Grid](http://www.seleniumhq.org/) environment on CUAHSI-managed hardware.  Test initiation and results interpretation are handled by Jenkins.  Meanwhile, the test case execution is handled by Selenium Grid.  
 
 ## Table of Contents
 
@@ -30,7 +30,7 @@ The Selenium Grid system uses VMs which run on CUAHSI hardware.  The number and 
 
 ## Install
 
-On the infrastructure side, this project uses [Jenkins](TODO) and [Selenium Grid](TODO). Please refer to the [Jenkins installation guide](TODO) and [Selenium Grid installation guide](TODO) for the installation of these tools.
+On the infrastructure side, this project uses Jenkins and Selenium Grid. Please refer to the [Jenkins installation guide](https://wiki.jenkins.io/display/JENKINS/Installing+Jenkins+on+Ubuntu) and [Selenium Grid installation guide](https://github.com/SeleniumHQ/selenium/wiki/Grid2) for the installation of these tools.
 
 The test suites and associated framework are dependent on the unittest, argparse, sys, time, and selenium Python packages.  Further, the python3 version of these packages are required.  As needed, install the Python packages with:
 ```sh
