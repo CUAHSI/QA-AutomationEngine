@@ -14,6 +14,7 @@ The test suites are designed to run within a [Jenkins](https://jenkins.io/) plus
 
 ## Table of Contents
 
+- [Background](#background)
 - [Install](#install)
 - [Usage](#usage)
 - [Maintainers](#maintainers)
