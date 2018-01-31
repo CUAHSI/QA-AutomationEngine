@@ -1,4 +1,4 @@
-# CUAHSI QA Automation Engine
+# QA Automation Engine
 
 > Automated test suites for multiple CUAHSI software systems, along with associated tools and infrastructure
 
@@ -72,8 +72,8 @@ For specifying which tests to run, edit the software system config file:
 
 ## Maintainers
 
-[@hydroshare](https://github.com/hydroshare).
 [@cuahsi](https://github.com/cuahsi).
+[@hydroshare](https://github.com/hydroshare).
 [@ndebuhr](https://github.com/ndebuhr).
 
 ## Contribute
