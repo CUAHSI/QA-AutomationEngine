@@ -34,7 +34,7 @@ The Selenium Grid system uses VMs which run on CUAHSI hardware.  The number and 
 On the infrastructure side, this project uses Jenkins and Selenium Grid. Please refer to the [Jenkins installation guide](https://wiki.jenkins.io/display/JENKINS/Installing+Jenkins+on+Ubuntu) and [Selenium Grid installation guide](https://github.com/SeleniumHQ/selenium/wiki/Grid2) for the installation of these tools.
 
 The test suites and associated framework are dependent on the unittest, argparse, sys, time, and selenium Python packages.  Further, the python3 version of these packages are required.  As needed, install the Python packages with:
-```sh
+```
 $ pip3 install unittest
 $ pip3 install argparse
 $ pip3 install sys
@@ -45,25 +45,25 @@ $ pip3 install selenium
 ## Usage
 
 The test suite can ran without the Jenkins and Selenium Grid infrastructure for test script development and test suite debugging purposes.  To run all test cases (not just those defined in the configuration file):
-```sh
+```
 $ python3 hydroclient.py
 ```
 Specific tests can be ran by including the class and method names, for example:
-```sh
+```
 $ python3 hydroclient.py HydroclientTestCase.test_A_000002
 ```
 When initiating a Selenium Grid execution, provide the IP of the Selenium Grid hub as an argument.  The port is assumed to be the Selenium Grid default of 4444.
-```sh
+```
 $ python3 hydroclient.py --grid 127.0.0.1
 $ python3 hydroclient.py HydroclientTestCase.test_A_000002 --grid 127.0.0.1
 ```
 
 In a Jenkins deployment, the core job runs the jenkins.sh script:
-```sh
+```
 $ bash jenkins.sh
 ```
 The Jenkins template project runs a parameterized version of the python3 commands previously stated.
-```sh
+```
 $ python3 hydroclient.py HydroclientTestCase.test_A_000002 --grid 127.0.0.1
 ```
 For specifying which tests to run, edit the software system config file:
