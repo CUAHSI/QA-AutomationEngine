@@ -17,7 +17,7 @@ The test suites are designed to run within a [Jenkins](https://jenkins.io/) plus
 - [Background](#background)
 - [Install](#install)
 - [Usage](#usage)
-- [Creating Test Cases](#creatingtestcases)
+- [Creating Test Cases](#creating-test-cases)
 - [Maintainers](#maintainers)
 - [Contribute](#contribute)
 - [License](#license)
