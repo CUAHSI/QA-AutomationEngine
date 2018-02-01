@@ -17,6 +17,7 @@ The test suites are designed to run within a [Jenkins](https://jenkins.io/) plus
 - [Background](#background)
 - [Install](#install)
 - [Usage](#usage)
+- [Creating Test Cases](#creatingtestcases)
 - [Maintainers](#maintainers)
 - [Contribute](#contribute)
 - [License](#license)
@@ -69,6 +70,17 @@ $ python3 hydroclient.py HydroclientTestCase.test_A_000002 --grid 127.0.0.1
 For specifying which tests to run, edit the software system config file:
 1) hydroclient.conf
 2) hydroshare.conf
+
+## Creating Test Cases
+The [PDF documentation](documentation/beta-release/CUAHSIAutomatedTestingEngineBeta.pdf) contained in this repository provides a deeper explanation of the test suite framework.  However, the general idea is to write test cases at the most abstract level, then support that with new classes, attributes, and methods in the lower abstraction levels as needed.
+
+In the case of the HydroClient software system, test cases should be created in hydroclient.py.  Consider a test case which involves running a map search, filtering by data service, then exporting to the workspace.  The top level test case script in [hydroclient.py](hydroclient.py) would likely only need four lines - one for each of the three steps above and one assert statement to confirm expected test results.  This test case is supported at the lower levels by (in decreasing levels of abstraction):
+
+1) [HydroClient macros](hc_macros.py), which captures common series of actions while working with HydroClient.  In our example, the map search step would be defined here and would include clicking the location search box, clearing the box of any existing text, injecting the desired test, then clicking the location search button.
+2) [HydroClient elements](hc_elements.py), which contains attributes and methods that support specific element identification on the page.  In our example, the location search field and the location search button would both be defined at this level.
+3) [Site elements](site_elements.py) handles all the low level interactions with off-the-shelf Selenium.  In our example, the click, clear_all_text, and inject_text methods would be defined at this level.  These methods may involve a large number of Selenium commands and should use best practices in simulating real user behavior.  For instance, (non-CUAHSI) test scripts commonly inject large strings of text into fields instantaneously - the inject_text method within [site_elements.py](site_elements.py) has a small pause between simulated key presses to better mimic real user behavior.  The site elements module is common to all CUAHSI automated testing suites.
+
+The [utilities](utils.py) are also common to all CUAHSI test suites.  These utilities support those rare actions which do not involve page element interaction, and therefore cannot be handled through the framework above.
 
 ## Maintainers
 
