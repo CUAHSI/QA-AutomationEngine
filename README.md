@@ -6,7 +6,7 @@ This repository contains:
 
 1. Selenium-based automated test suites for the CUAHSI [HydroClient](http://data.cuahsi.org) and [HydroShare](http://hydroshare.org) systems.
 2. An automated testing framework to support the rapid development of high readability and high maintainability test cases.
-3. Scripts to support the execution of the automated test suites on Jenkins and Selenium Grid installations.
+3. Scripts to support execution of the automated test suites on Jenkins and Selenium Grid installations.
 4. A simulation to characterize and communicate the parallel test execution process.
 5. Additional documentation to explain the theory and purpose of the testing system.
 
@@ -25,31 +25,27 @@ The test suites are designed to run within a [Jenkins](https://jenkins.io/) plus
 ## Background
 
 ### Jenkins
-The test suite execution process begins with a trigger of the "core" Jenkins job.  After setting up environment variables and pulling the GitHub repository, the core Jenkins job runs the jenkins.sh file.  This script uses API calls to create Jenkins jobs (for any new test cases) and to run Jenkins jobs.  Each test case is given a separate job in Jenkins, which enables the easy analysis of historical test execution data for a specific test.  
+The test suite execution process begins with a trigger of the "core" Jenkins job.  After setting up environment variables and pulling the GitHub repository, the core Jenkins job runs the jenkins.sh file.  This script uses API calls to create (for any new test cases) and run Jenkins jobs.  Each test case is given a separate job in Jenkins, which makes it easy to analyze historical test execution data for a specific test.  
 
 ### Selenium Grid
 The Selenium Grid system uses VMs which run on CUAHSI hardware.  The number and types of Selenium Grid nodes does not need to be established a priori.  Rather, the Selenium Grid hub allocates test cases based on what nodes are available at the time.
 
 ## Install
 
-On the infrastructure side, this project uses Jenkins and Selenium Grid. Please refer to the [Jenkins installation guide](https://wiki.jenkins.io/display/JENKINS/Installing+Jenkins+on+Ubuntu) and [Selenium Grid installation guide](https://github.com/SeleniumHQ/selenium/wiki/Grid2) for the installation of these tools.
+On the infrastructure side, this project uses Jenkins and Selenium Grid. Please refer to the [Jenkins installation guide](https://wiki.jenkins.io/display/JENKINS/Installing+Jenkins+on+Ubuntu) and [Selenium Grid installation guide](https://github.com/SeleniumHQ/selenium/wiki/Grid2) for instructions on how to install these tools.
 
-The test suites and associated framework are dependent on the unittest, argparse, sys, time, and selenium Python packages.  Further, the python3 version of these packages are required.  As needed, install the Python packages with:
+The test suites and associated framework are dependent on the unittest, argparse, sys, time, and selenium Python packages.  Further, the python3 versions of these packages are required.  Of these packages, only selenium is not included in the standard library.  Install this Python package with:
 ```
-$ pip3 install unittest
-$ pip3 install argparse
-$ pip3 install sys
-$ pip3 install time
 $ pip3 install selenium
 ```
 
 ## Usage
 
-The test suite can ran without the Jenkins and Selenium Grid infrastructure for test script development and test suite debugging purposes.  To run all test cases (not just those defined in the configuration file):
+The test suite can run without the Jenkins and Selenium Grid infrastructure for test script development and test suite debugging purposes.  To run all test cases (not just those defined in the configuration file):
 ```
 $ python3 hydroclient.py
 ```
-Specific tests can be ran by including the class and method names, for example:
+Specific tests can be executed by including the class and method names, for example:
 ```
 $ python3 hydroclient.py HydroclientTestCase.test_A_000002
 ```
@@ -63,11 +59,11 @@ In a Jenkins deployment, the core job runs the jenkins.sh script:
 ```
 $ bash jenkins.sh
 ```
-The Jenkins template project runs a parameterized version of the python3 commands previously stated.
+The Jenkins template project runs a parameterized version of the previously mentioned python3 commands.
 ```
 $ python3 hydroclient.py HydroclientTestCase.test_A_000002 --grid 127.0.0.1
 ```
-For specifying which tests to run, edit the software system config file:
+To specify which tests to run, edit the software system config file:
 1) hydroclient.conf
 2) hydroshare.conf
 
@@ -76,9 +72,9 @@ The [PDF documentation](documentation/beta-release/CUAHSIAutomatedTestingEngineB
 
 In the case of the HydroClient software system, test cases should be created in hydroclient.py.  Consider a test case which involves running a map search, filtering by data service, then exporting to the workspace.  The top level test case script in [hydroclient.py](hydroclient.py) would likely only need four lines - one for each of the three steps above and one assert statement to confirm expected test results.  This test case is supported at the lower levels by (in decreasing levels of abstraction):
 
-1) [HydroClient macros](hc_macros.py), which captures common series of actions while working with HydroClient.  In our example, the map search step would be defined here and would include clicking the location search box, clearing the box of any existing text, injecting the desired test, then clicking the location search button.
-2) [HydroClient elements](hc_elements.py), which contains attributes and methods that support specific element identification on the page.  In our example, the location search field and the location search button would both be defined at this level.
-3) [Site elements](site_elements.py) handles all the low level interactions with off-the-shelf Selenium.  In our example, the click, clear_all_text, and inject_text methods would be defined at this level.  These methods may involve a large number of Selenium commands and should use best practices in simulating real user behavior.  For instance, (non-CUAHSI) test scripts commonly inject large strings of text into fields instantaneously - the inject_text method within [site_elements.py](site_elements.py) has a small pause between simulated key presses to better mimic real user behavior.  The site elements module is common to all CUAHSI automated testing suites.
+1) [HydroClient macros](hc_macros.py), which captures common series of actions while working with HydroClient.  In our example, the map search step would be defined here and would include clicking the location search box, clearing the box of any existing text, injecting the desired text, then clicking the location search button.
+2) [HydroClient elements](hc_elements.py), which contains attributes and methods for specific element identification on the page.  In our example, the location search field and the location search button would both be defined at this level.
+3) [Site elements](site_elements.py) handles all the low level interactions with off-the-shelf Selenium.  In our example, the click, clear_all_text, and inject_text methods would be defined at this level.  These methods may involve a large number of Selenium commands and should use best practices in simulating real user behavior.  For instance, non-CUAHSI test scripts commonly inject large strings of text into fields instantaneously - the inject_text method within [site_elements.py](site_elements.py) has a small pause between simulated key presses to better mimic real user behavior.  The site elements module is common to all CUAHSI automated testing suites.
 
 The [utilities](utils.py) are also common to all CUAHSI test suites.  These utilities support those rare actions which do not involve page element interaction, and therefore cannot be handled through the framework above.
 
