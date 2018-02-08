@@ -255,6 +255,18 @@ class HydroclientTestCase(unittest.TestCase):
         Workspace.export_data_viewer(driver)
         Workspace.export_csv(driver)
         oracle()
+
+    def test_A_000014(self):
+        """ Check NLDAS service over ocean - sites den't exist """
+        def oracle():
+            self.assertEqual(Search.results_count(driver), '0')
+        Search.location_search(driver, 'Cape Cod Bay')
+        Search.map_zoomin(driver, 3)
+        ServiceSearch.filter_services(driver,
+                                      titles=['NLDAS Hourly NOAH Data',
+                                              'NLDAS Hourly Primary Forcing Data'])
+        oracle()
+        
         
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

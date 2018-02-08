@@ -13,7 +13,7 @@ class SiteElement:
     """
     def __init__(self, el_type=None, el_id=None, el_content=None,
                  el_href=None, el_class=None, el_dom=None, el_name=None,
-                 el_placeholder=None, el_recursive=None):
+                 el_placeholder=None, el_title=None, el_recursive=None):
         self.el_type = el_type
         self.el_id = el_id
         self.el_content = el_content
@@ -22,6 +22,7 @@ class SiteElement:
         self.el_dom = el_dom
         self.el_name = el_name
         self.el_placeholder = el_placeholder
+        self.el_title = el_title
         self.el_recursive = el_recursive
 
     def loc_it(self, el_driver):
@@ -54,6 +55,19 @@ class SiteElement:
                 else:
                     element_xpath = ".//" + loc_child.el_type + \
                                     "[@name='" + loc_child.el_name + "']"
+                target_element = loc_base.find_element_by_xpath(element_xpath)
+                return target_element
+
+            def loc_by_title(loc_base, loc_child):
+                """ Locates a website element, given the title
+                attribute
+                """
+                if loc_child is None:
+                    element_xpath = "//" + self.el_type + \
+                                    "[@title='" + self.el_title + "']"
+                else:
+                    element_xpath = ".//" + loc_child.el_type + \
+                                    "[@title='" + loc_child.el_title + "']"
                 target_element = loc_base.find_element_by_xpath(element_xpath)
                 return target_element
 
@@ -133,11 +147,13 @@ class SiteElement:
                 defining_el = loc_child # For relative identification
 
             # Hierarcy for identification using element attributes is
-            # id->name->href->class->content->DOM->type(no attributes)
+            # id->name->title->href->class->content->DOM->type(no attributes)
             if defining_el.el_id is not None:
                 target_element = loc_by_id(loc_base, loc_child)
             elif defining_el.el_name is not None:
                 target_element = loc_by_name(loc_base, loc_child)
+            elif defining_el.el_title is not None:
+                target_element = loc_by_title(loc_base, loc_child)
             elif defining_el.el_placeholder is not None:
                 target_element = loc_by_placeholder(loc_base, loc_child)
             elif defining_el.el_href is not None:

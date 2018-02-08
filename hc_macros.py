@@ -96,7 +96,11 @@ class Search:
 
     def reset_params(self, driver):
         SearchPage.reset.click(driver, SLEEP_TIME)
-    
+
+    def map_zoomin(self, driver, count=1):
+        for i in range(0, count):
+            SearchPage.map_zoomin.click(driver, SLEEP_TIME)
+        
 class ServiceSearch:
     """ Narrow search results through service selections - associated
     macros

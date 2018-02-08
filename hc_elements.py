@@ -8,6 +8,7 @@ class SearchPage:
     def __init__(self):
         self.workspace = SiteElement('*', el_id='tabbedDataMgrTab')
         self.map_area = SiteElement('div', el_id='map-canvas')
+        self.map_zoomin = SiteElement('div', el_title='Zoom in')
         self.search_now = SiteElement('button', el_id='btnSearchNow')
         self.reset = SiteElement('button', el_id='btnSetDefaults')
         self.filter_results = SiteElement('button', el_id='btnSearchSummary')
