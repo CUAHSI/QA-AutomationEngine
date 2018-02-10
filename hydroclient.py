@@ -257,8 +257,11 @@ class HydroclientTestCase(unittest.TestCase):
         oracle()
 
     def test_A_000014(self):
-        """ Check NLDAS service over ocean - sites den't exist """
+        """ Check NLDAS service over ocean to ensure sites don't exist """
         def oracle():
+            """ The results count over Cape Cod Bay (no land in view)
+            is 0 after filtering for only NLDAS services
+            """
             self.assertEqual(Search.results_count(driver), '0')
         Search.location_search(driver, 'Cape Cod Bay')
         Search.map_zoomin(driver, 3)
