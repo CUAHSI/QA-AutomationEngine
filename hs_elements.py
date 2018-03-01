@@ -20,7 +20,52 @@ class DiscoverPage:
         self.filter_is_discoverable = SiteElement('input', el_id='discoverable-true')
         self.filter_is_public = SiteElement('input', el_id='public-true')
         self.beaver_divide = SiteElement('a', el_content='Beaver Divide Air Temperature')
+        self.sort_order = SiteElement('select', el_id='id_sort_order')
+        self.sort_direction = SiteElement('select', el_id='id_sort_direction')
+        self.header_row = SiteElement('table', el_id='items-discovered',
+                                      el_recursive=[SiteElement('thead'),
+                                                    SiteElement('tr')])
 
+    def discovered_column_ind(self, column_ind):
+        """ Return the column header element, given the index """
+        return SiteElement('table', el_id='items-discovered',
+                           el_recursive=[SiteElement('thead'),
+                                         SiteElement('tr'),
+                                         SiteElement('th[' + str(column_ind) + ']')])
+        
+    def discovered_field(self, column_num, row_num):
+        """ Return the cell in the discover table, given row and column
+        indicies
+        """
+        return SiteElement('table', el_id='items-discovered',
+                           el_recursive=[SiteElement('tbody'),
+                                         SiteElement('tr[' + str(row_num) + ']'),
+                                         SiteElement('td[' + str(column_num) + ']')])
+
+    def discovered_field_href(self, column_num, row_num):
+        """ Return the cell in the discover table, given row and column
+        indicies.  Builds on discover_field method, but enables use for
+        hyperlinked fields.
+        """
+        return SiteElement('table', el_id='items-discovered',
+                           el_recursive=[SiteElement('tbody'),
+                                         SiteElement('tr[' + str(row_num) + ']'),
+                                         SiteElement('td[' + str(column_num) + ']'),
+                                         SiteElement('a')])
+                                         
+    def discovered_field_strong_href(self, column_num, row_num):
+        """ Return the cell in the discover table, given row and column
+        indicies.  Builds on discover_field method, but enables use for
+        bolded and hyperlinked fields.
+        """
+        return SiteElement('table', el_id='items-discovered',
+                           el_recursive=[SiteElement('tbody'),
+                                         SiteElement('tr[' + str(row_num) + ']'),
+                                         SiteElement('td[' + str(column_num) + ']'),
+                                         SiteElement('strong'),
+                                         SiteElement('a')])
+                                         
+                           
     def open_resource(self, resource_title):
         return SiteElement('a', el_content=resource_title)
 

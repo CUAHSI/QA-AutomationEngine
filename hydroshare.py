@@ -46,25 +46,46 @@ class HydroshareTestCase(unittest.TestCase):
         Discover.open_resource(driver, 'Beaver Divide Air Temperature')
         oracle()
 
-    def todo_test_B_000004(self):
-        """ Confirms date filtering functionality, as well as
-        map view functionality
+    def test_B_000006(self):
+        """ Confirms none of the Discover page sort options result in
+        incorrect sorting
         """
-        def oracle():
-            """ Confirms valid page returned after navigation """
-            self.assertIn('HydroShare', driver.title)
-        # Pulls up discover search page through site header
-        HomePage.discover_tab.click(driver, SLEEP_TIME)
-        DiscoverPage.start_date.inject_text(driver, "01/01/2014", SLEEP_TIME)
-        DiscoverPage.end_date.inject_text(driver, "12/31/2014", SLEEP_TIME)
-        # TODO fix element identification issue
-        DiscoverPage.map_tab.click(driver, SLEEP_TIME)
-        DiscoverPage.map_search.inject_text(driver, "Salt Lake City", SLEEP_TIME)
-        DiscoverPage.map_submit.click(driver, SLEEP_TIME)
-        DiscoverPage.list_tab.click(driver, SLEEP_TIME)
-        TestSystem.wait(5)
-        oracle()
-
+        def oracle(driver, column_name, ascend_or_descend):
+            """ Sorting is correctly implemented, as measured by a sample
+            of row comparisons (not exhaustive)
+            """
+            self.assertTrue(Discover.check_sorting(driver,
+                                                   column_name,
+                                                   ascend_or_descend))
+        Discover.goto(driver)
+        Discover.sort_direction(driver, 'Ascending')
+        Discover.sort_order(driver, 'Last Modified')
+        oracle(driver, 'Last Modified', 'Ascending')
+        Discover.sort_order(driver, 'Title')
+        oracle(driver, 'Title', 'Ascending')
+        Discover.sort_order(driver, 'First Author')
+        oracle(driver, 'First Author', 'Ascending')
+        Discover.sort_order(driver, 'Date Created')
+        oracle(driver, 'Date Created', 'Ascending')
+        Discover.sort_direction(driver, 'Descending')
+        Discover.sort_order(driver, 'Title')
+        oracle(driver, 'Title', 'Descending')
+        Discover.sort_order(driver, 'Date Created')
+        oracle(driver, 'Date Created', 'Descending')
+        Discover.sort_order(driver, 'Last Modified')        
+        oracle(driver, 'Last Modified', 'Descending')
+        Discover.sort_order(driver, 'First Author')
+        oracle(driver, 'First Author', 'Descending')
+        Discover.sort_direction(driver, 'Ascending')
+        Discover.sort_order(driver, 'Date Created')
+        oracle(driver, 'Date Created', 'Ascending')
+        Discover.sort_order(driver, 'Last Modified')
+        oracle(driver, 'Last Modified', 'Ascending')
+        Discover.sort_order(driver, 'First Author')
+        oracle(driver, 'First Author', 'Ascending')
+        Discover.sort_order(driver, 'Title')
+        oracle(driver, 'Title', 'Ascending')
+        
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--grid')

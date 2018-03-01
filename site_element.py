@@ -258,6 +258,13 @@ class SiteElement:
         select_element = Select(target_element)
         select_element.select_by_value(select_choice)
         time.sleep(sleep_time)
+
+    def select_option_text(self, el_driver, select_choice, sleep_time):
+        """ Selects an option from dropdown given visible text """
+        target_element = self.loc_it(el_driver)
+        select_element = Select(target_element)
+        select_element.select_by_visible_text(select_choice)
+        time.sleep(sleep_time)
         
     def scroll_to(self, el_driver, sleep_time):
         """ After element identification, the window is scrolled
@@ -323,3 +330,9 @@ class SiteElement:
             element_href = base_url + element_href
         return element_href
 
+    def get_child_count(self, el_driver):
+        """ Returns the number of child elements, given a parent 
+        element specification
+        """
+        target_element = self.loc_it(el_driver)
+        return len(target_element.find_elements_by_xpath(".//*"))
