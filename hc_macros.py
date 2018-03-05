@@ -1,14 +1,16 @@
-import sys
-import os
 import time
+
 from selenium.webdriver.common.keys import Keys
-from hc_elements import *
+
+from hc_elements import SearchPage, ServiceSearchPage, KeywordSearchPage, AdvancedSearchPage
+from hc_elements import FilterResultsPage, WorkspacePage, MapMarkerPage, QuickStartPage
 from modes import setup_mode
 
 # Hydroclient testing parameters
-MODE_SELECTION = 'safe-demo' #quick, watch, demo, or safe-demo
+MODE_SELECTION = 'safe-demo'  # quick, watch, demo, or safe-demo
 global SLEEP_TIME
 SLEEP_TIME = setup_mode(MODE_SELECTION)
+
 
 class Search:
     """ Main search interface macros """
@@ -16,7 +18,7 @@ class Search:
         SearchPage.map_area.click(driver, SLEEP_TIME)
         for i in range(0, count):
             SearchPage.map_area.scroll_right(driver, SLEEP_TIME/count)
-    
+
     def about_helpcenter(self, driver):
         SearchPage.about.click(driver, SLEEP_TIME)
         SearchPage.about_helpcenter.click(driver, SLEEP_TIME)
@@ -38,7 +40,7 @@ class Search:
         SearchPage.about_contact.click(driver, SLEEP_TIME)
         SearchPage.about_contact_help.click(driver, SLEEP_TIME)
         SearchPage.about_contact_close.click(driver, SLEEP_TIME)
-    
+
     def zendesk_help(self, driver, search_text, article_text):
         SearchPage.zendesk_iframe.iframe_in(driver)
         SearchPage.zendesk_help.click(driver, SLEEP_TIME)
@@ -49,10 +51,10 @@ class Search:
         SearchPage.zendesk_return(article_text).click(driver, SLEEP_TIME)
         SearchPage.zendesk_more.scroll_to(driver, SLEEP_TIME)
         SearchPage.zendesk_more.click(driver, SLEEP_TIME)
-        
+
     def quick_start(self, driver):
         SearchPage.quickstart.click(driver, SLEEP_TIME)
-    
+
     def legend_visible(self, driver):
         SearchPage.legend_tab.click(driver, SLEEP_TIME)
         legend_display = SearchPage.legend.get_attribute(driver, 'style')
@@ -60,8 +62,8 @@ class Search:
         legend_display = legend_display.split(';')[0]
         legend_display = legend_display.split(' ')[-1]
         SearchPage.search_tab.click(driver, SLEEP_TIME)
-        return (legend_display != 'none')
-    
+        return legend_display != 'none'
+
     def search(self, driver, count=1):
         for i in range(0, count):
             SearchPage.search_now.click(driver, SLEEP_TIME)
@@ -72,7 +74,7 @@ class Search:
 
     def map_icon_open(self, driver, results_count):
         SearchPage.map_indicator(results_count).click(driver, SLEEP_TIME)
-            
+
     def location_search(self, driver, location):
         SearchPage.location_search.click(driver, SLEEP_TIME)
         SearchPage.location_search.clear_all_text(driver, SLEEP_TIME)
@@ -100,7 +102,8 @@ class Search:
     def map_zoomin(self, driver, count=1):
         for i in range(0, count):
             SearchPage.map_zoomin.click(driver, SLEEP_TIME)
-        
+
+
 class ServiceSearch:
     """ Narrow search results through service selections - associated
     macros
@@ -125,6 +128,7 @@ class ServiceSearch:
         SearchPage.search_now.click(driver, SLEEP_TIME)
         time.sleep(10)
 
+
 class KeywordSearch:
     """ Macros for the keyword search filtering modal """
     def root_keywords(self, driver, keywords):
@@ -133,6 +137,7 @@ class KeywordSearch:
         for keyword in keywords:
             KeywordSearchPage.full_list_checkbox(keyword).click(driver, SLEEP_TIME)
         KeywordSearchPage.search.click(driver, SLEEP_TIME)
+
 
 class AdvancedSearch:
     """ Macros for all tabs within the advanced search modal """
@@ -144,7 +149,8 @@ class AdvancedSearch:
         AdvancedSearchPage.value_type_term_sort.click(driver, SLEEP_TIME)
         AdvancedSearchPage.value_type_first.range_click(driver, SLEEP_TIME)
         AdvancedSearchPage.search.click(driver, SLEEP_TIME)
-            
+
+
 class FilterResults:
     """ Detailed results view by pressing "Filter Results" button
     associated macros
@@ -168,7 +174,7 @@ class FilterResults:
         FilterResultsPage.choose_action.click(driver, SLEEP_TIME)
         FilterResultsPage.export_workspace.click(driver, SLEEP_TIME)
         FilterResultsPage.nav_workspace.click(driver, SLEEP_TIME)
-        
+
     def derived_value_to_workspace(self, driver):
         SearchPage.filter_results.click(driver, SLEEP_TIME)
         FilterResultsPage.table_count.select_option(driver, '100', SLEEP_TIME)
@@ -176,14 +182,15 @@ class FilterResults:
         FilterResultsPage.choose_action.click(driver, SLEEP_TIME)
         FilterResultsPage.export_workspace.click(driver, SLEEP_TIME)
         FilterResultsPage.nav_workspace.click(driver, SLEEP_TIME)
-        
+
     def search_filter_table(self, driver, search_string):
         SearchPage.filter_results.click(driver, SLEEP_TIME)
         FilterResultsPage.search.inject_text(driver, search_string, SLEEP_TIME)
         FilterResultsPage.sort_service.click(driver, SLEEP_TIME)
         FilterResultsPage.table_count.select_option(driver, '100', SLEEP_TIME)
         FilterResultsPage.nav_close.click(driver, SLEEP_TIME)
-        
+
+
 class Workspace:
     """ Macros related to workspace page/modal """
     def goto_from_search(self, driver):
@@ -196,7 +203,7 @@ class Workspace:
     def clear_selected(self, driver):
         WorkspacePage.selections_dropdown.passive_click(driver, SLEEP_TIME)
         WorkspacePage.select_clear.click(driver, SLEEP_TIME)
-    
+
     def remove_selected(self, driver):
         WorkspacePage.selections_dropdown.passive_click(driver, SLEEP_TIME)
         WorkspacePage.select_delete.click(driver, SLEEP_TIME)
@@ -212,7 +219,7 @@ class Workspace:
     def export_none(self, driver):
         WorkspacePage.select_tool.passive_click(driver, SLEEP_TIME)
         WorkspacePage.export_none.click(driver, SLEEP_TIME)
-        
+
     def completed_count(self, driver):
         time.sleep(50*SLEEP_TIME)
         return driver.page_source.count('<em> Completed</em>')
@@ -229,6 +236,7 @@ class Workspace:
                 return False
         return True
 
+
 class MapMarker:
     """ Macros for map-opened search results """
     def all_to_workspace(self, driver):
@@ -241,6 +249,7 @@ class MapMarker:
         MapMarkerPage.export_workspace.click(driver, SLEEP_TIME)
         MapMarkerPage.nav_workspace.click(driver, SLEEP_TIME)
 
+
 class QuickStart:
     """ Macros for the QuickStart modal """
     def help_expand(self, driver, help_item):
@@ -248,6 +257,7 @@ class QuickStart:
 
     def help_more(self, driver, link_text):
         QuickStartPage.more_info(link_text).click(driver, SLEEP_TIME)
+
 
 Search = Search()
 ServiceSearch = ServiceSearch()

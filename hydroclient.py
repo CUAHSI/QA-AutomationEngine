@@ -1,15 +1,18 @@
 """ Runs various smoke tests for the data.cuahsi.org """
-import unittest
 import argparse
 import sys
 import time
-from hc_macros import *
-from utils import *
+import unittest
+
 from selenium import webdriver
-from selenium.common.exceptions import NoSuchElementException
+
+from hc_macros import Search, ServiceSearch, KeywordSearch, AdvancedSearch
+from hc_macros import Workspace, FilterResults, MapMarker, QuickStart
+from utils import External, TestSystem
 
 # Test case parameters
 BASE_URL = 'http://data.cuahsi.org'
+
 
 # Test cases definition
 class HydroclientTestCase(unittest.TestCase):
@@ -19,9 +22,10 @@ class HydroclientTestCase(unittest.TestCase):
         """ Setup driver for use in automation tests """
         profile = webdriver.FirefoxProfile()
         profile.set_preference("general.useragent.override", "CUAHSI-QA-Selenium")
+        # TODO use self.driver instead of making it global
         global driver
         if infrastructure == 'grid':
-            driver = webdriver.Remote(command_executor='http://' + \
+            driver = webdriver.Remote(command_executor='http://' +
                                       grid_hub_ip + ':4444/wd/hub',
                                       desired_capabilities={'browserName': 'firefox'})
         else:
@@ -62,6 +66,7 @@ class HydroclientTestCase(unittest.TestCase):
             service visible via search filtering
             """
             self.assertIn('51', Search.results_count(driver))
+
         Search.location_search(driver, 'Lake Annie Highlands County')
         ServiceSearch.filter_services(driver, organizations='Archbold Biological Station')
         Search.search(driver, 60)
@@ -75,7 +80,8 @@ class HydroclientTestCase(unittest.TestCase):
             """ Start date and end date in workspace match the initial
             date filtering values established in the Search interface
             """
-            self.assertTrue(Workspace.in_results(driver,['2015-12-01','2015-12-30']))
+            self.assertTrue(Workspace.in_results(driver, ['2015-12-01', '2015-12-30']))
+
         Search.location_search(driver, 'Tampa ')
         ServiceSearch.filter_services(driver, titles='NWIS Unit Values')
         Search.date_filter(driver, '12/01/2015', '12/30/2015')
@@ -93,6 +99,7 @@ class HydroclientTestCase(unittest.TestCase):
         ServiceSearch.filter_services(driver,
                                       titles=['NLDAS Hourly NOAH Data',
                                               'NLDAS Hourly Primary Forcing Data'])
+
         FilterResults.search_filter_table(driver, 'X416-Y130')
         FilterResults.model_sim_and_derived_value_to_workspace(driver)
         oracle()
@@ -104,6 +111,7 @@ class HydroclientTestCase(unittest.TestCase):
         def oracle():
             """ Export to workspace is successful """
             self.assertEqual(Workspace.completed_count(driver), 4)
+
         Search.location_search(driver, 'Köln ')
         Search.search(driver)
         Search.map_icon_open(driver, '4')
@@ -121,32 +129,34 @@ class HydroclientTestCase(unittest.TestCase):
             self.assertTrue(Search.legend_visible(driver))
             Search.layer_toggle(driver, 'USGS LandCover 2011')
             self.assertFalse(Search.legend_visible(driver))
+
         Search.location_search(driver, 'Anchorage ')
         Search.layer_toggle(driver, 'USGS LandCover 2011')
         oracle()
-        
+
     def test_A_000008(self):
         """ Confirms consistency of layer naming among the HydroClient
         and the associated documentation
         """
         def oracle_1():
-            """ Layer naming in the Quick Start matches the 
+            """ Layer naming in the Quick Start matches the
             naming within the HydroClient search interface
             """
             for layer in layers:
                 self.assertIn('<li>' + layer + '</li>', TestSystem.page_source(driver))
+
         def oracle_2():
-            """ Layer naming in the help documentation page matches the 
+            """ Layer naming in the help documentation page matches the
             naming within the HydroClient search interface
             """
             for layer in layers:
                 self.assertIn('<h2>' + layer + '</h2>', TestSystem.page_source(driver))
-                
+
         layers = ['USGS Stream Gages', 'Nationalmap Hydrology',
                   'EPA Watersheds', 'USGS LandCover 2011']
-        for layer in layers: # Turn all on
+        for layer in layers:  # Turn all on
             Search.layer_toggle(driver, layer)
-        for layer in layers: # Turn all off
+        for layer in layers:  # Turn all off
             Search.layer_toggle(driver, layer)
         Search.quick_start(driver)
         QuickStart.help_expand(driver, 'Using the Layer Control')
@@ -154,7 +164,7 @@ class HydroclientTestCase(unittest.TestCase):
         QuickStart.help_more(driver, 'Click for more information on the Layer Control')
         External.switch_new_page(driver)
         oracle_2()
-        
+
     def test_A_000009(self):
         """ Layers help documentation available through ZenDesk help
         overlay button/widget
@@ -180,6 +190,7 @@ class HydroclientTestCase(unittest.TestCase):
             """
             self.assertTrue(all(x == rio_counts[0] for x in rio_counts))
             self.assertTrue(all(x == dallas_counts[0] for x in dallas_counts))
+
         rio_counts = []
         dallas_counts = []
         Search.location_search(driver, 'Rio De Janeiro')
@@ -189,15 +200,15 @@ class HydroclientTestCase(unittest.TestCase):
         AdvancedSearch.all_value_type(driver)
         rio_counts.append(Search.results_count(driver))
         Search.reset_params(driver)
-        
         Search.location_search(driver, 'Dallas')
         dallas_counts.append(Search.results_count(driver))
         KeywordSearch.root_keywords(driver, ['Biological', 'Chemical', 'Physical'])
         dallas_counts.append(Search.results_count(driver))
-        TestSystem.wait(3) #sec
+        TestSystem.wait(3)  # sec
         AdvancedSearch.all_value_type(driver)
-        TestSystem.wait(3) #sec
+        TestSystem.wait(3)  # sec
         dallas_counts.append(Search.results_count(driver))
+        oracle()
 
     def test_A_000011(self):
         """ Confirms About dropdown links successfully open up the
@@ -206,6 +217,7 @@ class HydroclientTestCase(unittest.TestCase):
         def oracle():
             """ No 404 Errors exist in external page sources """
             self.assertNotIn('404 Error', external_sources)
+
         external_sources = ''
         Search.about_helpcenter(driver)
         external_sources += External.source_new_page(driver)
@@ -228,6 +240,7 @@ class HydroclientTestCase(unittest.TestCase):
         def oracle():
             """ Results count is nonzero after map navigations """
             self.assertNotEqual(Search.results_count(driver), '0')
+
         Search.map_scroll(driver, 25)
         Search.location_search(driver, 'Raleigh')
         Search.search(driver)
@@ -242,6 +255,7 @@ class HydroclientTestCase(unittest.TestCase):
             been raised
             """
             self.assertIn('HydroClient', TestSystem.title(driver))
+
         Workspace.goto_from_search(driver)
         Workspace.select_all(driver)
         Workspace.clear_selected(driver)
@@ -263,26 +277,27 @@ class HydroclientTestCase(unittest.TestCase):
             is 0 after filtering for only NLDAS services
             """
             self.assertEqual(Search.results_count(driver), '0')
+
         Search.location_search(driver, 'Cape Cod Bay')
         Search.map_zoomin(driver, 3)
         ServiceSearch.filter_services(driver,
                                       titles=['NLDAS Hourly NOAH Data',
                                               'NLDAS Hourly Primary Forcing Data'])
         oracle()
-        
-        
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--grid')
     parser.add_argument('unittest_args', nargs='*')
-    
+
     args = parser.parse_args()
     if args.grid is None:
         infrastructure = 'standalone'
     else:
         infrastructure = 'grid'
         grid_hub_ip = args.grid
-        
+
     # Set the sys.argv to the unittest_args (leaving sys.argv[0] alone)
     sys.argv[1:] = args.unittest_args
     unittest.main(verbosity=2)

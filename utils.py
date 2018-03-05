@@ -1,14 +1,16 @@
 """ Contains the general, non-page specific utilities for test case
- execution.  Unlike hc_macros or hs_macros, these methods interact 
+ execution.  Unlike hc_macros or hs_macros, these methods interact
 directly with the Selenium driver
 """
 import time
+
 from modes import setup_mode
 
 # General testing parameters
-MODE_SELECTION = 'safe-demo' #quick, watch, demo, or safe-demo
+MODE_SELECTION = 'safe-demo'  # quick, watch, demo, or safe-demo
 global SLEEP_TIME
 SLEEP_TIME = setup_mode(MODE_SELECTION)
+
 
 class External:
     """ Utilities for handling new tabs/windows """
@@ -41,16 +43,18 @@ class External:
         time.sleep(SLEEP_TIME/2)
         return source
 
+
 class TestSystem:
     """ General utilities for Hydroclient test case creation """
     def title(self, driver):
         return driver.title
-    
+
     def wait(self, seconds=3):
         time.sleep(seconds)
 
     def page_source(self, driver):
         return driver.page_source
+
 
 External = External()
 TestSystem = TestSystem()

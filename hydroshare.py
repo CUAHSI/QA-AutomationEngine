@@ -1,14 +1,18 @@
 """ Runs various smoke tests for the hydroshare.org """
-import unittest
 import argparse
 import sys
-import time
-from hs_macros import *
-from utils import *
+import unittest
+
 from selenium import webdriver
+
+from hs_elements import HomePage, DiscoverPage
+from hs_macros import Discover, ResourceLanding
+from hs_macros import SLEEP_TIME
+from utils import TestSystem
 
 # Test case parameters
 BASE_URL = "http://www.hydroshare.org"
+
 
 # Test cases definition
 class HydroshareTestCase(unittest.TestCase):
@@ -18,9 +22,10 @@ class HydroshareTestCase(unittest.TestCase):
         """ Setup driver for use in automation tests """
         profile = webdriver.FirefoxProfile()
         profile.set_preference("general.useragent.override", "CUAHSI-QA-Selenium")
+        # TODO use self.driver instead of making it global
         global driver
         if infrastructure == 'grid':
-            driver = webdriver.Remote(command_executor='http://' + \
+            driver = webdriver.Remote(command_executor='http://' +
                                       grid_hub_ip + ':4444/wd/hub',
                                       desired_capabilities={'browserName': 'firefox'})
         else:
@@ -41,8 +46,10 @@ class HydroshareTestCase(unittest.TestCase):
             """ The Beaver Divide BagIt zip file
             matches expected file size
             """
-            self.assertEqual(ResourceLanding.download_size(driver, BASE_URL), 512000) #Bytes
-        Discover.discover_resources(driver, subject='iUTAH', resource_type='Generic', availability=['discoverable','public'])
+            self.assertEqual(ResourceLanding.download_size(driver, BASE_URL), 512000)  # Bytes
+
+        Discover.discover_resources(driver, subject='iUTAH', resource_type='Generic',
+                                    availability=['discoverable', 'public'])
         Discover.open_resource(driver, 'Beaver Divide Air Temperature')
         oracle()
 
@@ -85,19 +92,20 @@ class HydroshareTestCase(unittest.TestCase):
         oracle(driver, 'First Author', 'Ascending')
         Discover.sort_order(driver, 'Title')
         oracle(driver, 'Title', 'Ascending')
-        
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--grid')
     parser.add_argument('unittest_args', nargs='*')
-    
+
     args = parser.parse_args()
     if args.grid is None:
         infrastructure = 'standalone'
     else:
         infrastructure = 'grid'
         grid_hub_ip = args.grid
-        
+
     # Set the sys.argv to the unittest_args (leaving sys.argv[0] alone)
     sys.argv[1:] = args.unittest_args
     unittest.main(verbosity=2)
