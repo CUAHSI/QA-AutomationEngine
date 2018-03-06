@@ -45,7 +45,8 @@ class SiteElement:
                 else:
                     element_xpath = ".//" + loc_child.el_type + \
                                     "[@id='" + loc_child.el_id + "']"
-                target_element = loc_base.find_element_by_xpath(element_xpath)
+                target_element = loc_base.find_element_by_xpath((
+                    element_xpath))
                 return target_element
 
             def loc_by_name(loc_base, loc_child):
@@ -56,7 +57,8 @@ class SiteElement:
                 else:
                     element_xpath = ".//" + loc_child.el_type + \
                                     "[@name='" + loc_child.el_name + "']"
-                target_element = loc_base.find_element_by_xpath(element_xpath)
+                target_element = loc_base.find_element_by_xpath((
+                    element_xpath))
                 return target_element
 
             def loc_by_title(loc_base, loc_child):
@@ -69,7 +71,8 @@ class SiteElement:
                 else:
                     element_xpath = ".//" + loc_child.el_type + \
                                     "[@title='" + loc_child.el_title + "']"
-                target_element = loc_base.find_element_by_xpath(element_xpath)
+                target_element = loc_base.find_element_by_xpath((
+                    element_xpath))
                 return target_element
 
             def loc_by_placeholder(loc_base, loc_child):
@@ -78,11 +81,14 @@ class SiteElement:
                 """
                 if loc_child is None:
                     element_xpath = "//" + self.el_type + \
-                                    "[@placeholder='" + self.el_placeholder + "']"
+                                    "[@placeholder='" + \
+                                    self.el_placeholder + "']"
                 else:
                     element_xpath = ".//" + loc_child.el_type + \
-                                    "[@placeholder='" + loc_child.el_placeholder + "']"
-                target_element = loc_base.find_element_by_xpath(element_xpath)
+                                    "[@placeholder='" + \
+                                    loc_child.el_placeholder + "']"
+                target_element = loc_base.find_element_by_xpath((
+                    element_xpath))
                 return target_element
 
             def loc_by_href(loc_base, loc_child):
@@ -91,11 +97,14 @@ class SiteElement:
                 """
                 if loc_child is None:
                     element_xpath = "//" + self.el_type + \
-                                    "[contains(@href,'" + self.el_href + "')]"
+                                    "[contains(@href,'" + \
+                                    self.el_href + "')]"
                 else:
                     element_xpath = ".//" + loc_child.el_type + \
-                                    "[contains(@href,'" + loc_child.el_href + "')]"
-                target_element = loc_base.find_element_by_xpath(element_xpath)
+                                    "[contains(@href,'" + \
+                                    loc_child.el_href + "')]"
+                target_element = loc_base.find_element_by_xpath((
+                    element_xpath))
                 return target_element
 
             def loc_by_class(loc_base, loc_child):
@@ -106,7 +115,8 @@ class SiteElement:
                 else:
                     element_xpath = ".//" + loc_child.el_type + \
                                     "[@class='" + loc_child.el_class + "']"
-                target_element = loc_base.find_element_by_xpath(element_xpath)
+                target_element = loc_base.find_element_by_xpath((
+                    element_xpath))
                 return target_element
 
             def loc_by_content(loc_base, loc_child):
@@ -121,7 +131,8 @@ class SiteElement:
                     element_xpath = ".//" + loc_child.el_type + \
                                     "[contains(text(), '" + \
                                     loc_child.el_content + "')]"
-                target_element = loc_base.find_element_by_xpath(element_xpath)
+                target_element = loc_base.find_element_by_xpath((
+                    element_xpath))
                 return target_element
 
             def loc_by_dom(loc_base, loc_child):
@@ -130,7 +141,8 @@ class SiteElement:
                     element_xpath = self.el_dom
                 else:
                     element_xpath = loc_child.el_dom
-                target_element = loc_base.find_element_by_xpath(element_xpath)
+                target_element = loc_base.find_element_by_xpath((
+                    element_xpath))
                 return target_element
 
             def loc_by_nothing(loc_base, loc_child):
@@ -139,7 +151,8 @@ class SiteElement:
                     element_xpath = "//" + self.el_type
                 else:
                     element_xpath = ".//" + loc_child.el_type
-                target_element = loc_base.find_element_by_xpath(element_xpath)
+                target_element = loc_base.find_element_by_xpath((
+                    element_xpath))
                 return target_element
 
             if loc_child is None:
@@ -330,7 +343,7 @@ class SiteElement:
         return element_href
 
     def get_child_count(self, el_driver):
-        """ Returns the number of child elements, given a parent 
+        """ Returns the number of child elements, given a parent
         element specification
         """
         target_element = self.loc_it(el_driver)

@@ -21,13 +21,16 @@ class HydroclientTestCase(unittest.TestCase):
     def setUp(self):
         """ Setup driver for use in automation tests """
         profile = webdriver.FirefoxProfile()
-        profile.set_preference("general.useragent.override", "CUAHSI-QA-Selenium")
+        profile.set_preference("general.useragent.override",
+                               "CUAHSI-QA-Selenium")
         # TODO use self.driver instead of making it global
         global driver
         if infrastructure == 'grid':
-            driver = webdriver.Remote(command_executor='http://' +
-                                      grid_hub_ip + ':4444/wd/hub',
-                                      desired_capabilities={'browserName': 'firefox'})
+            driver = \
+                webdriver.Remote(command_executor='http://' +
+                                 grid_hub_ip + ':4444/wd/hub',
+                                 desired_capabilities=(
+                                     {'browserName': 'firefox'}))
         else:
             driver = webdriver.Firefox(profile)
         driver.maximize_window()
@@ -52,7 +55,8 @@ class HydroclientTestCase(unittest.TestCase):
             self.assertEqual(Workspace.completed_count(driver), 1)
 
         Search.location_search(driver, 'Lake Annie Highlands County')
-        ServiceSearch.filter_services(driver, organizations='Archbold Biological Station')
+        ServiceSearch.filter_services(driver, organizations=(
+            'Archbold Biological Station'))
         FilterResults.any_to_workspace(driver)
         oracle()
 
@@ -68,7 +72,8 @@ class HydroclientTestCase(unittest.TestCase):
             self.assertIn('51', Search.results_count(driver))
 
         Search.location_search(driver, 'Lake Annie Highlands County')
-        ServiceSearch.filter_services(driver, organizations='Archbold Biological Station')
+        ServiceSearch.filter_services(driver, organizations=(
+            'Archbold Biological Station'))
         Search.search(driver, 60)
         oracle()
 
@@ -80,7 +85,9 @@ class HydroclientTestCase(unittest.TestCase):
             """ Start date and end date in workspace match the initial
             date filtering values established in the Search interface
             """
-            self.assertTrue(Workspace.in_results(driver, ['2015-12-01', '2015-12-30']))
+            self.assertTrue(Workspace.in_results(driver,
+                                                 ['2015-12-01',
+                                                  '2015-12-30']))
 
         Search.location_search(driver, 'Tampa ')
         ServiceSearch.filter_services(driver, titles='NWIS Unit Values')
@@ -97,8 +104,10 @@ class HydroclientTestCase(unittest.TestCase):
             self.assertEqual(Workspace.completed_count(driver), 2)
         Search.location_search(driver, 'New Haven ')
         ServiceSearch.filter_services(driver,
-                                      titles=['NLDAS Hourly NOAH Data',
-                                              'NLDAS Hourly Primary Forcing Data'])
+                                      titles=(
+                                          ['NLDAS Hourly NOAH Data',
+                                           'NLDAS Hourly ' +
+                                           'Primary Forcing Data']))
 
         FilterResults.search_filter_table(driver, 'X416-Y130')
         FilterResults.model_sim_and_derived_value_to_workspace(driver)
@@ -143,14 +152,16 @@ class HydroclientTestCase(unittest.TestCase):
             naming within the HydroClient search interface
             """
             for layer in layers:
-                self.assertIn('<li>' + layer + '</li>', TestSystem.page_source(driver))
+                self.assertIn('<li>' + layer + '</li>',
+                              TestSystem.page_source(driver))
 
         def oracle_2():
             """ Layer naming in the help documentation page matches the
             naming within the HydroClient search interface
             """
             for layer in layers:
-                self.assertIn('<h2>' + layer + '</h2>', TestSystem.page_source(driver))
+                self.assertIn('<h2>' + layer + '</h2>',
+                              TestSystem.page_source(driver))
 
         layers = ['USGS Stream Gages', 'Nationalmap Hydrology',
                   'EPA Watersheds', 'USGS LandCover 2011']
@@ -161,7 +172,9 @@ class HydroclientTestCase(unittest.TestCase):
         Search.quick_start(driver)
         QuickStart.help_expand(driver, 'Using the Layer Control')
         oracle_1()
-        QuickStart.help_more(driver, 'Click for more information on the Layer Control')
+        QuickStart.help_more(driver,
+                             'Click for more information ' +
+                             'on the Layer Control')
         External.switch_new_page(driver)
         oracle_2()
 
@@ -188,21 +201,25 @@ class HydroclientTestCase(unittest.TestCase):
             """ Searches return same number of results as initial search
             without parameters
             """
-            self.assertTrue(all(x == rio_counts[0] for x in rio_counts))
-            self.assertTrue(all(x == dallas_counts[0] for x in dallas_counts))
+            self.assertTrue(all(x == rio_counts[0]
+                                for x in rio_counts))
+            self.assertTrue(all(x == dallas_counts[0]
+                                for x in dallas_counts))
 
         rio_counts = []
         dallas_counts = []
         Search.location_search(driver, 'Rio De Janeiro')
         rio_counts.append(Search.results_count(driver))
-        KeywordSearch.root_keywords(driver, ['Biological', 'Chemical', 'Physical'])
+        KeywordSearch.root_keywords(driver,
+                                    ['Biological', 'Chemical', 'Physical'])
         rio_counts.append(Search.results_count(driver))
         AdvancedSearch.all_value_type(driver)
         rio_counts.append(Search.results_count(driver))
         Search.reset_params(driver)
         Search.location_search(driver, 'Dallas')
         dallas_counts.append(Search.results_count(driver))
-        KeywordSearch.root_keywords(driver, ['Biological', 'Chemical', 'Physical'])
+        KeywordSearch.root_keywords(driver,
+                                    ['Biological', 'Chemical', 'Physical'])
         dallas_counts.append(Search.results_count(driver))
         TestSystem.wait(3)  # sec
         AdvancedSearch.all_value_type(driver)
@@ -282,7 +299,8 @@ class HydroclientTestCase(unittest.TestCase):
         Search.map_zoomin(driver, 3)
         ServiceSearch.filter_services(driver,
                                       titles=['NLDAS Hourly NOAH Data',
-                                              'NLDAS Hourly Primary Forcing Data'])
+                                              'NLDAS Hourly ' +
+                                              'Primary Forcing Data'])
         oracle()
 
 

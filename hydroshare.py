@@ -4,11 +4,7 @@ import sys
 import unittest
 
 from selenium import webdriver
-
-from hs_elements import HomePage, DiscoverPage
 from hs_macros import Discover, ResourceLanding
-from hs_macros import SLEEP_TIME
-from utils import TestSystem
 
 # Test case parameters
 BASE_URL = "http://www.hydroshare.org"
@@ -21,13 +17,16 @@ class HydroshareTestCase(unittest.TestCase):
     def setUp(self):
         """ Setup driver for use in automation tests """
         profile = webdriver.FirefoxProfile()
-        profile.set_preference("general.useragent.override", "CUAHSI-QA-Selenium")
+        profile.set_preference("general.useragent.override",
+                               "CUAHSI-QA-Selenium")
         # TODO use self.driver instead of making it global
         global driver
         if infrastructure == 'grid':
-            driver = webdriver.Remote(command_executor='http://' +
-                                      grid_hub_ip + ':4444/wd/hub',
-                                      desired_capabilities={'browserName': 'firefox'})
+            driver = \
+                webdriver.Remote(command_executor='http://' +
+                                 grid_hub_ip + ':4444/wd/hub',
+                                 desired_capabilities=(
+                                     {'browserName': 'firefox'}))
         else:
             driver = webdriver.Firefox(profile)
         driver.get(BASE_URL)
@@ -44,11 +43,13 @@ class HydroshareTestCase(unittest.TestCase):
         """
         def oracle():
             """ The Beaver Divide BagIt zip file
-            matches expected file size
+            matches expected file size (in Bytes)
             """
-            self.assertEqual(ResourceLanding.download_size(driver, BASE_URL), 512000)  # Bytes
+            self.assertEqual((
+                ResourceLanding.download_size(driver, BASE_URL), 512000))
 
-        Discover.discover_resources(driver, subject='iUTAH', resource_type='Generic',
+        Discover.discover_resources(driver, subject='iUTAH',
+                                    resource_type='Generic',
                                     availability=['discoverable', 'public'])
         Discover.open_resource(driver, 'Beaver Divide Air Temperature')
         oracle()
@@ -79,7 +80,7 @@ class HydroshareTestCase(unittest.TestCase):
         oracle(driver, 'Title', 'Descending')
         Discover.sort_order(driver, 'Date Created')
         oracle(driver, 'Date Created', 'Descending')
-        Discover.sort_order(driver, 'Last Modified')        
+        Discover.sort_order(driver, 'Last Modified')
         oracle(driver, 'Last Modified', 'Descending')
         Discover.sort_order(driver, 'First Author')
         oracle(driver, 'First Author', 'Descending')

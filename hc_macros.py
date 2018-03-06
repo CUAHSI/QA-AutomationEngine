@@ -2,8 +2,10 @@ import time
 
 from selenium.webdriver.common.keys import Keys
 
-from hc_elements import SearchPage, ServiceSearchPage, KeywordSearchPage, AdvancedSearchPage
-from hc_elements import FilterResultsPage, WorkspacePage, MapMarkerPage, QuickStartPage
+from hc_elements import SearchPage, ServiceSearchPage, \
+    KeywordSearchPage, AdvancedSearchPage
+from hc_elements import FilterResultsPage, WorkspacePage, \
+    MapMarkerPage, QuickStartPage
 from modes import setup_mode
 
 # Hydroclient testing parameters
@@ -46,8 +48,10 @@ class Search:
         SearchPage.zendesk_help.click(driver, SLEEP_TIME)
         SearchPage.zendesk_iframe.iframe_out(driver)
         SearchPage.zendesk_results.iframe_in(driver)
-        SearchPage.zendesk_search.inject_text(driver, search_text, SLEEP_TIME)
-        SearchPage.zendesk_search.inject_text(driver, Keys.RETURN, SLEEP_TIME)
+        SearchPage.zendesk_search.inject_text(driver, search_text,
+                                              SLEEP_TIME)
+        SearchPage.zendesk_search.inject_text(driver, Keys.RETURN,
+                                              SLEEP_TIME)
         SearchPage.zendesk_return(article_text).click(driver, SLEEP_TIME)
         SearchPage.zendesk_more.scroll_to(driver, SLEEP_TIME)
         SearchPage.zendesk_more.click(driver, SLEEP_TIME)
@@ -79,8 +83,10 @@ class Search:
         SearchPage.location_search.click(driver, SLEEP_TIME)
         SearchPage.location_search.clear_all_text(driver, SLEEP_TIME)
         SearchPage.location_search.inject_text(driver, location, SLEEP_TIME)
-        SearchPage.location_search.inject_text(driver, Keys.ARROW_DOWN, SLEEP_TIME)
-        SearchPage.location_search.inject_text(driver, Keys.RETURN, SLEEP_TIME)
+        SearchPage.location_search.inject_text(driver, Keys.ARROW_DOWN,
+                                               SLEEP_TIME)
+        SearchPage.location_search.inject_text(driver, Keys.RETURN,
+                                               SLEEP_TIME)
         time.sleep(SLEEP_TIME)
 
     def results_count(self, driver):
@@ -110,18 +116,24 @@ class ServiceSearch:
     """
     def filter_services(self, driver, organizations=None, titles=None):
         SearchPage.service_filter.click(driver, SLEEP_TIME)
-        ServiceSearchPage.table_count.select_option(driver, '100', SLEEP_TIME)
+        ServiceSearchPage.table_count.select_option(driver, '100',
+                                                    SLEEP_TIME)
         ServiceSearchPage.sort_organization.click(driver, SLEEP_TIME)
         if type(organizations) is list:
             for organization in organizations:
-                ServiceSearchPage.select_organization(organization).scroll_to(driver, SLEEP_TIME)
-                ServiceSearchPage.select_organization(organization).multi_click(driver, SLEEP_TIME)
+                ServiceSearchPage.select_organization((
+                    organization).scroll_to(driver, SLEEP_TIME))
+                ServiceSearchPage.select_organization((
+                    organization).multi_click(driver, SLEEP_TIME))
         elif organizations is not None:
-            ServiceSearchPage.select_organization(organizations).click(driver, SLEEP_TIME)
+            ServiceSearchPage.select_organization((
+                organizations).click(driver, SLEEP_TIME))
         if type(titles) is list:
             for title in titles:
-                ServiceSearchPage.select_title(title).scroll_to(driver, SLEEP_TIME)
-                ServiceSearchPage.select_title(title).multi_click(driver, SLEEP_TIME)
+                ServiceSearchPage.select_title((
+                    title).scroll_to(driver, SLEEP_TIME))
+                ServiceSearchPage.select_title((
+                    title).multi_click(driver, SLEEP_TIME))
         elif titles is not None:
             ServiceSearchPage.select_title(titles).click(driver, SLEEP_TIME)
         ServiceSearchPage.save.click(driver, SLEEP_TIME)
@@ -135,7 +147,8 @@ class KeywordSearch:
         SearchPage.keyword_filter.click(driver, SLEEP_TIME)
         KeywordSearchPage.full_list_tab.click(driver, SLEEP_TIME)
         for keyword in keywords:
-            KeywordSearchPage.full_list_checkbox(keyword).click(driver, SLEEP_TIME)
+            KeywordSearchPage.full_list_checkbox((
+                keyword).click(driver, SLEEP_TIME))
         KeywordSearchPage.search.click(driver, SLEEP_TIME)
 
 
@@ -157,7 +170,8 @@ class FilterResults:
     """
     def any_to_workspace(self, driver):
         SearchPage.filter_results.click(driver, SLEEP_TIME)
-        FilterResultsPage.table_count.select_option(driver, '100', SLEEP_TIME)
+        FilterResultsPage.table_count.select_option(driver, '100',
+                                                    SLEEP_TIME)
         FilterResultsPage.nav_close.scroll_to(driver, SLEEP_TIME)
         FilterResultsPage.select_any.click(driver, SLEEP_TIME)
         FilterResultsPage.choose_action.click(driver, SLEEP_TIME)
@@ -166,18 +180,21 @@ class FilterResults:
 
     def model_sim_and_derived_value_to_workspace(self, driver):
         SearchPage.filter_results.click(driver, SLEEP_TIME)
-        FilterResultsPage.table_count.select_option(driver, '100', SLEEP_TIME)
+        FilterResultsPage.table_count.select_option(driver, '100',
+                                                    SLEEP_TIME)
         FilterResultsPage.select_model_sim.click(driver, SLEEP_TIME)
         FilterResultsPage.sort_service.click(driver, SLEEP_TIME)
         FilterResultsPage.select_derived_value.scroll_to(driver, SLEEP_TIME)
-        FilterResultsPage.select_derived_value.multi_click(driver, SLEEP_TIME)
+        FilterResultsPage.select_derived_value.multi_click(driver,
+                                                           SLEEP_TIME)
         FilterResultsPage.choose_action.click(driver, SLEEP_TIME)
         FilterResultsPage.export_workspace.click(driver, SLEEP_TIME)
         FilterResultsPage.nav_workspace.click(driver, SLEEP_TIME)
 
     def derived_value_to_workspace(self, driver):
         SearchPage.filter_results.click(driver, SLEEP_TIME)
-        FilterResultsPage.table_count.select_option(driver, '100', SLEEP_TIME)
+        FilterResultsPage.table_count.select_option(driver, '100',
+                                                    SLEEP_TIME)
         FilterResultsPage.select_derived_value.click(driver, SLEEP_TIME)
         FilterResultsPage.choose_action.click(driver, SLEEP_TIME)
         FilterResultsPage.export_workspace.click(driver, SLEEP_TIME)
@@ -185,9 +202,11 @@ class FilterResults:
 
     def search_filter_table(self, driver, search_string):
         SearchPage.filter_results.click(driver, SLEEP_TIME)
-        FilterResultsPage.search.inject_text(driver, search_string, SLEEP_TIME)
+        FilterResultsPage.search.inject_text(driver, search_string,
+                                             SLEEP_TIME)
         FilterResultsPage.sort_service.click(driver, SLEEP_TIME)
-        FilterResultsPage.table_count.select_option(driver, '100', SLEEP_TIME)
+        FilterResultsPage.table_count.select_option(driver, '100',
+                                                    SLEEP_TIME)
         FilterResultsPage.nav_close.click(driver, SLEEP_TIME)
 
 
