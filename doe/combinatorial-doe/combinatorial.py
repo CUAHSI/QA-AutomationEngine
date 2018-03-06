@@ -52,14 +52,14 @@ def create_random_experiments(depths, experiments_count):
     return experiments
 
 
-def combinations_met(depths, experiments, factors):
+def combinations_met(to_compare, depths, experiments, factors):
     combinations = []
     combinations_needed = 1
-    for n in range(0, len(depths)):
+    for n in to_compare:
         combinations_needed *= depths[n]
     for p in range(0, len(experiments)):
         combination = []
-        for q in range(0, factors):
+        for q in to_compare:
             combination.append(experiments[p][q])
         if combination not in combinations:
             combinations.append(combination)
@@ -73,7 +73,9 @@ def passes_two_way(depths, experiments):
     # Two way check
     for i in range(0, len(depths)-1):
         for j in range(i+1, len(depths)):
-            if not combinations_met(depths, experiments, factors):
+            to_compare = [i, j]
+            if not combinations_met(to_compare, depths,
+                                    experiments, factors):
                 return False
     return True
 
@@ -83,7 +85,9 @@ def passes_three_way(depths, experiments):
     for i in range(0, len(depths)-2):
         for j in range(i+1, len(depths)-1):
             for k in range(i+2, len(depths)):
-                if not combinations_met(depths, experiments, factors):
+                to_compare = [i, j, k]
+                if not combinations_met(to_compare, depths,
+                                        experiments, factors):
                     return False
     return True
 
@@ -94,7 +98,9 @@ def passes_four_way(depths, experiments):
         for j in range(i+1, len(depths)-2):
             for k in range(i+2, len(depths)-1):
                 for l in range(i+3, len(depths)):
-                    if not combinations_met(depths, experiments, factors):
+                    to_compare = [i, j, k, l]
+                    if not combinations_met(to_compare, depths,
+                                            experiments, factors):
                         return False
     return True
 
