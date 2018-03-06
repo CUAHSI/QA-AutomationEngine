@@ -40,120 +40,109 @@ class SiteElement:
                 """ Locates a website element, given the element type and id
                 """
                 if loc_child is None:
-                    element_xpath = "//" + self.el_type + \
-                                    "[@id='" + self.el_id + "']"
+                    el_xpath = "//" + self.el_type + \
+                               "[@id='" + self.el_id + "']"
                 else:
-                    element_xpath = ".//" + loc_child.el_type + \
-                                    "[@id='" + loc_child.el_id + "']"
-                target_element = loc_base.find_element_by_xpath((
-                    element_xpath))
-                return target_element
+                    el_xpath = ".//" + loc_child.el_type + \
+                               "[@id='" + loc_child.el_id + "']"
+                target_el = loc_base.find_element_by_xpath(el_xpath)
+                return target_el
 
             def loc_by_name(loc_base, loc_child):
                 """ Locates a website element, given the name attribute """
                 if loc_child is None:
-                    element_xpath = "//" + self.el_type + \
-                                    "[@name='" + self.el_name + "']"
+                    el_xpath = "//" + self.el_type + \
+                               "[@name='" + self.el_name + "']"
                 else:
-                    element_xpath = ".//" + loc_child.el_type + \
-                                    "[@name='" + loc_child.el_name + "']"
-                target_element = loc_base.find_element_by_xpath((
-                    element_xpath))
-                return target_element
+                    el_xpath = ".//" + loc_child.el_type + \
+                               "[@name='" + loc_child.el_name + "']"
+                    target_el = loc_base.find_element_by_xpath(el_xpath)
+                return target_el
 
             def loc_by_title(loc_base, loc_child):
                 """ Locates a website element, given the title
                 attribute
                 """
                 if loc_child is None:
-                    element_xpath = "//" + self.el_type + \
-                                    "[@title='" + self.el_title + "']"
+                    el_xpath = "//" + self.el_type + \
+                               "[@title='" + self.el_title + "']"
                 else:
-                    element_xpath = ".//" + loc_child.el_type + \
-                                    "[@title='" + loc_child.el_title + "']"
-                target_element = loc_base.find_element_by_xpath((
-                    element_xpath))
-                return target_element
+                    el_xpath = ".//" + loc_child.el_type + \
+                               "[@title='" + loc_child.el_title + "']"
+                target_el = loc_base.find_element_by_xpath(el_xpath)
+                return target_el
 
             def loc_by_placeholder(loc_base, loc_child):
                 """ Locates a website element, given the placeholder
                 attribute
                 """
                 if loc_child is None:
-                    element_xpath = "//" + self.el_type + \
-                                    "[@placeholder='" + \
-                                    self.el_placeholder + "']"
+                    el_xpath = "//" + self.el_type + \
+                               "[@placeholder='" + self.el_placeholder + "']"
                 else:
-                    element_xpath = ".//" + loc_child.el_type + \
-                                    "[@placeholder='" + \
-                                    loc_child.el_placeholder + "']"
-                target_element = loc_base.find_element_by_xpath((
-                    element_xpath))
-                return target_element
+                    el_xpath = ".//" + loc_child.el_type + \
+                               "[@placeholder='" + \
+                               loc_child.el_placeholder + "']"
+                target_el = loc_base.find_element_by_xpath(el_xpath)
+                return target_el
 
             def loc_by_href(loc_base, loc_child):
                 """ Locates a website element, given the element type
                 and href
                 """
                 if loc_child is None:
-                    element_xpath = "//" + self.el_type + \
-                                    "[contains(@href,'" + \
-                                    self.el_href + "')]"
+                    el_xpath = "//" + self.el_type + \
+                               "[contains(@href,'" + self.el_href + "')]"
                 else:
-                    element_xpath = ".//" + loc_child.el_type + \
-                                    "[contains(@href,'" + \
-                                    loc_child.el_href + "')]"
-                target_element = loc_base.find_element_by_xpath((
-                    element_xpath))
-                return target_element
+                    el_xpath = ".//" + loc_child.el_type + \
+                               "[contains(@href,'" + \
+                               loc_child.el_href + "')]"
+                target_el = loc_base.find_element_by_xpath(el_xpath)
+                return target_el
 
             def loc_by_class(loc_base, loc_child):
                 """ Locates a website element, given the element class """
                 if loc_child is None:
-                    element_xpath = "//" + self.el_type + \
-                                    "[@class='" + self.el_class + "']"
+                    el_xpath = "//" + self.el_type + \
+                               "[@class='" + self.el_class + "']"
                 else:
-                    element_xpath = ".//" + loc_child.el_type + \
-                                    "[@class='" + loc_child.el_class + "']"
-                target_element = loc_base.find_element_by_xpath((
-                    element_xpath))
-                return target_element
+                    el_xpath = ".//" + loc_child.el_type + \
+                               "[@class='" + loc_child.el_class + "']"
+                target_el = loc_base.find_element_by_xpath(el_xpath)
+                return target_el
 
             def loc_by_content(loc_base, loc_child):
                 """ Locates a website element, based the element
                 text content
                 """
                 if loc_child is None:
-                    element_xpath = "//" + self.el_type + \
-                                    "[contains(text(), '" + \
-                                    self.el_content + "')]"
+                    el_xpath = "//" + self.el_type + \
+                               "[contains(text(), '" + \
+                               self.el_content + "')]"
                 else:
-                    element_xpath = ".//" + loc_child.el_type + \
-                                    "[contains(text(), '" + \
-                                    loc_child.el_content + "')]"
-                target_element = loc_base.find_element_by_xpath((
-                    element_xpath))
-                return target_element
+                    el_xpath = ".//" + loc_child.el_type + \
+                               "[contains(text(), '" + \
+                               loc_child.el_content + "')]"
+                target_el = loc_base.find_element_by_xpath(el_xpath)
+                return target_el
 
             def loc_by_dom(loc_base, loc_child):
                 """ Locates a website element given DOM path to element """
                 if loc_child is None:
-                    element_xpath = self.el_dom
+                    el_xpath = self.el_dom
                 else:
-                    element_xpath = loc_child.el_dom
-                target_element = loc_base.find_element_by_xpath((
-                    element_xpath))
-                return target_element
+                    el_xpath = loc_child.el_dom
+                target_el = loc_base.find_element_by_xpath(el_xpath)
+                return target_el
 
             def loc_by_nothing(loc_base, loc_child):
                 """ Locates a website element based only on the tag/type """
                 if loc_child is None:
-                    element_xpath = "//" + self.el_type
+                    el_xpath = "//" + self.el_type
                 else:
-                    element_xpath = ".//" + loc_child.el_type
-                target_element = loc_base.find_element_by_xpath((
-                    element_xpath))
-                return target_element
+                    el_xpath = ".//" + loc_child.el_type
+                target_el = loc_base.find_element_by_xpath(el_xpath)
+                return target_el
 
             if loc_child is None:
                 defining_el = self  # For absolute identification
@@ -163,50 +152,49 @@ class SiteElement:
             # Hierarchy for identification using element attributes is
             # id->name->title->href->class->content->DOM->type(no attributes)
             if defining_el.el_id is not None:
-                target_element = loc_by_id(loc_base, loc_child)
+                target_el = loc_by_id(loc_base, loc_child)
             elif defining_el.el_name is not None:
-                target_element = loc_by_name(loc_base, loc_child)
+                target_el = loc_by_name(loc_base, loc_child)
             elif defining_el.el_title is not None:
-                target_element = loc_by_title(loc_base, loc_child)
+                target_el = loc_by_title(loc_base, loc_child)
             elif defining_el.el_placeholder is not None:
-                target_element = loc_by_placeholder(loc_base, loc_child)
+                target_el = loc_by_placeholder(loc_base, loc_child)
             elif defining_el.el_href is not None:
-                target_element = loc_by_href(loc_base, loc_child)
+                target_el = loc_by_href(loc_base, loc_child)
             elif defining_el.el_class is not None:
-                target_element = loc_by_class(loc_base, loc_child)
+                target_el = loc_by_class(loc_base, loc_child)
             elif defining_el.el_content is not None:
-                target_element = loc_by_content(loc_base, loc_child)
+                target_el = loc_by_content(loc_base, loc_child)
             elif defining_el.el_dom is not None:
-                target_element = loc_by_dom(loc_base, loc_child)
+                target_el = loc_by_dom(loc_base, loc_child)
             else:
-                target_element = loc_by_nothing(loc_base, loc_child)
-            return target_element
+                target_el = loc_by_nothing(loc_base, loc_child)
+            return target_el
 
         if self.el_recursive is None:  # Use basic/single identification
-            target_element = loc_next(el_driver)
+            target_el = loc_next(el_driver)
         else:  # Use recursive identification
-            target_element = loc_next(el_driver)
+            target_el = loc_next(el_driver)
             for i in range(0, len(self.el_recursive)):
-                target_element = loc_next(target_element,
-                                          self.el_recursive[i])
-        return target_element
+                target_el = loc_next(target_el, self.el_recursive[i])
+        return target_el
 
     def click(self, el_driver, sleep_time):
         """ Identifies an element on the page.  After identification
         the element is then clicked.
         """
-        target_element = self.loc_it(el_driver)
-        target_element.click()
+        target_el = self.loc_it(el_driver)
+        target_el.click()
         time.sleep(sleep_time)
 
     def multi_click(self, el_driver, sleep_time):
         """ Clicks an element while holding the control key, as to enable
         a multi-selection
         """
-        target_element = self.loc_it(el_driver)
+        target_el = self.loc_it(el_driver)
         actions = ActionChains(el_driver)
         actions.key_down(Keys.LEFT_CONTROL)
-        actions.click(target_element)
+        actions.click(target_el)
         actions.key_up(Keys.LEFT_CONTROL)
         actions.perform()
         time.sleep(sleep_time)
@@ -215,10 +203,10 @@ class SiteElement:
         """ Clicks an element while holding the control key, as to enable
         a range selection
         """
-        target_element = self.loc_it(el_driver)
+        target_el = self.loc_it(el_driver)
         actions = ActionChains(el_driver)
         actions.key_down(Keys.LEFT_SHIFT)
-        actions.click(target_element)
+        actions.click(target_el)
         actions.key_up(Keys.LEFT_SHIFT)
         actions.perform()
         time.sleep(sleep_time)
@@ -228,10 +216,10 @@ class SiteElement:
         the element is then clicked, regardless if it is "interactable"
         or not
         """
-        target_element = self.loc_it(el_driver)
+        target_el = self.loc_it(el_driver)
         actions = ActionChains(el_driver)
-        actions.move_to_element(target_element)
-        actions.click(target_element)
+        actions.move_to_element(target_el)
+        actions.click(target_el)
         actions.perform()
         time.sleep(sleep_time)
 
@@ -257,42 +245,42 @@ class SiteElement:
 
     def clear_text(self, el_driver, size, sleep_time):
         """ Uses backspace to clear text from a field """
-        target_element = self.loc_it(el_driver)
-        target_element.send_keys(Keys.END)
+        target_el = self.loc_it(el_driver)
+        target_el.send_keys(Keys.END)
         for i in range(0, size):
-            target_element.send_keys(Keys.BACK_SPACE)
+            target_el.send_keys(Keys.BACK_SPACE)
             time.sleep(sleep_time/size)
         time.sleep(sleep_time)
 
     def select_option(self, el_driver, select_choice, sleep_time):
         """ Selects an option from a dropdown element """
-        target_element = self.loc_it(el_driver)
-        select_element = Select(target_element)
-        select_element.select_by_value(select_choice)
+        target_el = self.loc_it(el_driver)
+        select_el = Select(target_el)
+        select_el.select_by_value(select_choice)
         time.sleep(sleep_time)
 
     def select_option_text(self, el_driver, select_choice, sleep_time):
         """ Selects an option from dropdown given visible text """
-        target_element = self.loc_it(el_driver)
-        select_element = Select(target_element)
-        select_element.select_by_visible_text(select_choice)
+        target_el = self.loc_it(el_driver)
+        select_el = Select(target_el)
+        select_el.select_by_visible_text(select_choice)
         time.sleep(sleep_time)
 
     def scroll_to(self, el_driver, sleep_time):
         """ After element identification, the window is scrolled
         such that the element becomes visible in the window
         """
-        target_element = self.loc_it(el_driver)
-        target_element.location_once_scrolled_into_view
+        target_el = self.loc_it(el_driver)
+        target_el.location_once_scrolled_into_view
         time.sleep(sleep_time)
 
     def scroll_right(self, el_driver, sleep_time):
         """ Scroll right using Keys.ARROW_RIGHT
         and a hold of one second
         """
-        target_element = self.loc_it(el_driver)
+        target_el = self.loc_it(el_driver)
         actions = ActionChains(el_driver)
-        actions.move_to_element(target_element)
+        actions.move_to_element(target_el)
         actions.key_down(Keys.ARROW_RIGHT)
         actions.perform()
         time.sleep(1)
@@ -305,16 +293,16 @@ class SiteElement:
         """ Enters text into a field or other input-capable html
         element using send keys
         """
-        target_element = self.loc_it(el_driver)
+        target_el = self.loc_it(el_driver)
         for i in range(0, len(field_text)):
-            target_element.send_keys(field_text[i])
+            target_el.send_keys(field_text[i])
             time.sleep(sleep_time/len(field_text))
         time.sleep(sleep_time)
 
     def iframe_in(self, el_driver):
         """ Switches driver focus to an iframe within a page """
-        target_element = self.loc_it(el_driver)
-        el_driver.switch_to.frame(target_element)
+        target_el = self.loc_it(el_driver)
+        el_driver.switch_to.frame(target_el)
 
     def iframe_out(self, el_driver):
         """ Switches driver focus out of iframe and back to the
@@ -324,27 +312,27 @@ class SiteElement:
 
     def get_attribute(self, el_driver, attribute):
         """ Returns any attribute of website element """
-        target_element = self.loc_it(el_driver)
-        return target_element.get_attribute(attribute)
+        target_el = self.loc_it(el_driver)
+        return target_el.get_attribute(attribute)
 
     def get_text(self, el_driver):
         """ Returns content text of website element """
-        target_element = self.loc_it(el_driver)
-        return target_element.text
+        target_el = self.loc_it(el_driver)
+        return target_el.text
 
     def get_href(self, el_driver, base_url):
         """ Returns element href link, with relative links expanded
         into an absolute link
         """
-        target_element = self.loc_it(el_driver)
-        element_href = target_element.get_attribute("href")
-        if element_href[0] == '/':
-            element_href = base_url + element_href
-        return element_href
+        target_el = self.loc_it(el_driver)
+        target_href = target_el.get_attribute("href")
+        if target_href[0] == '/':
+            target_href = base_url + target_href
+        return target_href
 
     def get_child_count(self, el_driver):
         """ Returns the number of child elements, given a parent
         element specification
         """
-        target_element = self.loc_it(el_driver)
-        return len(target_element.find_elements_by_xpath(".//*"))
+        target_el = self.loc_it(el_driver)
+        return len(target_el.find_elements_by_xpath(".//*"))
