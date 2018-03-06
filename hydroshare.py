@@ -11,7 +11,7 @@ BASE_URL = "http://www.hydroshare.org"
 
 
 # Test cases definition
-class HydroshareTestCase(unittest.TestCase):
+class HydroshareTestSuite(unittest.TestCase):
     """ Python unittest setup for smoke tests """
 
     def setUp(self):

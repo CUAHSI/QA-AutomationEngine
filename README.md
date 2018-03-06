@@ -54,12 +54,12 @@ $ python3 hydroclient.py
 ```
 Specific tests can be executed by including the class and method names, for example:
 ```
-$ python3 hydroclient.py HydroclientTestCase.test_A_000002
+$ python3 hydroclient.py HydroclientTestSuite.test_A_000002
 ```
 When initiating a Selenium Grid execution, provide the IP of the Selenium Grid hub as an argument.  The port is assumed to be the Selenium Grid default of 4444.
 ```
 $ python3 hydroclient.py --grid 127.0.0.1
-$ python3 hydroclient.py HydroclientTestCase.test_A_000002 --grid 127.0.0.1
+$ python3 hydroclient.py HydroclientTestSuite.test_A_000002 --grid 127.0.0.1
 ```
 
 ### Jenkins Deployments
@@ -69,7 +69,7 @@ $ bash jenkins.sh
 ```
 The Jenkins template project runs a parameterized version of the previously mentioned python3 commands.
 ```
-$ python3 hydroclient.py HydroclientTestCase.test_A_000002 --grid 127.0.0.1
+$ python3 hydroclient.py HydroclientTestSuite.test_A_000002 --grid 127.0.0.1
 ```
 To specify which tests to run, edit the software system config file:
 1) hydroclient.conf

@@ -15,7 +15,7 @@ BASE_URL = 'http://data.cuahsi.org'
 
 
 # Test cases definition
-class HydroclientTestCase(unittest.TestCase):
+class HydroclientTestSuite(unittest.TestCase):
     """ Python unittest setup for smoke tests """
 
     def setUp(self):
