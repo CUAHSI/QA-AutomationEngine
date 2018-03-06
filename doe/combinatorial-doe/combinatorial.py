@@ -51,6 +51,7 @@ def create_random_experiments(depths, experiments_count):
         experiments.append(experiment)
     return experiments
 
+
 def combinations_met(depths, experiments, factors):
     combinations = []
     combinations_needed = 1
@@ -66,7 +67,7 @@ def combinations_met(depths, experiments, factors):
         return False
     else:
         return True
-    
+
 
 def passes_two_way(depths, experiments):
     # Two way check
