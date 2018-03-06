@@ -32,15 +32,22 @@ The Selenium Grid system uses VMs which run on CUAHSI hardware.  The number and 
 
 ## Install
 
+### Infrastructure
 On the infrastructure side, this project uses Jenkins and Selenium Grid. Please refer to the [Jenkins installation guide](https://wiki.jenkins.io/display/JENKINS/Installing+Jenkins+on+Ubuntu) and [Selenium Grid installation guide](https://github.com/SeleniumHQ/selenium/wiki/Grid2) for instructions on how to install these tools.
 
-The test suites and associated framework are dependent on the unittest, argparse, sys, time, and selenium Python packages.  Further, the python3 versions of these packages are required.  Of these packages, only selenium is not included in the standard library.  Install this Python package with:
+### Python Packages
+Installation of necessary Python packages can be accomplished with with:
 ```
-$ pip3 install selenium
+$ pip3 install -r requirements.txt
 ```
+
+### Browser Driver
+A browser driver must be downloaded into a system directory.  Further, this system directory must be included in the PATH environment variable.  For the Firefox browser, the [Gecko driver](TODO) should be downloaded.
+
 
 ## Usage
 
+### Test Execution
 The test suite can run without the Jenkins and Selenium Grid infrastructure for test script development and test suite debugging purposes.  To run all test cases (not just those defined in the configuration file):
 ```
 $ python3 hydroclient.py
@@ -55,7 +62,8 @@ $ python3 hydroclient.py --grid 127.0.0.1
 $ python3 hydroclient.py HydroclientTestCase.test_A_000002 --grid 127.0.0.1
 ```
 
-In a Jenkins deployment, the core job runs the jenkins.sh script:
+### Jenkins Deployments
+In a Jenkins deployment, the core job should run the jenkins.sh script:
 ```
 $ bash jenkins.sh
 ```
@@ -66,6 +74,12 @@ $ python3 hydroclient.py HydroclientTestCase.test_A_000002 --grid 127.0.0.1
 To specify which tests to run, edit the software system config file:
 1) hydroclient.conf
 2) hydroshare.conf
+
+### Flake8 Compliance
+To confirm Flake8 compliance, use:
+```
+$ make check
+```
 
 ## Creating Test Cases
 The [PDF documentation](documentation/beta-release/CUAHSIAutomatedTestingEngineBeta.pdf) contained in this repository provides a deeper explanation of the test suite framework.  However, the general idea is to write test cases at the most abstract level, then support that with new classes, attributes, and methods in the lower abstraction levels as needed.
