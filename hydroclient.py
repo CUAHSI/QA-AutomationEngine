@@ -55,7 +55,7 @@ class HydroclientTestSuite(unittest.TestCase):
             self.assertEqual(Workspace.count_complete(driver, 50), 1)
 
         Search.search_location(driver, 'Lake Annie Highlands County')
-        Services.filters(driver, organizations='Archbold Biological Station')
+        Services.filters(driver, orgs='Archbold Biological Station')
         Filter.to_workspace_cell(driver, 1, 1)
         oracle()
 
@@ -71,8 +71,7 @@ class HydroclientTestSuite(unittest.TestCase):
             self.assertIn('51', Search.count_results(driver))
 
         Search.search_location(driver, 'Lake Annie Highlands County')
-        Services.filters(driver, organizations=(
-            'Archbold Biological Station'))
+        Services.filters(driver, orgs='Archbold Biological Station')
         Search.search(driver, 60)
         oracle()
 
@@ -101,15 +100,15 @@ class HydroclientTestSuite(unittest.TestCase):
         """
         def oracle():
             """ Export to workspace is successful """
-            self.assertEqual(Workspace.count_complete(driver), 2)
+            self.assertEqual(Workspace.count_complete(driver, 50), 2)
         Search.search_location(driver, 'New Haven ')
         Services.filters(driver, titles=['NLDAS Hourly NOAH Data',
                                          'NLDAS Hourly ' +
                                          'Primary Forcing Data'])
 
         Filter.search_field(driver, 'X416-Y130')
-        Filter.to_workspace_texts_range(driver, 'Model Simulation Result',
-                                        'Derived Value')
+        Filter.to_workspace_texts_range(driver, ['Model Simulation Result',
+                                                 'Derived Value'])
         oracle()
 
     def test_A_000006(self):
@@ -159,8 +158,7 @@ class HydroclientTestSuite(unittest.TestCase):
             naming within the HydroClient search interface
             """
             for layer in layers:
-                self.assertIn('<h2>' + layer + '</h2>',
-                              TestSystem.page_source(driver))
+                self.assertIn(layer, TestSystem.page_source(driver))
 
         layers = ['USGS Stream Gages', 'Nationalmap Hydrology',
                   'EPA Watersheds', 'USGS LandCover 2011']
@@ -269,7 +267,7 @@ class HydroclientTestSuite(unittest.TestCase):
             """
             self.assertIn('HydroClient', TestSystem.title(driver))
 
-        Workspace.goto_from_search(driver)
+        Search.to_workspace(driver)
         Workspace.select_all(driver)
         Workspace.clear_select(driver)
         Workspace.remove_select(driver)
