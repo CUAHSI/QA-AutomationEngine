@@ -1,7 +1,7 @@
 import os
 
 from dateutil import parser
-from hs_elements import HomePage, DiscoverPage, ResourceLandingPage
+from hs_elements import HomePage, DiscoverPage, ResourcePage
 from modes import setup_mode
 
 # Testing parameters
@@ -10,22 +10,14 @@ global SLEEP_TIME
 SLEEP_TIME = setup_mode(MODE_SELECTION)
 
 
-class ResourceLanding:
-    """ Individual resource info/download page macros """
-    def download_size(self, driver, BASE_URL):
-        download_href = \
-            ResourceLandingPage.download_bagit.get_href(driver, BASE_URL)
-        os.system('wget ' + download_href)
-        download_file = download_href.split('/')[-1]
-        file_size = os.stat(download_file).st_size
-        return file_size
+class Home:
+    # def goto(self, driver): FROM DISCOVER
+    def to_discover(self, driver):
+        HomePage.to_discover.click(driver, SLEEP_TIME)
 
 
 class Discover:
     """ Discover tool macros """
-    def goto(self, driver):
-        HomePage.goto_discover(driver, SLEEP_TIME)
-
     def sort_order(self, driver, option):
         DiscoverPage.sort_order.select_option_text(driver, option,
                                                    SLEEP_TIME)
@@ -34,30 +26,32 @@ class Discover:
         DiscoverPage.sort_direction.select_option_text(driver, option,
                                                        SLEEP_TIME)
 
-    def open_resource(self, driver, resource_title):
-        DiscoverPage.open_resource(resource_title).click(driver, SLEEP_TIME)
+    # def open_resource(self, driver, resource_title):
+    def to_resource(self, driver, title):
+        DiscoverPage.to_resource(title).click(driver, SLEEP_TIME)
 
-    def disc_column_ind(self, driver, column_name):
+    # def disc_column_ind(self, driver, column_name):
+    def col_index(self, driver, col_name):
         """ Identifies the index for a discover page column, given the
         column name.  Indexes here start at one since the
         end application here is xpath, and those indexes are 1 based
         """
-        num_cols = DiscoverPage.header_row.get_child_count(driver)
+        num_cols = DiscoverPage.col_headers.get_child_count(driver)
         for i in range(1, num_cols+1):
-            name_to_check = \
-                DiscoverPage.disc_column_ind(i).get_text(driver)
-            if name_to_check == column_name:
+            name_to_check = DiscoverPage.col_index(i).get_text(driver)
+            if name_to_check == col_name:
                 return i
         return 0
 
-    def check_sorting(self, driver, column_name, ascend_or_descend):
+    # def check_sorting(self, driver, column_name, ascend_or_descend):
+    def check_sorting_multi(self, driver, column_name, ascend_or_descend):
         """ Checks discover page rows are sorted correctly by checking each
         of the first eight rows against the rows that are 1, 2, and 3
         positions down, relative to the base row.  So total of 24 checks.
         """
-        first_n_rows_to_check = 8
+        baseline_rows = 8
         all_pass = True
-        for i in range(1, first_n_rows_to_check):
+        for i in range(1, baseline_rows):
             for j in range(1, 4):
                 if not self.check_sorting_single(driver, column_name,
                                                  ascend_or_descend, i, i+j):
@@ -69,22 +63,20 @@ class Discover:
         """ Confirms that two rows are sorted correctly relative
         to eachother
         """
-        col_ind = self.disc_column_ind(driver, column_name)
+        col_ind = self.col_index(driver, column_name)
         if column_name == 'Title':
-            first_element = DiscoverPage.disc_field_strong_href(col_ind,
-                                                                row_one)
-            second_element = DiscoverPage.disc_field_strong_href(col_ind,
-                                                                 row_two)
+            first_element = DiscoverPage.cell_strong_href(col_ind, row_one)
+            second_element = DiscoverPage.cell_strong_href(col_ind, row_two)
             first_two_vals = [first_element.get_text(driver),
                               second_element.get_text(driver)]
         elif column_name == 'First Author':
-            first_element = DiscoverPage.disc_field_href(col_ind, row_one)
-            second_element = DiscoverPage.disc_field_href(col_ind, row_two)
+            first_element = DiscoverPage.cell_href(col_ind, row_one)
+            second_element = DiscoverPage.cell_href(col_ind, row_two)
             first_two_vals = [first_element.get_text(driver),
                               second_element.get_text(driver)]
         else:
-            first_element = DiscoverPage.disc_field(col_ind, row_one)
-            second_element = DiscoverPage.disc_field(col_ind, row_two)
+            first_element = DiscoverPage.cell(col_ind, row_one)
+            second_element = DiscoverPage.cell(col_ind, row_two)
             first_two_vals = [first_element.get_text(driver),
                               second_element.get_text(driver)]
         if ('Date' in column_name) or (column_name == 'Last Modified'):
@@ -101,9 +93,10 @@ class Discover:
             elif ascend_or_descend == 'Ascending':
                 return value_one <= value_two
 
-    def discover_resources(self, driver, author=None, subject=None,
-                           resource_type=None, owner=None, variable=None,
-                           sample_medium=None, unit=None, availability=None):
+    # def discover_resources(self, driver, author=None, subject=None,
+    def filters(self, driver, author=None, subject=None, resource_type=None,
+                owner=None, variable=None, sample_medium=None, unit=None,
+                availability=None):
         HomePage.goto_discover(driver, SLEEP_TIME)
         if type(author) is list:
             for author_item in author:
@@ -157,5 +150,18 @@ class Discover:
                 availability).click(driver, SLEEP_TIME))
 
 
-ResourceLanding = ResourceLanding()
+class Resource:
+    """ Individual resource info/download page macros """
+    # def download_size(self, driver, BASE_URL):
+    def size_download(self, driver, BASE_URL):
+        download_href = \
+            ResourcePage.bagit.get_href(driver, BASE_URL)
+        os.system('wget ' + download_href)
+        download_file = download_href.split('/')[-1]
+        file_size = os.stat(download_file).st_size
+        return file_size
+
+
+Home = Home()
 Discover = Discover()
+Resource = Resource()

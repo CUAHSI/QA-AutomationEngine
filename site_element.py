@@ -56,7 +56,7 @@ class SiteElement:
                 else:
                     el_xpath = ".//" + loc_child.el_type + \
                                "[@name='" + loc_child.el_name + "']"
-                    target_el = loc_base.find_element_by_xpath(el_xpath)
+                target_el = loc_base.find_element_by_xpath(el_xpath)
                 return target_el
 
             def loc_by_title(loc_base, loc_child):

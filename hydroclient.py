@@ -6,8 +6,8 @@ import unittest
 
 from selenium import webdriver
 
-from hc_macros import Search, ServiceSearch, KeywordSearch, AdvancedSearch
-from hc_macros import Workspace, FilterResults, MapMarker, QuickStart
+from hc_macros import Search, Marker, Services, Keywords, Advanced, \
+    Filter, About, QuickStart, Zendesk, Workspace
 from utils import External, TestSystem
 
 # Test case parameters
@@ -52,12 +52,11 @@ class HydroclientTestSuite(unittest.TestCase):
             sent to the workspace, and then is processed
             successfully in the workspace
             """
-            self.assertEqual(Workspace.completed_count(driver), 1)
+            self.assertEqual(Workspace.count_complete(driver, 50), 1)
 
-        Search.location_search(driver, 'Lake Annie Highlands County')
-        ServiceSearch.filter_services(driver, organizations=(
-            'Archbold Biological Station'))
-        FilterResults.any_to_workspace(driver)
+        Search.search_location(driver, 'Lake Annie Highlands County')
+        Services.filters(driver, organizations='Archbold Biological Station')
+        Filter.to_workspace_cell(driver, 1, 1)
         oracle()
 
     def test_A_000003(self):
@@ -69,10 +68,10 @@ class HydroclientTestSuite(unittest.TestCase):
             with the "Archbold Biological Center" set as the only
             service visible via search filtering
             """
-            self.assertIn('51', Search.results_count(driver))
+            self.assertIn('51', Search.count_results(driver))
 
-        Search.location_search(driver, 'Lake Annie Highlands County')
-        ServiceSearch.filter_services(driver, organizations=(
+        Search.search_location(driver, 'Lake Annie Highlands County')
+        Services.filters(driver, organizations=(
             'Archbold Biological Station'))
         Search.search(driver, 60)
         oracle()
@@ -85,14 +84,15 @@ class HydroclientTestSuite(unittest.TestCase):
             """ Start date and end date in workspace match the initial
             date filtering values established in the Search interface
             """
-            self.assertTrue(Workspace.in_results(driver,
-                                                 ['2015-12-01',
-                                                  '2015-12-30']))
+            self.assertTrue(Workspace.is_in_results(driver,
+                                                    ['2015-12-01',
+                                                     '2015-12-30'],
+                                                    10))
 
-        Search.location_search(driver, 'Tampa ')
-        ServiceSearch.filter_services(driver, titles='NWIS Unit Values')
-        Search.date_filter(driver, '12/01/2015', '12/30/2015')
-        FilterResults.derived_value_to_workspace(driver)
+        Search.search_location(driver, 'Tampa ')
+        Services.filters(driver, titles='NWIS Unit Values')
+        Search.filter_dates(driver, '12/01/2015', '12/30/2015')
+        Filter.to_workspace_text(driver, 'Derived Value')
         oracle()
 
     def test_A_000005(self):
@@ -101,16 +101,15 @@ class HydroclientTestSuite(unittest.TestCase):
         """
         def oracle():
             """ Export to workspace is successful """
-            self.assertEqual(Workspace.completed_count(driver), 2)
-        Search.location_search(driver, 'New Haven ')
-        ServiceSearch.filter_services(driver,
-                                      titles=(
-                                          ['NLDAS Hourly NOAH Data',
-                                           'NLDAS Hourly ' +
-                                           'Primary Forcing Data']))
+            self.assertEqual(Workspace.count_complete(driver), 2)
+        Search.search_location(driver, 'New Haven ')
+        Services.filters(driver, titles=['NLDAS Hourly NOAH Data',
+                                         'NLDAS Hourly ' +
+                                         'Primary Forcing Data'])
 
-        FilterResults.search_filter_table(driver, 'X416-Y130')
-        FilterResults.model_sim_and_derived_value_to_workspace(driver)
+        Filter.search_field(driver, 'X416-Y130')
+        Filter.to_workspace_texts_range(driver, 'Model Simulation Result',
+                                        'Derived Value')
         oracle()
 
     def test_A_000006(self):
@@ -119,12 +118,12 @@ class HydroclientTestSuite(unittest.TestCase):
         """
         def oracle():
             """ Export to workspace is successful """
-            self.assertEqual(Workspace.completed_count(driver), 4)
+            self.assertEqual(Workspace.count_complete(driver), 4)
 
-        Search.location_search(driver, 'Köln ')
+        Search.search_location(driver, 'Köln ')
         Search.search(driver)
-        Search.map_icon_open(driver, '4')
-        MapMarker.all_to_workspace(driver)
+        Search.to_map_marker(driver, '4')
+        Marker.to_workspace_all(driver)
         oracle()
 
     def test_A_000007(self):
@@ -135,12 +134,12 @@ class HydroclientTestSuite(unittest.TestCase):
             """ Legend is visible when Landcover layer on
             and not visible when the layer is off
             """
-            self.assertTrue(Search.legend_visible(driver))
-            Search.layer_toggle(driver, 'USGS LandCover 2011')
-            self.assertFalse(Search.legend_visible(driver))
+            self.assertTrue(Search.is_legend_visible(driver))
+            Search.toggle_layer(driver, 'USGS LandCover 2011')
+            self.assertFalse(Search.is_legend_visible(driver))
 
-        Search.location_search(driver, 'Anchorage ')
-        Search.layer_toggle(driver, 'USGS LandCover 2011')
+        Search.search_location(driver, 'Anchorage ')
+        Search.toggle_layer(driver, 'USGS LandCover 2011')
         oracle()
 
     def test_A_000008(self):
@@ -166,15 +165,14 @@ class HydroclientTestSuite(unittest.TestCase):
         layers = ['USGS Stream Gages', 'Nationalmap Hydrology',
                   'EPA Watersheds', 'USGS LandCover 2011']
         for layer in layers:  # Turn all on
-            Search.layer_toggle(driver, layer)
+            Search.toggle_layer(driver, layer)
         for layer in layers:  # Turn all off
-            Search.layer_toggle(driver, layer)
-        Search.quick_start(driver)
-        QuickStart.help_expand(driver, 'Using the Layer Control')
+            Search.toggle_layer(driver, layer)
+        Search.to_quickstart(driver)
+        QuickStart.section(driver, 'Using the Layer Control')
         oracle_1()
-        QuickStart.help_more(driver,
-                             'Click for more information ' +
-                             'on the Layer Control')
+        QuickStart.more(driver, 'Click for more information ' +
+                        'on the Layer Control')
         External.switch_new_page(driver)
         oracle_2()
 
@@ -186,9 +184,9 @@ class HydroclientTestSuite(unittest.TestCase):
             """ Test center results load without error """
             self.assertIn('Help Center', TestSystem.title(driver))
 
-        Search.location_search(driver, 'San Diego')
-        Search.location_search(driver, 'Amsterdam')
-        Search.zendesk_help(driver, 'Layers', 'Using the Layer Control')
+        Search.search_location(driver, 'San Diego')
+        Search.search_location(driver, 'Amsterdam')
+        Zendesk.to_help(driver, 'Layers', 'Using the Layer Control')
         External.switch_new_page(driver)
         oracle()
 
@@ -208,23 +206,21 @@ class HydroclientTestSuite(unittest.TestCase):
 
         rio_counts = []
         dallas_counts = []
-        Search.location_search(driver, 'Rio De Janeiro')
-        rio_counts.append(Search.results_count(driver))
-        KeywordSearch.root_keywords(driver,
-                                    ['Biological', 'Chemical', 'Physical'])
-        rio_counts.append(Search.results_count(driver))
-        AdvancedSearch.all_value_type(driver)
-        rio_counts.append(Search.results_count(driver))
-        Search.reset_params(driver)
-        Search.location_search(driver, 'Dallas')
-        dallas_counts.append(Search.results_count(driver))
-        KeywordSearch.root_keywords(driver,
-                                    ['Biological', 'Chemical', 'Physical'])
-        dallas_counts.append(Search.results_count(driver))
+        Search.search_location(driver, 'Rio De Janeiro')
+        rio_counts.append(Search.count_results(driver))
+        Keywords.filter_root(driver, ['Biological', 'Chemical', 'Physical'])
+        rio_counts.append(Search.count_results(driver))
+        Advanced.filter_all_value_types(driver)
+        rio_counts.append(Search.count_results(driver))
+        Search.reset(driver)
+        Search.search_location(driver, 'Dallas')
+        dallas_counts.append(Search.count_results(driver))
+        Keywords.filter_root(driver, ['Biological', 'Chemical', 'Physical'])
+        dallas_counts.append(Search.count_results(driver))
         TestSystem.wait(3)  # sec
-        AdvancedSearch.all_value_type(driver)
+        Advanced.filter_all_value_types(driver)
         TestSystem.wait(3)  # sec
-        dallas_counts.append(Search.results_count(driver))
+        dallas_counts.append(Search.count_results(driver))
         oracle()
 
     def test_A_000011(self):
@@ -236,16 +232,16 @@ class HydroclientTestSuite(unittest.TestCase):
             self.assertNotIn('404 Error', external_sources)
 
         external_sources = ''
-        Search.about_helpcenter(driver)
+        About.to_helpcenter(driver)
         external_sources += External.source_new_page(driver)
         External.close_new_page(driver)
-        Search.about_license_repo_top(driver)
+        About.to_license_repo_top(driver)
         external_sources += External.source_new_page(driver)
         External.close_new_page(driver)
-        Search.about_contact(driver)
+        About.to_contact(driver)
         external_sources += External.source_new_page(driver)
         External.close_new_page(driver)
-        Search.about_license_repo_inline(driver)
+        About.to_license_repo_inline(driver)
         external_sources += External.source_new_page(driver)
         External.close_new_page(driver)
         oracle()
@@ -256,10 +252,10 @@ class HydroclientTestSuite(unittest.TestCase):
         """
         def oracle():
             """ Results count is nonzero after map navigations """
-            self.assertNotEqual(Search.results_count(driver), '0')
+            self.assertNotEqual(Search.count_results(driver), '0')
 
-        Search.map_scroll(driver, 25)
-        Search.location_search(driver, 'Raleigh')
+        Search.scroll_map(driver, 25)
+        Search.search_location(driver, 'Raleigh')
         Search.search(driver)
         oracle()
 
@@ -275,16 +271,16 @@ class HydroclientTestSuite(unittest.TestCase):
 
         Workspace.goto_from_search(driver)
         Workspace.select_all(driver)
-        Workspace.clear_selected(driver)
-        Workspace.remove_selected(driver)
-        Workspace.clear_selected(driver)
+        Workspace.clear_select(driver)
+        Workspace.remove_select(driver)
+        Workspace.clear_select(driver)
         Workspace.select_all(driver)
-        Workspace.remove_selected(driver)
-        Workspace.export_csv(driver)
-        Workspace.export_data_viewer(driver)
-        Workspace.export_none(driver)
-        Workspace.export_data_viewer(driver)
-        Workspace.export_csv(driver)
+        Workspace.remove_select(driver)
+        Workspace.to_csv(driver)
+        Workspace.to_viewer(driver)
+        Workspace.to_none(driver)
+        Workspace.to_viewer(driver)
+        Workspace.to_csv(driver)
         oracle()
 
     def test_A_000014(self):
@@ -293,14 +289,14 @@ class HydroclientTestSuite(unittest.TestCase):
             """ The results count over Cape Cod Bay (no land in view)
             is 0 after filtering for only NLDAS services
             """
-            self.assertEqual(Search.results_count(driver), '0')
+            self.assertEqual(Search.count_results(driver), '0')
 
-        Search.location_search(driver, 'Cape Cod Bay')
-        Search.map_zoomin(driver, 3)
-        ServiceSearch.filter_services(driver,
-                                      titles=['NLDAS Hourly NOAH Data',
-                                              'NLDAS Hourly ' +
-                                              'Primary Forcing Data'])
+        Search.search_location(driver, 'Cape Cod Bay')
+        Search.zoom_in(driver, 3)
+        Services.filters(driver,
+                         titles=['NLDAS Hourly NOAH Data',
+                                 'NLDAS Hourly ' +
+                                 'Primary Forcing Data'])
         oracle()
 
 

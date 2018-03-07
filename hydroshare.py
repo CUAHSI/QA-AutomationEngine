@@ -4,7 +4,7 @@ import sys
 import unittest
 
 from selenium import webdriver
-from hs_macros import Discover, ResourceLanding
+from hs_macros import Home, Discover, Resource
 
 # Test case parameters
 BASE_URL = "http://www.hydroshare.org"
@@ -45,13 +45,11 @@ class HydroshareTestSuite(unittest.TestCase):
             """ The Beaver Divide BagIt zip file
             matches expected file size (in Bytes)
             """
-            self.assertEqual((
-                ResourceLanding.download_size(driver, BASE_URL), 512000))
-
-        Discover.discover_resources(driver, subject='iUTAH',
-                                    resource_type='Generic',
-                                    availability=['discoverable', 'public'])
-        Discover.open_resource(driver, 'Beaver Divide Air Temperature')
+            self.assertEqual(Resource.size_download(driver, BASE_URL),
+                             512000)
+        Discover.filters(driver, subject='iUTAH', resource_type='Generic',
+                         availability=['discoverable', 'public'])
+        Discover.to_resource(driver, 'Beaver Divide Air Temperature')
         oracle()
 
     def test_B_000006(self):
@@ -62,10 +60,10 @@ class HydroshareTestSuite(unittest.TestCase):
             """ Sorting is correctly implemented, as measured by a sample
             of row comparisons (not exhaustive)
             """
-            self.assertTrue(Discover.check_sorting(driver,
-                                                   column_name,
-                                                   ascend_or_descend))
-        Discover.goto(driver)
+            self.assertTrue(Discover.check_sorting_multi(driver,
+                                                         column_name,
+                                                         ascend_or_descend))
+        Home.to_discover(driver)
         Discover.sort_direction(driver, 'Ascending')
         Discover.sort_order(driver, 'Last Modified')
         oracle(driver, 'Last Modified', 'Ascending')
