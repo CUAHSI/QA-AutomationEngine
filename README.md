@@ -42,7 +42,7 @@ $ pip3 install -r requirements.txt
 ```
 
 ### Browser Driver
-A browser driver must be downloaded into a system directory.  Further, this system directory must be included in the PATH environment variable.  For the Firefox browser, the [Gecko driver](TODO) should be downloaded.
+A browser driver must be downloaded into a system directory.  Further, this system directory must be included in the PATH environment variable.  For the Firefox browser, the [Gecko driver](https://github.com/mozilla/geckodriver/releases) should be downloaded.
 
 
 ## Usage
