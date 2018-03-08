@@ -1,7 +1,7 @@
 import os
 
 from dateutil import parser
-from hs_elements import HomePage, DiscoverPage, ResourcePage
+from hs_elements import HomePage, AppsPage, DiscoverPage, ResourcePage
 from modes import setup_mode
 
 # Testing parameters
@@ -13,6 +13,23 @@ SLEEP_TIME = setup_mode(MODE_SELECTION)
 class Home:
     def to_discover(self, driver):
         HomePage.to_discover.click(driver, SLEEP_TIME)
+
+    def to_apps(self, driver):
+        HomePage.to_apps.click(driver, SLEEP_TIME)
+
+
+class Apps:
+    def show_info(self, driver, num):
+        AppsPage.info(num).click(driver, SLEEP_TIME)
+
+    def count(self, driver):
+        return AppsPage.container.get_immediate_child_count(driver)
+
+    def to_resource(self, driver, num):
+        AppsPage.resource(num).click(driver, SLEEP_TIME)
+
+    def get_title(self, driver, num):
+        return AppsPage.title(num).get_text(driver)
 
 
 class Discover:
@@ -95,44 +112,63 @@ class Discover:
         HomePage.to_discover.click(driver, SLEEP_TIME)
         if type(author) is list:
             for author_item in author:
-                DiscoverPage.filter_author(author_item).click(driver, SLEEP_TIME)
+                filter_el = DiscoverPage.filter_author(author_item)
+                filter_el.click(driver, SLEEP_TIME)
         elif author is not None:
-            DiscoverPage.filter_author(author).click(driver, SLEEP_TIME)
+            filter_el = DiscoverPage.filter_author(author)
+            filter_el.click(driver, SLEEP_TIME)
         if type(subject) is list:
             for subject_item in subject:
-                DiscoverPage.filter_subject(subject_item).click(driver, SLEEP_TIME)
+                filter_el = DiscoverPage.filter_subject(subject_item)
+                filter_el.click(driver, SLEEP_TIME)
         elif subject is not None:
-            DiscoverPage.filter_subject(subject).click(driver, SLEEP_TIME)
+            filter_el = DiscoverPage.filter_subject(subject)
+            filter_el.click(driver, SLEEP_TIME)
         if type(resource_type) is list:
             for resource_type_item in resource_type:
-                DiscoverPage.filter_resource_type(resource_type_item).click(driver, SLEEP_TIME)
+                filter_el = DiscoverPage.filter_resource_type(
+                    resource_type_item)
+                filter_el.click(driver, SLEEP_TIME)
         elif resource_type is not None:
-            DiscoverPage.filter_resource_type(resource_type).click(driver, SLEEP_TIME)
+            filter_el = DiscoverPage.filter_resource_type(resource_type)
+            filter_el.click(driver, SLEEP_TIME)
         if type(owner) is list:
             for owner_item in owner:
-                DiscoverPage.filter_owner(owner_item).click(driver, SLEEP_TIME)
+                filter_el = DiscoverPage.filter_owner(owner_item)
+                filter_el.click(driver, SLEEP_TIME)
         elif owner is not None:
-            DiscoverPage.filter_owner(owner).click(driver, SLEEP_TIME)
+            filter_el = DiscoverPage.filter_owner(owner)
+            filter_el.click(driver, SLEEP_TIME)
         if type(variable) is list:
             for variable_item in variable:
-                DiscoverPage.filter_variable(variable_item).click(driver, SLEEP_TIME)
+                filter_el = DiscoverPage.filter_variable(variable_item)
+                filter_el.click(driver, SLEEP_TIME)
         elif variable is not None:
-            DiscoverPage.filter_variable(variable).click(driver, SLEEP_TIME)
+            filter_el = DiscoverPage.filter_variable(variable)
+            filter_el.click(driver, SLEEP_TIME)
         if type(sample_medium) is list:
             for sample_medium_item in sample_medium:
-                DiscoverPage.filter_sample_medium(sample_medium_item).click(driver, SLEEP_TIME)
+                filter_el = DiscoverPage.filter_sample_medium(
+                    sample_medium_item)
+                filter_el.click(driver, SLEEP_TIME)
         elif sample_medium is not None:
-            DiscoverPage.filter_sample_medium(sample_medium).click(driver, SLEEP_TIME)
+            filter_el = DiscoverPage.filter_sample_medium(sample_medium)
+            filter_el.click(driver, SLEEP_TIME)
         if type(unit) is list:
             for unit_item in unit:
-                DiscoverPage.filter_unit(unit_item).click(driver, SLEEP_TIME)
+                filter_el = DiscoverPage.filter_unit(unit_item)
+                filter_el.click(driver, SLEEP_TIME)
         elif unit is not None:
-            DiscoverPage.filter_unit(unit).click(driver, SLEEP_TIME)
+            filter_el = DiscoverPage.filter_unit(unit)
+            filter_el.click(driver, SLEEP_TIME)
         if type(availability) is list:
             for availability_item in availability:
-                DiscoverPage.filter_availability(availability_item).click(driver, SLEEP_TIME)
+                filter_el = DiscoverPage.filter_availability(
+                    availability_item)
+                filter_el.click(driver, SLEEP_TIME)
         elif availability is not None:
-            DiscoverPage.filter_availability(availability).click(driver, SLEEP_TIME)
+            filter_el = DiscoverPage.filter_availability(availability)
+            filter_el.click(driver, SLEEP_TIME)
 
 
 class Resource:
@@ -148,5 +184,6 @@ class Resource:
 
 
 Home = Home()
+Apps = Apps()
 Discover = Discover()
 Resource = Resource()

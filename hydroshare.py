@@ -4,7 +4,8 @@ import sys
 import unittest
 
 from selenium import webdriver
-from hs_macros import Home, Discover, Resource
+from hs_macros import Home, Apps, Discover, Resource
+from utils import External, TestSystem
 
 # Test case parameters
 BASE_URL = "http://www.hydroshare.org"
@@ -91,6 +92,23 @@ class HydroshareTestSuite(unittest.TestCase):
         oracle(driver, 'First Author', 'Ascending')
         Discover.sort_order(driver, 'Title')
         oracle(driver, 'Title', 'Ascending')
+
+    def test_B_000007(self):
+        """ Confirms all apps have an associated resource page which is
+        correctly linked and correctly listed within the app info on the
+        apps page
+        """
+        def oracle(app_name, resource_page):
+            self.assertIn(app_name, resource_page)
+        Home.to_apps(driver)
+        External.switch_new_page(driver)
+        apps_count = Apps.count(driver)
+        for i in range(0, apps_count):  # +1 used below - xpath start at 1
+            app_name = Apps.get_title(driver, i+1)
+            Apps.show_info(driver, i+1)
+            Apps.to_resource(driver, i+1)
+            oracle(app_name, External.source_new_page(driver))
+            TestSystem.back(driver)
 
 
 if __name__ == '__main__':
