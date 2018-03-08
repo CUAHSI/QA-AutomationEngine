@@ -11,7 +11,6 @@ SLEEP_TIME = setup_mode(MODE_SELECTION)
 
 
 class Home:
-    # def goto(self, driver): FROM DISCOVER
     def to_discover(self, driver):
         HomePage.to_discover.click(driver, SLEEP_TIME)
 
@@ -26,11 +25,9 @@ class Discover:
         DiscoverPage.sort_direction.select_option_text(driver, option,
                                                        SLEEP_TIME)
 
-    # def open_resource(self, driver, resource_title):
     def to_resource(self, driver, title):
         DiscoverPage.to_resource(title).click(driver, SLEEP_TIME)
 
-    # def disc_column_ind(self, driver, column_name):
     def col_index(self, driver, col_name):
         """ Identifies the index for a discover page column, given the
         column name.  Indexes here start at one since the
@@ -43,7 +40,6 @@ class Discover:
                 return i
         return 0
 
-    # def check_sorting(self, driver, column_name, ascend_or_descend):
     def check_sorting_multi(self, driver, column_name, ascend_or_descend):
         """ Checks discover page rows are sorted correctly by checking each
         of the first eight rows against the rows that are 1, 2, and 3
@@ -93,49 +89,40 @@ class Discover:
             elif ascend_or_descend == 'Ascending':
                 return value_one <= value_two
 
-    # def discover_resources(self, driver, author=None, subject=None,
     def filters(self, driver, author=None, subject=None, resource_type=None,
                 owner=None, variable=None, sample_medium=None, unit=None,
                 availability=None):
-        HomePage.goto_discover(driver, SLEEP_TIME)
+        HomePage.to_discover.click(driver, SLEEP_TIME)
         if type(author) is list:
             for author_item in author:
-                DiscoverPage.filter_author((
-                    author_item).click(driver, SLEEP_TIME))
+                DiscoverPage.filter_author(author_item).click(driver, SLEEP_TIME)
         elif author is not None:
             DiscoverPage.filter_author(author).click(driver, SLEEP_TIME)
         if type(subject) is list:
             for subject_item in subject:
-                DiscoverPage.filter_subject((
-                    subject_item).click(driver, SLEEP_TIME))
+                DiscoverPage.filter_subject(subject_item).click(driver, SLEEP_TIME)
         elif subject is not None:
             DiscoverPage.filter_subject(subject).click(driver, SLEEP_TIME)
         if type(resource_type) is list:
             for resource_type_item in resource_type:
-                DiscoverPage.filter_resource_type((
-                    resource_type_item).click(driver, SLEEP_TIME))
+                DiscoverPage.filter_resource_type(resource_type_item).click(driver, SLEEP_TIME)
         elif resource_type is not None:
-            DiscoverPage.filter_resource_type((
-                resource_type).click(driver, SLEEP_TIME))
+            DiscoverPage.filter_resource_type(resource_type).click(driver, SLEEP_TIME)
         if type(owner) is list:
             for owner_item in owner:
-                DiscoverPage.filter_owner((
-                    owner_item).click(driver, SLEEP_TIME))
+                DiscoverPage.filter_owner(owner_item).click(driver, SLEEP_TIME)
         elif owner is not None:
             DiscoverPage.filter_owner(owner).click(driver, SLEEP_TIME)
         if type(variable) is list:
             for variable_item in variable:
-                DiscoverPage.filter_variable((
-                    variable_item).click(driver, SLEEP_TIME))
+                DiscoverPage.filter_variable(variable_item).click(driver, SLEEP_TIME)
         elif variable is not None:
             DiscoverPage.filter_variable(variable).click(driver, SLEEP_TIME)
         if type(sample_medium) is list:
             for sample_medium_item in sample_medium:
-                DiscoverPage.filter_sample_medium((
-                    sample_medium_item).click(driver, SLEEP_TIME))
+                DiscoverPage.filter_sample_medium(sample_medium_item).click(driver, SLEEP_TIME)
         elif sample_medium is not None:
-            DiscoverPage.filter_sample_medium((
-                sample_medium).click(driver, SLEEP_TIME))
+            DiscoverPage.filter_sample_medium(sample_medium).click(driver, SLEEP_TIME)
         if type(unit) is list:
             for unit_item in unit:
                 DiscoverPage.filter_unit(unit_item).click(driver, SLEEP_TIME)
@@ -143,22 +130,20 @@ class Discover:
             DiscoverPage.filter_unit(unit).click(driver, SLEEP_TIME)
         if type(availability) is list:
             for availability_item in availability:
-                DiscoverPage.filter_availability((
-                    availability_item).click(driver, SLEEP_TIME))
+                DiscoverPage.filter_availability(availability_item).click(driver, SLEEP_TIME)
         elif availability is not None:
-            DiscoverPage.filter_availability((
-                availability).click(driver, SLEEP_TIME))
+            DiscoverPage.filter_availability(availability).click(driver, SLEEP_TIME)
 
 
 class Resource:
     """ Individual resource info/download page macros """
-    # def download_size(self, driver, BASE_URL):
     def size_download(self, driver, BASE_URL):
         download_href = \
             ResourcePage.bagit.get_href(driver, BASE_URL)
-        os.system('wget ' + download_href)
+        os.system('wget -q ' + download_href)
         download_file = download_href.split('/')[-1]
         file_size = os.stat(download_file).st_size
+        os.system('rm ' + download_file)
         return file_size
 
 
