@@ -48,18 +48,18 @@ class MarkerModal:
             SiteElement('a', el_id='anchorAddSelectionsToWorkspaceMM')
         self.workspace = SiteElement('button', el_id='tableModal-DataMgr')
 
-        def cell(self, row, col):
-            return SiteElement('table', el_id='tblMapMarker',
-                               el_recursive=(
-                                   [SiteElement(el_dom='./tbody'),
-                                    SiteElement(el_dom='./tr[' + row + ']'),
-                                    SiteElement(el_dom='./td[' + col + ']'),
-                                    SiteElement(el_dom='./div')]))
+    def cell(self, row, col):
+        return SiteElement('table', el_id='tblMapMarker',
+                           el_recursive=(
+                               [SiteElement(el_dom='./tbody'),
+                                SiteElement(el_dom='./tr[' + str(row) + ']'),
+                                SiteElement(el_dom='./td[' + str(col) + ']'),
+                                SiteElement(el_dom='./div')]))
 
-        def sort(self, sort_by):
-            return SiteElement('table', el_id='tblMapMarker',
-                               el_recursive=(
-                                   [SiteElement('th', el_content=sort_by)]))
+    def sort(self, sort_by):
+        return SiteElement('div', el_id='tblMapMarker_wrapper',
+                           el_recursive=(
+                               [SiteElement('th', el_content=sort_by)]))
 
 
 class ServicesModal:

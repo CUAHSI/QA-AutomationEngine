@@ -116,16 +116,18 @@ class HydroclientTestSuite(unittest.TestCase):
         oracle()
 
     def test_A_000006(self):
-        """ TODO Clean this test case up - Prague service has been
-        removed
+        """ Confirms metadata availability and the capability to download data
+        near Köln Germany
         """
         def oracle():
-            """ Export to workspace is successful """
-            self.assertEqual(Workspace.count_complete(driver), 4)
+            """ Results are exported to workspace and number of successfully
+            processed time series is above 0
+            """
+            self.assertNotEqual(Workspace.count_complete(driver, 50), 0)
 
         Search.search_location(driver, 'Köln ')
         Search.search(driver)
-        Search.to_map_marker(driver, '4')
+        Search.to_map_marker(driver, '13')
         Marker.to_workspace_all(driver)
         oracle()
 
@@ -174,11 +176,11 @@ class HydroclientTestSuite(unittest.TestCase):
             Search.toggle_layer(driver, layer)
         Search.to_quickstart(driver)
         QuickStart.section(driver, 'Using the Layer Control')
-        oracle_1(layers)
+        oracle_1()
         QuickStart.more(driver, 'Click for more information ' +
                         'on the Layer Control')
         External.switch_new_page(driver)
-        oracle_2(layers)
+        oracle_2()
 
     def test_A_000009(self):
         """ Confirms that additional help on layer control can be
