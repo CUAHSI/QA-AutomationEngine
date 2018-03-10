@@ -11,28 +11,32 @@ SLEEP_TIME = setup_mode(MODE_SELECTION)
 
 
 class Home:
-    # def goto(self, driver): FROM DISCOVER
     def to_discover(self, driver):
+        """ Navigate to the Discover page using the menu at the top
+        of the home page
+        """
         HomePage.to_discover.click(driver, SLEEP_TIME)
 
 
 class Discover:
-    """ Discover tool macros """
     def sort_order(self, driver, option):
+        """ Set the sort order to {{option}} """
         DiscoverPage.sort_order.select_option_text(driver, option,
                                                    SLEEP_TIME)
 
     def sort_direction(self, driver, option):
+        """ Set the sort direction to {{option}} """
         DiscoverPage.sort_direction.select_option_text(driver, option,
                                                        SLEEP_TIME)
 
-    # def open_resource(self, driver, resource_title):
     def to_resource(self, driver, title):
+        """ Navigate to the {{title}} resource landing page by clicking
+        on it within the table
+        """
         DiscoverPage.to_resource(title).click(driver, SLEEP_TIME)
 
-    # def disc_column_ind(self, driver, column_name):
     def col_index(self, driver, col_name):
-        """ Identifies the index for a discover page column, given the
+        """ Indentify the index for a discover page column, given the
         column name.  Indexes here start at one since the
         end application here is xpath, and those indexes are 1 based
         """
@@ -43,11 +47,11 @@ class Discover:
                 return i
         return 0
 
-    # def check_sorting(self, driver, column_name, ascend_or_descend):
     def check_sorting_multi(self, driver, column_name, ascend_or_descend):
-        """ Checks discover page rows are sorted correctly by checking each
-        of the first eight rows against the rows that are 1, 2, and 3
-        positions down, relative to the base row.  So total of 24 checks.
+        """ Check discover page rows are sorted correctly.  The automated
+        testing system checks the first eight rows against the rows that
+        are 1, 2, and 3 positions down, relative to the base row (a total
+        of 24 checks)
         """
         baseline_rows = 8
         all_pass = True
@@ -60,8 +64,8 @@ class Discover:
 
     def check_sorting_single(self, driver, column_name, ascend_or_descend,
                              row_one, row_two):
-        """ Confirms that two rows are sorted correctly relative
-        to eachother
+        """ Confirm that two rows are sorted correctly relative to
+        eachother
         """
         col_ind = self.col_index(driver, column_name)
         if column_name == 'Title':
@@ -93,10 +97,15 @@ class Discover:
             elif ascend_or_descend == 'Ascending':
                 return value_one <= value_two
 
-    # def discover_resources(self, driver, author=None, subject=None,
     def filters(self, driver, author=None, subject=None, resource_type=None,
                 owner=None, variable=None, sample_medium=None, unit=None,
                 availability=None):
+        """ Use the filters on the left side of the Discover interface.
+        Filters should include author(s) {{author}}, subject(s) {{subject}},
+        resource type(s) {{resource_type}}, owner(s) {{owner}}, variables
+        {{variable}}, sample medium(s) {{sample_medium}}, unit(s) {{unit}},
+        and availability(s) {{availability}}
+        """
         HomePage.goto_discover(driver, SLEEP_TIME)
         if type(author) is list:
             for author_item in author:
@@ -151,9 +160,8 @@ class Discover:
 
 
 class Resource:
-    """ Individual resource info/download page macros """
-    # def download_size(self, driver, BASE_URL):
     def size_download(self, driver, BASE_URL):
+        """ Check the size of the BagIt download """
         download_href = \
             ResourcePage.bagit.get_href(driver, BASE_URL)
         os.system('wget ' + download_href)

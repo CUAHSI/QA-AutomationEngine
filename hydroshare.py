@@ -37,13 +37,13 @@ class HydroshareTestSuite(unittest.TestCase):
         driver.quit()
 
     def test_B_000003(self):
-        """ Confirms Beaver Divide Air Temperature resource
-        landing page is online via navigation and title check,
-        then downloads the BagIt archive and confirms
+        """ Confirms Beaver Divide Air Temperature resource landing page is
+        online via navigation and title check, then downloads the BagIt
+        archive and confirms the BagIt file size matches expectation
         """
         def oracle():
-            """ The Beaver Divide BagIt zip file
-            matches expected file size (in Bytes)
+            """ The Beaver Divide BagIt zip file matches expected file
+            size (in Bytes)
             """
             self.assertEqual(Resource.size_download(driver, BASE_URL),
                              512000)
@@ -53,8 +53,9 @@ class HydroshareTestSuite(unittest.TestCase):
         oracle()
 
     def test_B_000006(self):
-        """ Confirms none of the Discover page sort options result in
-        incorrect sorting
+        """ Confirms the sorting behavior on the Discover page (both sort
+        direction and sort field) functions correctly, as evaluated by a few
+        of the first rows being ordered correctly
         """
         def oracle(driver, column_name, ascend_or_descend):
             """ Sorting is correctly implemented, as measured by a sample
