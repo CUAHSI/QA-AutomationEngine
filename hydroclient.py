@@ -17,7 +17,6 @@ BASE_URL = 'http://data.cuahsi.org'
 # Test cases definition
 class HydroclientTestSuite(unittest.TestCase):
     """ Python unittest setup for smoke tests """
-
     def setUp(self):
         """ Setup driver for use in automation tests """
         profile = webdriver.FirefoxProfile()
@@ -43,14 +42,13 @@ class HydroclientTestSuite(unittest.TestCase):
         driver.quit()
 
     def test_A_000002(self):
-        """ Confirms metadata available through
-        HydroClient and that a sample of the data
-        downloads successfully
+        """ Confirms Archbold service metadata is available through
+        HydroClient and that a sample of the data downloads successfully
         """
         def oracle():
-            """ The Lake Annie FL data can be successfully
-            sent to the workspace, and then is processed
-            successfully in the workspace
+            """ The Lake Annie Florida data can be successfully sent to the
+            workspace, and then is processed successfully in the
+            workspace ("completed" status)
             """
             self.assertEqual(Workspace.count_complete(driver, 50), 1)
 
@@ -64,9 +62,9 @@ class HydroclientTestSuite(unittest.TestCase):
         in problematic behavior
         """
         def oracle():
-            """ 51 results show up for the Lake Annie FL data search,
-            with the "Archbold Biological Center" set as the only
-            service visible via search filtering
+            """ 51 results are returned for a Lake Annie Florida data search,
+            when the search is filtered to only include "Archbold Biological
+            Center" service
             """
             self.assertIn('51', Search.count_results(driver))
 
@@ -76,8 +74,9 @@ class HydroclientTestSuite(unittest.TestCase):
         oracle()
 
     def test_A_000004(self):
-        """ Confirms date filtering of NWIS UV data service is maintained
-        throughout search and workspace export workflow
+        """ Confirms the start and end date in a NWIS Unit Values
+        data search are applied throughout search and workspace export
+        workflow
         """
         def oracle():
             """ Start date and end date in workspace match the initial
@@ -95,12 +94,17 @@ class HydroclientTestSuite(unittest.TestCase):
         oracle()
 
     def test_A_000005(self):
-        """ Confirms New Haven CT Site X416-Y130 metadata and data are
-        available for NASA Goddard Earth Sciences services
+        """ Confirms metadata and data availability for the NASA Goddard
+        Earth Sciences services, using the New Haven CT Site X416-Y130.
+        The two associated services are NLDAS Hourly NOAH Data and NLDAS
+        Hourly Primary Forcing Data
         """
         def oracle():
-            """ Export to workspace is successful """
+            """ The two time series are sent to the workspace and processed,
+            resulting in a "completed" status for both time series
+            """
             self.assertEqual(Workspace.count_complete(driver, 50), 2)
+
         Search.search_location(driver, 'New Haven ')
         Services.filters(driver, titles=['NLDAS Hourly NOAH Data',
                                          'NLDAS Hourly ' +
@@ -112,8 +116,8 @@ class HydroclientTestSuite(unittest.TestCase):
         oracle()
 
     def test_A_000006(self):
-        """ Confirms Prague data is online for a site near Köln
-        Germany
+        """ TODO Clean this test case up - Prague service has been
+        removed
         """
         def oracle():
             """ Export to workspace is successful """
@@ -126,12 +130,13 @@ class HydroclientTestSuite(unittest.TestCase):
         oracle()
 
     def test_A_000007(self):
-        """ Confirms visibility of the legend when the USGS Landcover
-        layer is turned on within the search interface
+        """ Confirms visibility of the search sidebar legend when the
+        USGS Landcover layer is turned on.  Map scope during the test is
+        an area around Anchorage Alaska.
         """
         def oracle():
-            """ Legend is visible when Landcover layer on
-            and not visible when the layer is off
+            """ Legend is visible when Landcover layer is on, but it is
+            not visible when the layer is off
             """
             self.assertTrue(Search.is_legend_visible(driver))
             Search.toggle_layer(driver, 'USGS LandCover 2011')
@@ -142,19 +147,20 @@ class HydroclientTestSuite(unittest.TestCase):
         oracle()
 
     def test_A_000008(self):
-        """ Confirms consistency of layer naming among the HydroClient
-        and the associated documentation
+        """ Confirms that map layer naming, as defined in the HydroClient
+        user interface, is consistent with the Quick Start and help pages
+        documentation
         """
         def oracle_1():
-            """ Layer naming in the Quick Start matches the
-            naming within the HydroClient search interface
+            """ Map layer naming in the Quick Start modal matches the
+            naming within the HydroClient map search interface
             """
             for layer in layers:
                 self.assertIn('<li>' + layer + '</li>',
                               TestSystem.page_source(driver))
 
         def oracle_2():
-            """ Layer naming in the help documentation page matches the
+            """ Map layer naming in the help documentation page matches the
             naming within the HydroClient search interface
             """
             for layer in layers:
@@ -162,25 +168,28 @@ class HydroclientTestSuite(unittest.TestCase):
 
         layers = ['USGS Stream Gages', 'Nationalmap Hydrology',
                   'EPA Watersheds', 'USGS LandCover 2011']
-        for layer in layers:  # Turn all on
+        for layer in layers:  # Turn all layer on
             Search.toggle_layer(driver, layer)
-        for layer in layers:  # Turn all off
+        for layer in layers:  # Turn all layers off
             Search.toggle_layer(driver, layer)
         Search.to_quickstart(driver)
         QuickStart.section(driver, 'Using the Layer Control')
-        oracle_1()
+        oracle_1(layers)
         QuickStart.more(driver, 'Click for more information ' +
                         'on the Layer Control')
         External.switch_new_page(driver)
-        oracle_2()
+        oracle_2(layers)
 
     def test_A_000009(self):
-        """ Layers help documentation available through ZenDesk help
-        overlay button/widget
+        """ Confirms that additional help on layer control can be
+        accessed using the Zendesk widget
         """
         def oracle():
-            """ Test center results load without error """
+            """ A valid help center page is opened from the Zendesk
+            widget, and the page contains the word "Layers"
+            """
             self.assertIn('Help Center', TestSystem.title(driver))
+            self.assertIn('Layers', TestSystem.title(driver))
 
         Search.search_location(driver, 'San Diego')
         Search.search_location(driver, 'Amsterdam')
@@ -191,11 +200,13 @@ class HydroclientTestSuite(unittest.TestCase):
     def test_A_000010(self):
         """ Confirms that filtering by all keywords and all data types
         returns the same number of results as if no search parameters
-        were applied
+        were applied.  This test is applied near both the Dallas Texas
+        and Rio De Janeiro Brazil areas
         """
         def oracle():
-            """ Searches return same number of results as initial search
-            without parameters
+            """ A search which filters for all keywords and all data types
+            returns the same number of results as a search without any
+            filters
             """
             self.assertTrue(all(x == rio_counts[0]
                                 for x in rio_counts))
@@ -215,18 +226,18 @@ class HydroclientTestSuite(unittest.TestCase):
         dallas_counts.append(Search.count_results(driver))
         Keywords.filter_root(driver, ['Biological', 'Chemical', 'Physical'])
         dallas_counts.append(Search.count_results(driver))
-        TestSystem.wait(3)  # sec
+        TestSystem.wait(3)  # extra wait time in seconds
         Advanced.filter_all_value_types(driver)
-        TestSystem.wait(3)  # sec
+        TestSystem.wait(3)  # extra wait time in seconds
         dallas_counts.append(Search.count_results(driver))
         oracle()
 
     def test_A_000011(self):
-        """ Confirms About dropdown links successfully open up the
-        associated resource in new tab and do not show a 404 Error
+        """ Confirms "About" modal dropdown links successfully open up
+        the associated resource in a new tab and do not show a 404 Error
         """
         def oracle():
-            """ No 404 Errors exist in external page sources """
+            """ None of the resource pages contain the text "404 Error" """
             self.assertNotIn('404 Error', external_sources)
 
         external_sources = ''
@@ -245,11 +256,16 @@ class HydroclientTestSuite(unittest.TestCase):
         oracle()
 
     def test_A_000012(self):
-        """ Confirms repeated map scrolls do not cause issues in
-        subsequent map searches
+        """ Confirms repeated map scrolls, followed by a location search,
+        returns nonzero results for an area which normally has nonzero
+        search results.  Effectively, this test confirms that viewing
+        duplicate map instances to the left and right of the main (starting)
+        map instance does not cause problems during location searching.
         """
         def oracle():
-            """ Results count is nonzero after map navigations """
+            """ Results count is nonzero after map navigations and a map
+            location search (in that order)
+            """
             self.assertNotEqual(Search.count_results(driver), '0')
 
         Search.scroll_map(driver, 25)
@@ -258,12 +274,12 @@ class HydroclientTestSuite(unittest.TestCase):
         oracle()
 
     def test_A_000013(self):
-        """ Confirms operations and button clicks on an empty workspace
-        do not result in errors
+        """ Confirms operations within the Workspace user interface
+        do not result in errors when the workspace is empty
         """
         def oracle():
-            """ Page has not been redirected and no fatal errors have
-            been raised
+            """ The browser is still on using the HydroClient system
+            after Workspace operations are used on an empty Workspace
             """
             self.assertIn('HydroClient', TestSystem.title(driver))
 
@@ -282,7 +298,8 @@ class HydroclientTestSuite(unittest.TestCase):
         oracle()
 
     def test_A_000014(self):
-        """ Check NLDAS service over ocean to ensure sites don't exist """
+        """ Confirms NLDAS data is not available over the ocean (from
+        either of the two services) """
         def oracle():
             """ The results count over Cape Cod Bay (no land in view)
             is 0 after filtering for only NLDAS services

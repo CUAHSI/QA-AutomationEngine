@@ -214,7 +214,6 @@ class QuickStartModal:
     def section(self, name):
         return SiteElement('a', el_content=name)
 
-    # TODO - why this needed in addition to above?
     def more(self, name):
         return SiteElement('a', el_content=name)
 
