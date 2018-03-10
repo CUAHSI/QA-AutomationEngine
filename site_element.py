@@ -336,3 +336,10 @@ class SiteElement:
         """
         target_el = self.loc_it(el_driver)
         return len(target_el.find_elements_by_xpath(".//*"))
+
+    def get_immediate_child_count(self, el_driver):
+        """ Returns the number of immediate child elements, given a parent
+        element specification
+        """
+        target_el = self.loc_it(el_driver)
+        return len(target_el.find_elements_by_xpath("*"))

@@ -55,6 +55,9 @@ class TestSystem:
     def page_source(self, driver):
         return driver.page_source
 
+    def back(self, driver):
+        driver.execute_script("window.history.go(-1)")
+
 
 External = External()
 TestSystem = TestSystem()

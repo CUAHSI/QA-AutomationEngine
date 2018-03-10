@@ -4,6 +4,38 @@ from site_element import SiteElement
 class HomePage:
     def __init__(self):
         self.to_discover = SiteElement('li', el_id='dropdown-menu-search')
+        self.to_apps = SiteElement('*', el_id='dropdown-menu-' +
+                                   'https:--www.hydroshare.org-apps-')
+
+
+class AppsPage:
+    def __init__(self):
+        self.container = \
+            SiteElement('div', el_class='container apps-container',
+                        el_recursive=[SiteElement('div', el_class='row')])
+
+    def info(self, num):
+        return SiteElement('div', el_class='container apps-container',
+                           el_recursive=(
+                               [SiteElement('div', el_class='row'),
+                                SiteElement('div[' + str(num) + ']'),
+                                SiteElement('a',
+                                            el_class='app-info-toggle')]))
+
+    def resource(self, num):
+        return SiteElement('div', el_class='container apps-container',
+                           el_recursive=(
+                               [SiteElement('div', el_class='row'),
+                                SiteElement('div[' + str(num) + ']'),
+                                SiteElement('p', el_class='app-description'),
+                                SiteElement('a')]))
+
+    def title(self, num):
+        return SiteElement('div', el_class='container apps-container',
+                           el_recursive=(
+                               [SiteElement('div', el_class='row'),
+                                SiteElement('div[' + str(num) + ']'),
+                                SiteElement('h3')]))
 
 
 class DiscoverPage:
@@ -109,5 +141,6 @@ class ResourcePage:
 
 
 HomePage = HomePage()
+AppsPage = AppsPage()
 DiscoverPage = DiscoverPage()
 ResourcePage = ResourcePage()
