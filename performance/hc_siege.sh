@@ -8,10 +8,10 @@
 # --header="Cookie: sessionid=mjifge6nj0mo6375cdlf2rvw5dea0pr3" 
 echo 'HYDROCLIENT' > hc_siege.txt
 
-siege -c1 -r10 -d1 --log=/dev/null http://data.cuahsi.com \
+siege -c1 -r10 -d1 --log=/dev/null http://data.cuahsi.org \
  --user-agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.186 Safari/537.36" \
  --header="Accept: text/html"  >> /dev/null 2>> hc_siege.txt & wait
 
-siege -c2 -t30s -d1 --log=/dev/null http://data.cuahsi.com \
+siege -c2 -t30s -d1 --log=/dev/null http://data.cuahsi.org \
  --user-agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.186 Safari/537.36" \
  --header="Accept: text/html"  >> /dev/null 2>> hc_siege.txt & wait
