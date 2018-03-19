@@ -52,8 +52,8 @@ class MarkerModal:
         return SiteElement('table', el_id='tblMapMarker',
                            el_recursive=(
                                [SiteElement(el_dom='./tbody'),
-                                SiteElement(el_dom='./tr[' + str(row) + ']'),
-                                SiteElement(el_dom='./td[' + str(col) + ']'),
+                                SiteElement(el_dom='./tr[{}]'.format(row)),
+                                SiteElement(el_dom='./td[{}]'.format(col)),
                                 SiteElement(el_dom='./div')]))
 
     def sort(self, sort_by):
@@ -129,8 +129,8 @@ class AdvancedModal:
     def value_type_cell(self, row, col):
         return SiteElement('table', el_id='tblCvValueType',
                            el_recursive=[SiteElement('tbody'),
-                                         SiteElement('tr[' + str(row) + ']'),
-                                         SiteElement('td[' + str(col) + ']')])
+                                         SiteElement('tr[{}]'.format(row)),
+                                         SiteElement('td[{}]'.format(col))])
 
 
 class FilterModal:
@@ -152,8 +152,8 @@ class FilterModal:
         return SiteElement('table', el_id='tblDetailedSearchResults',
                            el_recursive=(
                                [SiteElement('tbody'),
-                                SiteElement(el_dom='./tr[' + str(row) + ']'),
-                                SiteElement(el_dom='./td[' + str(col) + ']'),
+                                SiteElement(el_dom='./tr[{}]'.format(row)),
+                                SiteElement(el_dom='./td[{}]'.format(col)),
                                 SiteElement(el_dom='./div')]))
 
     def cell_text(self, text):

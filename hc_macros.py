@@ -37,6 +37,7 @@ class Search:
     def is_legend_visible(self, driver):
         """ Click on the legend tab, within the search interface sidebar """
         SearchPage.legend_tab.click(driver, SLEEP_TIME)
+        # TODO Clean up below
         legend_vis = SearchPage.legend_img.get_attribute(driver, 'style')
         legend_vis = legend_vis.split(':')[-1]
         legend_vis = legend_vis.split(';')[0]

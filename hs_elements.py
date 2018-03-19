@@ -18,14 +18,14 @@ class AppsPage:
         return SiteElement('div', el_class='container apps-container',
                            el_recursive=(
                                [SiteElement('div', el_class='row'),
-                                SiteElement('div[' + str(num) + ']'),
+                                SiteElement('div[{}]'.format(num)),
                                 SiteElement('a', el_class='app-info-toggle')]))
 
     def resource(self, num):
         return SiteElement('div', el_class='container apps-container',
                            el_recursive=(
                                [SiteElement('div', el_class='row'),
-                                SiteElement('div[' + str(num) + ']'),
+                                SiteElement('div[{}]'.format(num)),
                                 SiteElement('p', el_class='app-description'),
                                 SiteElement('a')]))
 
@@ -33,7 +33,7 @@ class AppsPage:
         return SiteElement('div', el_class='container apps-container',
                            el_recursive=(
                                [SiteElement('div', el_class='row'),
-                                SiteElement('div[' + str(num) + ']'),
+                                SiteElement('div[{}]'.format(num)),
                                 SiteElement('h3')]))
 
 
@@ -59,7 +59,7 @@ class DiscoverPage:
         return SiteElement('table', el_id='items-discovered',
                            el_recursive=[SiteElement('thead'),
                                          SiteElement('tr'),
-                                         SiteElement('th[' + str(col_index) + ']')])
+                                         SiteElement('th[{}]'.format(col_index))])
 
     def cell(self, col, row):
         """ Return the cell in the discover table, given row and column
@@ -67,8 +67,8 @@ class DiscoverPage:
         """
         return SiteElement('table', el_id='items-discovered',
                            el_recursive=[SiteElement('tbody'),
-                                         SiteElement('tr[' + str(row) + ']'),
-                                         SiteElement('td[' + str(col) + ']')])
+                                         SiteElement('tr[{}]'.format(row)),
+                                         SiteElement('td[{}]'.format(col))])
 
     def cell_href(self, col, row):
         """ Return the cell in the discover table, given row and column
@@ -77,8 +77,8 @@ class DiscoverPage:
         """
         return SiteElement('table', el_id='items-discovered',
                            el_recursive=[SiteElement('tbody'),
-                                         SiteElement('tr[' + str(row) + ']'),
-                                         SiteElement('td[' + str(col) + ']'),
+                                         SiteElement('tr[{}]'.format(row)),
+                                         SiteElement('td[{}]'.format(col)),
                                          SiteElement('a')])
 
     def cell_strong_href(self, col, row):
@@ -88,40 +88,40 @@ class DiscoverPage:
         """
         return SiteElement('table', el_id='items-discovered',
                            el_recursive=[SiteElement('tbody'),
-                                         SiteElement('tr[' + str(row) + ']'),
-                                         SiteElement('td[' + str(col) + ']'),
+                                         SiteElement('tr[{}]'.format(row)),
+                                         SiteElement('td[{}]'.format(col)),
                                          SiteElement('strong'),
                                          SiteElement('a')])
 
     def filter_author(self, author):
-        return SiteElement('input', el_id='creators-' + author)
+        return SiteElement('input', el_id='creators-{}'.format(author))
 
     def filter_subject(self, subject):
-        return SiteElement('input', el_id='subjects-' + subject)
+        return SiteElement('input', el_id='subjects-{}'.format(subject))
 
     def filter_resource_type(self, resource_type):
-        return SiteElement('input', el_id='resource_type-' + resource_type)
+        return SiteElement('input', el_id='resource_type-{}'.format(resource_type))
 
     def filter_owner(self, owner):
-        return SiteElement('input', el_id='owners_names-' + owner)
+        return SiteElement('input', el_id='owners_names-{}'.format(owner))
 
     def filter_variable(self, variable):
-        return SiteElement('input', el_id='variable_names-' + variable)
+        return SiteElement('input', el_id='variable_names-{}'.format(variable))
 
     def filter_sample_medium(self, sample_medium):
-        return SiteElement('input', el_id='sample_mediums-' + sample_medium)
+        return SiteElement('input', el_id='sample_mediums-{}'.format(sample_medium))
 
     def filter_unit(self, unit):
-        return SiteElement('input', el_id='units_names-' + unit)
+        return SiteElement('input', el_id='units_names-{}'.format(unit))
 
     def filter_discoverable(self, discoverable):
-        return SiteElement('input', el_id='discoverable-' + discoverable)
+        return SiteElement('input', el_id='discoverable-{}'.format(discoverable))
 
     def filter_public(self, public):
-        return SiteElement('input', el_id='public-' + public)
+        return SiteElement('input', el_id='public-{}'.format(public))
 
     def filter_availability(self, availability):
-        return SiteElement('input', el_id=availability + '-true')
+        return SiteElement('input', el_id='{}-true'.format(availability))
 
 
 class ResourcePage:

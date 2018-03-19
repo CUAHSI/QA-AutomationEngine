@@ -22,10 +22,9 @@ class HydroshareTestSuite(unittest.TestCase):
         # TODO use self.driver instead of making it global
         global driver
         if infrastructure == 'grid':
-            driver = webdriver.Remote(command_executor='http://' +
-                                      grid_hub_ip + ':4444/wd/hub',
-                                      desired_capabilities=(
-                                          {'browserName': 'firefox'}))
+            driver = webdriver.Remote(
+                command_executor='http://{}:4444/wd/hub'.format(grid_hub_ip),
+                desired_capabilities={'browserName': 'firefox'})
         else:
             driver = webdriver.Firefox(profile)
         driver.get(BASE_URL)

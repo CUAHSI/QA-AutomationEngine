@@ -184,10 +184,10 @@ class Resource:
     def size_download(self, driver, BASE_URL):
         """ Check the size of the BagIt download """
         download_href = ResourcePage.bagit.get_href(driver, BASE_URL)
-        os.system('wget -q ' + download_href)
+        os.system('wget -q {}'.format(download_href))
         download_file = download_href.split('/')[-1]
         file_size = os.stat(download_file).st_size
-        os.system('rm ' + download_file)
+        os.system('rm {}'.format(download_file))
         return file_size
 
 
