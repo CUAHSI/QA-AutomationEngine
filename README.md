@@ -85,12 +85,12 @@ $ make check
 Calls to the [combinatorial design of experiments utility](doe/combinatorial-doe/combinatorial.py) requires a specification of the number of experiments to generate (--experiments), the number of factors for the combinatorial design (--factors), and the number of possible values for each independent variable (--specification).  For example, consider the following design of experiments problem:
 1) Pairwise (2-way) combinatorial approach
 2) One independent variable has three possible values, while three independent variables have two possible values
-3) Desired number of experiments is 12 (6 is the feasible minimum, but specifying 6 might take too long)
+3) Desired number of experiments is eight (six is the feasible minimum, but specifying the minimum may result in a long solution convergence time)
 This problem could be solved with the following call:
 ```
-$ python3 combinatorial.py --experiments 12 --factors 2 --specification '3,2,2,2'
+$ python3 combinatorial.py --experiments 8 --factors 2 --specification 3 2 2 2
 ```
-Note: This utility is for very simple DOE-based test case generation only.  Further, the number of experiments should be well above the feasible minimum in order to generate a solution in a reasonable amount of time.  The brute force approach quickly becomes impractical for large or close-to-optimal DOE problems.
+Note: This utility is for very simple DOE-based test case generation only.  Further, the number of experiments should be well above the feasible minimum in order to generate a solution quickly.  The brute force approach quickly becomes impractical for large and close-to-optimal DOE problems.
 
 ## Creating Test Cases
 The [PDF documentation](documentation/beta-release/CUAHSIAutomatedTestingEngineBeta.pdf) contained in this repository provides a deeper explanation of the test suite framework.  However, the general idea is to write test cases at the most abstract level, then support that with new classes, attributes, and methods in the lower abstraction levels as needed.
