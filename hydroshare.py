@@ -18,16 +18,14 @@ class HydroshareTestSuite(unittest.TestCase):
     def setUp(self):
         """ Setup driver for use in automation tests """
         profile = webdriver.FirefoxProfile()
-        profile.set_preference("general.useragent.override",
-                               "CUAHSI-QA-Selenium")
+        profile.set_preference("general.useragent.override", "CUAHSI-QA-Selenium")
         # TODO use self.driver instead of making it global
         global driver
         if infrastructure == 'grid':
-            driver = \
-                webdriver.Remote(command_executor='http://' +
-                                 grid_hub_ip + ':4444/wd/hub',
-                                 desired_capabilities=(
-                                     {'browserName': 'firefox'}))
+            driver = webdriver.Remote(command_executor='http://' +
+                                      grid_hub_ip + ':4444/wd/hub',
+                                      desired_capabilities=(
+                                          {'browserName': 'firefox'}))
         else:
             driver = webdriver.Firefox(profile)
         driver.get(BASE_URL)
@@ -46,8 +44,7 @@ class HydroshareTestSuite(unittest.TestCase):
             """ The Beaver Divide BagIt zip file matches expected file
             size (in Bytes)
             """
-            self.assertEqual(Resource.size_download(driver, BASE_URL),
-                             512000)
+            self.assertEqual(Resource.size_download(driver, BASE_URL), 512000)
         Discover.filters(driver, subject='iUTAH', resource_type='Generic',
                          availability=['discoverable', 'public'])
         Discover.to_resource(driver, 'Beaver Divide Air Temperature')
@@ -62,8 +59,7 @@ class HydroshareTestSuite(unittest.TestCase):
             """ Sorting is correctly implemented, as measured by a sample
             of row comparisons (not exhaustive)
             """
-            self.assertTrue(Discover.check_sorting_multi(driver,
-                                                         column_name,
+            self.assertTrue(Discover.check_sorting_multi(driver, column_name,
                                                          ascend_or_descend))
         Home.to_discover(driver)
         Discover.sort_direction(driver, 'Ascending')

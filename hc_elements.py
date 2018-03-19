@@ -1,6 +1,6 @@
-""" This module contains the definitions for site element locations.
-These site element locations can be defined in through a number of
-mechanisms, as further detailed in the SiteElement class
+""" This module contains the definitions for site element locations.  These site
+element locations can be defined in through a number of mechanisms, as further
+detailed in the SiteElement class
 """
 from site_element import SiteElement
 
@@ -18,13 +18,13 @@ class SearchPage:
                                     el_content='Data Service(s)...')
         self.keywords = SiteElement('button', el_id='btnSelectKeywords')
         self.advanced = SiteElement('button', el_id='btnAdvancedSearch')
-        self.results_count = \
-            SiteElement('span', el_id='timeseriesFoundOrFilteredCount')
+        self.results_count = SiteElement('span',
+                                         el_id='timeseriesFoundOrFilteredCount')
         self.date_filter = SiteElement('*', el_id='optionsDatesRange')
         self.date_start = SiteElement('*', el_id='startDateModal')
         self.date_end = SiteElement('*', el_id='endDateModal')
-        self.date_clickout = \
-            SiteElement('h3', el_content='Please select your date range:')
+        self.date_clickout = SiteElement('h3',
+                                         el_content='Please select your date range:')
         self.date_save = SiteElement('*', el_id='btnDateRangeModalSave')
         self.layers = SiteElement('*', el_id='Layer Control')
         self.legend_tab = SiteElement('a', el_content='LEGENDS')
@@ -44,8 +44,8 @@ class SearchPage:
 class MarkerModal:
     def __init__(self):
         self.action = SiteElement('div', el_id='ddActionsMM')
-        self.to_workspace = \
-            SiteElement('a', el_id='anchorAddSelectionsToWorkspaceMM')
+        self.to_workspace = SiteElement('a',
+                                        el_id='anchorAddSelectionsToWorkspaceMM')
         self.workspace = SiteElement('button', el_id='tableModal-DataMgr')
 
     def cell(self, row, col):
@@ -69,18 +69,14 @@ class ServicesModal:
         self.sort_org = SiteElement('th', el_content='Organization')
         self.save = SiteElement('button', el_id='btnServicesModalSave')
         self.search = SiteElement('button', el_id='btnServicesModalSearch')
-        self.table_count = SiteElement('select',
-                                       el_name='tblDataServices_length')
-        self.archbold = SiteElement('td',
-                                    el_content='Archbold Biological Station')
-        self.nwis_uv = \
-            SiteElement('a', el_content='NWIS Unit Values',
-                        el_recursive=[SiteElement(el_dom='./../..'),
-                                      SiteElement(el_dom='./td[1]')])
-        self.nasa_noah = \
-            SiteElement('a', el_content='NLDAS Hourly NOAH Data',
-                        el_recursive=[SiteElement(el_dom='./../..'),
-                                      SiteElement(el_dom='./td[1]')])
+        self.table_count = SiteElement('select', el_name='tblDataServices_length')
+        self.archbold = SiteElement('td', el_content='Archbold Biological Station')
+        self.nwis_uv = SiteElement('a', el_content='NWIS Unit Values',
+                                   el_recursive=[SiteElement(el_dom='./../..'),
+                                                 SiteElement(el_dom='./td[1]')])
+        self.nasa_noah = SiteElement('a', el_content='NLDAS Hourly NOAH Data',
+                                     el_recursive=[SiteElement(el_dom='./../..'),
+                                                   SiteElement(el_dom='./td[1]')])
         self.nasa_forcing = \
             SiteElement('a', el_content='NLDAS Hourly Primary Forcing Data',
                         el_recursive=[SiteElement(el_dom='./../..'),
@@ -126,37 +122,31 @@ class AdvancedModal:
 
     def value_type_sort(self, sort_by):
         return SiteElement('table', el_id='tblCvValueType',
-                           el_recursive=(
-                               [SiteElement('thead'),
-                                SiteElement('tr'),
-                                SiteElement('th', el_content=sort_by)]))
+                           el_recursive=[SiteElement('thead'),
+                                         SiteElement('tr'),
+                                         SiteElement('th', el_content=sort_by)])
 
     def value_type_cell(self, row, col):
         return SiteElement('table', el_id='tblCvValueType',
                            el_recursive=[SiteElement('tbody'),
-                                         SiteElement('tr[' +
-                                                     str(row) + ']'),
-                                         SiteElement('td[' +
-                                                     str(col) + ']')])
+                                         SiteElement('tr[' + str(row) + ']'),
+                                         SiteElement('td[' + str(col) + ']')])
 
 
 class FilterModal:
     def __init__(self):
         self.action = SiteElement('div', el_id='ddActionsDSR')
-        self.count = SiteElement('select',
-                                 el_name='tblDetailedSearchResults_length')
-        self.to_workspace = \
-            SiteElement('a', el_id='anchorAddSelectionsToWorkspaceDSR')
-        self.exports = \
-            SiteElement('button',
-                        el_id='tableModal-DownloadMgrSearchSummary')
-        self.workspace = \
-            SiteElement('button', el_id='tableModal-DataMgrSearchSummary')
+        self.count = SiteElement('select', el_name='tblDetailedSearchResults_length')
+        self.to_workspace = SiteElement('a',
+                                        el_id='anchorAddSelectionsToWorkspaceDSR')
+        self.exports = SiteElement('button',
+                                   el_id='tableModal-DownloadMgrSearchSummary')
+        self.workspace = SiteElement('button',
+                                     el_id='tableModal-DataMgrSearchSummary')
         self.close = SiteElement('button', el_id='closeSearchSummary')
-        self.search = \
-            SiteElement('div', el_id='tblDetailedSearchResults_filter',
-                        el_recursive=[SiteElement(el_dom='./label'),
-                                      SiteElement(el_dom='./input')])
+        self.search = SiteElement('div', el_id='tblDetailedSearchResults_filter',
+                                  el_recursive=[SiteElement(el_dom='./label'),
+                                                SiteElement(el_dom='./input')])
 
     def cell(self, row, col):
         return SiteElement('table', el_id='tblDetailedSearchResults',
@@ -168,29 +158,26 @@ class FilterModal:
 
     def cell_text(self, text):
         return SiteElement('table', el_id='tblDetailedSearchResults',
-                           el_recursive=(
-                               [SiteElement('tbody'),
-                                SiteElement('td', el_content=text)]))
+                           el_recursive=[SiteElement('tbody'),
+                                         SiteElement('td', el_content=text)])
 
     def sort(self, sort_by):
         return SiteElement('div', el_id='tblDetailedSearchResults_wrapper',
-                           el_recursive=(
-                               [SiteElement('thead'),
-                                SiteElement('th', el_content=sort_by)]))
+                           el_recursive=[SiteElement('thead'),
+                                         SiteElement('th', el_content=sort_by)])
 
 
 class AboutModal:
     def __init__(self):
-        self.helpcenter = \
-            SiteElement('li', el_id='liZendeskTab',
-                        el_recursive=[SiteElement('span'), SiteElement('a')])
-        self.licensing = \
-            SiteElement('li', el_id='liLicenseTab',
-                        el_recursive=[SiteElement('span'), SiteElement('a')])
+        self.helpcenter = SiteElement('li', el_id='liZendeskTab',
+                                      el_recursive=[SiteElement('span'),
+                                                    SiteElement('a')])
+        self.licensing = SiteElement('li', el_id='liLicenseTab',
+                                     el_recursive=[SiteElement('span'),
+                                                   SiteElement('a')])
         self.licensing_close = \
             SiteElement('div', el_id='licenseModal',
-                        el_recursive=[SiteElement('button',
-                                                  el_class='close')])
+                        el_recursive=[SiteElement('button', el_class='close')])
         self.license_repo_top = \
             SiteElement('div', el_id='licenseModal',
                         el_recursive=[SiteElement('a', el_href=(
@@ -204,10 +191,8 @@ class AboutModal:
                         el_recursive=[SiteElement('span'), SiteElement('a')])
         self.contact_close = \
             SiteElement('div', el_id='contactModal',
-                        el_recursive=[SiteElement('button',
-                                                  el_class='close')])
-        self.contact_help = \
-            SiteElement('a', el_content='Need additional help')
+                        el_recursive=[SiteElement('button', el_class='close')])
+        self.contact_help = SiteElement('a', el_content='Need additional help')
 
 
 class QuickStartModal:
@@ -231,14 +216,10 @@ class ZendeskWidget:
 
 class WorkspacePage:
     def __init__(self):
-        self.select_dropdown = \
-            SiteElement('*', el_id='dropdownMenu1')
-        self.select_all = \
-            SiteElement('*', el_id='anchorAllSelectionsDataMgr')
-        self.select_clear = \
-            SiteElement('*', el_id='spanClearSelectionsDM')
-        self.select_delete = \
-            SiteElement('*', el_id='spanRemoveSelectionsDM')
+        self.select_dropdown = SiteElement('*', el_id='dropdownMenu1')
+        self.select_all = SiteElement('*', el_id='anchorAllSelectionsDataMgr')
+        self.select_clear = SiteElement('*', el_id='spanClearSelectionsDM')
+        self.select_delete = SiteElement('*', el_id='spanRemoveSelectionsDM')
         self.tools = SiteElement('*', el_id='ddHydrodataToolDataMgr')
         self.to_csv = SiteElement('*', el_id='idDownloadToClient')
         self.to_viewer = SiteElement('li', el_id='byuApps',

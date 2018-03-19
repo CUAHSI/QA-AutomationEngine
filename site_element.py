@@ -81,8 +81,7 @@ class SiteElement:
                                "[@placeholder='" + self.el_placeholder + "']"
                 else:
                     el_xpath = ".//" + loc_child.el_type + \
-                               "[@placeholder='" + \
-                               loc_child.el_placeholder + "']"
+                               "[@placeholder='" + loc_child.el_placeholder + "']"
                 target_el = loc_base.find_element_by_xpath(el_xpath)
                 return target_el
 
@@ -95,8 +94,7 @@ class SiteElement:
                                "[contains(@href,'" + self.el_href + "')]"
                 else:
                     el_xpath = ".//" + loc_child.el_type + \
-                               "[contains(@href,'" + \
-                               loc_child.el_href + "')]"
+                               "[contains(@href,'" + loc_child.el_href + "')]"
                 target_el = loc_base.find_element_by_xpath(el_xpath)
                 return target_el
 
@@ -117,12 +115,10 @@ class SiteElement:
                 """
                 if loc_child is None:
                     el_xpath = "//" + self.el_type + \
-                               "[contains(text(), '" + \
-                               self.el_content + "')]"
+                               "[contains(text(), '" + self.el_content + "')]"
                 else:
                     el_xpath = ".//" + loc_child.el_type + \
-                               "[contains(text(), '" + \
-                               loc_child.el_content + "')]"
+                               "[contains(text(), '" + loc_child.el_content + "')]"
                 target_el = loc_base.find_element_by_xpath(el_xpath)
                 return target_el
 
@@ -150,7 +146,8 @@ class SiteElement:
                 defining_el = loc_child  # For relative identification
 
             # Hierarchy for identification using element attributes is
-            # id->name->title->href->class->content->DOM->type(no attributes)
+            # id->name->title->placeholder->href->class->content->DOM->
+            # type(no attributes)
             if defining_el.el_id is not None:
                 target_el = loc_by_id(loc_base, loc_child)
             elif defining_el.el_name is not None:

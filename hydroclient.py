@@ -25,11 +25,10 @@ class HydroclientTestSuite(unittest.TestCase):
         # TODO use self.driver instead of making it global
         global driver
         if infrastructure == 'grid':
-            driver = \
-                webdriver.Remote(command_executor='http://' +
-                                 grid_hub_ip + ':4444/wd/hub',
-                                 desired_capabilities=(
-                                     {'browserName': 'firefox'}))
+            driver = webdriver.Remote(command_executor='http://' +
+                                      grid_hub_ip + ':4444/wd/hub',
+                                      desired_capabilities=(
+                                          {'browserName': 'firefox'}))
         else:
             driver = webdriver.Firefox(profile)
         driver.maximize_window()
@@ -83,8 +82,7 @@ class HydroclientTestSuite(unittest.TestCase):
             date filtering values established in the Search interface
             """
             self.assertTrue(Workspace.is_in_results(driver,
-                                                    ['2015-12-01',
-                                                     '2015-12-30'],
+                                                    ['2015-12-01', '2015-12-30'],
                                                     10))
 
         Search.search_location(driver, 'Tampa ')
@@ -107,8 +105,7 @@ class HydroclientTestSuite(unittest.TestCase):
 
         Search.search_location(driver, 'New Haven ')
         Services.filters(driver, titles=['NLDAS Hourly NOAH Data',
-                                         'NLDAS Hourly ' +
-                                         'Primary Forcing Data'])
+                                         'NLDAS Hourly Primary Forcing Data'])
 
         Filter.search_field(driver, 'X416-Y130')
         Filter.to_workspace_texts_range(driver, ['Model Simulation Result',
@@ -177,8 +174,7 @@ class HydroclientTestSuite(unittest.TestCase):
         Search.to_quickstart(driver)
         QuickStart.section(driver, 'Using the Layer Control')
         oracle_1()
-        QuickStart.more(driver, 'Click for more information ' +
-                        'on the Layer Control')
+        QuickStart.more(driver, 'Click for more information on the Layer Control')
         External.switch_new_page(driver)
         oracle_2()
 
@@ -210,10 +206,8 @@ class HydroclientTestSuite(unittest.TestCase):
             returns the same number of results as a search without any
             filters
             """
-            self.assertTrue(all(x == rio_counts[0]
-                                for x in rio_counts))
-            self.assertTrue(all(x == dallas_counts[0]
-                                for x in dallas_counts))
+            self.assertTrue(all(x == rio_counts[0] for x in rio_counts))
+            self.assertTrue(all(x == dallas_counts[0] for x in dallas_counts))
 
         rio_counts = []
         dallas_counts = []
@@ -310,10 +304,8 @@ class HydroclientTestSuite(unittest.TestCase):
 
         Search.search_location(driver, 'Cape Cod Bay')
         Search.zoom_in(driver, 3)
-        Services.filters(driver,
-                         titles=['NLDAS Hourly NOAH Data',
-                                 'NLDAS Hourly ' +
-                                 'Primary Forcing Data'])
+        Services.filters(driver, titles=['NLDAS Hourly NOAH Data',
+                                         'NLDAS Hourly Primary Forcing Data'])
         oracle()
 
 

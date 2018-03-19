@@ -19,8 +19,7 @@ class AppsPage:
                            el_recursive=(
                                [SiteElement('div', el_class='row'),
                                 SiteElement('div[' + str(num) + ']'),
-                                SiteElement('a',
-                                            el_class='app-info-toggle')]))
+                                SiteElement('a', el_class='app-info-toggle')]))
 
     def resource(self, num):
         return SiteElement('div', el_class='container apps-container',
@@ -47,8 +46,7 @@ class DiscoverPage:
         self.map_submit = SiteElement('a', el_id='geocoder-submit')
         self.list_tab = SiteElement('a', el_content='List')
         self.sort_order = SiteElement('select', el_id='id_sort_order')
-        self.sort_direction = SiteElement('select',
-                                          el_id='id_sort_direction')
+        self.sort_direction = SiteElement('select', el_id='id_sort_direction')
         self.col_headers = SiteElement('table', el_id='items-discovered',
                                        el_recursive=[SiteElement('thead'),
                                                      SiteElement('tr')])
@@ -61,8 +59,7 @@ class DiscoverPage:
         return SiteElement('table', el_id='items-discovered',
                            el_recursive=[SiteElement('thead'),
                                          SiteElement('tr'),
-                                         SiteElement('th[' +
-                                                     str(col_index) + ']')])
+                                         SiteElement('th[' + str(col_index) + ']')])
 
     def cell(self, col, row):
         """ Return the cell in the discover table, given row and column
@@ -70,10 +67,8 @@ class DiscoverPage:
         """
         return SiteElement('table', el_id='items-discovered',
                            el_recursive=[SiteElement('tbody'),
-                                         SiteElement('tr[' +
-                                                     str(row) + ']'),
-                                         SiteElement('td[' +
-                                                     str(col) + ']')])
+                                         SiteElement('tr[' + str(row) + ']'),
+                                         SiteElement('td[' + str(col) + ']')])
 
     def cell_href(self, col, row):
         """ Return the cell in the discover table, given row and column
@@ -82,10 +77,8 @@ class DiscoverPage:
         """
         return SiteElement('table', el_id='items-discovered',
                            el_recursive=[SiteElement('tbody'),
-                                         SiteElement('tr[' +
-                                                     str(row) + ']'),
-                                         SiteElement('td[' +
-                                                     str(col) + ']'),
+                                         SiteElement('tr[' + str(row) + ']'),
+                                         SiteElement('td[' + str(col) + ']'),
                                          SiteElement('a')])
 
     def cell_strong_href(self, col, row):
@@ -95,10 +88,8 @@ class DiscoverPage:
         """
         return SiteElement('table', el_id='items-discovered',
                            el_recursive=[SiteElement('tbody'),
-                                         SiteElement('tr[' +
-                                                     str(row) + ']'),
-                                         SiteElement('td[' +
-                                                     str(col) + ']'),
+                                         SiteElement('tr[' + str(row) + ']'),
+                                         SiteElement('td[' + str(col) + ']'),
                                          SiteElement('strong'),
                                          SiteElement('a')])
 
