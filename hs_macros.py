@@ -38,13 +38,11 @@ class Apps:
 class Discover:
     def sort_order(self, driver, option):
         """ Set the sort order to {{option}} """
-        DiscoverPage.sort_order.select_option_text(driver, option,
-                                                   SLEEP_TIME)
+        DiscoverPage.sort_order.select_option_text(driver, option, SLEEP_TIME)
 
     def sort_direction(self, driver, option):
         """ Set the sort direction to {{option}} """
-        DiscoverPage.sort_direction.select_option_text(driver, option,
-                                                       SLEEP_TIME)
+        DiscoverPage.sort_direction.select_option_text(driver, option, SLEEP_TIME)
 
     def to_resource(self, driver, title):
         """ Navigate to the {{title}} resource landing page by clicking
@@ -140,8 +138,7 @@ class Discover:
             filter_el.click(driver, SLEEP_TIME)
         if type(resource_type) is list:
             for resource_type_item in resource_type:
-                filter_el = DiscoverPage.filter_resource_type(
-                    resource_type_item)
+                filter_el = DiscoverPage.filter_resource_type(resource_type_item)
                 filter_el.click(driver, SLEEP_TIME)
         elif resource_type is not None:
             filter_el = DiscoverPage.filter_resource_type(resource_type)
@@ -162,8 +159,7 @@ class Discover:
             filter_el.click(driver, SLEEP_TIME)
         if type(sample_medium) is list:
             for sample_medium_item in sample_medium:
-                filter_el = DiscoverPage.filter_sample_medium(
-                    sample_medium_item)
+                filter_el = DiscoverPage.filter_sample_medium(sample_medium_item)
                 filter_el.click(driver, SLEEP_TIME)
         elif sample_medium is not None:
             filter_el = DiscoverPage.filter_sample_medium(sample_medium)
@@ -177,8 +173,7 @@ class Discover:
             filter_el.click(driver, SLEEP_TIME)
         if type(availability) is list:
             for availability_item in availability:
-                filter_el = DiscoverPage.filter_availability(
-                    availability_item)
+                filter_el = DiscoverPage.filter_availability(availability_item)
                 filter_el.click(driver, SLEEP_TIME)
         elif availability is not None:
             filter_el = DiscoverPage.filter_availability(availability)
@@ -188,12 +183,11 @@ class Discover:
 class Resource:
     def size_download(self, driver, BASE_URL):
         """ Check the size of the BagIt download """
-        download_href = \
-            ResourcePage.bagit.get_href(driver, BASE_URL)
-        os.system('wget -q ' + download_href)
+        download_href = ResourcePage.bagit.get_href(driver, BASE_URL)
+        os.system('wget -q {}'.format(download_href))
         download_file = download_href.split('/')[-1]
         file_size = os.stat(download_file).st_size
-        os.system('rm ' + download_file)
+        os.system('rm {}'.format(download_file))
         return file_size
 
 

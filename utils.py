@@ -57,9 +57,8 @@ class TestSystem:
     def page_source(self, driver):
         return driver.page_source
 
-    def back(self, driver):
-        self.check_language(driver)
-        driver.execute_script("window.history.go(-1)")
+    def back(self, driver, count=1):
+        driver.execute_script("window.history.go(-{})".format(count))
 
     def pull_texts(self, driver):
         elements = driver.find_elements_by_xpath('*')

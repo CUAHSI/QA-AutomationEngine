@@ -37,6 +37,7 @@ class Search:
     def is_legend_visible(self, driver):
         """ Click on the legend tab, within the search interface sidebar """
         SearchPage.legend_tab.click(driver, SLEEP_TIME)
+        # TODO Clean up below
         legend_vis = SearchPage.legend_img.get_attribute(driver, 'style')
         legend_vis = legend_vis.split(':')[-1]
         legend_vis = legend_vis.split(';')[0]
@@ -69,10 +70,8 @@ class Search:
         SearchPage.map_search.click(driver, SLEEP_TIME)
         SearchPage.map_search.clear_all_text(driver, SLEEP_TIME)
         SearchPage.map_search.inject_text(driver, location, SLEEP_TIME)
-        SearchPage.map_search.inject_text(driver, Keys.ARROW_DOWN,
-                                          SLEEP_TIME)
-        SearchPage.map_search.inject_text(driver, Keys.RETURN,
-                                          SLEEP_TIME)
+        SearchPage.map_search.inject_text(driver, Keys.ARROW_DOWN, SLEEP_TIME)
+        SearchPage.map_search.inject_text(driver, Keys.RETURN, SLEEP_TIME)
         time.sleep(SLEEP_TIME)
 
     def count_results(self, driver):
@@ -129,8 +128,7 @@ class Services:
         the {{org}} organization(s) and the {{titles}} titles
         """
         SearchPage.services.click(driver, SLEEP_TIME)
-        ServicesModal.table_count.select_option(driver, '100',
-                                                SLEEP_TIME)
+        ServicesModal.table_count.select_option(driver, '100', SLEEP_TIME)
         ServicesModal.sort_org.click(driver, SLEEP_TIME)
         if type(orgs) is list:
             for org in orgs:
@@ -140,10 +138,8 @@ class Services:
             ServicesModal.select_org(orgs).click(driver, SLEEP_TIME)
         if type(titles) is list:
             for title in titles:
-                ServicesModal.select_title(title).scroll_to(driver,
-                                                            SLEEP_TIME)
-                ServicesModal.select_title(title).multi_click(driver,
-                                                              SLEEP_TIME)
+                ServicesModal.select_title(title).scroll_to(driver, SLEEP_TIME)
+                ServicesModal.select_title(title).multi_click(driver, SLEEP_TIME)
         elif titles is not None:
             ServicesModal.select_title(titles).click(driver, SLEEP_TIME)
         ServicesModal.save.click(driver, SLEEP_TIME)
@@ -162,8 +158,7 @@ class Keywords:
         SearchPage.keywords.click(driver, SLEEP_TIME)
         KeywordsModal.full_list.click(driver, SLEEP_TIME)
         for keyword in keywords:
-            KeywordsModal.full_list_checkbox(keyword).click(driver,
-                                                            SLEEP_TIME)
+            KeywordsModal.full_list_checkbox(keyword).click(driver, SLEEP_TIME)
         KeywordsModal.search.click(driver, SLEEP_TIME)
 
 
@@ -299,10 +294,8 @@ class Zendesk:
         ZendeskWidget.helping.click(driver, SLEEP_TIME)
         SearchPage.zendesk.iframe_out(driver)
         ZendeskWidget.results.iframe_in(driver)
-        ZendeskWidget.search.inject_text(driver, search_text,
-                                         SLEEP_TIME)
-        ZendeskWidget.search.inject_text(driver, Keys.RETURN,
-                                         SLEEP_TIME)
+        ZendeskWidget.search.inject_text(driver, search_text, SLEEP_TIME)
+        ZendeskWidget.search.inject_text(driver, Keys.RETURN, SLEEP_TIME)
         ZendeskWidget.pull(article_text).click(driver, SLEEP_TIME)
         ZendeskWidget.more.scroll_to(driver, SLEEP_TIME)
         ZendeskWidget.more.click(driver, SLEEP_TIME)

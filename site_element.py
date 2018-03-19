@@ -40,22 +40,20 @@ class SiteElement:
                 """ Locates a website element, given the element type and id
                 """
                 if loc_child is None:
-                    el_xpath = "//" + self.el_type + \
-                               "[@id='" + self.el_id + "']"
+                    el_xpath = "//{}[@id='{}']".format(self.el_type, self.el_id)
                 else:
-                    el_xpath = ".//" + loc_child.el_type + \
-                               "[@id='" + loc_child.el_id + "']"
+                    el_xpath = ".//{}[@id='{}']".format(loc_child.el_type,
+                                                        loc_child.el_id)
                 target_el = loc_base.find_element_by_xpath(el_xpath)
                 return target_el
 
             def loc_by_name(loc_base, loc_child):
                 """ Locates a website element, given the name attribute """
                 if loc_child is None:
-                    el_xpath = "//" + self.el_type + \
-                               "[@name='" + self.el_name + "']"
+                    el_xpath = "//{}[@name='{}']".format(self.el_type, self.el_name)
                 else:
-                    el_xpath = ".//" + loc_child.el_type + \
-                               "[@name='" + loc_child.el_name + "']"
+                    el_xpath = ".//{}[@name='{}']".format(loc_child.el_type,
+                                                          loc_child.el_name)
                 target_el = loc_base.find_element_by_xpath(el_xpath)
                 return target_el
 
@@ -64,11 +62,11 @@ class SiteElement:
                 attribute
                 """
                 if loc_child is None:
-                    el_xpath = "//" + self.el_type + \
-                               "[@title='" + self.el_title + "']"
+                    el_xpath = "//{}[@title='{}']".format(self.el_type,
+                                                          self.el_title)
                 else:
-                    el_xpath = ".//" + loc_child.el_type + \
-                               "[@title='" + loc_child.el_title + "']"
+                    el_xpath = ".//{}[@title='{}']".format(loc_child.el_type,
+                                                           loc_child.el_title)
                 target_el = loc_base.find_element_by_xpath(el_xpath)
                 return target_el
 
@@ -77,12 +75,12 @@ class SiteElement:
                 attribute
                 """
                 if loc_child is None:
-                    el_xpath = "//" + self.el_type + \
-                               "[@placeholder='" + self.el_placeholder + "']"
+                    el_xpath = "//{}[@placeholder='{}']".format(self.el_type,
+                                                                self.el_placeholder)
                 else:
-                    el_xpath = ".//" + loc_child.el_type + \
-                               "[@placeholder='" + \
-                               loc_child.el_placeholder + "']"
+                    el_xpath = \
+                        ".//{}[@placeholder='{}']".format(loc_child.el_type,
+                                                          loc_child.el_placeholder)
                 target_el = loc_base.find_element_by_xpath(el_xpath)
                 return target_el
 
@@ -91,23 +89,22 @@ class SiteElement:
                 and href
                 """
                 if loc_child is None:
-                    el_xpath = "//" + self.el_type + \
-                               "[contains(@href,'" + self.el_href + "')]"
+                    el_xpath = "//{}[contains(@href,'{}')".format(self.el_type,
+                                                                  self.el_href)
                 else:
-                    el_xpath = ".//" + loc_child.el_type + \
-                               "[contains(@href,'" + \
-                               loc_child.el_href + "')]"
+                    el_xpath = ".//{}[contains(@href,'{}')".format(loc_child.el_type,
+                                                                   loc_child.el_href)
                 target_el = loc_base.find_element_by_xpath(el_xpath)
                 return target_el
 
             def loc_by_class(loc_base, loc_child):
                 """ Locates a website element, given the element class """
                 if loc_child is None:
-                    el_xpath = "//" + self.el_type + \
-                               "[@class='" + self.el_class + "']"
+                    el_xpath = "//{}[@class='{}']".format(self.el_type,
+                                                          self.el_class)
                 else:
-                    el_xpath = ".//" + loc_child.el_type + \
-                               "[@class='" + loc_child.el_class + "']"
+                    el_xpath = ".//{}[@class='{}']".format(loc_child.el_type,
+                                                           loc_child.el_class)
                 target_el = loc_base.find_element_by_xpath(el_xpath)
                 return target_el
 
@@ -116,13 +113,12 @@ class SiteElement:
                 text content
                 """
                 if loc_child is None:
-                    el_xpath = "//" + self.el_type + \
-                               "[contains(text(), '" + \
-                               self.el_content + "')]"
+                    el_xpath = "//{}[contains(text(),'{}')".format(self.el_type,
+                                                                   self.el_content)
                 else:
-                    el_xpath = ".//" + loc_child.el_type + \
-                               "[contains(text(), '" + \
-                               loc_child.el_content + "')]"
+                    el_xpath = \
+                        ".//{}[contains(text(),'{}')".format(loc_child.el_type,
+                                                             loc_child.el_content)
                 target_el = loc_base.find_element_by_xpath(el_xpath)
                 return target_el
 
@@ -138,9 +134,9 @@ class SiteElement:
             def loc_by_nothing(loc_base, loc_child):
                 """ Locates a website element based only on the tag/type """
                 if loc_child is None:
-                    el_xpath = "//" + self.el_type
+                    el_xpath = "//{}".format(self.el_type)
                 else:
-                    el_xpath = ".//" + loc_child.el_type
+                    el_xpath = ".//{}".format(loc_child.el_type)
                 target_el = loc_base.find_element_by_xpath(el_xpath)
                 return target_el
 
@@ -150,7 +146,8 @@ class SiteElement:
                 defining_el = loc_child  # For relative identification
 
             # Hierarchy for identification using element attributes is
-            # id->name->title->href->class->content->DOM->type(no attributes)
+            # id->name->title->placeholder->href->class->content->DOM->
+            # type(no attributes)
             if defining_el.el_id is not None:
                 target_el = loc_by_id(loc_base, loc_child)
             elif defining_el.el_name is not None:
