@@ -90,10 +90,11 @@ class SiteElement:
                 """
                 if loc_child is None:
                     el_xpath = "//{}[contains(@href,'{}')]".format(self.el_type,
-                                                                  self.el_href)
+                                                                   self.el_href)
                 else:
-                    el_xpath = ".//{}[contains(@href,'{}')]".format(loc_child.el_type,
-                                                                   loc_child.el_href)
+                    el_xpath = \
+                        ".//{}[contains(@href,'{}')]".format(loc_child.el_type,
+                                                             loc_child.el_href)
                 target_el = loc_base.find_element_by_xpath(el_xpath)
                 return target_el
 
@@ -114,11 +115,11 @@ class SiteElement:
                 """
                 if loc_child is None:
                     el_xpath = "//{}[contains(text(),'{}')]".format(self.el_type,
-                                                                   self.el_content)
+                                                                    self.el_content)
                 else:
                     el_xpath = \
                         ".//{}[contains(text(),'{}')]".format(loc_child.el_type,
-                                                             loc_child.el_content)
+                                                              loc_child.el_content)
                 target_el = loc_base.find_element_by_xpath(el_xpath)
                 return target_el
 

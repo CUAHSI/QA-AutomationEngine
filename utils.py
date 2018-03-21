@@ -5,7 +5,6 @@ directly with the Selenium driver
 import re
 import time
 
-from functools import reduce
 from modes import setup_mode
 
 # General testing parameters
