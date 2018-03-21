@@ -2,8 +2,10 @@
  execution.  Unlike hc_macros or hs_macros, these methods interact
 directly with the Selenium driver
 """
+import re
 import time
 
+from functools import reduce
 from modes import setup_mode
 
 # General testing parameters
@@ -60,13 +62,13 @@ class TestSystem:
     def back(self, driver, count=1):
         driver.execute_script("window.history.go(-{})".format(count))
 
-    def pull_texts(self, driver):
+    def pull_words(self, driver):
         elements = driver.find_elements_by_xpath('*')
-        texts = []
-        for element in elements:
-            if element.text is not None:
-                texts += element.text.split(' ')
-        return texts
+        texts = [element.text for element in elements]
+        contents = [text for text in texts if text is not None]
+        alpha_contents = [re.sub('[^A-Za-z]', ' ', content) for content in contents]
+        words = [word for content in alpha_contents for word in content.split(' ')]
+        return words
 
     def check_language(self, driver):
         """ Confirms that language is consistent with CUAHSI standards for
@@ -75,23 +77,15 @@ class TestSystem:
         lang_dict = {}
         with open("config/language.yaml", 'r') as stream:
             lines = stream.readlines()
-        for line in lines:
-            if line[0:3] != '###':
-                lang_dict[line.split(':')[0].strip()] = (
-                    line.split(':')[1].strip())
-        pulled_words = self.pull_texts(driver)
-        words = []
-        for pulled_word in pulled_words:
-            words += pulled_word.split('\n')
-        words = list(filter(None, words))
-        words = [word.replace('.', '') for word in words]
-        words = [word.replace(',', '') for word in words]
-        words = [word.replace('(', '') for word in words]
-        words = [word.replace(')', '') for word in words]
-        for word in words:
-            if word in lang_dict.keys():
-                print('\n', driver.current_url, '\n',
-                      word + ' should be changed to ' + lang_dict[word])
+        config_lines = [line for line in lines if '###' not in line]
+        for config_line in config_lines:
+            lang_key, lang_value = config_line.split(':')
+            lang_dict[lang_key] = lang_value
+        words = self.pull_words(driver)
+        bad_words = [word for word in words if word in lang_dict.keys()]
+        print(driver.current_url)
+        for bad_word in bad_words:
+            print('{} -> {}'.format(bad_word, lang_dict[bad_word]))
 
 
 External = External()
