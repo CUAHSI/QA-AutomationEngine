@@ -92,17 +92,6 @@ $ python3 combinatorial.py --experiments 8 --factors 2 --specification 3 2 2 2
 ```
 Note: This utility is for very simple DOE-based test case generation only.  Further, the number of experiments should be well above the feasible minimum in order to generate a solution quickly.  The brute force approach quickly becomes impractical for large and close-to-optimal DOE problems.
 
-## Creating Test Cases
-The [PDF documentation](documentation/beta-release/CUAHSIAutomatedTestingEngineBeta.pdf) contained in this repository provides a deeper explanation of the test suite framework.  However, the general idea is to write test cases at the most abstract level, then support that with new classes, attributes, and methods in the lower abstraction levels as needed.
-
-In the case of the HydroClient software system, test cases should be created in hydroclient.py.  Consider a test case which involves running a map search, filtering by data service, then exporting to the workspace.  The top level test case script in [hydroclient.py](hydroclient.py) would likely only need four lines - one for each of the three steps above and one assert statement to confirm expected test results.  This test case is supported at the lower levels by (in decreasing levels of abstraction):
-
-1) [HydroClient macros](hc_macros.py), which captures common series of actions while working with HydroClient.  In our example, the map search step would be defined here and would include clicking the location search box, clearing the box of any existing text, injecting the desired text, then clicking the location search button.
-2) [HydroClient elements](hc_elements.py), which contains attributes and methods for specific element identification on the page.  In our example, the location search field and the location search button would both be defined at this level.
-3) [Site elements](site_elements.py) handles all the low level interactions with off-the-shelf Selenium.  In our example, the click, clear_all_text, and inject_text methods would be defined at this level.  These methods may involve a large number of Selenium commands and should use best practices in simulating real user behavior.  For instance, non-CUAHSI test scripts commonly inject large strings of text into fields instantaneously - the inject_text method within [site_elements.py](site_elements.py) has a small pause between simulated key presses to better mimic real user behavior.  The site elements module is common to all CUAHSI automated testing suites.
-
-The [utilities](utils.py) are also common to all CUAHSI test suites.  These utilities support those rare actions which do not involve page element interaction, and therefore cannot be handled through the framework above.
-
 ### Test Assets Generation
 CUAHSI software systems sometimes require test files in order verify and validate the system.  The utilities to automatically generate these files are deliberately independent from the automated testing system.  This enables not only the automated test system to use these utilities, but also the greater team at large.  The [assets](assets) folder contains the test file generation utilities.
 
@@ -112,6 +101,17 @@ $ python3 gen_all.py --sets 3 --methods 4 --sites 5 --sources 6 --variables 7
 ```
 As one would expect, this generates a methods.csv file with 4 records, a sites.csv file with 5 records, a sources.csv file with 6 records, and a variables.csv file with 7 records.  The number of data value records will typically far exceed the number of records for the metadata csv files previously described.  As a result of this size, the data value records must sometimes be uploaded in chunks (multiple files).  The "sets" argument dictates how many data value files are generated, with each file having 250k records.  This number of records per file strikes a good balance between upload speed and upload size.
 
+## Creating Test Cases
+
+The [PDF documentation](documentation/beta-release/CUAHSIAutomatedTestingEngineBeta.pdf) contained in this repository provides a deeper explanation of the test suite framework.  However, the general idea is to write test cases at the most abstract level, then support that with new classes, attributes, and methods in the lower abstraction levels as needed.
+
+In the case of the HydroClient software system, test cases should be created in hydroclient.py.  Consider a test case which involves running a map search, filtering by data service, then exporting to the workspace.  The top level test case script in [hydroclient.py](hydroclient.py) would likely only need four lines - one for each of the three steps above and one assert statement to confirm expected test results.  This test case is supported at the lower levels by (in decreasing levels of abstraction):
+
+1) [HydroClient macros](hc_macros.py), which captures common series of actions while working with HydroClient.  In our example, the map search step would be defined here and would include clicking the location search box, clearing the box of any existing text, injecting the desired text, then clicking the location search button.
+2) [HydroClient elements](hc_elements.py), which contains attributes and methods for specific element identification on the page.  In our example, the location search field and the location search button would both be defined at this level.
+3) [Site elements](site_elements.py) handles all the low level interactions with off-the-shelf Selenium.  In our example, the click, clear_all_text, and inject_text methods would be defined at this level.  These methods may involve a large number of Selenium commands and should use best practices in simulating real user behavior.  For instance, non-CUAHSI test scripts commonly inject large strings of text into fields instantaneously - the inject_text method within [site_elements.py](site_elements.py) has a small pause between simulated key presses to better mimic real user behavior.  The site elements module is common to all CUAHSI automated testing suites.
+
+The [utilities](utils.py) are also common to all CUAHSI test suites.  These utilities support those rare actions which do not involve page element interaction, and therefore cannot be handled through the framework above.
 
 ## Maintainers
 
