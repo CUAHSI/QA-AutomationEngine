@@ -28,8 +28,8 @@ for i in range(0, count):
     email = ''.join(email)
     citation = [random.choice(string.ascii_letters) for i in range(0, 64)]
     citation = ''.join(citation)
-    source = [source_code, organization, source_desc, source_link,
-              contact_name, email, citation]
-    source = ['"' + field + '"' for field in source]
+    unquoted_row = [source_code, organization, source_desc, source_link,
+                    contact_name, email, citation]
+    row = ['"{}"'.format(field) for field in unquoted_row]
     with open('sources.csv', 'a') as sources_file:
-        sources_file.write(','.join(source) + '\n')
+        sources_file.write(','.join(row) + '\n')

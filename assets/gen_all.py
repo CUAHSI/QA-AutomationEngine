@@ -20,6 +20,3 @@ os.system('python3 gen_datavalues.py' +
           ' --sites ' + args.sites +
           ' --sources ' + args.sources +
           ' --variables ' + args.variables)
-
-
-

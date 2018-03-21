@@ -21,11 +21,13 @@ for i in range(0, count):
     site_name = ''.join(site_name)
     latitude = str(90*random.random()-90*random.random())[:8]
     longitude = str(180*random.random()-180*random.random())[:8]
+    county = ''
+    site_state = ''
     datum_srs = 'WGS84'
-    elevation = str(random.randint(1,500))
+    elevation = str(random.randint(1, 500))
     site_type = 'Stream'
-    site = [site_code, site_name, latitude, longitude, '', '',
-            datum_srs, elevation, site_type]
-    site = ['"' + field + '"' for field in site]
+    unquoted_row = [site_code, site_name, latitude, longitude, county, site_state,
+                    datum_srs, elevation, site_type]
+    row = ['"{}"'.format(field) for field in unquoted_row]
     with open('sites.csv', 'a') as sites_file:
-        sites_file.write(','.join(site) + '\n')
+        sites_file.write(','.join(row) + '\n')
