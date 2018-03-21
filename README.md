@@ -103,6 +103,16 @@ In the case of the HydroClient software system, test cases should be created in 
 
 The [utilities](utils.py) are also common to all CUAHSI test suites.  These utilities support those rare actions which do not involve page element interaction, and therefore cannot be handled through the framework above.
 
+### Test Assets Generation
+CUAHSI software systems sometimes require test files in order verify and validate the system.  The utilities to automatically generate these files are deliberately independent from the automated testing system.  This enables not only the automated test system to use these utilities, but also the greater team at large.  The [assets](assets) folder contains the test file generation utilities.
+
+For HydroServer test files generation, the user must specify the number of data value sets, methods, sites, sources, and variables.  An example script call is provided below.
+```
+$ python3 gen_all.py --sets 3 --methods 4 --sites 5 --sources 6 --variables 7
+```
+As one would expect, this generates a methods.csv file with 4 records, a sites.csv file with 5 records, a sources.csv file with 6 records, and a variables.csv file with 7 records.  The number of data value records will typically far exceed the number of records for the metadata csv files previously described.  As a result of this size, the data value records must sometimes be uploaded in chunks (multiple files).  The "sets" argument dictates how many data value files are generated, with each file having 250k records.  This number of records per file strikes a good balance between upload speed and upload size.
+
+
 ## Maintainers
 
 [@cuahsi](https://github.com/cuahsi).
