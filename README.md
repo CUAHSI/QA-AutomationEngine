@@ -95,7 +95,13 @@ Note: This utility is for very simple DOE-based test case generation only.  Furt
 ### Test Assets Generation
 CUAHSI software systems sometimes require test files in order verify and validate the system.  The utilities to automatically generate these files are deliberately independent from the automated testing system.  This enables not only the automated test system to use these utilities, but also the greater team at large.  The [assets](assets) folder contains the test file generation utilities.
 
-For HydroServer test files generation, the user must specify the number of data value sets, methods, sites, sources, and variables.  An example script call is provided below.
+For HydroServer test files generation, a few environment variables must be defined:
+1) GENSERVER is the Azure SQL database server name
+2) GENDB is the database name
+3) GENUSER is the username for SQL server access - the account must have the authorization to run ad hoc SELECT queries
+4) GENPASSWD is the password for SQL server access
+
+Then, the user must specify the number of data value sets, methods, sites, sources, and variables.  An example script call is provided below.
 ```
 $ python3 gen_all.py --sets 3 --methods 4 --sites 5 --sources 6 --variables 7
 ```
