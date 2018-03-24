@@ -1,5 +1,4 @@
 propsfile
-settings.py
-db.sqlite3
+*.bak
 *.log
 __pycache__

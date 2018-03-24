@@ -2,6 +2,7 @@
  execution.  Unlike hc_macros or hs_macros, these methods interact
 directly with the Selenium driver
 """
+import re
 import time
 
 from modes import setup_mode
@@ -18,6 +19,7 @@ class External:
         win_handle = driver.window_handles[-1]
         driver.switch_to.window(win_handle)
         time.sleep(SLEEP_TIME)
+        TestSystem.check_language(driver)
 
     def switch_old_page(self, driver):
         win_handle = driver.window_handles[-2]
@@ -39,6 +41,7 @@ class External:
         driver.switch_to.window(new_handle)
         time.sleep(SLEEP_TIME/2)
         source = driver.page_source
+        TestSystem.check_language(driver)
         driver.switch_to.window(orig_handle)
         time.sleep(SLEEP_TIME/2)
         return source
@@ -57,6 +60,31 @@ class TestSystem:
 
     def back(self, driver, count=1):
         driver.execute_script("window.history.go(-{})".format(count))
+
+    def pull_words(self, driver):
+        elements = driver.find_elements_by_xpath('*')
+        texts = [element.text for element in elements]
+        contents = [text for text in texts if text is not None]
+        alpha_contents = [re.sub('[^A-Za-z]', ' ', content) for content in contents]
+        words = [word for content in alpha_contents for word in content.split(' ')]
+        return words
+
+    def check_language(self, driver):
+        """ Confirms that language is consistent with CUAHSI standards for
+        terminology, capitalization, etc.
+        """
+        lang_dict = {}
+        with open("config/language.yaml", 'r') as stream:
+            lines = stream.readlines()
+        config_lines = [line for line in lines if '###' not in line]
+        for config_line in config_lines:
+            lang_key, lang_value = config_line.split(':')
+            lang_dict[lang_key] = lang_value
+        words = self.pull_words(driver)
+        bad_words = [word for word in words if word in lang_dict.keys()]
+        print(driver.current_url)
+        for bad_word in bad_words:
+            print('{} -> {}'.format(bad_word, lang_dict[bad_word]))
 
 
 External = External()
