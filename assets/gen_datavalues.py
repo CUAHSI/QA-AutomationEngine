@@ -4,10 +4,9 @@ import random
 
 from datetime import datetime, timedelta
 
-size = 250000
-
 parser = argparse.ArgumentParser()
 parser.add_argument('--sets')
+parser.add_argument('--size')
 parser.add_argument('--methods')
 parser.add_argument('--sites')
 parser.add_argument('--sources')
@@ -15,6 +14,10 @@ parser.add_argument('--variables')
 args = parser.parse_args()
 
 sets = int(args.sets)
+if args.size is not None:
+    size = int(args.size)
+else:
+    size = 250000
 methods = int(args.methods)
 sites = int(args.sites)
 sources = int(args.sources)
