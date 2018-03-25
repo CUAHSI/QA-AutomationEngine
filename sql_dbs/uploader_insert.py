@@ -52,56 +52,46 @@ def post_datavalues(cursor, datavalues_csv):
                                  datavalue_csv[9], 'SOURCEID')
         variableid = convert_to_id(cursor, 'Variables', 'VARIABLECODE',
                                    datavalue_csv[1], 'VARIABLEID')
-        datavalue_db = [ind,  # valueid
-                        datavalue_csv[2],  # datavalue
-                        '',  # valueaccuracy
+        datavalue_db = [datavalue_csv[2],  # datavalue
                         datavalue_csv[3],  # localdatetime
                         datavalue_csv[4],  # utcoffset
                         datavalue_csv[5],  # datetimeutc
                         siteid,  # siteid
                         variableid,  # variableid
-                        '',  # offsetvalue
-                        '',  # offsettypeid
                         datavalue_csv[7],  # censorcode
-                        '',  # qualifierid
                         methodid,  # methodid
                         sourceid,  # sourceid
-                        '',  # sampleid
-                        '',  # derivedfromid
                         datavalue_csv[6]  # qualitycontrollevelid
                         ]
-        nvarchars = [3, 5, 10]  # no 2 b/c empty
-        datavalue_labels = ['VALUEID', 'DATAVALUE', 'VALUEACCURACY',
-                            'LOCALDATETIME', 'UTCOFFSET', 'DATETIMEUTC',
-                            'SITEID', 'VARIABLEID', 'OFFSETVALUE',
-                            'OFFSETTYPEID', 'CENSORCODE', 'QUALIFIERID',
-                            'METHODID', 'SOURCEID', 'SAMPLEID', 'DERIVEDFROMID',
+        nvarchars = [1, 3, 6]
+        datavalue_labels = ['DATAVALUE', 'LOCALDATETIME', 'UTCOFFSET', 'DATETIMEUTC',
+                            'SITEID', 'VARIABLEID', 'CENSORCODE',
+                            'METHODID', 'SOURCEID',
                             'QUALITYCONTROLLEVELID']
         datavalue_db = format_fields(datavalue_db, nvarchars)
-        print('INSERT INTO DataValues ({}) VALUES ({});'.format(
+        cursor.execute('INSERT INTO DataValues ({}) VALUES ({});'.format(
             ', '.join(datavalue_labels), ', '.join(datavalue_db)))
+    cursor.commit()
 
 
 def post_methods(cursor, methods_csv):
     for ind, method_csv in enumerate(methods_csv, start=1):
         method_csv = convert_to_list(method_csv)
-        method_db = [ind,  # methodid
-                     method_csv[1],  # methoddescription
-                     '',  # methodlink
+        method_db = [method_csv[1],  # methoddescription
                      method_csv[0]  # methodcode
                      ]
-        nvarchars = [1, 3]  # no 2 b/c empty
-        method_labels = ['METHODID', 'METHODDESCRIPTION', 'METHODLINK', 'METHODCODE']
+        nvarchars = [0, 1]
+        method_labels = ['METHODDESCRIPTION', 'METHODCODE']
         method_db = format_fields(method_db, nvarchars)
-        print('INSERT INTO Methods ({}) VALUES ({});'.format(
+        cursor.execute('INSERT INTO Methods ({}) VALUES ({});'.format(
             ', '.join(method_labels), ', '.join(method_db)))
+    cursor.commit()
 
 
 def post_sources(cursor, sources_csv):
     for ind, source_csv in enumerate(sources_csv, start=1):
         source_csv = convert_to_list(source_csv)
-        source_db = [ind,  # sourceid
-                     source_csv[1],  # organization
+        source_db = [source_csv[1],  # organization
                      source_csv[2],  # sourcedescription
                      source_csv[3],  # sourcelink
                      source_csv[4],  # contactname
@@ -115,14 +105,15 @@ def post_sources(cursor, sources_csv):
                      '0',  # metadataid
                      source_csv[0]  # sourcecode
                      ]
-        nvarchars = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13]
-        source_labels = ['SOURCEID', 'ORGANIZATION', 'SOURCEDESCRIPTION',
+        nvarchars = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12]
+        source_labels = ['ORGANIZATION', 'SOURCEDESCRIPTION',
                          'SOURCELINK', 'CONTACTNAME', 'PHONE', 'EMAIL',
                          'ADDRESS', 'CITY', 'STATE', 'ZIPCODE', 'CITATION',
                          'METADATAID', 'SOURCECODE']
         source_db = format_fields(source_db, nvarchars)
-        print('INSERT INTO Sources ({}) VALUES ({});'.format(
+        cursor.execute('INSERT INTO Sources ({}) VALUES ({});'.format(
             ', '.join(source_labels), ', '.join(source_db)))
+    cursor.commit()
 
 
 def post_sites(cursor, sites_csv):
@@ -130,31 +121,26 @@ def post_sites(cursor, sites_csv):
         site_csv = convert_to_list(site_csv)
         latlongdatumid = convert_to_id(cursor, 'SpatialReferences', 'SRSNAME',
                                        site_csv[6], 'SpatialReferenceID')
-        site_db = [ind,  # siteid
-                   site_csv[0],  # sitecode
+        site_db = [site_csv[0],  # sitecode
                    site_csv[1],  # sitename
                    site_csv[2],  # latitude
                    site_csv[3],  # longitude
                    latlongdatumid,  # latlongdatumid
                    site_csv[7],  # elevation_m
-                   '',  # vertical_datum
-                   '',  # localx
-                   '',  # localy
-                   '',  # localprojectionid
-                   '',  # posaccuracy_m
                    site_csv[5],  # state
                    site_csv[4],  # county
-                   '',  # comments
-                   site_csv[8]  # site_type
+                   site_csv[8]  # sitetype
                    ]
-        nvarchars = [1, 2, 15]  # no 7, 12, 13, or 14 b/c empty
-        site_labels = ['SITEID', 'SITECODE', 'SITENAME', 'LATITUDE', 'LONGITUDE',
-                       'LATLONGDATUMID', 'ELEVATION_M', 'VERTICAL_DATUM', 'LOCALX',
-                       'LOCALY', 'LOCALPROJECTIONID', 'POSACCURACY_M', 'STATE',
-                       'COUNTY', 'COMMENTS', 'SITE_TYPE']
+        nvarchars = [0, 1, 6, 7, 8]
+        site_labels = ['SITECODE', 'SITENAME', 'LATITUDE', 'LONGITUDE',
+                       'LATLONGDATUMID', 'ELEVATION_M', 'STATE',
+                       'COUNTY', 'SITETYPE']
         site_db = format_fields(site_db, nvarchars)
         print('INSERT INTO Sites ({}) VALUES ({});'.format(
             ', '.join(site_labels), ', '.join(site_db)))
+        cursor.execute('INSERT INTO Sites ({}) VALUES ({});'.format(
+            ', '.join(site_labels), ', '.join(site_db)))
+    cursor.commit()
 
 
 def post_variables(cursor, variables_csv):
@@ -164,8 +150,7 @@ def post_variables(cursor, variables_csv):
                                         variable_csv[2], 'UNITSID')
         timeunitsid = convert_to_id(cursor, 'Units', 'UNITSNAME',
                                     variable_csv[8], 'UNITSID')
-        variable_db = [ind,  # variableid
-                       variable_csv[0],  # variablecode
+        variable_db = [variable_csv[0],  # variablecode
                        variable_csv[1],  # variablename
                        'Not applicable',  # speciation
                        variableunitsid,  # variableunitsid
@@ -178,14 +163,15 @@ def post_variables(cursor, variables_csv):
                        variable_csv[9],  # general category
                        variable_csv[10]  # nodatavalue
                        ]
-        nvarchars = [1, 2, 3, 5, 6, 10, 11]
-        variable_labels = ['VARIABLEID', 'VARIABLECODE', 'VARIABLENAME',
+        nvarchars = [0, 1, 2, 4, 5, 9, 10]
+        variable_labels = ['VARIABLECODE', 'VARIABLENAME',
                            'SPECIATION', 'VARIABLEUNITSID', 'SAMPLEMEDIUM',
                            'VALUETYPE', 'ISREGULAR', 'TIMESUPPORT', 'TIMEUNITSID',
                            'DATATYPE', 'GENERALCATEGORY', 'NODATAVALUE']
         variable_db = format_fields(variable_db, nvarchars)
-        print('INSERT INTO Variables ({}) VALUES ({});'.format(
+        cursor.execute('INSERT INTO Variables ({}) VALUES ({});'.format(
             ', '.join(variable_labels), ', '.join(variable_db)))
+    cursor.commit()
 
 
 driver = '{ODBC Driver 13 for SQL Server}'
