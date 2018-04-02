@@ -5,7 +5,7 @@ import sys
 import unittest
 
 from selenium import webdriver
-from hs_macros import Home, Apps, Discover, Resource, Help
+from hs_macros import Home, Apps, Discover, Resource, Help, API
 from utils import External, TestSystem
 
 # Test case parameters
@@ -29,7 +29,7 @@ class HydroshareTestSuite(unittest.TestCase):
         else:
             driver = webdriver.Firefox(profile)
         driver.get(BASE_URL)
-        driver.implicitly_wait(10)
+        driver.implicitly_wait(20)
 
     def tearDown(self):
         """ Tear down test environment after execution """
@@ -123,6 +123,53 @@ class HydroshareTestSuite(unittest.TestCase):
             Help.open_core(driver, ind)
             oracle(core_topic)
             Help.to_core_breadcrumb(driver)
+
+    def test_B_000009(self):
+        """ Confirms absense of errors for the basic get methods within hydroshare
+        api that use just a resource id required parameter
+        """
+        def oracle(response_code):
+            self.assertEqual(response_code, '200')
+        resource_id = '927094481da54af38ffb6f0c39ad8787'
+        endpoints = ['/hsapi/resource/{id}/',
+                     '/hsapi/resource/{id}/file_list/',
+                     '/hsapi/resource/{id}/files/',
+                     '/hsapi/resource/{id}/map/',
+                     '/hsapi/resource/{id}/scimeta/']
+        TestSystem.to_url(driver, '{}/hsapi/'.format(BASE_URL))
+        API.expand_hsapi(driver)
+        for endpoint in endpoints:
+            API.toggle_endpoint(driver, endpoint, 'GET')
+            API.set_resource_id(driver, endpoint, 'GET', resource_id)
+            API.submit(driver, endpoint, 'GET')
+            response_code = API.response_code(driver, endpoint, 'GET')
+            oracle(response_code)
+            API.toggle_endpoint(driver, endpoint, 'GET')
+
+    def test_B_000010(self):
+        """ Confirms absense of errors for the basic get methods within hydroshare
+        api that require no parameters
+        """
+        def oracle(response_code):
+            """ Response code from api endpoint call is 200 """
+            self.assertEqual(response_code, '200')
+        endpoints = ['/hsapi/dictionary/universities/',
+                     '/hsapi/resource/',
+                     '/hsapi/resource/types/',
+                     '/hsapi/resourceList/',
+                     '/hsapi/resourceTypes/',
+                     '/hsapi/user/',
+                     '/hsapi/userInfo/']
+        TestSystem.to_url(driver, '{}/hsapi/'.format(BASE_URL))
+        API.expand_hsapi(driver)
+        for endpoint in endpoints:
+            API.toggle_endpoint(driver, endpoint, 'GET')
+            API.submit(driver, endpoint, 'GET')
+            API.response_code(driver, endpoint, 'GET')
+            TestSystem.wait(3)  # wait 3 seconds for empty field population
+            response_code = API.response_code(driver, endpoint, 'GET')
+            oracle(response_code)
+            API.toggle_endpoint(driver, endpoint, 'GET')
 
 
 if __name__ == '__main__':

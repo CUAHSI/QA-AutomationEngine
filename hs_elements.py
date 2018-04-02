@@ -150,8 +150,47 @@ class HelpPage:
                                 SiteElement('div')]))
 
 
+class APIPage:
+    def __init__(self):
+        self.hsapi = SiteElement('*', el_id='endpointListTogger_hsapi')
+        self.endpoint_list = SiteElement('*', el_id='hsapi_endpoint_list')
+
+    def path_by_index(self, index):
+        return SiteElement('*', el_id='hsapi_endpoint_list',
+                           el_recursive=[SiteElement('li[{}]'.format(index)),
+                                         SiteElement('span', el_class='path'),
+                                         SiteElement('a')])
+
+    def type_by_index(self, index):
+        return SiteElement('*', el_id='hsapi_endpoint_list',
+                           el_recursive=[SiteElement('li[{}]'.format(index)),
+                                         SiteElement('span', el_class='http_method'),
+                                         SiteElement('a')])
+
+    def parameter_by_index(self, index):
+        return SiteElement('*', el_id='hsapi_endpoint_list',
+                           el_recursive=[SiteElement('li[{}]'.format(index)),
+                                         SiteElement('tbody',
+                                                     el_class='operation-params'),
+                                         SiteElement('input',
+                                                     el_class='parameter required')])
+
+    def submit(self, index):
+        return SiteElement('*', el_id='hsapi_endpoint_list',
+                           el_recursive=[SiteElement('li[{}]'.format(index)),
+                                         SiteElement('input', el_class='submit')])
+
+    def response_code(self, index):
+        return SiteElement('*', el_id='hsapi_endpoint_list',
+                           el_recursive=[SiteElement('li[{}]'.format(index)),
+                                         SiteElement('div',
+                                                     el_class='block response_code'),
+                                         SiteElement('pre')])
+
+
 HomePage = HomePage()
 AppsPage = AppsPage()
 DiscoverPage = DiscoverPage()
 ResourcePage = ResourcePage()
 HelpPage = HelpPage()
+APIPage = APIPage()

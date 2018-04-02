@@ -49,6 +49,10 @@ class External:
 
 class TestSystem:
     """ General utilities for Hydroclient test case creation """
+    def to_url(self, driver, url):
+        driver.get(url)
+        time.sleep(3*SLEEP_TIME)
+
     def title(self, driver):
         return driver.title
 

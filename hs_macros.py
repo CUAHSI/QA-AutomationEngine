@@ -1,7 +1,8 @@
 import os
 
 from dateutil import parser
-from hs_elements import HomePage, AppsPage, DiscoverPage, ResourcePage, HelpPage
+from hs_elements import HomePage, AppsPage, DiscoverPage, ResourcePage, HelpPage, \
+    APIPage
 from modes import setup_mode
 
 # Testing parameters
@@ -208,8 +209,40 @@ class Help:
         HelpPage.core_breadcrumb.click(driver, SLEEP_TIME)
 
 
+class API:
+    def expand_hsapi(self, driver):
+        APIPage.hsapi.click(driver, SLEEP_TIME)
+
+    def endpoint_index(self, driver, path, method):
+        num_endpoints = APIPage.endpoint_list.get_immediate_child_count(driver)
+        for i in range(1, num_endpoints+1):
+            check_path = APIPage.path_by_index(i).get_text(driver)
+            check_method = APIPage.type_by_index(i).get_text(driver)
+            if check_path == path and check_method == method:
+                return i
+        return 0
+
+    def toggle_endpoint(self, driver, path, method):
+        endpoint_ind = self.endpoint_index(driver, path, method)
+        APIPage.path_by_index(endpoint_ind).click(driver, SLEEP_TIME)
+
+    def set_resource_id(self, driver, path, method, resource_id):
+        endpoint_ind = self.endpoint_index(driver, path, method)
+        APIPage.parameter_by_index(endpoint_ind).inject_text(driver, resource_id,
+                                                             SLEEP_TIME)
+
+    def submit(self, driver, path, method):
+        endpoint_ind = self.endpoint_index(driver, path, method)
+        APIPage.submit(endpoint_ind).click(driver, SLEEP_TIME)
+
+    def response_code(self, driver, path, method):
+        endpoint_ind = self.endpoint_index(driver, path, method)
+        return APIPage.response_code(endpoint_ind).get_text(driver)
+
+
 Home = Home()
 Apps = Apps()
 Discover = Discover()
 Resource = Resource()
 Help = Help()
+API = API()
