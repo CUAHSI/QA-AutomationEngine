@@ -6,6 +6,9 @@ class HomePage:
         self.to_discover = SiteElement('li', el_id='dropdown-menu-search')
         self.to_apps = SiteElement('*', el_id='dropdown-menu-' +
                                    'https:--www.hydroshare.org-apps-')
+        self.to_help = SiteElement('*', el_id='dropdown-menu-' +
+                                   'http:--help.hydroshare.org',
+                                   el_content='HELP')
 
 
 class AppsPage:
@@ -131,7 +134,24 @@ class ResourcePage:
                                  'Zipped BagIt Archive')
 
 
+class HelpPage:
+    def __init__(self):
+        self.core_root = \
+            SiteElement('div', el_id='content',
+                        el_recursive=[SiteElement('div', el_class='row')])
+        self.core_breadcrumb = SiteElement('li', el_id='breadcrumb-menu-home')
+
+    def core_item(self, index):
+        return SiteElement('div', el_id='content',
+                           el_recursive=(
+                               [SiteElement('div', el_class='row'),
+                                SiteElement(el_dom='./div[{}]'.format(index)),
+                                SiteElement('div', el_class='topic-name'),
+                                SiteElement('div')]))
+
+
 HomePage = HomePage()
 AppsPage = AppsPage()
 DiscoverPage = DiscoverPage()
 ResourcePage = ResourcePage()
+HelpPage = HelpPage()

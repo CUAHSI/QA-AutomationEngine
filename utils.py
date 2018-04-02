@@ -60,6 +60,7 @@ class TestSystem:
 
     def back(self, driver, count=1):
         driver.execute_script("window.history.go(-{})".format(count))
+        time.sleep(SLEEP_TIME)
 
     def pull_words(self, driver):
         elements = driver.find_elements_by_xpath('*')

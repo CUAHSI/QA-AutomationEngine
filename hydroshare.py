@@ -1,10 +1,11 @@
 """ Runs various smoke tests for the hydroshare.org """
 import argparse
+import re
 import sys
 import unittest
 
 from selenium import webdriver
-from hs_macros import Home, Apps, Discover, Resource
+from hs_macros import Home, Apps, Discover, Resource, Help
 from utils import External, TestSystem
 
 # Test case parameters
@@ -105,6 +106,23 @@ class HydroshareTestSuite(unittest.TestCase):
             Apps.to_resource(driver, i+1)
             oracle(app_name, External.source_new_page(driver))
             TestSystem.back(driver)
+
+    def test_B_000008(self):
+        """ Checks all HydroShare Help links to confirm links are intact
+        and that the topic title words come up in the associated help page
+        """
+        def oracle(core_topic):
+            words_string = re.sub('[^A-Za-z]', ' ', core_topic)
+            for word in words_string.split(' '):
+                self.assertIn(word, TestSystem.page_source(driver))
+        Home.to_help(driver)
+        core_count = Help.count_core(driver)
+        core_topics = [Help.get_core_topic(driver, i+1)
+                       for i in range(0, core_count)]
+        for ind, core_topic in enumerate(core_topics, 1):  # xpath ind start at 1
+            Help.open_core(driver, ind)
+            oracle(core_topic)
+            Help.to_core_breadcrumb(driver)
 
 
 if __name__ == '__main__':

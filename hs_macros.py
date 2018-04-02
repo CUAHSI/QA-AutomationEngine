@@ -1,7 +1,7 @@
 import os
 
 from dateutil import parser
-from hs_elements import HomePage, AppsPage, DiscoverPage, ResourcePage
+from hs_elements import HomePage, AppsPage, DiscoverPage, ResourcePage, HelpPage
 from modes import setup_mode
 
 # Testing parameters
@@ -19,6 +19,9 @@ class Home:
 
     def to_apps(self, driver):
         HomePage.to_apps.click(driver, SLEEP_TIME)
+
+    def to_help(self, driver):
+        HomePage.to_help.click(driver, SLEEP_TIME)
 
 
 class Apps:
@@ -191,7 +194,22 @@ class Resource:
         return file_size
 
 
+class Help:
+    def open_core(self, driver, index):
+        HelpPage.core_item(index).click(driver, SLEEP_TIME)
+
+    def count_core(self, driver):
+        return HelpPage.core_root.get_immediate_child_count(driver)
+
+    def get_core_topic(self, driver, index):
+        return HelpPage.core_item(index).get_text(driver)
+
+    def to_core_breadcrumb(self, driver):
+        HelpPage.core_breadcrumb.click(driver, SLEEP_TIME)
+
+
 Home = Home()
 Apps = Apps()
 Discover = Discover()
 Resource = Resource()
+Help = Help()
