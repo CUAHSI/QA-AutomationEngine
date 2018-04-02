@@ -5,7 +5,7 @@ import sys
 import unittest
 
 from selenium import webdriver
-from hs_macros import Home, Apps, Discover, Resource, Help, API
+from hs_macros import Home, Apps, Discover, Resource, Help, About, API
 from utils import External, TestSystem
 
 # Test case parameters
@@ -170,6 +170,28 @@ class HydroshareTestSuite(unittest.TestCase):
             response_code = API.response_code(driver, endpoint, 'GET')
             oracle(response_code)
             API.toggle_endpoint(driver, endpoint, 'GET')
+
+    def test_B_000011(self):
+        """ Check Hydroshare About policy pages to confirm links and content """
+        def oracle(policy, article_title, webpage_title):
+            """ Confirms the policy link text matches up with the opened policy
+            page title and webpage title
+            """
+            self.assertIn(policy, article_title)
+            self.assertIn(policy, webpage_title)
+        Home.to_about(driver)
+        About.toggle_tree(driver)
+        About.toggle_tree(driver)
+        About.expand_tree_top(driver, 'Policies')
+        policies = ['HydroShare Publication Agreement',
+                    'Quota',
+                    'Statement of Privacy',
+                    'Terms of Use']
+        for policy in policies:
+            About.open_policy(driver, policy)
+            article_title = About.get_title(driver)
+            webpage_title = TestSystem.title(driver)
+            oracle(policy, article_title, webpage_title)
 
 
 if __name__ == '__main__':

@@ -2,7 +2,7 @@ import os
 
 from dateutil import parser
 from hs_elements import HomePage, AppsPage, DiscoverPage, ResourcePage, HelpPage, \
-    APIPage
+    AboutPage, APIPage
 from modes import setup_mode
 
 # Testing parameters
@@ -23,6 +23,9 @@ class Home:
 
     def to_help(self, driver):
         HomePage.to_help.click(driver, SLEEP_TIME)
+
+    def to_about(self, driver):
+        HomePage.to_about.click(driver, SLEEP_TIME)
 
 
 class Apps:
@@ -209,6 +212,22 @@ class Help:
         HelpPage.core_breadcrumb.click(driver, SLEEP_TIME)
 
 
+class About:
+    def toggle_tree(self, driver):
+        AboutPage.tree_root.click(driver, SLEEP_TIME)
+
+    def expand_tree_top(self, driver, item):
+        item = item.replace(' ', '-').lower()
+        AboutPage.tree_top(item).click(driver, SLEEP_TIME)
+
+    def open_policy(self, driver, policy):
+        policy = policy.replace(' ', '-').lower()
+        AboutPage.tree_policy(policy).click(driver, SLEEP_TIME)
+
+    def get_title(self, driver):
+        return AboutPage.article_title.get_text(driver)
+
+
 class API:
     def expand_hsapi(self, driver):
         APIPage.hsapi.click(driver, SLEEP_TIME)
@@ -245,4 +264,5 @@ Apps = Apps()
 Discover = Discover()
 Resource = Resource()
 Help = Help()
+About = About()
 API = API()

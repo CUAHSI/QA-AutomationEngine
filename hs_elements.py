@@ -9,6 +9,10 @@ class HomePage:
         self.to_help = SiteElement('*', el_id='dropdown-menu-' +
                                    'http:--help.hydroshare.org',
                                    el_content='HELP')
+        self.to_about = SiteElement('*', el_id='dropdown-menu-' +
+                                    'https:--help.hydroshare.org' +
+                                    '-about-hydroshare-',
+                                    el_content='ABOUT')
 
 
 class AppsPage:
@@ -150,6 +154,30 @@ class HelpPage:
                                 SiteElement('div')]))
 
 
+class AboutPage:
+    def __init__(self):
+        self.tree_root = SiteElement('li', el_id='tree-menu-about-hydroshare',
+                                     el_recursive=[SiteElement('div[1]'),
+                                                   SiteElement('i')])
+        self.article_title = SiteElement('h1', el_class='page-title')
+
+    def tree_top(self, item):
+        return SiteElement('li', el_id='tree-menu-about-hydroshare',
+                           el_recursive=(
+                               [SiteElement('li', el_id='tree-menu-about-' +
+                                            'hydroshare-{}'.format(item)),
+                                SiteElement('div', el_class='tree-menu-item'),
+                                SiteElement('i')]))
+
+    def tree_policy(self, item):
+        return SiteElement('li', el_id='tree-menu-about-hydroshare',
+                           el_recursive=(
+                               [SiteElement('li', el_id='tree-menu-about-' +
+                                            'hydroshare-policies-{}'.format(item)),
+                                SiteElement('div', el_class='tree-menu-item'),
+                                SiteElement('a')]))
+
+
 class APIPage:
     def __init__(self):
         self.hsapi = SiteElement('*', el_id='endpointListTogger_hsapi')
@@ -193,4 +221,5 @@ AppsPage = AppsPage()
 DiscoverPage = DiscoverPage()
 ResourcePage = ResourcePage()
 HelpPage = HelpPage()
+AboutPage = AboutPage()
 APIPage = APIPage()
