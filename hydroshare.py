@@ -1,10 +1,11 @@
 """ Runs various smoke tests for the hydroshare.org """
 import argparse
+import re
 import sys
 import unittest
 
 from selenium import webdriver
-from hs_macros import Home, Apps, Discover, Resource
+from hs_macros import Home, Apps, Discover, Resource, Help, About, API
 from utils import External, TestSystem
 
 # Test case parameters
@@ -28,7 +29,7 @@ class HydroshareTestSuite(unittest.TestCase):
         else:
             driver = webdriver.Firefox(profile)
         driver.get(BASE_URL)
-        driver.implicitly_wait(10)
+        driver.implicitly_wait(20)
 
     def tearDown(self):
         """ Tear down test environment after execution """
@@ -105,6 +106,92 @@ class HydroshareTestSuite(unittest.TestCase):
             Apps.to_resource(driver, i+1)
             oracle(app_name, External.source_new_page(driver))
             TestSystem.back(driver)
+
+    def test_B_000008(self):
+        """ Checks all HydroShare Help links to confirm links are intact
+        and that the topic title words come up in the associated help page
+        """
+        def oracle(core_topic):
+            words_string = re.sub('[^A-Za-z]', ' ', core_topic)
+            for word in words_string.split(' '):
+                self.assertIn(word, TestSystem.page_source(driver))
+        Home.to_help(driver)
+        core_count = Help.count_core(driver)
+        core_topics = [Help.get_core_topic(driver, i+1)
+                       for i in range(0, core_count)]
+        for ind, core_topic in enumerate(core_topics, 1):  # xpath ind start at 1
+            Help.open_core(driver, ind)
+            oracle(core_topic)
+            Help.to_core_breadcrumb(driver)
+
+    def test_B_000009(self):
+        """ Confirms absense of errors for the basic get methods within hydroshare
+        api that use just a resource id required parameter
+        """
+        def oracle(response_code):
+            self.assertEqual(response_code, '200')
+        resource_id = '927094481da54af38ffb6f0c39ad8787'
+        endpoints = ['/hsapi/resource/{id}/',
+                     '/hsapi/resource/{id}/file_list/',
+                     '/hsapi/resource/{id}/files/',
+                     '/hsapi/resource/{id}/map/',
+                     '/hsapi/resource/{id}/scimeta/']
+        TestSystem.to_url(driver, '{}/hsapi/'.format(BASE_URL))
+        API.expand_hsapi(driver)
+        for endpoint in endpoints:
+            API.toggle_endpoint(driver, endpoint, 'GET')
+            API.set_resource_id(driver, endpoint, 'GET', resource_id)
+            API.submit(driver, endpoint, 'GET')
+            response_code = API.response_code(driver, endpoint, 'GET')
+            oracle(response_code)
+            API.toggle_endpoint(driver, endpoint, 'GET')
+
+    def test_B_000010(self):
+        """ Confirms absense of errors for the basic get methods within hydroshare
+        api that require no parameters
+        """
+        def oracle(response_code):
+            """ Response code from api endpoint call is 200 """
+            self.assertEqual(response_code, '200')
+        endpoints = ['/hsapi/dictionary/universities/',
+                     '/hsapi/resource/',
+                     '/hsapi/resource/types/',
+                     '/hsapi/resourceList/',
+                     '/hsapi/resourceTypes/',
+                     '/hsapi/user/',
+                     '/hsapi/userInfo/']
+        TestSystem.to_url(driver, '{}/hsapi/'.format(BASE_URL))
+        API.expand_hsapi(driver)
+        for endpoint in endpoints:
+            API.toggle_endpoint(driver, endpoint, 'GET')
+            API.submit(driver, endpoint, 'GET')
+            API.response_code(driver, endpoint, 'GET')
+            TestSystem.wait(3)  # wait 3 seconds for empty field population
+            response_code = API.response_code(driver, endpoint, 'GET')
+            oracle(response_code)
+            API.toggle_endpoint(driver, endpoint, 'GET')
+
+    def test_B_000011(self):
+        """ Check Hydroshare About policy pages to confirm links and content """
+        def oracle(policy, article_title, webpage_title):
+            """ Confirms the policy link text matches up with the opened policy
+            page title and webpage title
+            """
+            self.assertIn(policy, article_title)
+            self.assertIn(policy, webpage_title)
+        Home.to_about(driver)
+        About.toggle_tree(driver)
+        About.toggle_tree(driver)
+        About.expand_tree_top(driver, 'Policies')
+        policies = ['HydroShare Publication Agreement',
+                    'Quota',
+                    'Statement of Privacy',
+                    'Terms of Use']
+        for policy in policies:
+            About.open_policy(driver, policy)
+            article_title = About.get_title(driver)
+            webpage_title = TestSystem.title(driver)
+            oracle(policy, article_title, webpage_title)
 
 
 if __name__ == '__main__':

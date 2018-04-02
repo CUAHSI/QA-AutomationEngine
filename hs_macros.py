@@ -1,7 +1,8 @@
 import os
 
 from dateutil import parser
-from hs_elements import HomePage, AppsPage, DiscoverPage, ResourcePage
+from hs_elements import HomePage, AppsPage, DiscoverPage, ResourcePage, HelpPage, \
+    AboutPage, APIPage
 from modes import setup_mode
 
 # Testing parameters
@@ -19,6 +20,12 @@ class Home:
 
     def to_apps(self, driver):
         HomePage.to_apps.click(driver, SLEEP_TIME)
+
+    def to_help(self, driver):
+        HomePage.to_help.click(driver, SLEEP_TIME)
+
+    def to_about(self, driver):
+        HomePage.to_about.click(driver, SLEEP_TIME)
 
 
 class Apps:
@@ -191,7 +198,71 @@ class Resource:
         return file_size
 
 
+class Help:
+    def open_core(self, driver, index):
+        HelpPage.core_item(index).click(driver, SLEEP_TIME)
+
+    def count_core(self, driver):
+        return HelpPage.core_root.get_immediate_child_count(driver)
+
+    def get_core_topic(self, driver, index):
+        return HelpPage.core_item(index).get_text(driver)
+
+    def to_core_breadcrumb(self, driver):
+        HelpPage.core_breadcrumb.click(driver, SLEEP_TIME)
+
+
+class About:
+    def toggle_tree(self, driver):
+        AboutPage.tree_root.click(driver, SLEEP_TIME)
+
+    def expand_tree_top(self, driver, item):
+        item = item.replace(' ', '-').lower()
+        AboutPage.tree_top(item).click(driver, SLEEP_TIME)
+
+    def open_policy(self, driver, policy):
+        policy = policy.replace(' ', '-').lower()
+        AboutPage.tree_policy(policy).click(driver, SLEEP_TIME)
+
+    def get_title(self, driver):
+        return AboutPage.article_title.get_text(driver)
+
+
+class API:
+    def expand_hsapi(self, driver):
+        APIPage.hsapi.click(driver, SLEEP_TIME)
+
+    def endpoint_index(self, driver, path, method):
+        num_endpoints = APIPage.endpoint_list.get_immediate_child_count(driver)
+        for i in range(1, num_endpoints+1):
+            check_path = APIPage.path_by_index(i).get_text(driver)
+            check_method = APIPage.type_by_index(i).get_text(driver)
+            if check_path == path and check_method == method:
+                return i
+        return 0
+
+    def toggle_endpoint(self, driver, path, method):
+        endpoint_ind = self.endpoint_index(driver, path, method)
+        APIPage.path_by_index(endpoint_ind).click(driver, SLEEP_TIME)
+
+    def set_resource_id(self, driver, path, method, resource_id):
+        endpoint_ind = self.endpoint_index(driver, path, method)
+        APIPage.parameter_by_index(endpoint_ind).inject_text(driver, resource_id,
+                                                             SLEEP_TIME)
+
+    def submit(self, driver, path, method):
+        endpoint_ind = self.endpoint_index(driver, path, method)
+        APIPage.submit(endpoint_ind).click(driver, SLEEP_TIME)
+
+    def response_code(self, driver, path, method):
+        endpoint_ind = self.endpoint_index(driver, path, method)
+        return APIPage.response_code(endpoint_ind).get_text(driver)
+
+
 Home = Home()
 Apps = Apps()
 Discover = Discover()
 Resource = Resource()
+Help = Help()
+About = About()
+API = API()

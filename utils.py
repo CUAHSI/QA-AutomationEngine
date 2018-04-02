@@ -49,6 +49,10 @@ class External:
 
 class TestSystem:
     """ General utilities for Hydroclient test case creation """
+    def to_url(self, driver, url):
+        driver.get(url)
+        time.sleep(3*SLEEP_TIME)
+
     def title(self, driver):
         return driver.title
 
@@ -60,6 +64,7 @@ class TestSystem:
 
     def back(self, driver, count=1):
         driver.execute_script("window.history.go(-{})".format(count))
+        time.sleep(SLEEP_TIME)
 
     def pull_words(self, driver):
         elements = driver.find_elements_by_xpath('*')

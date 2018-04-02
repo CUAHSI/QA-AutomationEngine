@@ -6,6 +6,13 @@ class HomePage:
         self.to_discover = SiteElement('li', el_id='dropdown-menu-search')
         self.to_apps = SiteElement('*', el_id='dropdown-menu-' +
                                    'https:--www.hydroshare.org-apps-')
+        self.to_help = SiteElement('*', el_id='dropdown-menu-' +
+                                   'http:--help.hydroshare.org',
+                                   el_content='HELP')
+        self.to_about = SiteElement('*', el_id='dropdown-menu-' +
+                                    'https:--help.hydroshare.org' +
+                                    '-about-hydroshare-',
+                                    el_content='ABOUT')
 
 
 class AppsPage:
@@ -131,7 +138,88 @@ class ResourcePage:
                                  'Zipped BagIt Archive')
 
 
+class HelpPage:
+    def __init__(self):
+        self.core_root = \
+            SiteElement('div', el_id='content',
+                        el_recursive=[SiteElement('div', el_class='row')])
+        self.core_breadcrumb = SiteElement('li', el_id='breadcrumb-menu-home')
+
+    def core_item(self, index):
+        return SiteElement('div', el_id='content',
+                           el_recursive=(
+                               [SiteElement('div', el_class='row'),
+                                SiteElement(el_dom='./div[{}]'.format(index)),
+                                SiteElement('div', el_class='topic-name'),
+                                SiteElement('div')]))
+
+
+class AboutPage:
+    def __init__(self):
+        self.tree_root = SiteElement('li', el_id='tree-menu-about-hydroshare',
+                                     el_recursive=[SiteElement('div[1]'),
+                                                   SiteElement('i')])
+        self.article_title = SiteElement('h1', el_class='page-title')
+
+    def tree_top(self, item):
+        return SiteElement('li', el_id='tree-menu-about-hydroshare',
+                           el_recursive=(
+                               [SiteElement('li', el_id='tree-menu-about-' +
+                                            'hydroshare-{}'.format(item)),
+                                SiteElement('div', el_class='tree-menu-item'),
+                                SiteElement('i')]))
+
+    def tree_policy(self, item):
+        return SiteElement('li', el_id='tree-menu-about-hydroshare',
+                           el_recursive=(
+                               [SiteElement('li', el_id='tree-menu-about-' +
+                                            'hydroshare-policies-{}'.format(item)),
+                                SiteElement('div', el_class='tree-menu-item'),
+                                SiteElement('a')]))
+
+
+class APIPage:
+    def __init__(self):
+        self.hsapi = SiteElement('*', el_id='endpointListTogger_hsapi')
+        self.endpoint_list = SiteElement('*', el_id='hsapi_endpoint_list')
+
+    def path_by_index(self, index):
+        return SiteElement('*', el_id='hsapi_endpoint_list',
+                           el_recursive=[SiteElement('li[{}]'.format(index)),
+                                         SiteElement('span', el_class='path'),
+                                         SiteElement('a')])
+
+    def type_by_index(self, index):
+        return SiteElement('*', el_id='hsapi_endpoint_list',
+                           el_recursive=[SiteElement('li[{}]'.format(index)),
+                                         SiteElement('span', el_class='http_method'),
+                                         SiteElement('a')])
+
+    def parameter_by_index(self, index):
+        return SiteElement('*', el_id='hsapi_endpoint_list',
+                           el_recursive=[SiteElement('li[{}]'.format(index)),
+                                         SiteElement('tbody',
+                                                     el_class='operation-params'),
+                                         SiteElement('input',
+                                                     el_class='parameter required')])
+
+    def submit(self, index):
+        return SiteElement('*', el_id='hsapi_endpoint_list',
+                           el_recursive=[SiteElement('li[{}]'.format(index)),
+                                         SiteElement('input', el_class='submit')])
+
+    def response_code(self, index):
+        return SiteElement('*', el_id='hsapi_endpoint_list',
+                           el_recursive=[SiteElement('li[{}]'.format(index)),
+                                         SiteElement('div',
+                                                     el_class='block response_code'),
+                                         SiteElement('pre')])
+
+
 HomePage = HomePage()
 AppsPage = AppsPage()
 DiscoverPage = DiscoverPage()
 ResourcePage = ResourcePage()
+HelpPage = HelpPage()
+AboutPage = AboutPage()
+APIPage = APIPage()
