@@ -45,4 +45,4 @@ seriescatalog_time = seriescatalog(cursor)
 result = [args.datavalues, args.sites, deduplication_time, seriescatalog_time]
 
 with open('stored-proc.txt', 'a') as f:
-    f.write(','.join(result))
+    f.write(','.join(result) + '\n')
