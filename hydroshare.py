@@ -1,11 +1,10 @@
 """ Runs various smoke tests for the hydroshare.org """
-import argparse
 import re
 import sys
 import unittest
 
-from selenium import webdriver
-from hs_macros import Home, Apps, Discover, Resource, Help, About, API
+from cuahsi_base import BaseTest, basecli
+from hs_macros import Home, Apps, Discover, Resource, Help, API, About
 from utils import External, TestSystem
 
 # Test case parameters
@@ -13,27 +12,13 @@ BASE_URL = "http://www.hydroshare.org"
 
 
 # Test cases definition
-class HydroshareTestSuite(unittest.TestCase):
+class HydroshareTestSuite(BaseTest):
     """ Python unittest setup for smoke tests """
 
     def setUp(self):
-        """ Setup driver for use in automation tests """
-        profile = webdriver.FirefoxProfile()
-        profile.set_preference("general.useragent.override", "CUAHSI-QA-Selenium")
-        # TODO use self.driver instead of making it global
-        global driver
-        if infrastructure == 'grid':
-            driver = webdriver.Remote(
-                command_executor='http://{}:4444/wd/hub'.format(grid_hub_ip),
-                desired_capabilities={'browserName': 'firefox'})
-        else:
-            driver = webdriver.Firefox(profile)
-        driver.get(BASE_URL)
-        driver.implicitly_wait(20)
-
-    def tearDown(self):
-        """ Tear down test environment after execution """
-        driver.quit()
+        super(HydroshareTestSuite, self).setUp()
+        self.driver.get(BASE_URL)
+        self.driver.implicitly_wait(10)
 
     def test_B_000003(self):
         """ Confirms Beaver Divide Air Temperature resource landing page is
@@ -44,10 +29,10 @@ class HydroshareTestSuite(unittest.TestCase):
             """ The Beaver Divide BagIt zip file matches expected file
             size (in Bytes)
             """
-            self.assertEqual(Resource.size_download(driver, BASE_URL), 512000)
-        Discover.filters(driver, subject='iUTAH', resource_type='Generic',
+            self.assertEqual(Resource.size_download(self.driver, BASE_URL), 512000)
+        Discover.filters(self.driver, subject='iUTAH', resource_type='Generic',
                          availability=['discoverable', 'public'])
-        Discover.to_resource(driver, 'Beaver Divide Air Temperature')
+        Discover.to_resource(self.driver, 'Beaver Divide Air Temperature')
         oracle()
 
     def test_B_000006(self):
@@ -61,6 +46,8 @@ class HydroshareTestSuite(unittest.TestCase):
             """
             self.assertTrue(Discover.check_sorting_multi(driver, column_name,
                                                          ascend_or_descend))
+
+        driver = self.driver
         Home.to_discover(driver)
         Discover.sort_direction(driver, 'Ascending')
         Discover.sort_order(driver, 'Last Modified')
@@ -97,6 +84,8 @@ class HydroshareTestSuite(unittest.TestCase):
         """
         def oracle(app_name, resource_page):
             self.assertIn(app_name, resource_page)
+
+        driver = self.driver
         Home.to_apps(driver)
         External.switch_new_page(driver)
         apps_count = Apps.count(driver)
@@ -114,15 +103,15 @@ class HydroshareTestSuite(unittest.TestCase):
         def oracle(core_topic):
             words_string = re.sub('[^A-Za-z]', ' ', core_topic)
             for word in words_string.split(' '):
-                self.assertIn(word, TestSystem.page_source(driver))
-        Home.to_help(driver)
-        core_count = Help.count_core(driver)
-        core_topics = [Help.get_core_topic(driver, i+1)
+                self.assertIn(word, TestSystem.page_source(self.driver))
+        Home.to_help(self.driver)
+        core_count = Help.count_core(self.driver)
+        core_topics = [Help.get_core_topic(self.driver, i+1)
                        for i in range(0, core_count)]
         for ind, core_topic in enumerate(core_topics, 1):  # xpath ind start at 1
-            Help.open_core(driver, ind)
+            Help.open_core(self.driver, ind)
             oracle(core_topic)
-            Help.to_core_breadcrumb(driver)
+            Help.to_core_breadcrumb(self.driver)
 
     def test_B_000009(self):
         """ Confirms absense of errors for the basic get methods within hydroshare
@@ -136,15 +125,15 @@ class HydroshareTestSuite(unittest.TestCase):
                      '/hsapi/resource/{id}/files/',
                      '/hsapi/resource/{id}/map/',
                      '/hsapi/resource/{id}/scimeta/']
-        TestSystem.to_url(driver, '{}/hsapi/'.format(BASE_URL))
-        API.expand_hsapi(driver)
+        TestSystem.to_url(self.driver, '{}/hsapi/'.format(BASE_URL))
+        API.expand_hsapi(self.driver)
         for endpoint in endpoints:
-            API.toggle_endpoint(driver, endpoint, 'GET')
-            API.set_resource_id(driver, endpoint, 'GET', resource_id)
-            API.submit(driver, endpoint, 'GET')
-            response_code = API.response_code(driver, endpoint, 'GET')
+            API.toggle_endpoint(self.driver, endpoint, 'GET')
+            API.set_resource_id(self.driver, endpoint, 'GET', resource_id)
+            API.submit(self.driver, endpoint, 'GET')
+            response_code = API.response_code(self.driver, endpoint, 'GET')
             oracle(response_code)
-            API.toggle_endpoint(driver, endpoint, 'GET')
+            API.toggle_endpoint(self.driver, endpoint, 'GET')
 
     def test_B_000010(self):
         """ Confirms absense of errors for the basic get methods within hydroshare
@@ -160,16 +149,16 @@ class HydroshareTestSuite(unittest.TestCase):
                      '/hsapi/resourceTypes/',
                      '/hsapi/user/',
                      '/hsapi/userInfo/']
-        TestSystem.to_url(driver, '{}/hsapi/'.format(BASE_URL))
-        API.expand_hsapi(driver)
+        TestSystem.to_url(self.driver, '{}/hsapi/'.format(BASE_URL))
+        API.expand_hsapi(self.driver)
         for endpoint in endpoints:
-            API.toggle_endpoint(driver, endpoint, 'GET')
-            API.submit(driver, endpoint, 'GET')
-            API.response_code(driver, endpoint, 'GET')
+            API.toggle_endpoint(self.driver, endpoint, 'GET')
+            API.submit(self.driver, endpoint, 'GET')
+            API.response_code(self.driver, endpoint, 'GET')
             TestSystem.wait(3)  # wait 3 seconds for empty field population
-            response_code = API.response_code(driver, endpoint, 'GET')
+            response_code = API.response_code(self.driver, endpoint, 'GET')
             oracle(response_code)
-            API.toggle_endpoint(driver, endpoint, 'GET')
+            API.toggle_endpoint(self.driver, endpoint, 'GET')
 
     def test_B_000011(self):
         """ Check Hydroshare About policy pages to confirm links and content """
@@ -179,32 +168,24 @@ class HydroshareTestSuite(unittest.TestCase):
             """
             self.assertIn(policy, article_title)
             self.assertIn(policy, webpage_title)
-        Home.to_about(driver)
-        About.toggle_tree(driver)
-        About.toggle_tree(driver)
-        About.expand_tree_top(driver, 'Policies')
+        Home.to_about(self.driver)
+        About.toggle_tree(self.driver)
+        About.toggle_tree(self.driver)
+        About.expand_tree_top(self.driver, 'Policies')
         policies = ['HydroShare Publication Agreement',
                     'Quota',
                     'Statement of Privacy',
                     'Terms of Use']
         for policy in policies:
-            About.open_policy(driver, policy)
-            article_title = About.get_title(driver)
-            webpage_title = TestSystem.title(driver)
+            About.open_policy(self.driver, policy)
+            article_title = About.get_title(self.driver)
+            webpage_title = TestSystem.title(self.driver)
             oracle(policy, article_title, webpage_title)
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--grid')
-    parser.add_argument('unittest_args', nargs='*')
-
-    args = parser.parse_args()
-    if args.grid is None:
-        infrastructure = 'standalone'
-    else:
-        infrastructure = 'grid'
-        grid_hub_ip = args.grid
+    args = basecli().parse_args()
+    HydroshareTestSuite.GRID_HUB_IP = vars(args).get('grid')
 
     # Set the sys.argv to the unittest_args (leaving sys.argv[0] alone)
     sys.argv[1:] = args.unittest_args

@@ -1,11 +1,9 @@
 """ Runs various smoke tests for the data.cuahsi.org """
-import argparse
 import sys
 import time
 import unittest
 
-from selenium import webdriver
-
+from cuahsi_base import BaseTest, basecli
 from hc_macros import Search, Marker, Services, Keywords, Advanced, \
     Filter, About, QuickStart, Zendesk, Workspace
 from utils import External, TestSystem
@@ -15,28 +13,15 @@ BASE_URL = 'http://data.cuahsi.org'
 
 
 # Test cases definition
-class HydroclientTestSuite(unittest.TestCase):
+class HydroclientTestSuite(BaseTest):
     """ Python unittest setup for smoke tests """
-    def setUp(self):
-        """ Setup driver for use in automation tests """
-        profile = webdriver.FirefoxProfile()
-        profile.set_preference("general.useragent.override", "CUAHSI-QA-Selenium")
-        # TODO use self.driver instead of making it global
-        global driver
-        if infrastructure == 'grid':
-            driver = webdriver.Remote(
-                command_executor='http://{}:4444/wd/hub'.format(grid_hub_ip),
-                desired_capabilities={'browserName': 'firefox'})
-        else:
-            driver = webdriver.Firefox(profile)
-        driver.maximize_window()
-        driver.get(BASE_URL)
-        time.sleep(5)
-        driver.implicitly_wait(10)
 
-    def tearDown(self):
-        """ Tear down test environment after execution """
-        driver.quit()
+    def setUp(self):
+        super(HydroclientTestSuite, self).setUp()
+        self.driver.maximize_window()
+        self.driver.get(BASE_URL)
+        time.sleep(5)
+        self.driver.implicitly_wait(10)
 
     def test_A_000002(self):
         """ Confirms Archbold service metadata is available through
@@ -47,11 +32,11 @@ class HydroclientTestSuite(unittest.TestCase):
             workspace, and then is processed successfully in the
             workspace ("completed" status)
             """
-            self.assertEqual(Workspace.count_complete(driver, 50), 1)
+            self.assertEqual(Workspace.count_complete(self.driver, 50), 1)
 
-        Search.search_location(driver, 'Lake Annie Highlands County')
-        Services.filters(driver, orgs='Archbold Biological Station')
-        Filter.to_workspace_cell(driver, 1, 1)
+        Search.search_location(self.driver, 'Lake Annie Highlands County')
+        Services.filters(self.driver, orgs='Archbold Biological Station')
+        Filter.to_workspace_cell(self.driver, 1, 1)
         oracle()
 
     def test_A_000003(self):
@@ -63,11 +48,11 @@ class HydroclientTestSuite(unittest.TestCase):
             when the search is filtered to only include "Archbold Biological
             Center" service
             """
-            self.assertIn('51', Search.count_results(driver))
+            self.assertIn('51', Search.count_results(self.driver))
 
-        Search.search_location(driver, 'Lake Annie Highlands County')
-        Services.filters(driver, orgs='Archbold Biological Station')
-        Search.search(driver, 60)
+        Search.search_location(self.driver, 'Lake Annie Highlands County')
+        Services.filters(self.driver, orgs='Archbold Biological Station')
+        Search.search(self.driver, 60)
         oracle()
 
     def test_A_000004(self):
@@ -79,14 +64,14 @@ class HydroclientTestSuite(unittest.TestCase):
             """ Start date and end date in workspace match the initial
             date filtering values established in the Search interface
             """
-            self.assertTrue(Workspace.is_in_results(driver,
+            self.assertTrue(Workspace.is_in_results(self.driver,
                                                     ['2015-12-01', '2015-12-30'],
                                                     10))
 
-        Search.search_location(driver, 'Tampa ')
-        Services.filters(driver, titles='NWIS Unit Values')
-        Search.filter_dates(driver, '12/01/2015', '12/30/2015')
-        Filter.to_workspace_text(driver, 'Derived Value')
+        Search.search_location(self.driver, 'Tampa ')
+        Services.filters(self.driver, titles='NWIS Unit Values')
+        Search.filter_dates(self.driver, '12/01/2015', '12/30/2015')
+        Filter.to_workspace_text(self.driver, 'Derived Value')
         oracle()
 
     def test_A_000005(self):
@@ -99,15 +84,15 @@ class HydroclientTestSuite(unittest.TestCase):
             """ The two time series are sent to the workspace and processed,
             resulting in a "completed" status for both time series
             """
-            self.assertEqual(Workspace.count_complete(driver, 50), 2)
+            self.assertEqual(Workspace.count_complete(self.driver, 50), 2)
 
-        Search.search_location(driver, 'New Haven ')
-        Services.filters(driver, titles=['NLDAS Hourly NOAH Data',
-                                         'NLDAS Hourly Primary Forcing Data'])
+        Search.search_location(self.driver, 'New Haven ')
+        Services.filters(self.driver, titles=['NLDAS Hourly NOAH Data',
+                                              'NLDAS Hourly Primary Forcing Data'])
 
-        Filter.search_field(driver, 'X416-Y130')
-        Filter.to_workspace_texts_range(driver, ['Model Simulation Result',
-                                                 'Derived Value'])
+        Filter.search_field(self.driver, 'X416-Y130')
+        Filter.to_workspace_texts_range(self.driver, ['Model Simulation Result',
+                                                      'Derived Value'])
         oracle()
 
     def test_A_000006(self):
@@ -118,12 +103,12 @@ class HydroclientTestSuite(unittest.TestCase):
             """ Results are exported to workspace and number of successfully
             processed time series is above 0
             """
-            self.assertNotEqual(Workspace.count_complete(driver, 50), 0)
+            self.assertNotEqual(Workspace.count_complete(self.driver, 50), 0)
 
-        Search.search_location(driver, 'Köln ')
-        Search.search(driver)
-        Search.to_map_marker(driver, '13')
-        Marker.to_workspace_all(driver)
+        Search.search_location(self.driver, 'Köln ')
+        Search.search(self.driver)
+        Search.to_map_marker(self.driver, '13')
+        Marker.to_workspace_all(self.driver)
         oracle()
 
     def test_A_000007(self):
@@ -135,12 +120,12 @@ class HydroclientTestSuite(unittest.TestCase):
             """ Legend is visible when Landcover layer is on, but it is
             not visible when the layer is off
             """
-            self.assertTrue(Search.is_legend_visible(driver))
-            Search.toggle_layer(driver, 'USGS LandCover 2011')
-            self.assertFalse(Search.is_legend_visible(driver))
+            self.assertTrue(Search.is_legend_visible(self.driver))
+            Search.toggle_layer(self.driver, 'USGS LandCover 2011')
+            self.assertFalse(Search.is_legend_visible(self.driver))
 
-        Search.search_location(driver, 'Anchorage ')
-        Search.toggle_layer(driver, 'USGS LandCover 2011')
+        Search.search_location(self.driver, 'Anchorage ')
+        Search.toggle_layer(self.driver, 'USGS LandCover 2011')
         oracle()
 
     def test_A_000008(self):
@@ -163,6 +148,7 @@ class HydroclientTestSuite(unittest.TestCase):
             for layer in layers:
                 self.assertIn(layer, TestSystem.page_source(driver))
 
+        driver = self.driver
         layers = ['USGS Stream Gages', 'Nationalmap Hydrology',
                   'EPA Watersheds', 'USGS LandCover 2011']
         for layer in layers:  # Turn all layer on
@@ -187,6 +173,7 @@ class HydroclientTestSuite(unittest.TestCase):
             self.assertIn('Help Center', TestSystem.title(driver))
             self.assertIn('Layers', TestSystem.title(driver))
 
+        driver = self.driver
         Search.search_location(driver, 'San Diego')
         Search.search_location(driver, 'Amsterdam')
         Zendesk.to_help(driver, 'Layers', 'Using the Layer Control')
@@ -207,6 +194,7 @@ class HydroclientTestSuite(unittest.TestCase):
             self.assertTrue(all(x == rio_counts[0] for x in rio_counts))
             self.assertTrue(all(x == dallas_counts[0] for x in dallas_counts))
 
+        driver = self.driver
         rio_counts = []
         dallas_counts = []
         Search.search_location(driver, 'Rio De Janeiro')
@@ -234,6 +222,7 @@ class HydroclientTestSuite(unittest.TestCase):
             """ None of the resource pages contain the text "404 Error" """
             self.assertNotIn('404 Error', external_sources)
 
+        driver = self.driver
         external_sources = ''
         About.to_helpcenter(driver)
         external_sources += External.source_new_page(driver)
@@ -260,11 +249,11 @@ class HydroclientTestSuite(unittest.TestCase):
             """ Results count is nonzero after map navigations and a map
             location search (in that order)
             """
-            self.assertNotEqual(Search.count_results(driver), '0')
+            self.assertNotEqual(Search.count_results(self.driver), '0')
 
-        Search.scroll_map(driver, 25)
-        Search.search_location(driver, 'Raleigh')
-        Search.search(driver)
+        Search.scroll_map(self.driver, 25)
+        Search.search_location(self.driver, 'Raleigh')
+        Search.search(self.driver)
         oracle()
 
     def test_A_000013(self):
@@ -277,6 +266,7 @@ class HydroclientTestSuite(unittest.TestCase):
             """
             self.assertIn('HydroClient', TestSystem.title(driver))
 
+        driver = self.driver
         Search.to_workspace(driver)
         Workspace.select_all(driver)
         Workspace.clear_select(driver)
@@ -298,26 +288,18 @@ class HydroclientTestSuite(unittest.TestCase):
             """ The results count over Cape Cod Bay (no land in view)
             is 0 after filtering for only NLDAS services
             """
-            self.assertEqual(Search.count_results(driver), '0')
+            self.assertEqual(Search.count_results(self.driver), '0')
 
-        Search.search_location(driver, 'Cape Cod Bay')
-        Search.zoom_in(driver, 3)
-        Services.filters(driver, titles=['NLDAS Hourly NOAH Data',
-                                         'NLDAS Hourly Primary Forcing Data'])
+        Search.search_location(self.driver, 'Cape Cod Bay')
+        Search.zoom_in(self.driver, 3)
+        Services.filters(self.driver, titles=['NLDAS Hourly NOAH Data',
+                                              'NLDAS Hourly Primary Forcing Data'])
         oracle()
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--grid')
-    parser.add_argument('unittest_args', nargs='*')
-
-    args = parser.parse_args()
-    if args.grid is None:
-        infrastructure = 'standalone'
-    else:
-        infrastructure = 'grid'
-        grid_hub_ip = args.grid
+    args = basecli().parse_args()
+    HydroclientTestSuite.GRID_HUB_IP = vars(args).get('grid')
 
     # Set the sys.argv to the unittest_args (leaving sys.argv[0] alone)
     sys.argv[1:] = args.unittest_args
