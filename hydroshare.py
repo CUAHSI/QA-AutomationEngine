@@ -5,6 +5,7 @@ import unittest
 
 from cuahsi_base import BaseTest, basecli
 from hs_macros import Home, Apps, Discover, Resource, Help, API, About
+from hs_elements import AppsPage
 from utils import External, TestSystem
 
 # Test case parameters
@@ -18,7 +19,6 @@ class HydroshareTestSuite(BaseTest):
     def setUp(self):
         super(HydroshareTestSuite, self).setUp()
         self.driver.get(BASE_URL)
-        self.driver.implicitly_wait(10)
 
     def test_B_000003(self):
         """ Confirms Beaver Divide Air Temperature resource landing page is
@@ -30,6 +30,7 @@ class HydroshareTestSuite(BaseTest):
             size (in Bytes)
             """
             self.assertEqual(Resource.size_download(self.driver, BASE_URL), 512000)
+
         Discover.filters(self.driver, subject='iUTAH', resource_type='Generic',
                          availability=['discoverable', 'public'])
         Discover.to_resource(self.driver, 'Beaver Divide Air Temperature')
@@ -86,8 +87,10 @@ class HydroshareTestSuite(BaseTest):
             self.assertIn(app_name, resource_page)
 
         driver = self.driver
+        num_windows_now = len(driver.window_handles)
         Home.to_apps(driver)
-        External.switch_new_page(driver)
+        External.switch_new_page(driver, num_windows_now,
+                                 AppsPage.apps_container_locator)
         apps_count = Apps.count(driver)
         for i in range(0, apps_count):  # +1 used below - xpath start at 1
             app_name = Apps.get_title(driver, i+1)
@@ -170,7 +173,9 @@ class HydroshareTestSuite(BaseTest):
             self.assertIn(policy, webpage_title)
         Home.to_about(self.driver)
         About.toggle_tree(self.driver)
+        TestSystem.wait(1)
         About.toggle_tree(self.driver)
+        TestSystem.wait(1)
         About.expand_tree_top(self.driver, 'Policies')
         policies = ['HydroShare Publication Agreement',
                     'Quota',

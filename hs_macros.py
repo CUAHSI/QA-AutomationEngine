@@ -1,42 +1,35 @@
 import os
+import time
 
 from dateutil import parser
-from hs_elements import HomePage, AppsPage, DiscoverPage, ResourcePage, HelpPage, \
-    AboutPage, APIPage
-from modes import setup_mode
-
-# Testing parameters
-MODE_SELECTION = 'demo'
-global SLEEP_TIME
-SLEEP_TIME = setup_mode(MODE_SELECTION)
+from hs_elements import HomePage, AppsPage, DiscoverPage, ResourcePage, \
+    HelpPage, AboutPage, APIPage
+from config.delays import HSAPI_GUI_RESPONSE_DELAY
 
 
 class Home:
     def to_discover(self, driver):
-        """ Navigate to the Discover page using the menu at the top
-        of the home page
-        """
-        HomePage.to_discover.click(driver, SLEEP_TIME)
+        HomePage.to_discover.click(driver)
 
     def to_apps(self, driver):
-        HomePage.to_apps.click(driver, SLEEP_TIME)
+        HomePage.to_apps.click(driver)
 
     def to_help(self, driver):
-        HomePage.to_help.click(driver, SLEEP_TIME)
+        HomePage.to_help.click(driver)
 
     def to_about(self, driver):
-        HomePage.to_about.click(driver, SLEEP_TIME)
+        HomePage.to_about.click(driver)
 
 
 class Apps:
     def show_info(self, driver, num):
-        AppsPage.info(num).click(driver, SLEEP_TIME)
+        AppsPage.info(num).click(driver)
 
     def count(self, driver):
         return AppsPage.container.get_immediate_child_count(driver)
 
     def to_resource(self, driver, num):
-        AppsPage.resource(num).click(driver, SLEEP_TIME)
+        AppsPage.resource(num).click(driver)
 
     def get_title(self, driver, num):
         return AppsPage.title(num).get_text(driver)
@@ -45,17 +38,17 @@ class Apps:
 class Discover:
     def sort_order(self, driver, option):
         """ Set the sort order to {{option}} """
-        DiscoverPage.sort_order.select_option_text(driver, option, SLEEP_TIME)
+        DiscoverPage.sort_order.select_option_text(driver, option)
 
     def sort_direction(self, driver, option):
         """ Set the sort direction to {{option}} """
-        DiscoverPage.sort_direction.select_option_text(driver, option, SLEEP_TIME)
+        DiscoverPage.sort_direction.select_option_text(driver, option)
 
     def to_resource(self, driver, title):
         """ Navigate to the {{title}} resource landing page by clicking
         on it within the table
         """
-        DiscoverPage.to_resource(title).click(driver, SLEEP_TIME)
+        DiscoverPage.to_resource(title).click(driver)
 
     def col_index(self, driver, col_name):
         """ Indentify the index for a discover page column, given the
@@ -128,63 +121,63 @@ class Discover:
         {{variable}}, sample medium(s) {{sample_medium}}, unit(s) {{unit}},
         and availability(s) {{availability}}
         """
-        HomePage.to_discover.click(driver, SLEEP_TIME)
+        HomePage.to_discover.click(driver)
         if type(author) is list:
             for author_item in author:
                 filter_el = DiscoverPage.filter_author(author_item)
-                filter_el.click(driver, SLEEP_TIME)
+                filter_el.click(driver)
         elif author is not None:
             filter_el = DiscoverPage.filter_author(author)
-            filter_el.click(driver, SLEEP_TIME)
+            filter_el.click(driver)
         if type(subject) is list:
             for subject_item in subject:
                 filter_el = DiscoverPage.filter_subject(subject_item)
-                filter_el.click(driver, SLEEP_TIME)
+                filter_el.click(driver)
         elif subject is not None:
             filter_el = DiscoverPage.filter_subject(subject)
-            filter_el.click(driver, SLEEP_TIME)
+            filter_el.click(driver)
         if type(resource_type) is list:
             for resource_type_item in resource_type:
                 filter_el = DiscoverPage.filter_resource_type(resource_type_item)
-                filter_el.click(driver, SLEEP_TIME)
+                filter_el.click(driver)
         elif resource_type is not None:
             filter_el = DiscoverPage.filter_resource_type(resource_type)
-            filter_el.click(driver, SLEEP_TIME)
+            filter_el.click(driver)
         if type(owner) is list:
             for owner_item in owner:
                 filter_el = DiscoverPage.filter_owner(owner_item)
-                filter_el.click(driver, SLEEP_TIME)
+                filter_el.click(driver)
         elif owner is not None:
             filter_el = DiscoverPage.filter_owner(owner)
-            filter_el.click(driver, SLEEP_TIME)
+            filter_el.click(driver)
         if type(variable) is list:
             for variable_item in variable:
                 filter_el = DiscoverPage.filter_variable(variable_item)
-                filter_el.click(driver, SLEEP_TIME)
+                filter_el.click(driver)
         elif variable is not None:
             filter_el = DiscoverPage.filter_variable(variable)
-            filter_el.click(driver, SLEEP_TIME)
+            filter_el.click(driver)
         if type(sample_medium) is list:
             for sample_medium_item in sample_medium:
                 filter_el = DiscoverPage.filter_sample_medium(sample_medium_item)
-                filter_el.click(driver, SLEEP_TIME)
+                filter_el.click(driver)
         elif sample_medium is not None:
             filter_el = DiscoverPage.filter_sample_medium(sample_medium)
-            filter_el.click(driver, SLEEP_TIME)
+            filter_el.click(driver)
         if type(unit) is list:
             for unit_item in unit:
                 filter_el = DiscoverPage.filter_unit(unit_item)
-                filter_el.click(driver, SLEEP_TIME)
+                filter_el.click(driver)
         elif unit is not None:
             filter_el = DiscoverPage.filter_unit(unit)
-            filter_el.click(driver, SLEEP_TIME)
+            filter_el.click(driver)
         if type(availability) is list:
             for availability_item in availability:
                 filter_el = DiscoverPage.filter_availability(availability_item)
-                filter_el.click(driver, SLEEP_TIME)
+                filter_el.click(driver)
         elif availability is not None:
             filter_el = DiscoverPage.filter_availability(availability)
-            filter_el.click(driver, SLEEP_TIME)
+            filter_el.click(driver)
 
 
 class Resource:
@@ -200,7 +193,7 @@ class Resource:
 
 class Help:
     def open_core(self, driver, index):
-        HelpPage.core_item(index).click(driver, SLEEP_TIME)
+        HelpPage.core_item(index).click(driver)
 
     def count_core(self, driver):
         return HelpPage.core_root.get_immediate_child_count(driver)
@@ -209,20 +202,20 @@ class Help:
         return HelpPage.core_item(index).get_text(driver)
 
     def to_core_breadcrumb(self, driver):
-        HelpPage.core_breadcrumb.click(driver, SLEEP_TIME)
+        HelpPage.core_breadcrumb.click(driver)
 
 
 class About:
     def toggle_tree(self, driver):
-        AboutPage.tree_root.click(driver, SLEEP_TIME)
+        AboutPage.tree_root.click(driver)
 
     def expand_tree_top(self, driver, item):
         item = item.replace(' ', '-').lower()
-        AboutPage.tree_top(item).click(driver, SLEEP_TIME)
+        AboutPage.tree_top(item).click(driver)
 
     def open_policy(self, driver, policy):
         policy = policy.replace(' ', '-').lower()
-        AboutPage.tree_policy(policy).click(driver, SLEEP_TIME)
+        AboutPage.tree_policy(policy).click(driver)
 
     def get_title(self, driver):
         return AboutPage.article_title.get_text(driver)
@@ -230,7 +223,7 @@ class About:
 
 class API:
     def expand_hsapi(self, driver):
-        APIPage.hsapi.click(driver, SLEEP_TIME)
+        APIPage.hsapi.click(driver)
 
     def endpoint_index(self, driver, path, method):
         num_endpoints = APIPage.endpoint_list.get_immediate_child_count(driver)
@@ -243,16 +236,16 @@ class API:
 
     def toggle_endpoint(self, driver, path, method):
         endpoint_ind = self.endpoint_index(driver, path, method)
-        APIPage.path_by_index(endpoint_ind).click(driver, SLEEP_TIME)
+        APIPage.path_by_index(endpoint_ind).click(driver)
 
     def set_resource_id(self, driver, path, method, resource_id):
         endpoint_ind = self.endpoint_index(driver, path, method)
-        APIPage.parameter_by_index(endpoint_ind).inject_text(driver, resource_id,
-                                                             SLEEP_TIME)
+        APIPage.parameter_by_index(endpoint_ind).inject_text(driver, resource_id)
 
     def submit(self, driver, path, method):
         endpoint_ind = self.endpoint_index(driver, path, method)
-        APIPage.submit(endpoint_ind).click(driver, SLEEP_TIME)
+        APIPage.submit(endpoint_ind).click(driver)
+        time.sleep(HSAPI_GUI_RESPONSE_DELAY)
 
     def response_code(self, driver, path, method):
         endpoint_ind = self.endpoint_index(driver, path, method)

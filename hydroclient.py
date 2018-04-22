@@ -1,27 +1,25 @@
 """ Runs various smoke tests for the data.cuahsi.org """
 import sys
-import time
 import unittest
 
 from cuahsi_base import BaseTest, basecli
 from hc_macros import Search, Marker, Services, Keywords, Advanced, \
     Filter, About, QuickStart, Zendesk, Workspace
+from hc_elements import ZendeskArticlePage
 from utils import External, TestSystem
 
 # Test case parameters
-BASE_URL = 'http://data.cuahsi.org'
+BASE_URL = 'http://data.cuahsi.org'  # production
 
 
 # Test cases definition
 class HydroclientTestSuite(BaseTest):
-    """ Python unittest setup for smoke tests """
+    """ Test suite for the HydroClient software system """
 
     def setUp(self):
         super(HydroclientTestSuite, self).setUp()
         self.driver.maximize_window()
         self.driver.get(BASE_URL)
-        time.sleep(5)
-        self.driver.implicitly_wait(10)
 
     def test_A_000002(self):
         """ Confirms Archbold service metadata is available through
@@ -32,10 +30,11 @@ class HydroclientTestSuite(BaseTest):
             workspace, and then is processed successfully in the
             workspace ("completed" status)
             """
-            self.assertEqual(Workspace.count_complete(self.driver, 50), 1)
+            self.assertEqual(Workspace.count_complete(self.driver), 1)
 
         Search.search_location(self.driver, 'Lake Annie Highlands County')
         Services.filters(self.driver, orgs='Archbold Biological Station')
+        Filter.open(self.driver)
         Filter.to_workspace_cell(self.driver, 1, 1)
         oracle()
 
@@ -71,6 +70,7 @@ class HydroclientTestSuite(BaseTest):
         Search.search_location(self.driver, 'Tampa ')
         Services.filters(self.driver, titles='NWIS Unit Values')
         Search.filter_dates(self.driver, '12/01/2015', '12/30/2015')
+        Filter.open(self.driver)
         Filter.to_workspace_text(self.driver, 'Derived Value')
         oracle()
 
@@ -81,18 +81,18 @@ class HydroclientTestSuite(BaseTest):
         Hourly Primary Forcing Data
         """
         def oracle():
-            """ The two time series are sent to the workspace and processed,
-            resulting in a "completed" status for both time series
+            """ The time series are sent to the workspace and processed,
+            resulting in a "completed" status for all time series
             """
-            self.assertEqual(Workspace.count_complete(self.driver, 50), 2)
+            self.assertEqual(Workspace.count_complete(self.driver, 6), 3)
 
         Search.search_location(self.driver, 'New Haven ')
         Services.filters(self.driver, titles=['NLDAS Hourly NOAH Data',
                                               'NLDAS Hourly Primary Forcing Data'])
 
+        Filter.open(self.driver)
         Filter.search_field(self.driver, 'X416-Y130')
-        Filter.to_workspace_texts_range(self.driver, ['Model Simulation Result',
-                                                      'Derived Value'])
+        Filter.to_workspace_cell_multi(self.driver, [1, 5, 9])  # rows 1, 5, 9
         oracle()
 
     def test_A_000006(self):
@@ -103,12 +103,12 @@ class HydroclientTestSuite(BaseTest):
             """ Results are exported to workspace and number of successfully
             processed time series is above 0
             """
-            self.assertNotEqual(Workspace.count_complete(self.driver, 50), 0)
+            self.assertNotEqual(Workspace.count_complete(self.driver), 0)
 
         Search.search_location(self.driver, 'Köln ')
         Search.search(self.driver)
-        Search.to_map_marker(self.driver, '13')
-        Marker.to_workspace_all(self.driver)
+        Search.to_random_map_marker(self.driver, 24)
+        Marker.to_workspace_one(self.driver)
         oracle()
 
     def test_A_000007(self):
@@ -116,17 +116,20 @@ class HydroclientTestSuite(BaseTest):
         USGS Landcover layer is turned on.  Map scope during the test is
         an area around Anchorage Alaska.
         """
-        def oracle():
+        def oracle(visible_expected):
             """ Legend is visible when Landcover layer is on, but it is
             not visible when the layer is off
             """
-            self.assertTrue(Search.is_legend_visible(self.driver))
-            Search.toggle_layer(self.driver, 'USGS LandCover 2011')
-            self.assertFalse(Search.is_legend_visible(self.driver))
+            if visible_expected:
+                self.assertTrue(Search.is_legend_visible(self.driver))
+            else:
+                self.assertFalse(Search.is_legend_visible(self.driver))
 
         Search.search_location(self.driver, 'Anchorage ')
         Search.toggle_layer(self.driver, 'USGS LandCover 2011')
-        oracle()
+        oracle(visible_expected=True)
+        Search.toggle_layer(self.driver, 'USGS LandCover 2011')
+        oracle(visible_expected=False)
 
     def test_A_000008(self):
         """ Confirms that map layer naming, as defined in the HydroClient
@@ -158,8 +161,10 @@ class HydroclientTestSuite(BaseTest):
         Search.to_quickstart(driver)
         QuickStart.section(driver, 'Using the Layer Control')
         oracle_1()
+        num_windows_opened = len(driver.window_handles)
         QuickStart.more(driver, 'Click for more information on the Layer Control')
-        External.switch_new_page(driver)
+        External.switch_new_page(driver, num_windows_opened,
+                                 ZendeskArticlePage.article_header_locator)
         oracle_2()
 
     def test_A_000009(self):
@@ -171,13 +176,15 @@ class HydroclientTestSuite(BaseTest):
             widget, and the page contains the word "Layers"
             """
             self.assertIn('Help Center', TestSystem.title(driver))
-            self.assertIn('Layers', TestSystem.title(driver))
+            self.assertIn('Layer', TestSystem.title(driver))
 
         driver = self.driver
         Search.search_location(driver, 'San Diego')
         Search.search_location(driver, 'Amsterdam')
+        num_windows_opened = len(driver.window_handles)
         Zendesk.to_help(driver, 'Layers', 'Using the Layer Control')
-        External.switch_new_page(driver)
+        External.switch_new_page(driver, num_windows_opened,
+                                 ZendeskArticlePage.article_header_locator)
         oracle()
 
     def test_A_000010(self):
@@ -191,26 +198,27 @@ class HydroclientTestSuite(BaseTest):
             returns the same number of results as a search without any
             filters
             """
-            self.assertTrue(all(x == rio_counts[0] for x in rio_counts))
-            self.assertTrue(all(x == dallas_counts[0] for x in dallas_counts))
+            for rio_count in rio_counts:
+                self.assertEqual(rio_count, rio_counts[0])
+            for dallas_count in dallas_counts:
+                self.assertEqual(dallas_count, dallas_counts[0])
 
         driver = self.driver
         rio_counts = []
         dallas_counts = []
         Search.search_location(driver, 'Rio De Janeiro')
-        rio_counts.append(Search.count_results(driver))
         Keywords.filter_root(driver, ['Biological', 'Chemical', 'Physical'])
         rio_counts.append(Search.count_results(driver))
         Advanced.filter_all_value_types(driver)
         rio_counts.append(Search.count_results(driver))
         Search.reset(driver)
+        rio_counts.append(Search.count_results(driver))
         Search.search_location(driver, 'Dallas')
-        dallas_counts.append(Search.count_results(driver))
         Keywords.filter_root(driver, ['Biological', 'Chemical', 'Physical'])
         dallas_counts.append(Search.count_results(driver))
-        TestSystem.wait(3)  # extra wait time in seconds
         Advanced.filter_all_value_types(driver)
-        TestSystem.wait(3)  # extra wait time in seconds
+        dallas_counts.append(Search.count_results(driver))
+        Search.reset(driver)
         dallas_counts.append(Search.count_results(driver))
         oracle()
 
@@ -220,22 +228,31 @@ class HydroclientTestSuite(BaseTest):
         """
         def oracle():
             """ None of the resource pages contain the text "404 Error" """
-            self.assertNotIn('404 Error', external_sources)
+            self.assertNotIn('404 Error', external_sources,
+                             msg='"{}" page was not found.'.format(page))
 
         driver = self.driver
-        external_sources = ''
-        About.to_helpcenter(driver)
-        external_sources += External.source_new_page(driver)
-        External.close_new_page(driver)
+
+        page = 'Help Center'
+        for to_helpcenter_link in [About.to_helpcenter, About.to_contact]:
+            to_helpcenter_link(driver)
+            external_sources = External.source_new_page(driver)
+            External.close_new_page(driver)
+            oracle()
+        About.contact_close(driver)
+
+        page = 'CUAHSI GitHub repository'
+        # opens in new window
         About.to_license_repo_top(driver)
-        external_sources += External.source_new_page(driver)
+        external_sources = External.source_new_page(driver)
         External.close_new_page(driver)
-        About.to_contact(driver)
-        external_sources += External.source_new_page(driver)
-        External.close_new_page(driver)
+        oracle()
+        About.licensing_close(driver)
+        # opens in the same window
         About.to_license_repo_inline(driver)
-        external_sources += External.source_new_page(driver)
-        External.close_new_page(driver)
+        external_sources = External.source_new_page(driver)
+        # TODO Brian fix of _blank target inconsistency in the works
+        # External.close_new_page(driver)
         oracle()
 
     def test_A_000012(self):
