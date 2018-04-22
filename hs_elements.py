@@ -1,219 +1,193 @@
+from selenium.webdriver.common.by import By
+
 from site_element import SiteElement
 
 
 class HomePage:
     def __init__(self):
-        self.to_discover = SiteElement('li', el_id='dropdown-menu-search')
-        self.to_apps = SiteElement('*', el_id='dropdown-menu-' +
-                                   'https:--www.hydroshare.org-apps-')
-        self.to_help = SiteElement('*', el_id='dropdown-menu-' +
-                                   'http:--help.hydroshare.org',
-                                   el_content='HELP')
-        self.to_about = SiteElement('*', el_id='dropdown-menu-' +
-                                    'https:--help.hydroshare.org' +
-                                    '-about-hydroshare-',
-                                    el_content='ABOUT')
+        self.to_discover = SiteElement(By.ID, 'dropdown-menu-search')
+        self.to_apps = \
+            SiteElement(By.ID,
+                        'dropdown-menu-https:--www.hydroshare.org-apps-')
+        self.to_help = SiteElement(By.ID,
+                                   'dropdown-menu-http:--help.hydroshare.org')
+        self.to_about = SiteElement(By.ID,
+                                    'dropdown-menu-https:--help.hydroshare.org' +
+                                    '-about-hydroshare-')
 
 
 class AppsPage:
     def __init__(self):
         self.container = \
-            SiteElement('div', el_class='container apps-container',
-                        el_recursive=[SiteElement('div', el_class='row')])
+            SiteElement(*self.apps_container_locator)
 
     def info(self, num):
-        return SiteElement('div', el_class='container apps-container',
-                           el_recursive=(
-                               [SiteElement('div', el_class='row'),
-                                SiteElement('div[{}]'.format(num)),
-                                SiteElement('a', el_class='app-info-toggle')]))
+        return SiteElement(By.CSS_SELECTOR,
+                           "div.container.apps-container div.row "
+                           "div:nth-of-type({}) "
+                           "a.app-info-toggle".format(num))
 
     def resource(self, num):
-        return SiteElement('div', el_class='container apps-container',
-                           el_recursive=(
-                               [SiteElement('div', el_class='row'),
-                                SiteElement('div[{}]'.format(num)),
-                                SiteElement('p', el_class='app-description'),
-                                SiteElement('a')]))
+        return SiteElement(By.CSS_SELECTOR,
+                           "div.container.apps-container div.row "
+                           "div:nth-of-type({}) "
+                           "p.app-description a".format(num))
 
     def title(self, num):
-        return SiteElement('div', el_class='container apps-container',
-                           el_recursive=(
-                               [SiteElement('div', el_class='row'),
-                                SiteElement('div[{}]'.format(num)),
-                                SiteElement('h3')]))
+        return SiteElement(By.CSS_SELECTOR,
+                           "div.container.apps-container "
+                           "div.row div:nth-of-type({}) h3".format(num))
+
+    @property
+    def apps_container_locator(self):
+        return By.CSS_SELECTOR, "div.container.apps-container div.row"
 
 
 class DiscoverPage:
     def __init__(self):
-        self.start_date = SiteElement('input', el_id='id_start_date')
-        self.end_date = SiteElement('input', el_id='id_end_date')
-        self.map_tab = SiteElement('a', el_href='map-view')
-        self.map_search = SiteElement('input', el_id='geocoder-address')
-        self.map_submit = SiteElement('a', el_id='geocoder-submit')
-        self.list_tab = SiteElement('a', el_content='List')
-        self.sort_order = SiteElement('select', el_id='id_sort_order')
-        self.sort_direction = SiteElement('select', el_id='id_sort_direction')
-        self.col_headers = SiteElement('table', el_id='items-discovered',
-                                       el_recursive=[SiteElement('thead'),
-                                                     SiteElement('tr')])
+        self.start_date = SiteElement(By.ID, 'id_start_date')
+        self.end_date = SiteElement(By.ID, 'id_end_date')
+        self.map_tab = SiteElement(By.CSS_SELECTOR, 'a[href="#map-view"]')
+        self.map_search = SiteElement(By.ID, 'geocoder-address')
+        self.map_submit = SiteElement(By.ID, 'geocoder-submit')
+        self.list_tab = SiteElement(By.CSS_SELECTOR, 'a[href="#list-view"]')
+        self.sort_order = SiteElement(By.ID, 'id_sort_order')
+        self.sort_direction = SiteElement(By.ID, 'id_sort_direction')
+        self.col_headers = SiteElement(By.CSS_SELECTOR,
+                                       '#items-discovered thead tr')
 
     def to_resource(self, title):
-        return SiteElement('a', el_content=title)
+        return SiteElement(By.XPATH,
+                           "//a[contains(text(), '{}')]".format(title))
 
     def col_index(self, col_index):
         """ Return the column header element, given the index """
-        return SiteElement('table', el_id='items-discovered',
-                           el_recursive=[SiteElement('thead'),
-                                         SiteElement('tr'),
-                                         SiteElement('th[{}]'.format(col_index))])
+        return SiteElement(By.CSS_SELECTOR,
+                           '#items-discovered thead tr '
+                           'th:nth-of-type({})'.format(col_index))
 
     def cell(self, col, row):
-        """ Return the cell in the discover table, given row and column
-        indicies
         """
-        return SiteElement('table', el_id='items-discovered',
-                           el_recursive=[SiteElement('tbody'),
-                                         SiteElement('tr[{}]'.format(row)),
-                                         SiteElement('td[{}]'.format(col))])
+        Return the cell in the discover table, given row and column indicies
+        """
+        return SiteElement(By.CSS_SELECTOR,
+                           '#items-discovered tbody tr:nth-of-type({}) '
+                           'td:nth-of-type({})'.format(row, col))
 
     def cell_href(self, col, row):
-        """ Return the cell in the discover table, given row and column
-        indicies.  Builds on discover_field method, but enables use for
-        hyperlinked fields.
         """
-        return SiteElement('table', el_id='items-discovered',
-                           el_recursive=[SiteElement('tbody'),
-                                         SiteElement('tr[{}]'.format(row)),
-                                         SiteElement('td[{}]'.format(col)),
-                                         SiteElement('a')])
+        Return the cell's hyperlink in the discover table, given row and column
+        indicies.
+        """
+        return SiteElement(By.CSS_SELECTOR,
+                           '#items-discovered tbody tr:nth-of-type({}) '
+                           'td:nth-of-type({}) a'.format(row, col))
 
     def cell_strong_href(self, col, row):
-        """ Return the cell in the discover table, given row and column
-        indicies.  Builds on discover_field method, but enables use for
-        bolded and hyperlinked fields.
         """
-        return SiteElement('table', el_id='items-discovered',
-                           el_recursive=[SiteElement('tbody'),
-                                         SiteElement('tr[{}]'.format(row)),
-                                         SiteElement('td[{}]'.format(col)),
-                                         SiteElement('strong'),
-                                         SiteElement('a')])
+        Return the cell's bolded hyperlink in the discover table,
+        given row and column indicies.
+        """
+        return SiteElement(By.CSS_SELECTOR,
+                           '#items-discovered tbody tr:nth-of-type({}) '
+                           'td:nth-of-type({}) strong a'.format(row, col))
 
     def filter_author(self, author):
-        return SiteElement('input', el_id='creators-{}'.format(author))
+        return SiteElement(By.ID, 'creator-{}'.format(author))
 
     def filter_subject(self, subject):
-        return SiteElement('input', el_id='subjects-{}'.format(subject))
+        return SiteElement(By.ID, 'subject-{}'.format(subject))
 
     def filter_resource_type(self, resource_type):
-        return SiteElement('input', el_id='resource_type-{}'.format(resource_type))
+        return SiteElement(By.ID, 'resource_type-{}'.format(resource_type))
 
     def filter_owner(self, owner):
-        return SiteElement('input', el_id='owners_names-{}'.format(owner))
+        return SiteElement(By.ID, 'owner_names-{}'.format(owner))
 
     def filter_variable(self, variable):
-        return SiteElement('input', el_id='variable_names-{}'.format(variable))
+        return SiteElement(By.ID, 'variable_name-{}'.format(variable))
 
     def filter_sample_medium(self, sample_medium):
-        return SiteElement('input', el_id='sample_mediums-{}'.format(sample_medium))
+        return SiteElement(By.ID, 'sample_medium-{}'.format(sample_medium))
 
     def filter_unit(self, unit):
-        return SiteElement('input', el_id='units_names-{}'.format(unit))
-
-    def filter_discoverable(self, discoverable):
-        return SiteElement('input', el_id='discoverable-{}'.format(discoverable))
-
-    def filter_public(self, public):
-        return SiteElement('input', el_id='public-{}'.format(public))
+        return SiteElement(By.ID, 'units_name-{}'.format(unit))
 
     def filter_availability(self, availability):
-        return SiteElement('input', el_id='{}-true'.format(availability))
+        return SiteElement(By.ID, 'availability-{}'.format(availability))
 
 
 class ResourcePage:
     def __init__(self):
-        self.bagit = SiteElement('a', el_id='btn-download-all',
-                                 el_content='Download All Content as ' +
-                                 'Zipped BagIt Archive')
+        self.bagit = SiteElement(By.ID, 'btn-download-all')
 
 
 class HelpPage:
     def __init__(self):
-        self.core_root = \
-            SiteElement('div', el_id='content',
-                        el_recursive=[SiteElement('div', el_class='row')])
-        self.core_breadcrumb = SiteElement('li', el_id='breadcrumb-menu-home')
+        self.core_root = SiteElement(By.CSS_SELECTOR, '#content div.row')
+        self.core_breadcrumb = SiteElement(By.ID, 'breadcrumb-menu-home')
 
     def core_item(self, index):
-        return SiteElement('div', el_id='content',
-                           el_recursive=(
-                               [SiteElement('div', el_class='row'),
-                                SiteElement(el_dom='./div[{}]'.format(index)),
-                                SiteElement('div', el_class='topic-name'),
-                                SiteElement('div')]))
+        return SiteElement(By.CSS_SELECTOR, '#content '
+                           'div.row div:nth-of-type({}) '
+                           'div.topic-name div'.format(index))
 
 
 class AboutPage:
     def __init__(self):
-        self.tree_root = SiteElement('li', el_id='tree-menu-about-hydroshare',
-                                     el_recursive=[SiteElement('div[1]'),
-                                                   SiteElement('i')])
-        self.article_title = SiteElement('h1', el_class='page-title')
+        self.tree_root = SiteElement(By.CSS_SELECTOR,
+                                     '#tree-menu-about-hydroshare '
+                                     'div.tree-menu-item i')
+        self.article_title = SiteElement(By.CSS_SELECTOR, 'h1.page-title')
 
     def tree_top(self, item):
-        return SiteElement('li', el_id='tree-menu-about-hydroshare',
-                           el_recursive=(
-                               [SiteElement('li', el_id='tree-menu-about-' +
-                                            'hydroshare-{}'.format(item)),
-                                SiteElement('div', el_class='tree-menu-item'),
-                                SiteElement('i')]))
+        return SiteElement(By.CSS_SELECTOR,
+                           '#tree-menu-about-hydroshare '
+                           '#tree-menu-about-hydroshare-{} '
+                           'div.tree-menu-item i'.format(item))
 
     def tree_policy(self, item):
-        return SiteElement('li', el_id='tree-menu-about-hydroshare',
-                           el_recursive=(
-                               [SiteElement('li', el_id='tree-menu-about-' +
-                                            'hydroshare-policies-{}'.format(item)),
-                                SiteElement('div', el_class='tree-menu-item'),
-                                SiteElement('a')]))
+        return SiteElement(By.CSS_SELECTOR,
+                           '#tree-menu-about-hydroshare '
+                           '#tree-menu-about-hydroshare-policies-{} '
+                           'div.tree-menu-item a'.format(item))
 
 
 class APIPage:
     def __init__(self):
-        self.hsapi = SiteElement('*', el_id='endpointListTogger_hsapi')
-        self.endpoint_list = SiteElement('*', el_id='hsapi_endpoint_list')
+        self.hsapi = SiteElement(By.ID, 'endpointListTogger_hsapi')
+        self.endpoint_list = SiteElement(By.ID, 'hsapi_endpoint_list')
 
     def path_by_index(self, index):
-        return SiteElement('*', el_id='hsapi_endpoint_list',
-                           el_recursive=[SiteElement('li[{}]'.format(index)),
-                                         SiteElement('span', el_class='path'),
-                                         SiteElement('a')])
+        return SiteElement(By.CSS_SELECTOR,
+                           '#hsapi_endpoint_list '
+                           'li:nth-of-type({}) '
+                           'span.path a'.format(index))
 
     def type_by_index(self, index):
-        return SiteElement('*', el_id='hsapi_endpoint_list',
-                           el_recursive=[SiteElement('li[{}]'.format(index)),
-                                         SiteElement('span', el_class='http_method'),
-                                         SiteElement('a')])
+        return SiteElement(By.CSS_SELECTOR,
+                           '#hsapi_endpoint_list '
+                           'li:nth-of-type({}) '
+                           'span.http_method a'.format(index))
 
     def parameter_by_index(self, index):
-        return SiteElement('*', el_id='hsapi_endpoint_list',
-                           el_recursive=[SiteElement('li[{}]'.format(index)),
-                                         SiteElement('tbody',
-                                                     el_class='operation-params'),
-                                         SiteElement('input',
-                                                     el_class='parameter required')])
+        return SiteElement(By.CSS_SELECTOR,
+                           '#hsapi_endpoint_list '
+                           'li:nth-of-type({}) '
+                           'tbody.operation-params '
+                           'input.parameter.required'.format(index))
 
     def submit(self, index):
-        return SiteElement('*', el_id='hsapi_endpoint_list',
-                           el_recursive=[SiteElement('li[{}]'.format(index)),
-                                         SiteElement('input', el_class='submit')])
+        return SiteElement(By.CSS_SELECTOR,
+                           '#hsapi_endpoint_list '
+                           'li:nth-of-type({}) '
+                           'input.submit'.format(index))
 
     def response_code(self, index):
-        return SiteElement('*', el_id='hsapi_endpoint_list',
-                           el_recursive=[SiteElement('li[{}]'.format(index)),
-                                         SiteElement('div',
-                                                     el_class='block response_code'),
-                                         SiteElement('pre')])
+        return SiteElement(By.CSS_SELECTOR,
+                           '#hsapi_endpoint_list '
+                           'li:nth-of-type({}) '
+                           'div.block.response_code pre'.format(index))
 
 
 HomePage = HomePage()
