@@ -1,0 +1,7 @@
+# install of core requirements
+-r requirements.txt
+
+azure==3.0.0
+azure-monitor==0.3.1
+seaborn==0.8.1
+pandas==0.22.0

@@ -14,6 +14,13 @@ class HomePage:
         self.to_about = SiteElement(By.ID,
                                     'dropdown-menu-https:--help.hydroshare.org' +
                                     '-about-hydroshare-')
+        self.to_login = SiteElement(By.CSS_SELECTOR, '#signin-menu a')
+        self.to_collaborate = SiteElement(By.CSS_SELECTOR,
+                                          '#dropdown-menu-collaborate a')
+        self.profile_image = SiteElement(By.ID, 'profile-menu')
+        self.profile_button = SiteElement(By.CSS_SELECTOR,
+                                          '.account div.dropdown-footer '
+                                          '.btn.btn-primary')
 
 
 class AppsPage:
@@ -120,12 +127,22 @@ class DiscoverPage:
 class ResourcePage:
     def __init__(self):
         self.bagit = SiteElement(By.ID, 'btn-download-all')
+        self.open_with = SiteElement(By.ID, 'apps-dropdown')
+        self.open_jupyterhub = SiteElement(By.CSS_SELECTOR,
+                                           'li[title="JupyterHub"]')
 
 
 class HelpPage:
     def __init__(self):
         self.core_root = SiteElement(By.CSS_SELECTOR, '#content div.row')
         self.core_breadcrumb = SiteElement(By.ID, 'breadcrumb-menu-home')
+        self.footer_terms = SiteElement(By.CSS_SELECTOR,
+                                        'footer a[href=\'/terms-of-use\']')
+        self.footer_privacy = SiteElement(By.CSS_SELECTOR,
+                                          'footer a[href=\'/privacy\']')
+        self.footer_sitemap = SiteElement(By.CSS_SELECTOR,
+                                          'footer a[href=\'/sitemap/\']')
+        self.title = SiteElement(By.CSS_SELECTOR, 'h1.page-title')
 
     def core_item(self, index):
         return SiteElement(By.CSS_SELECTOR, '#content '
@@ -190,6 +207,52 @@ class APIPage:
                            'div.block.response_code pre'.format(index))
 
 
+class LoginPage:
+    def __init__(self):
+        self.username = SiteElement(By.ID, 'id_username')
+        self.password = SiteElement(By.ID, 'id_password')
+        self.submit = SiteElement(By.CSS_SELECTOR,
+                                  'input.btn.btn-primary[type=\'submit\']')
+
+
+class ProfilePage:
+    def __init__(self):
+        self.edit = SiteElement(By.ID, 'btn-edit-profile')
+        self.add_org = SiteElement(By.CSS_SELECTOR,
+                                   'input[placeholder="Organization(s)"]')
+        self.save = SiteElement(By.CSS_SELECTOR,
+                                'button.btn-save-profile:first-of-type')
+
+    def delete_org(self, index):
+        return SiteElement(By.CSS_SELECTOR,
+                           'span.tag:nth-of-type({}) a'.format(index))
+
+
+class GroupsPage:
+    def __init__(self):
+        self.create_group = SiteElement(By.CSS_SELECTOR,
+                                        'a[data-target="#create-group-dialog"]')
+
+
+class GroupPage:
+    def __init__(self):
+        self.name = SiteElement(By.CSS_SELECTOR, '.group-title')
+
+
+class NewGroupModal:
+    def __init__(self):
+        self.name = SiteElement(By.CSS_SELECTOR, 'input.form-control[name="name"]')
+        self.purpose = SiteElement(By.CSS_SELECTOR,
+                                   'textarea.form-control[name="purpose"]')
+        self.about = SiteElement(By.CSS_SELECTOR,
+                                 'textarea.form-control[name="description"]')
+        self.public = SiteElement(By.CSS_SELECTOR, 'input[value="public"]')
+        self.discoverable = SiteElement(By.CSS_SELECTOR,
+                                        'input[value="discoverable"]')
+        self.private = SiteElement(By.CSS_SELECTOR, 'input[value="private"]')
+        self.submit = SiteElement(By.CSS_SELECTOR, 'button[type="submit"]')
+
+
 HomePage = HomePage()
 AppsPage = AppsPage()
 DiscoverPage = DiscoverPage()
@@ -197,3 +260,8 @@ ResourcePage = ResourcePage()
 HelpPage = HelpPage()
 AboutPage = AboutPage()
 APIPage = APIPage()
+LoginPage = LoginPage()
+ProfilePage = ProfilePage()
+GroupsPage = GroupsPage()
+GroupPage = GroupPage()
+NewGroupModal = NewGroupModal()

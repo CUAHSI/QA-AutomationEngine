@@ -313,6 +313,20 @@ class HydroclientTestSuite(BaseTest):
                                               'NLDAS Hourly Primary Forcing Data'])
         oracle()
 
+    def test_A_000015(self):
+        """ Confirms no date filters returns the same number of results as
+        applying a date filter from 01/01/0100 to 01/01/9000 """
+        def oracle(init_count, final_count):
+            self.assertEqual(init_count, final_count)
+        Search.search_location(self.driver, 'United States')
+        Search.search(self.driver)
+        Search.filter_dates(self.driver, '01/01/0100', '01/01/9000')
+        init_count = Search.count_results(self.driver)
+        Search.clear_date_filter(self.driver)
+        Search.search(self.driver)
+        final_count = Search.count_results(self.driver)
+        oracle(init_count, final_count)
+
 
 if __name__ == '__main__':
     args = basecli().parse_args()

@@ -1,9 +1,12 @@
 import os
 import time
 
+from selenium.webdriver.common.keys import Keys
+
 from dateutil import parser
 from hs_elements import HomePage, AppsPage, DiscoverPage, ResourcePage, \
-    HelpPage, AboutPage, APIPage
+    HelpPage, AboutPage, APIPage, LoginPage, ProfilePage, GroupsPage, \
+    GroupPage, NewGroupModal
 from config.delays import HSAPI_GUI_RESPONSE_DELAY
 
 
@@ -19,6 +22,19 @@ class Home:
 
     def to_about(self, driver):
         HomePage.to_about.click(driver)
+
+    def to_collaborate(self, driver):
+        HomePage.to_collaborate.click(driver)
+
+    def login(self, driver, username, password):
+        HomePage.to_login.click(driver)
+        LoginPage.username.inject_text(driver, username)
+        LoginPage.password.inject_text(driver, password)
+        LoginPage.submit.click(driver)
+
+    def to_profile(self, driver):
+        HomePage.profile_image.click(driver)
+        HomePage.profile_button.click(driver)
 
 
 class Apps:
@@ -121,7 +137,6 @@ class Discover:
         {{variable}}, sample medium(s) {{sample_medium}}, unit(s) {{unit}},
         and availability(s) {{availability}}
         """
-        HomePage.to_discover.click(driver)
         if type(author) is list:
             for author_item in author:
                 filter_el = DiscoverPage.filter_author(author_item)
@@ -190,6 +205,10 @@ class Resource:
         os.system('rm {}'.format(download_file))
         return file_size
 
+    def open_with_jupyterhub(self, driver):
+        ResourcePage.open_with.click(driver)
+        ResourcePage.open_jupyterhub.click(driver)
+
 
 class Help:
     def open_core(self, driver, index):
@@ -203,6 +222,18 @@ class Help:
 
     def to_core_breadcrumb(self, driver):
         HelpPage.core_breadcrumb.click(driver)
+
+    def to_footer_terms(self, driver):
+        HelpPage.footer_terms.click(driver)
+
+    def to_footer_privacy(self, driver):
+        HelpPage.footer_privacy.click(driver)
+
+    def to_footer_sitemap(self, driver):
+        HelpPage.footer_sitemap.click(driver)
+
+    def get_title(self, driver):
+        return HelpPage.title.get_text(driver)
 
 
 class About:
@@ -252,6 +283,42 @@ class API:
         return APIPage.response_code(endpoint_ind).get_text(driver)
 
 
+class Profile:
+    def to_editor(self, driver):
+        ProfilePage.edit.click(driver)
+
+    def add_org(self, driver, org):
+        ProfilePage.add_org.inject_text(driver, org)
+        ProfilePage.add_org.inject_text(driver, Keys.ARROW_DOWN)
+        ProfilePage.add_org.inject_text(driver, Keys.ENTER)
+
+    def delete_org(self, driver, index):
+        ProfilePage.delete_org(index).click(driver)
+
+    def save(self, driver):
+        ProfilePage.save.click(driver)
+
+
+class Groups:
+    def create_group(self, driver, name, purpose, about, privacy):
+        GroupsPage.create_group.click(driver)
+        NewGroupModal.name.inject_text(driver, name)
+        NewGroupModal.purpose.inject_text(driver, purpose)
+        NewGroupModal.about.inject_text(driver, about)
+        if privacy.lower() == 'public':
+            NewGroupModal.public.click(driver)
+        elif privacy.lower() == 'discoverable':
+            NewGroupModal.discoverable.click(driver)
+        else:
+            NewGroupModal.private.click(driver)
+        NewGroupModal.submit.click(driver)
+
+
+class Group:
+    def check_title(self, driver):
+        return GroupPage.name.get_text(driver)
+
+
 Home = Home()
 Apps = Apps()
 Discover = Discover()
@@ -259,3 +326,6 @@ Resource = Resource()
 Help = Help()
 About = About()
 API = API()
+Profile = Profile()
+Groups = Groups()
+Group = Group()

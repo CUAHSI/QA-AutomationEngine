@@ -91,6 +91,10 @@ class Search:
             EC.visibility_of_element_located(SearchPage.modal_fade_locator))
         Search.search(driver)
 
+    def clear_date_filter(self, driver):
+        """ Clears any date filters with an "All Dates" selection """
+        SearchPage.all_dates.click(driver)
+
     def reset(self, driver):
         """ Press the reset button in the sidebar """
         SearchPage.reset.click(driver)

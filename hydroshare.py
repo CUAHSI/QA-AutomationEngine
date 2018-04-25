@@ -1,10 +1,12 @@
 """ Runs various smoke tests for the hydroshare.org """
+import random
 import re
 import sys
 import unittest
 
 from cuahsi_base import BaseTest, basecli
-from hs_macros import Home, Apps, Discover, Resource, Help, API, About
+from hs_macros import Home, Apps, Discover, Resource, Help, API, About, Profile, \
+    Groups, Group
 from hs_elements import AppsPage
 from utils import External, TestSystem
 
@@ -31,6 +33,7 @@ class HydroshareTestSuite(BaseTest):
             """
             self.assertEqual(Resource.size_download(self.driver, BASE_URL), 512000)
 
+        Home.to_discover(self.driver)
         Discover.filters(self.driver, subject='iUTAH', resource_type='Generic',
                          availability=['discoverable', 'public'])
         Discover.to_resource(self.driver, 'Beaver Divide Air Temperature')
@@ -107,6 +110,7 @@ class HydroshareTestSuite(BaseTest):
             words_string = re.sub('[^A-Za-z]', ' ', core_topic)
             for word in words_string.split(' '):
                 self.assertIn(word, TestSystem.page_source(self.driver))
+
         Home.to_help(self.driver)
         core_count = Help.count_core(self.driver)
         core_topics = [Help.get_core_topic(self.driver, i+1)
@@ -122,6 +126,7 @@ class HydroshareTestSuite(BaseTest):
         """
         def oracle(response_code):
             self.assertEqual(response_code, '200')
+
         resource_id = '927094481da54af38ffb6f0c39ad8787'
         endpoints = ['/hsapi/resource/{id}/',
                      '/hsapi/resource/{id}/file_list/',
@@ -145,6 +150,7 @@ class HydroshareTestSuite(BaseTest):
         def oracle(response_code):
             """ Response code from api endpoint call is 200 """
             self.assertEqual(response_code, '200')
+
         endpoints = ['/hsapi/dictionary/universities/',
                      '/hsapi/resource/',
                      '/hsapi/resource/types/',
@@ -171,6 +177,7 @@ class HydroshareTestSuite(BaseTest):
             """
             self.assertIn(policy, article_title)
             self.assertIn(policy, webpage_title)
+
         Home.to_about(self.driver)
         About.toggle_tree(self.driver)
         TestSystem.wait(1)
@@ -186,6 +193,71 @@ class HydroshareTestSuite(BaseTest):
             article_title = About.get_title(self.driver)
             webpage_title = TestSystem.title(self.driver)
             oracle(policy, article_title, webpage_title)
+
+    def test_B_000012(self):
+        """ Confirm footer links redirect to valid pages and are available
+        at the bottom of a sample of pages """
+        def oracle_helppage(webpage_title, expected_title):
+            """ Expected title is actual page title """
+            self.assertIn(expected_title.lower(), webpage_title.lower())
+
+        def oracle_sitemap(webpage_title):
+            """ Resulting page exists """
+            self.assertNotIn('Page not found', webpage_title)
+
+        Home.to_help(self.driver)
+        Help.to_footer_terms(self.driver)
+        oracle_helppage(Help.get_title(self.driver), 'Terms of Use')
+        Help.to_footer_privacy(self.driver)
+        oracle_helppage(Help.get_title(self.driver), 'Statement of Privacy')
+        Help.to_footer_sitemap(self.driver)
+        oracle_sitemap(TestSystem.title(self.driver))
+
+    def test_B_000013(self):
+        """ Confirms clean removal, then readdition, of user organizations using
+        the user profile interface """
+        def oracle():
+            self.assertIn('Your profile has been successfully updated.',
+                          TestSystem.page_source(self.driver))
+
+        Home.login(self.driver, 'jim', '62meister')
+        Home.to_profile(self.driver)
+        Profile.to_editor(self.driver)
+        Profile.delete_org(self.driver, 2)
+        Profile.delete_org(self.driver, 1)
+        Profile.add_org(self.driver, 'Freie Universität Berlin')
+        Profile.add_org(self.driver, 'Agricultural University of Warsaw')
+        Profile.save(self.driver)
+        TestSystem.wait(3)  # TODO setup config file for delays
+        oracle()
+
+    def test_B_000014(self):
+        """ Confirms ability to create HydroShare groups through standard
+        graphical interface and workflow """
+        def oracle(group_name):
+            self.assertEqual(Group.check_title(self.driver), group_name)
+
+        Home.login(self.driver, 'jim', '62meister')
+        Home.to_collaborate(self.driver)
+        group_name = 'QA Test Group {}'.format(random.randint(1, 1000000))
+        Groups.create_group(self.driver,
+                            name=group_name,
+                            purpose='1230!@#$%^&*()-=_+<{[QA TEST]}>.,/',
+                            about='Über Die Gruppe',
+                            privacy='private')
+        oracle(group_name)
+
+    def test_B_000015(self):
+        """ Confirms Resource "Open With" successfully redirects to JupyterHub """
+        def oracle(webpage_title):
+            """ Resulting page exists """
+            self.assertNotIn('Page not found', webpage_title)
+
+        Home.to_discover(self.driver)
+        Discover.filters(self.driver, author='Castronova, Anthony')
+        Discover.to_resource(self.driver, 'Terrain Processing - TauDem Example')
+        Resource.open_with_jupyterhub(self.driver)
+        oracle(TestSystem.title(self.driver))
 
 
 if __name__ == '__main__':
