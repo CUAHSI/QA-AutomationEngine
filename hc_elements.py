@@ -26,6 +26,7 @@ class SearchPage:
         self.date_start = SiteElement(By.ID, 'startDateModal')
         self.date_end = SiteElement(By.ID, 'endDateModal')
         self.date_save = SiteElement(By.ID, 'btnDateRangeModalSave')
+        self.all_dates = SiteElement(By.ID, 'optionsDatesAll')
         self.layers = SiteElement(By.ID, 'Layer Control')
         self.legend_tab = SiteElement(By.CSS_SELECTOR, 'a[href="#legend"]')
         self.legend_img = SiteElement(By.ID, 'nlcdColorClassUpdate')
