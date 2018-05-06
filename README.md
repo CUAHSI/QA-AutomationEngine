@@ -61,6 +61,11 @@ When initiating a Selenium Grid execution, provide the IP of the Selenium Grid h
 $ python3 hydroclient.py --grid 127.0.0.1
 $ python3 hydroclient.py HydroclientTestSuite.test_A_000002 --grid 127.0.0.1
 ```
+To select a browser for test execution, provide a browser name as an argument. Current choices are 'firefox', 'chrome' and 'safari' (w/o quotes). Default is 'firefox'.
+```
+$ python3 hydroclient.py --browser chrome
+$ python3 hydroclient.py --browser safari HydroclientTestSuite.test_A_000002
+```
 
 ### Jenkins Deployments
 In a Jenkins deployment, the core job should run the jenkins.sh script:
