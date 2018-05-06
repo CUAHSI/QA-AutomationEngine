@@ -1,8 +1,6 @@
 """ Runs various smoke tests for the data.cuahsi.org """
-import sys
-import unittest
 
-from cuahsi_base import BaseTest, basecli
+from cuahsi_base import BaseTest, parse_args_run_tests
 from hc_macros import Search, Marker, Services, Keywords, Advanced, \
     Filter, About, QuickStart, Zendesk, Workspace
 from hc_elements import ZendeskArticlePage
@@ -329,9 +327,4 @@ class HydroclientTestSuite(BaseTest):
 
 
 if __name__ == '__main__':
-    args = basecli().parse_args()
-    HydroclientTestSuite.GRID_HUB_IP = vars(args).get('grid')
-
-    # Set the sys.argv to the unittest_args (leaving sys.argv[0] alone)
-    sys.argv[1:] = args.unittest_args
-    unittest.main(verbosity=2)
+    parse_args_run_tests(HydroclientTestSuite)

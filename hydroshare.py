@@ -1,12 +1,10 @@
 """ Runs various smoke tests for the hydroshare.org """
 import random
 import re
-import sys
-import unittest
 
-from cuahsi_base import BaseTest, basecli
 from hs_macros import Home, Apps, Discover, Resource, Help, API, About, Profile, \
     Groups, Group
+from cuahsi_base import BaseTest, parse_args_run_tests
 from hs_elements import AppsPage
 from utils import External, TestSystem
 
@@ -236,7 +234,6 @@ class HydroshareTestSuite(BaseTest):
         graphical interface and workflow """
         def oracle(group_name):
             self.assertEqual(Group.check_title(self.driver), group_name)
-
         Home.login(self.driver, 'jim', '62meister')
         Home.to_collaborate(self.driver)
         group_name = 'QA Test Group {}'.format(random.randint(1, 1000000))
@@ -261,9 +258,4 @@ class HydroshareTestSuite(BaseTest):
 
 
 if __name__ == '__main__':
-    args = basecli().parse_args()
-    HydroshareTestSuite.GRID_HUB_IP = vars(args).get('grid')
-
-    # Set the sys.argv to the unittest_args (leaving sys.argv[0] alone)
-    sys.argv[1:] = args.unittest_args
-    unittest.main(verbosity=2)
+    parse_args_run_tests(HydroshareTestSuite)
