@@ -3,7 +3,7 @@ import random
 import re
 
 from hs_macros import Home, Apps, Discover, Resource, Help, API, About, Profile, \
-    Groups, Group
+    Groups, Group, MyResources
 from cuahsi_base import BaseTest, parse_args_run_tests
 from hs_elements import AppsPage
 from utils import External, TestSystem
@@ -255,6 +255,19 @@ class HydroshareTestSuite(BaseTest):
         Discover.to_resource(self.driver, 'Terrain Processing - TauDem Example')
         Resource.open_with_jupyterhub(self.driver)
         oracle(TestSystem.title(self.driver))
+
+    def test_B_000016(self):
+        """ Create basic resource without any files """
+        def oracle(resource_title):
+            """ Check title to make sure it matches initial input """
+            self.assertEqual('Test Resource', resource_title)
+
+        Home.login(self.driver, 'jim', '62meister')
+        Home.to_my_resources(self.driver)
+        MyResources.create_resource(self.driver, 'Test Resource')
+        TestSystem.wait()
+        resource_title = Resource.get_title(self.driver)
+        oracle(resource_title)
 
 
 if __name__ == '__main__':

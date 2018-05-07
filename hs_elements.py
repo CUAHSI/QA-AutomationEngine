@@ -5,6 +5,7 @@ from site_element import SiteElement
 
 class HomePage:
     def __init__(self):
+        self.to_my_resources = SiteElement(By.ID, 'dropdown-menu-my-resources')
         self.to_discover = SiteElement(By.ID, 'dropdown-menu-search')
         self.to_apps = \
             SiteElement(By.ID,
@@ -130,6 +131,7 @@ class ResourcePage:
         self.open_with = SiteElement(By.ID, 'apps-dropdown')
         self.open_jupyterhub = SiteElement(By.CSS_SELECTOR,
                                            'li[title="JupyterHub"]')
+        self.title = SiteElement(By.ID, 'resource-title')
 
 
 class HelpPage:
@@ -253,6 +255,14 @@ class NewGroupModal:
         self.submit = SiteElement(By.CSS_SELECTOR, 'button[type="submit"]')
 
 
+class MyResourcesPage:
+    def __init__(self):
+        self.create_new = SiteElement(By.CSS_SELECTOR, '#facets a')
+        self.title = SiteElement(By.ID, 'txtTitle')
+        self.create_resource = SiteElement(By.CSS_SELECTOR,
+                                           '.btn-create-resource:nth-of-type(1)')
+
+
 HomePage = HomePage()
 AppsPage = AppsPage()
 DiscoverPage = DiscoverPage()
@@ -265,3 +275,4 @@ ProfilePage = ProfilePage()
 GroupsPage = GroupsPage()
 GroupPage = GroupPage()
 NewGroupModal = NewGroupModal()
+MyResourcesPage = MyResourcesPage()
