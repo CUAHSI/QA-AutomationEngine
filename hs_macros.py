@@ -6,11 +6,14 @@ from selenium.webdriver.common.keys import Keys
 from dateutil import parser
 from hs_elements import HomePage, AppsPage, DiscoverPage, ResourcePage, \
     HelpPage, AboutPage, APIPage, LoginPage, ProfilePage, GroupsPage, \
-    GroupPage, NewGroupModal
+    GroupPage, NewGroupModal, MyResourcesPage
 from config.delays import HSAPI_GUI_RESPONSE_DELAY
 
 
 class Home:
+    def to_my_resources(self, driver):
+        HomePage.to_my_resources.click(driver)
+
     def to_discover(self, driver):
         HomePage.to_discover.click(driver)
 
@@ -209,6 +212,9 @@ class Resource:
         ResourcePage.open_with.click(driver)
         ResourcePage.open_jupyterhub.click(driver)
 
+    def get_title(self, driver):
+        return ResourcePage.title.get_text(driver)
+
 
 class Help:
     def open_core(self, driver, index):
@@ -319,6 +325,14 @@ class Group:
         return GroupPage.name.get_text(driver)
 
 
+class MyResources:
+    def create_resource(self, driver, title):
+        MyResourcesPage.create_new.click(driver)
+        MyResourcesPage.title.click(driver)
+        MyResourcesPage.title.inject_text(driver, title)
+        MyResourcesPage.create_resource.click(driver)
+
+
 Home = Home()
 Apps = Apps()
 Discover = Discover()
@@ -329,3 +343,4 @@ API = API()
 Profile = Profile()
 Groups = Groups()
 Group = Group()
+MyResources = MyResources()
