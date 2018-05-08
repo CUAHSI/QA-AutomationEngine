@@ -8,18 +8,18 @@ import time
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
-from config.delays import NEW_PAGE_LOAD_DELAY
+from .delays import NEW_PAGE_LOAD
 
 
 class External:
     """ Utilities for handling new tabs/windows """
 
     def switch_new_page(self, driver, num_windows_before, new_window_load_locator):
-        WebDriverWait(driver, NEW_PAGE_LOAD_DELAY).until(
+        WebDriverWait(driver, NEW_PAGE_LOAD).until(
             EC.number_of_windows_to_be(num_windows_before+1))
         win_handle = driver.window_handles[-1]
         driver.switch_to.window(win_handle)
-        WebDriverWait(driver, NEW_PAGE_LOAD_DELAY).until(
+        WebDriverWait(driver, NEW_PAGE_LOAD).until(
             EC.visibility_of_element_located(new_window_load_locator))
 
         TestSystem.check_language(driver)
@@ -39,11 +39,11 @@ class External:
         orig_handle = driver.current_window_handle
         new_handle = driver.window_handles[-1]
         driver.switch_to.window(new_handle)
-        time.sleep(NEW_PAGE_LOAD_DELAY)
+        time.sleep(NEW_PAGE_LOAD)
         source = driver.page_source
         TestSystem.check_language(driver)
         driver.switch_to.window(orig_handle)
-        time.sleep(NEW_PAGE_LOAD_DELAY)
+        time.sleep(NEW_PAGE_LOAD)
 
         return source
 
@@ -52,7 +52,7 @@ class TestSystem:
     """ General utilities for Hydroclient test case creation """
     def to_url(self, driver, url):
         driver.get(url)
-        time.sleep(NEW_PAGE_LOAD_DELAY)
+        time.sleep(NEW_PAGE_LOAD)
 
     def title(self, driver):
         return driver.title
