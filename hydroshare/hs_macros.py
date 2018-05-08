@@ -7,7 +7,7 @@ from dateutil import parser
 from hs_elements import HomePage, AppsPage, DiscoverPage, ResourcePage, \
     HelpPage, AboutPage, APIPage, LoginPage, ProfilePage, GroupsPage, \
     GroupPage, NewGroupModal, MyResourcesPage
-from config.delays import HSAPI_GUI_RESPONSE_DELAY
+from timing import HSAPI_GUI_RESPONSE
 
 
 class Home:
@@ -282,7 +282,7 @@ class API:
     def submit(self, driver, path, method):
         endpoint_ind = self.endpoint_index(driver, path, method)
         APIPage.submit(endpoint_ind).click(driver)
-        time.sleep(HSAPI_GUI_RESPONSE_DELAY)
+        time.sleep(HSAPI_GUI_RESPONSE)
 
     def response_code(self, driver, path, method):
         endpoint_ind = self.endpoint_index(driver, path, method)

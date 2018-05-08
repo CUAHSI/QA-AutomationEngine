@@ -1,10 +1,11 @@
 """ Runs various smoke tests for the data.cuahsi.org """
 
-from cuahsi_base import BaseTest, parse_args_run_tests
 from hc_macros import Search, Marker, Services, Keywords, Advanced, \
     Filter, About, QuickStart, Zendesk, Workspace
 from hc_elements import ZendeskArticlePage
-from utils import External, TestSystem
+
+from cuahsi_base.utils import External, TestSystem
+from cuahsi_base.cuahsi_base import BaseTest, parse_args_run_tests
 
 # Test case parameters
 BASE_URL = 'http://data.cuahsi.org'  # production

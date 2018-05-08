@@ -4,7 +4,7 @@ import unittest
 
 from selenium import webdriver
 
-from config.browser import USER_AGENT
+from .browser import USER_AGENT
 
 
 class BaseTest(unittest.TestCase):

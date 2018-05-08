@@ -50,21 +50,21 @@ A browser driver must be downloaded into a system directory.  Further, this syst
 ### Test Execution
 The test suite can run without the Jenkins and Selenium Grid infrastructure for test script development and test suite debugging purposes.  To run all test cases (not just those defined in the configuration file):
 ```
-$ python3 hydroclient.py
+$ ./hydrotest hydroclient
 ```
 Specific tests can be executed by including the class and method names, for example:
 ```
-$ python3 hydroclient.py HydroclientTestSuite.test_A_000002
+$ ./hydrotest hydroclient HydroclientTestSuite.test_A_000002
 ```
 When initiating a Selenium Grid execution, provide the IP of the Selenium Grid hub as an argument.  The port is assumed to be the Selenium Grid default of 4444.
 ```
-$ python3 hydroclient.py --grid 127.0.0.1
-$ python3 hydroclient.py HydroclientTestSuite.test_A_000002 --grid 127.0.0.1
+$ ./hydrotest hydroclient --grid 127.0.0.1
+$ ./hydrotest hydroclient HydroclientTestSuite.test_A_000002 --grid 127.0.0.1
 ```
 To select a browser for test execution, provide a browser name as an argument. Current choices are 'firefox', 'chrome' and 'safari' (w/o quotes). Default is 'firefox'.
 ```
-$ python3 hydroclient.py --browser chrome
-$ python3 hydroclient.py --browser safari HydroclientTestSuite.test_A_000002
+$ ./hydrotest hydroclient --browser chrome
+$ ./hydrotest hydroclient --browser safari HydroclientTestSuite.test_A_000002
 ```
 
 ### Jenkins Deployments
@@ -74,20 +74,20 @@ $ bash jenkins.sh
 ```
 The Jenkins template project runs a parameterized version of the previously mentioned python3 commands.
 ```
-$ python3 hydroclient.py HydroclientTestSuite.test_A_000002 --grid 127.0.0.1
+$ ./hydrotest hydroclient HydroclientTestSuite.test_A_000002 --grid 127.0.0.1
 ```
 To specify which tests to run, edit the software system config file:
-1) hydroclient.conf
-2) hydroshare.conf
+1) [hydroclient.conf](hydroclient/hydroclient.conf)
+2) [hydroshare.conf](hydroshare/hydroshare.conf)
 
 ### Flake8 Compliance
 To confirm Flake8 compliance, use:
 ```
-$ make check
+$ ./hydrotest check
 ```
 
 ### Combinatorial Design of Experiments
-Calls to the [combinatorial design of experiments utility](doe/combinatorial-doe/combinatorial.py) requires a specification of the number of experiments to generate (--experiments), the number of factors for the combinatorial design (--factors), and the number of possible values for each independent variable (--specification).  For example, consider the following design of experiments problem:
+Calls to the [combinatorial design of experiments utility](cuahsi_base/combinatorial.py) requires a specification of the number of experiments to generate (--experiments), the number of factors for the combinatorial design (--factors), and the number of possible values for each independent variable (--specification).  For example, consider the following design of experiments problem:
 1) Pairwise (2-way) combinatorial approach
 2) One independent variable has three possible values, while three independent variables have two possible values
 3) Desired number of experiments is eight (six is the feasible minimum, but specifying the minimum may result in a long solution convergence time)
@@ -116,13 +116,13 @@ As one would expect, this generates a methods.csv file with 4 records, a sites.c
 
 The [PDF documentation](documentation/beta-release/CUAHSIAutomatedTestingEngineBeta.pdf) contained in this repository provides a deeper explanation of the test suite framework.  However, the general idea is to write test cases at the most abstract level, then support that with new classes, attributes, and methods in the lower abstraction levels as needed.
 
-In the case of the HydroClient software system, test cases should be created in hydroclient.py.  Consider a test case which involves running a map search, filtering by data service, then exporting to the workspace.  The top level test case script in [hydroclient.py](hydroclient.py) would likely only need four lines - one for each of the three steps above and one assert statement to confirm expected test results.  This test case is supported at the lower levels by (in decreasing levels of abstraction):
+In the case of the HydroClient software system, test cases should be created in hydroclient.py.  Consider a test case which involves running a map search, filtering by data service, then exporting to the workspace.  The top level test case script in [hydroclient.py](hydroclient/hydroclient.py) would likely only need four lines - one for each of the three steps above and one assert statement to confirm expected test results.  This test case is supported at the lower levels by (in decreasing levels of abstraction):
 
-1) [HydroClient macros](hc_macros.py), which captures common series of actions while working with HydroClient.  In our example, the map search step would be defined here and would include clicking the location search box, clearing the box of any existing text, injecting the desired text, then clicking the location search button.
-2) [HydroClient elements](hc_elements.py), which contains attributes and methods for specific element identification on the page.  In our example, the location search field and the location search button would both be defined at this level.
-3) [Site elements](site_elements.py) handles all the low level interactions with off-the-shelf Selenium.  In our example, the click, clear_all_text, and inject_text methods would be defined at this level.  These methods may involve a large number of Selenium commands and should use best practices in simulating real user behavior.  For instance, non-CUAHSI test scripts commonly inject large strings of text into fields instantaneously - the inject_text method within [site_elements.py](site_elements.py) has a small pause between simulated key presses to better mimic real user behavior.  The site elements module is common to all CUAHSI automated testing suites.
+1) [HydroClient macros](hydroclient/hc_macros.py), which captures common series of actions while working with HydroClient.  In our example, the map search step would be defined here and would include clicking the location search box, clearing the box of any existing text, injecting the desired text, then clicking the location search button.
+2) [HydroClient elements](hydroclient/hc_elements.py), which contains attributes and methods for specific element identification on the page.  In our example, the location search field and the location search button would both be defined at this level.
+3) [Site elements](cuahsi_base/site_elements.py) handles all the low level interactions with off-the-shelf Selenium.  In our example, the click, clear_all_text, and inject_text methods would be defined at this level.  These methods may involve a large number of Selenium commands and should use best practices in simulating real user behavior.  For instance, non-CUAHSI test scripts commonly inject large strings of text into fields instantaneously - the inject_text method within [site_elements.py](cuahsi_base/site_elements.py) has a small pause between simulated key presses to better mimic real user behavior.  The site elements module is common to all CUAHSI automated testing suites.
 
-The [utilities](utils.py) are also common to all CUAHSI test suites.  These utilities support those rare actions which do not involve page element interaction, and therefore cannot be handled through the framework above.
+The [utilities](cuahsi_base/utils.py) are also common to all CUAHSI test suites.  These utilities support those rare actions which do not involve page element interaction, and therefore cannot be handled through the framework above.
 
 ## Maintainers
 
@@ -132,7 +132,7 @@ The [utilities](utils.py) are also common to all CUAHSI test suites.  These util
 
 ## Contribute
 
-Please feel free to contribute.  [Open an issue](https://github.com/ndebuhr/cuahsi-qa-automation-engine/issues/new) or submit PRs.
+Please feel free to contribute.  [Open an issue](https://github.com/CUAHSI/QA-AutomationEngine/issues/new) or submit PRs.
 
 ## License
 
