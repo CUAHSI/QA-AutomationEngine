@@ -7,9 +7,9 @@ from selenium.webdriver.support import expected_conditions as EC
 from hc_elements import SearchPage, MarkerModal, ServicesModal, \
     KeywordsModal, AdvancedModal, FilterModal, AboutModal, \
     QuickStartModal, ZendeskWidget, WorkspacePage
-from cuahsi_base.delays import WORKSPACE_CREATE_ARCHIVE_DELAY, SEARCH_IN_PROGRESS_DELAY, \
-    SEARCH_AUTOCOMPLETE_DELAY, WORKSPACE_TOOLTIP_DISAPPEAR, MODAL_FADE_DELAY, \
-    FILTER_MODAL_OPEN_DELAY
+from timing import WORKSPACE_CREATE_ARCHIVE, SEARCH_IN_PROGRESS, \
+    SEARCH_AUTOCOMPLETE, WORKSPACE_TOOLTIP_DISAPPEAR, MODAL_FADE, \
+    FILTER_MODAL_OPEN
 
 
 class Search:
@@ -43,7 +43,7 @@ class Search:
         """ Press the Search Now button {{count}} time(s) """
         for i in range(0, count):
             SearchPage.search.click(driver)
-            time.sleep(SEARCH_IN_PROGRESS_DELAY)
+            time.sleep(SEARCH_IN_PROGRESS)
 
     def toggle_layer(self, driver, layer_name):
         """ Turn on the {{layer_name}} layer using the map search interface
@@ -63,10 +63,10 @@ class Search:
         SearchPage.map_search.click(driver)
         SearchPage.map_search.clear_all_text(driver)
         SearchPage.map_search.inject_text(driver, location)
-        time.sleep(SEARCH_AUTOCOMPLETE_DELAY)
+        time.sleep(SEARCH_AUTOCOMPLETE)
         SearchPage.map_search.inject_text(driver, Keys.ARROW_DOWN)
         SearchPage.map_search.inject_text(driver, Keys.RETURN)
-        time.sleep(SEARCH_IN_PROGRESS_DELAY)
+        time.sleep(SEARCH_IN_PROGRESS)
 
     def count_results(self, driver):
         """ Check the number of results using the "Time Series Found"
@@ -87,7 +87,7 @@ class Search:
         SearchPage.date_end.inject_text(driver, end_date)
         SearchPage.date_start.inject_text(driver, Keys.TAB)
         SearchPage.date_save.click(driver)
-        WebDriverWait(driver, MODAL_FADE_DELAY+1).until_not(
+        WebDriverWait(driver, MODAL_FADE+1).until_not(
             EC.visibility_of_element_located(SearchPage.modal_fade_locator))
         Search.search(driver)
 
@@ -98,7 +98,7 @@ class Search:
     def reset(self, driver):
         """ Press the reset button in the sidebar """
         SearchPage.reset.click(driver)
-        time.sleep(SEARCH_IN_PROGRESS_DELAY)
+        time.sleep(SEARCH_IN_PROGRESS)
 
     def zoom_in(self, driver, count=1):
         """ Use the + button on the map interface to zoom in {{count}} times
@@ -151,7 +151,7 @@ class Services:
         elif titles is not None:
             ServicesModal.select_title(titles).click(driver)
         ServicesModal.save.click(driver)
-        WebDriverWait(driver, MODAL_FADE_DELAY).until_not(
+        WebDriverWait(driver, MODAL_FADE).until_not(
             EC.visibility_of_element_located(SearchPage.modal_fade_locator))
         Search.search(driver)
 
@@ -169,7 +169,7 @@ class Keywords:
         for keyword in keywords:
             KeywordsModal.full_list_checkbox(keyword).click(driver)
         KeywordsModal.search.click(driver)
-        time.sleep(SEARCH_IN_PROGRESS_DELAY)
+        time.sleep(SEARCH_IN_PROGRESS)
 
 
 class Advanced:
@@ -185,7 +185,7 @@ class Advanced:
         AdvancedModal.value_type_sort('Term').click(driver)
         AdvancedModal.value_type_cell(1, 1).range_click(driver)
         AdvancedModal.search.click(driver)
-        time.sleep(SEARCH_IN_PROGRESS_DELAY)
+        time.sleep(SEARCH_IN_PROGRESS)
 
 
 class Filter:
@@ -195,7 +195,7 @@ class Filter:
         # (iframe[@id="launcher"]) obscures 'Filter Results' button
         # fix is in the works by Brian
         SearchPage.map_filter.javascript_click(driver)
-        WebDriverWait(driver, FILTER_MODAL_OPEN_DELAY).until(
+        WebDriverWait(driver, FILTER_MODAL_OPEN).until(
             EC.visibility_of_element_located(FilterModal.window_locator))
 
     def close(self, driver):
@@ -270,7 +270,7 @@ class Filter:
         modal window
         """
         FilterModal.search.inject_text(driver, search_string)
-        time.sleep(SEARCH_AUTOCOMPLETE_DELAY)
+        time.sleep(SEARCH_AUTOCOMPLETE)
         FilterModal.sort('Service Title').click(driver)
         FilterModal.count.select_option(driver, '100')
 
@@ -303,7 +303,7 @@ class About:
 
     def licensing_close(self, driver):
         AboutModal.licensing_close.click(driver)
-        WebDriverWait(driver, MODAL_FADE_DELAY).until_not(
+        WebDriverWait(driver, MODAL_FADE).until_not(
             EC.visibility_of_element_located(SearchPage.modal_fade_locator))
 
     def to_contact(self, driver):
@@ -317,7 +317,7 @@ class About:
 
     def contact_close(self, driver):
         AboutModal.contact_close.click(driver)
-        WebDriverWait(driver, MODAL_FADE_DELAY).until_not(
+        WebDriverWait(driver, MODAL_FADE).until_not(
             EC.visibility_of_element_located(SearchPage.modal_fade_locator))
 
 
@@ -395,7 +395,7 @@ class Workspace:
         """ Check the number of rows in the workspace which are processed
         and show a status of "Completed"
         """
-        time.sleep(WORKSPACE_CREATE_ARCHIVE_DELAY*wait_multiplier)
+        time.sleep(WORKSPACE_CREATE_ARCHIVE*wait_multiplier)
         return driver.page_source.count('<em> Completed</em>')
 
     def is_in_results(self, driver, strings, time_mult):
