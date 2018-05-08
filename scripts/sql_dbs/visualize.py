@@ -66,7 +66,7 @@ def create_linear_graphs(df, indep_names, dep_name, output_folder):
 
             output_file = os.path.join(output_folder,
                                        'fixed-{}.png'.format(graph_number))
-            plt.tick_params(axis='both', which='major', labelsize=7)            
+            plt.tick_params(axis='both', which='major', labelsize=7)
             plt.savefig(output_file)
             graph_number += 1
 
