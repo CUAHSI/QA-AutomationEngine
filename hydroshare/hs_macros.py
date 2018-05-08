@@ -7,7 +7,7 @@ from dateutil import parser
 from hs_elements import HomePage, AppsPage, DiscoverPage, ResourcePage, \
     HelpPage, AboutPage, APIPage, LoginPage, ProfilePage, GroupsPage, \
     GroupPage, NewGroupModal, MyResourcesPage
-from config.delays import HSAPI_GUI_RESPONSE_DELAY
+from cuahsi_base.delays import HSAPI_GUI_RESPONSE_DELAY
 
 
 class Home:

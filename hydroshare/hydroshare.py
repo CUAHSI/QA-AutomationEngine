@@ -4,9 +4,10 @@ import re
 
 from hs_macros import Home, Apps, Discover, Resource, Help, API, About, Profile, \
     Groups, Group, MyResources
-from cuahsi_base import BaseTest, parse_args_run_tests
 from hs_elements import AppsPage
-from utils import External, TestSystem
+
+from cuahsi_base.cuahsi_base import BaseTest, parse_args_run_tests
+from cuahsi_base.utils import External, TestSystem
 
 # Test case parameters
 BASE_URL = "http://www.hydroshare.org"

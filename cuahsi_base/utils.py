@@ -8,7 +8,7 @@ import time
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
-from config.delays import NEW_PAGE_LOAD_DELAY
+from .delays import NEW_PAGE_LOAD_DELAY
 
 
 class External:

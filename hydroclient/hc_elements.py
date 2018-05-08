@@ -4,7 +4,7 @@ detailed in the SiteElement class
 """
 from selenium.webdriver.common.by import By
 
-from site_element import SiteElement
+from cuahsi_base.site_element import SiteElement
 
 
 class SearchPage:

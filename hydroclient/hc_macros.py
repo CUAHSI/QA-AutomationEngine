@@ -7,7 +7,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from hc_elements import SearchPage, MarkerModal, ServicesModal, \
     KeywordsModal, AdvancedModal, FilterModal, AboutModal, \
     QuickStartModal, ZendeskWidget, WorkspacePage
-from config.delays import WORKSPACE_CREATE_ARCHIVE_DELAY, SEARCH_IN_PROGRESS_DELAY, \
+from cuahsi_base.delays import WORKSPACE_CREATE_ARCHIVE_DELAY, SEARCH_IN_PROGRESS_DELAY, \
     SEARCH_AUTOCOMPLETE_DELAY, WORKSPACE_TOOLTIP_DISAPPEAR, MODAL_FADE_DELAY, \
     FILTER_MODAL_OPEN_DELAY
 
