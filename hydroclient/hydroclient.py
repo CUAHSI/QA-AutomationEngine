@@ -8,7 +8,7 @@ from cuahsi_base.utils import External, TestSystem
 from cuahsi_base.cuahsi_base import BaseTest, parse_args_run_tests
 
 # Test case parameters
-BASE_URL = 'http://data.cuahsi.org'  # production
+BASE_URL = 'https://data.cuahsi.org/'  # production
 
 
 # Test cases definition
@@ -325,6 +325,26 @@ class HydroclientTestSuite(BaseTest):
         Search.search(self.driver)
         final_count = Search.count_results(self.driver)
         oracle(init_count, final_count)
+
+    def test_A_000016(self):
+        """ Austin, TX search successfully pulls metadata, which is then viewable
+        within the Filter Results dialog.
+        """
+        def oracle(result_nums):
+            """ Results count is between 1k and 10k, as seen from Filter Results
+            dialog reporting
+            """
+            self.assertEqual(result_nums[0], 1)  # first results page is active
+            self.assertEqual(result_nums[1], 10)  # 10 results on first page
+            self.assertTrue(1000 < result_nums[2] and result_nums[2] < 10000)
+
+        Search.search_location(self.driver, 'Austin, TX')
+        Search.search(self.driver)
+        Filter.open(self.driver)
+        TestSystem.wait(10)
+        result_nums = Filter.count_results(self.driver)
+        result_nums = [int(result_num) for result_num in result_nums]
+        oracle(result_nums)
 
 
 if __name__ == '__main__':
