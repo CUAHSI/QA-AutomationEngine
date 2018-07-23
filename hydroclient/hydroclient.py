@@ -8,7 +8,7 @@ from cuahsi_base.utils import External, TestSystem
 from cuahsi_base.cuahsi_base import BaseTest, parse_args_run_tests
 
 # Test case parameters
-BASE_URL = 'http://data.cuahsi.org'  # production
+BASE_URL = 'https://stage-data.cuahsi.org'  # production
 
 
 # Test cases definition
@@ -110,26 +110,6 @@ class HydroclientTestSuite(BaseTest):
         Marker.to_workspace_one(self.driver)
         oracle()
 
-    def test_A_000007(self):
-        """ Confirms visibility of the search sidebar legend when the
-        USGS Landcover layer is turned on.  Map scope during the test is
-        an area around Anchorage Alaska.
-        """
-        def oracle(visible_expected):
-            """ Legend is visible when Landcover layer is on, but it is
-            not visible when the layer is off
-            """
-            if visible_expected:
-                self.assertTrue(Search.is_legend_visible(self.driver))
-            else:
-                self.assertFalse(Search.is_legend_visible(self.driver))
-
-        Search.search_location(self.driver, 'Anchorage ')
-        Search.toggle_layer(self.driver, 'USGS LandCover 2011')
-        oracle(visible_expected=True)
-        Search.toggle_layer(self.driver, 'USGS LandCover 2011')
-        oracle(visible_expected=False)
-
     def test_A_000008(self):
         """ Confirms that map layer naming, as defined in the HydroClient
         user interface, is consistent with the Quick Start and help pages
@@ -151,8 +131,7 @@ class HydroclientTestSuite(BaseTest):
                 self.assertIn(layer, TestSystem.page_source(driver))
 
         driver = self.driver
-        layers = ['USGS Stream Gages', 'Nationalmap Hydrology',
-                  'EPA Watersheds', 'USGS LandCover 2011']
+        layers = ['USGS Stream Gages', 'Nationalmap Hydrology', 'EPA Watersheds']
         for layer in layers:  # Turn all layer on
             Search.toggle_layer(driver, layer)
         for layer in layers:  # Turn all layers off
@@ -211,6 +190,7 @@ class HydroclientTestSuite(BaseTest):
         Advanced.filter_all_value_types(driver)
         rio_counts.append(Search.count_results(driver))
         Search.reset(driver)
+        Search.search(self.driver)
         rio_counts.append(Search.count_results(driver))
         Search.search_location(driver, 'Dallas')
         Keywords.filter_root(driver, ['Biological', 'Chemical', 'Physical'])
@@ -218,6 +198,7 @@ class HydroclientTestSuite(BaseTest):
         Advanced.filter_all_value_types(driver)
         dallas_counts.append(Search.count_results(driver))
         Search.reset(driver)
+        Search.search(self.driver)
         dallas_counts.append(Search.count_results(driver))
         oracle()
 
@@ -325,6 +306,26 @@ class HydroclientTestSuite(BaseTest):
         Search.search(self.driver)
         final_count = Search.count_results(self.driver)
         oracle(init_count, final_count)
+
+    def test_A_000016(self):
+        """ Austin, TX search successfully pulls metadata, which is then viewable
+        within the Filter Results dialog.
+        """
+        def oracle(result_nums):
+            """ Results count is between 1k and 10k, as seen from Filter Results
+            dialog reporting
+            """
+            self.assertEqual(result_nums[0], 1)  # first results page is active
+            self.assertEqual(result_nums[1], 10)  # 10 results on first page
+            self.assertTrue(1000 < result_nums[2] and result_nums[2] < 10000)
+
+        Search.search_location(self.driver, 'Austin, TX')
+        Search.search(self.driver)
+        Filter.open(self.driver)
+        TestSystem.wait(10)
+        result_nums = Filter.count_results(self.driver)
+        result_nums = [int(result_num) for result_num in result_nums]
+        oracle(result_nums)
 
 
 if __name__ == '__main__':

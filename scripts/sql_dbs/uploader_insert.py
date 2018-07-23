@@ -12,6 +12,7 @@ args = parser.parse_args()
 
 batch_size = 500
 
+
 def get_csv_data(csv_name):
     with open(csv_name, 'r') as csv_file:
         csv_lines = csv_file.readlines()
@@ -29,6 +30,7 @@ def pull_metadata_table(cursor, table):
     cursor.execute("SELECT * FROM {};".format(table))
     columns = [column[0] for column in cursor.description]
     return [tuple(columns)] + cursor.fetchall()
+
 
 def convert_to_id(cursor, metadata_caches, table, cv_label, cv_value, id_label):
     table = metadata_caches[table]
@@ -197,7 +199,7 @@ cnxn = pyodbc.connect('DRIVER={};PORT={};'.format(driver, 1433) +
 cursor = cnxn.cursor()
 
 spatial_references = pull_metadata_table(cursor, 'SpatialReferences')
-metadata_caches = {'spatialreferences':spatial_references}
+metadata_caches = {'spatialreferences': spatial_references}
 
 if args.methods is not None:
     methods = get_csv_data(args.methods)

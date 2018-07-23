@@ -79,7 +79,7 @@ class TestSystem:
         terminology, capitalization, etc.
         """
         lang_dict = {}
-        with open("config/language.yaml", 'r') as stream:
+        with open("cuahsi_base/language.yaml", 'r') as stream:
             lines = stream.readlines()
         config_lines = [line for line in lines if '###' not in line]
         for config_line in config_lines:

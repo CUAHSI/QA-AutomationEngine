@@ -8,9 +8,7 @@ from hs_elements import AppsPage
 
 from cuahsi_base.cuahsi_base import BaseTest, parse_args_run_tests
 from cuahsi_base.utils import External, TestSystem
-
-# Test case parameters
-BASE_URL = "http://www.hydroshare.org"
+from config import BASE_URL, USERNAME, PASSWORD
 
 
 # Test cases definition
@@ -219,7 +217,7 @@ class HydroshareTestSuite(BaseTest):
             self.assertIn('Your profile has been successfully updated.',
                           TestSystem.page_source(self.driver))
 
-        Home.login(self.driver, 'jim', '62meister')
+        Home.login(self.driver, USERNAME, PASSWORD)
         Home.to_profile(self.driver)
         Profile.to_editor(self.driver)
         Profile.delete_org(self.driver, 2)
@@ -235,7 +233,7 @@ class HydroshareTestSuite(BaseTest):
         graphical interface and workflow """
         def oracle(group_name):
             self.assertEqual(Group.check_title(self.driver), group_name)
-        Home.login(self.driver, 'jim', '62meister')
+        Home.login(self.driver, USERNAME, PASSWORD)
         Home.to_collaborate(self.driver)
         group_name = 'QA Test Group {}'.format(random.randint(1, 1000000))
         Groups.create_group(self.driver,
@@ -263,7 +261,7 @@ class HydroshareTestSuite(BaseTest):
             """ Check title to make sure it matches initial input """
             self.assertEqual('Test Resource', resource_title)
 
-        Home.login(self.driver, 'jim', '62meister')
+        Home.login(self.driver, USERNAME, PASSWORD)
         Home.to_my_resources(self.driver)
         MyResources.create_resource(self.driver, 'Test Resource')
         TestSystem.wait()
