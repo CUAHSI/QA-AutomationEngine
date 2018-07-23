@@ -1,4 +1,5 @@
 import time
+import re
 
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
@@ -189,6 +190,12 @@ class Advanced:
 
 
 class Filter:
+    def count_results(self, driver):
+        results_info = FilterModal.info.get_text(driver)
+        results_info = results_info.replace(',', '')
+        nums = re.findall(r'\d+', results_info)
+        return nums
+
     def open(self, driver):
         # SearchPage.map_filter.click(driver)
         # TODO Should use regular webdriver .click(), however 'Help?' launcher

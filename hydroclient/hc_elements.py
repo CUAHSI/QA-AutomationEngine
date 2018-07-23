@@ -130,6 +130,7 @@ class AdvancedModal:
 
 class FilterModal:
     def __init__(self):
+        self.info = SiteElement(By.ID, 'tblDetailedSearchResults_info')
         self.action = SiteElement(By.ID, 'ddActionsDSR')
         self.count = SiteElement(By.CSS_SELECTOR,
                                  'select[name="tblDetailedSearchResults_length"]')
