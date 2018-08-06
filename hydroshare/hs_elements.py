@@ -261,6 +261,29 @@ class MyResourcesPage:
         self.title = SiteElement(By.ID, 'txtTitle')
         self.create_resource = SiteElement(By.CSS_SELECTOR,
                                            '.btn-create-resource:nth-of-type(1)')
+        self.resource_types = SiteElement(By.CSS_SELECTOR, '#input-resource-type')
+        self.search_options = SiteElement(By.CSS_SELECTOR, '.btn.btn-default.dropdown-toggle')
+        self.search = SiteElement(By.CSS_SELECTOR, '#resource-search-input')
+        self.search_author = SiteElement(By.CSS_SELECTOR, '#input-author')
+        self.search_subject = SiteElement(By.CSS_SELECTOR, '#input-subject')
+        self.clear_search = SiteElement(By.CSS_SELECTOR, '#btn-clear-search-input')
+        self.clear_author_search = SiteElement(By.CSS_SELECTOR, '#btn-clear-author-input')
+        self.clear_subject_search = SiteElement(By.CSS_SELECTOR, '#btn-clear-subject-input')
+        self.label = SiteElement(By.CSS_SELECTOR, '#btn-label')
+        self.create_label = SiteElement(By.XPATH, '//li[@data-target="#modalCreateLabel"]')
+        self.new_label_name = SiteElement(By.CSS_SELECTOR, '#txtLabelName')
+        self.create_label_submit = SiteElement(By.CSS_SELECTOR, '#btn-create-label')
+        self.add_label = SiteElement(By.CSS_SELECTOR,
+                                     'tr.data-row:nth-child(1) > td:nth-child(1) > span[data-toggle="dropdown"]:nth-child(5)')
+        self.manage_labels = SiteElement(By.XPATH, '//li[@data-target="#modalManageLabels"]')
+        self.remove_label = SiteElement(By.CSS_SELECTOR, '.btn-label-remove')
+
+    def label_name(self, label_name):
+        return SiteElement(By.XPATH, '(//input[@ value="{}"])[2]'.format(label_name))
+
+    def resource_type(self, option):
+            return SiteElement(By.XPATH, '//option[contains(text(), "{}")]'.format(option))
+
 
 
 HomePage = HomePage()

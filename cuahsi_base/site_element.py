@@ -172,6 +172,11 @@ class SiteElement:
         target_el = self.loc_it(el_driver)
         return target_el.text
 
+    def get_value(self, el_driver):
+        """ Returns content text of website element """
+        target_el = self.loc_it(el_driver)
+        return target_el.get_attribute('value')
+
     def get_href(self, el_driver, base_url):
         """ Returns element href link, with relative links expanded
         into an absolute link
@@ -195,3 +200,8 @@ class SiteElement:
         """
         target_el = self.loc_it(el_driver)
         return len(target_el.find_elements_by_xpath("*"))
+
+    def get_class(self, el_driver):
+        target_el = self.loc_it(el_driver)
+        target_class = target_el.get_attribute('class')
+        return target_class

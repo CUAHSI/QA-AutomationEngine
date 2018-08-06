@@ -4,9 +4,10 @@ import time
 from selenium.webdriver.common.keys import Keys
 
 from dateutil import parser
+
 from hs_elements import HomePage, AppsPage, DiscoverPage, ResourcePage, \
-    HelpPage, AboutPage, APIPage, LoginPage, ProfilePage, GroupsPage, \
-    GroupPage, NewGroupModal, MyResourcesPage
+     HelpPage, AboutPage, APIPage, LoginPage, ProfilePage, GroupsPage, \
+     GroupPage, NewGroupModal, MyResourcesPage
 from timing import HSAPI_GUI_RESPONSE
 
 
@@ -331,6 +332,51 @@ class MyResources:
         MyResourcesPage.title.click(driver)
         MyResourcesPage.title.inject_text(driver, title)
         MyResourcesPage.create_resource.click(driver)
+
+    def search_resource_type(self, driver):
+        MyResourcesPage.search_options.click(driver)
+
+    def search_type(self, driver, option):
+        MyResourcesPage.resource_type(option).click(driver)
+
+    def search_author(self, driver, author):
+        MyResourcesPage.search_author.inject_text(driver, author)
+
+    def search_subject(self, driver, subject):
+        MyResourcesPage.search_subject.inject_text(driver, subject)
+
+    def clear_search(self, driver):
+        MyResourcesPage.clear_search.click(driver)
+
+    def clear_author_search(self, driver):
+        MyResourcesPage.clear_author_search.click(driver)
+
+    def clear_subject_search(self, driver):
+        MyResourcesPage.clear_subject_search.click(driver)
+
+    def read_searchbar(self, driver):
+        return MyResourcesPage.search.get_value(driver)
+
+    def create_label(self, driver, new_name):
+        MyResourcesPage.label.click(driver)
+        MyResourcesPage.create_label.click(driver)
+        MyResourcesPage.new_label_name.inject_text(driver, new_name)
+        MyResourcesPage.create_label_submit.click(driver)
+        time.sleep(2)
+
+    def toggle_label(self, driver, label):
+        MyResourcesPage.add_label.click(driver)
+        MyResourcesPage.label_name(label).click(driver)
+        MyResourcesPage.add_label.click(driver)
+
+    def check_label_applied(self, driver):
+        is_label_applied = 'has-labels' in MyResourcesPage.add_label.get_class(driver)
+        return is_label_applied
+
+    def delete_label(self, driver):
+        MyResourcesPage.label.click(driver)
+        MyResourcesPage.manage_labels.click(driver)
+        MyResourcesPage.remove_label.click(driver)
 
 
 Home = Home()

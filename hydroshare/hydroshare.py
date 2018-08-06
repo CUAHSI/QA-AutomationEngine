@@ -268,6 +268,113 @@ class HydroshareTestSuite(BaseTest):
         resource_title = Resource.get_title(self.driver)
         oracle(resource_title)
 
+    def test_B_000017(self):
+        """ Confirm applying resource type filters in My Resources does not break system """
+        def oracle(page_title):
+            """ My Resources page is still clean/active """
+            self.assertIn('My Resources', page_title)
+        options = ['Collection',
+                   'Composite Resource',
+                   'Generic',
+                   'Geographic Feature',
+                   'Geographic Raster',
+                   'HIS Referenced',
+                   'Model Instance',
+                   'Model Program',
+                   'MODFLOW',
+                   'Multidimensional',
+                   'Script Resource',
+                   'Swat Model Instance',
+                   'Time Series',
+                   'Web App']
+        Home.login(self.driver, USERNAME, PASSWORD)
+        Home.to_my_resources(self.driver)
+        MyResources.search_resource_type(self.driver)
+        for option in options:
+            MyResources.search_type(self.driver, option)
+            oracle(TestSystem.title(self.driver))
+
+    def test_B_000018(self):
+        """ Use My Resources search bar filters and non-ASCII characters """
+        def oracle_type(is_applied):
+            """ Search bar shows the resource type filter """
+            if is_applied:
+                self.assertIn('[type:', MyResources.read_searchbar(self.driver))
+            else:
+                self.assertNotIn('[type:', MyResources.read_searchbar(self.driver))
+
+        def oracle_author(is_applied):
+            """ Search bar shows the author filter """
+            if is_applied:
+                self.assertIn('[author:Über', MyResources.read_searchbar(self.driver))
+            else:
+                self.assertNotIn('[author:', MyResources.read_searchbar(self.driver))
+
+        def oracle_subject(is_applied):
+            """ Search bar shows the subject filter """
+            if is_applied:
+                self.assertIn('[subject:Über', MyResources.read_searchbar(self.driver))
+            else:
+                self.assertNotIn('[subject:', MyResources.read_searchbar(self.driver))
+
+        Home.login(self.driver, USERNAME, PASSWORD)
+        Home.to_my_resources(self.driver)
+
+        MyResources.search_resource_type(self.driver)
+
+        oracle_type(False)
+        MyResources.search_type(self.driver, 'Web App')
+        oracle_type(True)
+        oracle_author(False)
+        MyResources.search_author(self.driver, 'Über')
+        oracle_author(True)
+        oracle_subject(False)
+        MyResources.search_subject(self.driver, 'Über')
+        oracle_subject(True)
+
+        oracle_type(True)
+        oracle_author(True)
+        oracle_subject(True)
+
+        MyResources.clear_search(self.driver)
+
+        oracle_type(False)
+        oracle_author(False)
+        oracle_subject(False)
+
+        MyResources.search_resource_type(self.driver)
+        MyResources.search_type(self.driver, 'Web App')
+        MyResources.search_author(self.driver, 'Über')
+        MyResources.search_subject(self.driver, 'Über')
+        MyResources.clear_author_search(self.driver)
+        oracle_author(False)
+        MyResources.clear_subject_search(self.driver)
+        oracle_subject(False)
+        MyResources.search_type(self.driver, 'All')
+
+        oracle_type(False)
+        oracle_author(False)
+        oracle_subject(False)
+
+    def test_B_000019(self):
+        """ Create a new resources label """
+        def oracle_selected():
+            """ The label class is showing as selected """
+            self.assertTrue(MyResources.check_label_applied(self.driver))
+
+        def oracle_deselected():
+            """ The label class is showing as deselected """
+            self.assertFalse(MyResources.check_label_applied(self.driver))
+
+        Home.login(self.driver, USERNAME, PASSWORD)
+        Home.to_my_resources(self.driver)
+        MyResources.create_label(self.driver, 'Test')
+        MyResources.toggle_label(self.driver, 'Test')
+        oracle_selected()
+        MyResources.toggle_label(self.driver, 'Test')
+        oracle_deselected()
+        MyResources.delete_label(self.driver)
+
 
 if __name__ == '__main__':
     parse_args_run_tests(HydroshareTestSuite)
