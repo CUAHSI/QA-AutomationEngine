@@ -14,7 +14,7 @@ then
     exit 1
 fi
 
-cd ..
+cd ../..
 
 for i in $(seq 1 1 $2)
 do
@@ -27,7 +27,7 @@ sleep 120  # ensure tests have finished
 DATETIME=$(date -I'minutes')
 for i in $(seq 1 1 $2)
 do
-    cat "user-$i-results.txt" >> "$1_$2_$3_$4_$DATETIME.txt"
+    cat "user-$i-results.txt" >> "scripts/hc_performance_testing/$1_$2_$3_$4_$DATETIME.txt"
 done
 rm -f ../user-*.txt
 
