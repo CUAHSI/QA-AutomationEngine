@@ -1,5 +1,8 @@
 # Setup Jenkins server for automated systems testing with CI/CD pipeline
 
+### Core concept of the QA automation server
+![automation server concept](automation-server-concept.png)
+
 ### Spin up Jenkins automation server
 ```
 docker-compose up -d
