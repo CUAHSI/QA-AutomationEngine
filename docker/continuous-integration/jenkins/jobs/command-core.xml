@@ -1,8 +1,31 @@
 <?xml version='1.1' encoding='UTF-8'?>
 <project>
+  <actions/>
   <description>Runs jenkins bash script to initiate the running and creation of jobs</description>
   <keepDependencies>false</keepDependencies>
   <properties>
+    <hudson.model.ParametersDefinitionProperty>
+      <parameterDefinitions>
+        <hudson.model.StringParameterDefinition>
+          <name>JENKINSIP</name>
+          <description></description>
+          <defaultValue>localhost</defaultValue>
+          <trim>false</trim>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>USERNAME</name>
+          <description></description>
+          <defaultValue>admin</defaultValue>
+          <trim>false</trim>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>TESTSUITE</name>
+          <description></description>
+          <defaultValue>hydroshare</defaultValue>
+          <trim>false</trim>
+        </hudson.model.StringParameterDefinition>
+      </parameterDefinitions>
+    </hudson.model.ParametersDefinitionProperty>
     <com.coravy.hudson.plugins.github.GithubProjectProperty plugin="github@1.29.2">
       <projectUrl>https://github.com/CUAHSI/QA-AutomationEngine/</projectUrl>
       <displayName></displayName>
