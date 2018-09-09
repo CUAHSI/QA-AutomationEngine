@@ -12,7 +12,7 @@ while read TEST; do
 	sleep 1
 	curl -s -X POST "http://$JENKINSIP:8080/createItem?name=$TESTSUITE-$TEST" -k -H "$CRUMB" --user "$USERNAME":"$USERPASS" --data-binary @job-template-config.xml -H "Content-Type:text/xml"
 	sleep 1
-	curl -s -X POST "http://$JENKINSIP:8080/job/$TESTSUITE-$TEST/buildWithParameters?delay=0sec&TESTCASE=$TEST" -k -H "$CRUMB" --user "$USERNAME":"$USERPASS"
+	curl -s -X POST "http://$JENKINSIP:8080/job/$TESTSUITE-$TEST/buildWithParameters?delay=0sec&$TESTCASE=$TEST" -k -H "$CRUMB" --user "$USERNAME":"$USERPASS"
     fi
     sleep 1
 done < "$TESTSUITE/$TESTSUITE.conf"
