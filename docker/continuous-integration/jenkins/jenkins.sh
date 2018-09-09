@@ -15,4 +15,4 @@ while read TEST; do
 	curl -s -X POST "http://$JENKINSIP:8080/job/$TESTSUITE-$TEST/buildWithParameters?delay=0sec&TESTCASE=$TEST" -k -H "$CRUMB" --user "$USERNAME":"$USERPASS"
     fi
     sleep 1
-done <"../../../$TESTSUITE/$TESTSUITE.conf"
+done < "$TESTSUITE/$TESTSUITE.conf"
