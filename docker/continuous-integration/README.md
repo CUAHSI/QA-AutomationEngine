@@ -8,6 +8,7 @@
 docker-compose up -d
 ```
 ### Install system through GUI on port 8080.
+* ``` docker exec -it [DOCKER CONTAINER NAME] cat /var/jenkins_home/secrets/initialAdminPassword ``` to get the instance password
 * Use "Continue as admin" instead of creating a user
 * Install suggested plugins
 ### Setup the "command core" job
