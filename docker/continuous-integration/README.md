@@ -4,6 +4,7 @@
 ![automation server concept](automation-server-concept.png)
 
 ### Spin up Jenkins automation server
+Install Docker and Docker Compose on the server, then navigate to the [docker/continuous-integration/](https://github.com/CUAHSI/QA-AutomationEngine/blob/develop/docker/continous-integration/) folder and run:
 ```
 docker-compose up -d
 ```
