@@ -47,7 +47,7 @@
   <concurrentBuild>false</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command>./hydrotest hydroshare &quot;HydroshareTestCase.test_B_$TESTCASE&quot;</command>
+      <command>./hydrotest hydroshare &quot;HydroshareTestCase.test_B_$TESTCASE&quot; --grid localhost</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers/>
