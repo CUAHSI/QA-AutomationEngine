@@ -2,8 +2,6 @@ selenium-hub:
   image: selenium/hub
   ports:
   - 4444:4444
-  expose:
-  - "5555"
 
 chrome:
   image: ${REPOSITORY}/node-debug-chrome:latest
