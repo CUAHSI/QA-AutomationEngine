@@ -16,7 +16,7 @@ class BaseTest(unittest.TestCase):
 
         if self.grid_hub_ip is not None:
             if not sys.warnoptions:
-                warnings.simplefilter("ignore::ResourceWarning")
+                warnings.simplefilter("ignore", ResourceWarning)
             remote_args = {'command_executor':
                            'http://{}:4444/wd/hub'.format(self.grid_hub_ip),
                            'desired_capabilities': {'browserName': self.browser}}
