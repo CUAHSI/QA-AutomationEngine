@@ -1,11 +1,11 @@
 import argparse
 import sys
 import unittest
+import warnings
 
 from selenium import webdriver
 
 from .browser import USER_AGENT
-
 
 class BaseTest(unittest.TestCase):
     grid_hub_ip = None
@@ -72,4 +72,5 @@ def parse_args_run_tests(test_class):
 
     sys.argv[1:] = args.unittest_args
     unittest.main(verbosity=2)
-    unittest.main(warnings="ignore")
+    if not sys.warnoptions:
+        warnings.simplefilter("ignore::ResourceWarning")
