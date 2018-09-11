@@ -1,11 +1,11 @@
 import argparse
 import sys
 import unittest
+import warnings
 
 from selenium import webdriver
 
 from .browser import USER_AGENT
-
 
 class BaseTest(unittest.TestCase):
     grid_hub_ip = None
@@ -15,6 +15,8 @@ class BaseTest(unittest.TestCase):
         """ Setup driver for use in automation tests """
 
         if self.grid_hub_ip is not None:
+            if not sys.warnoptions:
+                warnings.simplefilter("ignore", ResourceWarning)
             remote_args = {'command_executor':
                            'http://{}:4444/wd/hub'.format(self.grid_hub_ip),
                            'desired_capabilities': {'browserName': self.browser}}
@@ -22,7 +24,6 @@ class BaseTest(unittest.TestCase):
                 remote_args['browser_profile'] = self._firefox_profile()
             elif self.browser == 'chrome':
                 remote_args['options'] = self._chrome_options()
-
             driver = webdriver.Remote(**remote_args)
         else:
             if self.browser == 'firefox':

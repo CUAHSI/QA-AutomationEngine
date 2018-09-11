@@ -7,8 +7,9 @@ This repository contains:
 1. Selenium-based automated test suites for the CUAHSI [HydroClient](http://data.cuahsi.org) and [HydroShare](http://hydroshare.org) systems.
 2. An automated testing framework to support the rapid development of high readability and high maintainability test cases.
 3. Scripts to support execution of the automated test suites on Jenkins and Selenium Grid installations.
-4. A simulation to characterize and communicate the parallel test execution process.
-5. Additional documentation to explain the theory and purpose of the testing system.
+4. Dockerfiles and Docker Compose configuration files to facilitate the creation of servers for QA/CI.
+5. A simulation to characterize and communicate the parallel test execution process.
+6. Additional documentation to explain the theory and purpose of the testing system.
 
 The test suites are designed to run within a [Jenkins](https://jenkins.io/) plus [Selenium Grid](http://www.seleniumhq.org/) environment on CUAHSI-managed hardware.  Test initiation and results interpretation are handled by Jenkins.  Meanwhile, the test case execution is handled by Selenium Grid.  
 
@@ -25,30 +26,29 @@ The test suites are designed to run within a [Jenkins](https://jenkins.io/) plus
 ## Background
 
 ### Jenkins
-The test suite execution process begins with a trigger of the "core" Jenkins job.  After setting up environment variables and pulling the GitHub repository, the core Jenkins job runs the jenkins.sh file.  This script uses API calls to create (for any new test cases) and run Jenkins jobs.  Each test case is given a separate job in Jenkins, which makes it easy to analyze historical test execution data for a specific test.  
+The test suite execution process begins with a trigger of the "command-core" Jenkins job.  This job uses API calls to create (for any new test cases) and run Jenkins jobs.  Each test case is given a separate job in Jenkins, which makes it easy to analyze historical test execution data for a specific test.  For more information, review the continuous integration README in [docker/continuous-integration/](https://github.com/CUAHSI/QA-AutomationEngine/blob/master/docker/continuous-integration/).
 
 ### Selenium Grid
-The Selenium Grid system uses VMs which run on CUAHSI hardware.  The number and types of Selenium Grid nodes does not need to be established a priori.  Rather, the Selenium Grid hub allocates test cases based on what nodes are available at the time.
+The Selenium Grid system uses Docker containers for rapid parallel execution of test suites.  The number and types of Selenium Grid nodes does not need to be established a priori.  Rather, the Selenium Grid hub allocates test cases based on what nodes are available at the time.  For more information, review the continuous integration README in [docker/continuous-integration/](https://github.com/CUAHSI/QA-AutomationEngine/blob/master/docker/continuous-integration/)
 
 ## Install
 
 ### Infrastructure
-On the infrastructure side, this project uses Jenkins and Selenium Grid. Please refer to the [Jenkins installation guide](https://wiki.jenkins.io/display/JENKINS/Installing+Jenkins+on+Ubuntu) and [Selenium Grid installation guide](https://github.com/SeleniumHQ/selenium/wiki/Grid2) for instructions on how to install these tools.
+Please refer to the README in [docker/continuous-integration/](https://github.com/CUAHSI/QA-AutomationEngine/blob/master/docker/continuous-integration/) for information on how to spin up a QA automation server, which facilitates a continuous integration pipeline.  Using other Selenium Grid systems for ad hoc suite executions is possible.  Please refer to the [Usage](#usage) section for information on this.  The remaining information in this Install section pertains only to standalone suite executions.
 
 ### Python Packages
-Installation of necessary Python packages can be accomplished with with:
+For standalone executions, Python packages should be installed with:
 ```
 $ pip3 install -r requirements.txt
 ```
 
 ### Browser Driver
-A browser driver must be downloaded into a system directory.  Further, this system directory must be included in the PATH environment variable.  For the Firefox browser, the [Gecko driver](https://github.com/mozilla/geckodriver/releases) should be downloaded.
-
+For standalone executions, a browser driver must be downloaded into a system directory.  Further, this system directory must be included in the PATH environment variable.  For the Firefox browser, the [Gecko driver](https://github.com/mozilla/geckodriver/releases) should be downloaded.
 
 ## Usage
 
 ### Test Execution
-The test suite can run without the Jenkins and Selenium Grid infrastructure for test script development and test suite debugging purposes.  To run all test cases (not just those defined in the configuration file):
+The test suite can be ran standalone - without the Jenkins and Selenium Grid infrastructure - for test script development and test suite debugging purposes.  To run all test cases (not just those defined in the configuration file):
 ```
 $ ./hydrotest hydroclient
 ```
@@ -68,15 +68,7 @@ $ ./hydrotest hydroclient --browser safari HydroclientTestSuite.test_A_000002
 ```
 
 ### Jenkins Deployments
-In a Jenkins deployment, the core job should run the jenkins.sh script:
-```
-$ bash jenkins.sh
-```
-The Jenkins template project runs a parameterized version of the previously mentioned python3 commands.
-```
-$ ./hydrotest hydroclient HydroclientTestSuite.test_A_000002 --grid 127.0.0.1
-```
-To specify which tests to run, edit the software system config file:
+After following the README in [docker/continuous-integration/](https://github.com/CUAHSI/QA-AutomationEngine/blob/master/docker/continuous-integration/) to setup a QA automation server, the tests to run can be configured using the following configuration files:
 1) [hydroclient.conf](hydroclient/hydroclient.conf)
 2) [hydroshare.conf](hydroshare/hydroshare.conf)
 
@@ -120,7 +112,7 @@ In the case of the HydroClient software system, test cases should be created in 
 
 1) [HydroClient macros](hydroclient/hc_macros.py), which captures common series of actions while working with HydroClient.  In our example, the map search step would be defined here and would include clicking the location search box, clearing the box of any existing text, injecting the desired text, then clicking the location search button.
 2) [HydroClient elements](hydroclient/hc_elements.py), which contains attributes and methods for specific element identification on the page.  In our example, the location search field and the location search button would both be defined at this level.
-3) [Site elements](cuahsi_base/site_elements.py) handles all the low level interactions with off-the-shelf Selenium.  In our example, the click, clear_all_text, and inject_text methods would be defined at this level.  These methods may involve a large number of Selenium commands and should use best practices in simulating real user behavior.  For instance, non-CUAHSI test scripts commonly inject large strings of text into fields instantaneously - the inject_text method within [site_elements.py](cuahsi_base/site_elements.py) has a small pause between simulated key presses to better mimic real user behavior.  The site elements module is common to all CUAHSI automated testing suites.
+3) [Site elements](cuahsi_base/site_element.py) handles all the low level interactions with off-the-shelf Selenium.  In our example, the click, clear_all_text, and inject_text methods would be defined at this level.  These methods may involve a large number of Selenium commands and should use best practices in simulating real user behavior.  For instance, non-CUAHSI test scripts commonly inject large strings of text into fields instantaneously - the inject_text method within [site_element.py](cuahsi_base/site_element.py) has a small pause between simulated key presses to better mimic real user behavior.  The site elements module is common to all CUAHSI automated testing suites.
 
 The [utilities](cuahsi_base/utils.py) are also common to all CUAHSI test suites.  These utilities support those rare actions which do not involve page element interaction, and therefore cannot be handled through the framework above.
 
