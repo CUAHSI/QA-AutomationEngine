@@ -22,7 +22,6 @@ class BaseTest(unittest.TestCase):
                 remote_args['browser_profile'] = self._firefox_profile()
             elif self.browser == 'chrome':
                 remote_args['options'] = self._chrome_options()
-            unittest.main(warnings="ignore")
             driver = webdriver.Remote(**remote_args)
         else:
             if self.browser == 'firefox':
@@ -73,3 +72,4 @@ def parse_args_run_tests(test_class):
 
     sys.argv[1:] = args.unittest_args
     unittest.main(verbosity=2)
+    unittest.main(warnings="ignore")
