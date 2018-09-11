@@ -18,10 +18,10 @@ Navigate to the [docker/continuous-integration/](https://github.com/CUAHSI/QA-Au
 docker-compose up -d
 ```
 ### Get the Jenkins instance password and finish Jenkins installation through the GUI on port 8080.
-* ``` docker exec -it [DOCKER CONTAINER NAME] cat /var/jenkins_home/secrets/initialAdminPassword ``` to get the instance password
+* ``` docker exec -it [JENKINS DOCKER CONTAINER NAME] cat /var/jenkins_home/secrets/initialAdminPassword ``` to get the instance password
 * Open the Jenkins GUI to finish the installation (e.g. localhost:8080 in a browser), login with the admin password, and install suggested plugins
 * Use "Continue as admin" instead of creating a user
 ### Setup the "command core" and "hydroshare-job-template" jobs
 ```
-docker exec -t [DOCKER CONTAINER NAME] bash /var/jenkins_home/cuahsi/jenkins/setup.sh
+docker exec -t [JENKINS DOCKER CONTAINER NAME] bash /var/jenkins_home/cuahsi/jenkins/setup.sh
 ```
