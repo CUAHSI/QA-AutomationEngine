@@ -47,7 +47,8 @@
   <concurrentBuild>false</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command>./hydrotest hydroshare &quot;HydroshareTestSuite.test_B_$TESTCASE&quot; --browser chrome --grid localhost</command>
+      <command>pip3 install -r requirements.txt
+./hydrotest hydroshare &quot;HydroshareTestSuite.test_B_$TESTCASE&quot; --browser chrome --grid localhost</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers/>
