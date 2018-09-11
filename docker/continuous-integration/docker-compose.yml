@@ -9,4 +9,9 @@ services:
      - "50000:50000"
     volumes:
      - .:/var/jenkins_home/cuahsi/
-
+    networks:
+     - cuahsi_ci
+networks:
+  cuahsi_ci:
+    external:
+      name: cuahsi_ci
