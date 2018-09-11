@@ -1,6 +1,8 @@
 """ Runs various smoke tests for the hydroshare.org """
 import random
 import re
+import sys
+import warnings
 
 from hs_macros import Home, Apps, Discover, Resource, Help, API, About, Profile, \
     Groups, Group, MyResources
@@ -377,4 +379,6 @@ class HydroshareTestSuite(BaseTest):
 
 
 if __name__ == '__main__':
+    if not sys.warnoptions:
+        warnings.simplefilter("ignore::ResourceWarning")
     parse_args_run_tests(HydroshareTestSuite)

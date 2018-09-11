@@ -1,7 +1,6 @@
 import argparse
 import sys
 import unittest
-import warnings
 
 from selenium import webdriver
 
@@ -72,5 +71,3 @@ def parse_args_run_tests(test_class):
 
     sys.argv[1:] = args.unittest_args
     unittest.main(verbosity=2)
-    if not sys.warnoptions:
-        warnings.simplefilter("ignore::ResourceWarning")
