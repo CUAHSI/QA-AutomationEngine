@@ -1,6 +1,8 @@
 """ Runs various smoke tests for the hydroshare.org """
+import os
 import random
 import re
+import urllib.request
 
 from hs_macros import Home, Apps, Discover, Resource, Help, API, About, Profile, \
     Groups, Group, MyResources
@@ -374,6 +376,31 @@ class HydroshareTestSuite(BaseTest):
         MyResources.toggle_label(self.driver, 'Test')
         oracle_deselected()
         MyResources.delete_label(self.driver)
+
+    def test_B_000021(self):
+        """ Confirm ability to upload CV file to users profile """
+        def oracle(cv_filename):
+            """ Checks "View CV" window page title contains the file name """
+            self.assertTrue(cv_filename in TestSystem.title(self.driver))
+
+        Home.login(self.driver, USERNAME, PASSWORD)
+        Home.to_profile(self.driver)
+        Profile.to_editor(self.driver)
+        urllib.request.urlretrieve ('https://www.bu.edu/com-csc/resume/resume_samples.pdf', 'cv-test.pdf')
+        cwd = os.getcwd()
+        cv_path = os.path.join(cwd, 'cv-test.pdf')
+        Profile.add_cv(self.driver, cv_path)
+        TestSystem.scroll_to_top(self.driver)
+        Profile.save(self.driver)
+        num_windows_now = len(self.driver.window_handles)
+        Profile.view_cv(self.driver)
+        External.to_file(self.driver, num_windows_now, 'cv-test')
+        oracle('cv-test')
+        os.remove(cv_path)
+        External.switch_old_page(self.driver)
+        External.close_new_page(self.driver)
+        Profile.to_editor(self.driver)
+        Profile.delete_cv(self.driver)
 
 
 if __name__ == '__main__':

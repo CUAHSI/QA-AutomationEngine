@@ -305,6 +305,16 @@ class Profile:
     def save(self, driver):
         ProfilePage.save.click(driver)
 
+    def add_cv(self, driver, link):
+        ProfilePage.add_cv.set_path(driver, link)
+
+    def view_cv(self, driver):
+        ProfilePage.view_cv.click(driver)
+
+    def delete_cv(self, driver):
+        ProfilePage.delete_cv.click(driver)
+        ProfilePage.confirm_delete_cv.click(driver)
+
 
 class Groups:
     def create_group(self, driver, name, purpose, about, privacy):

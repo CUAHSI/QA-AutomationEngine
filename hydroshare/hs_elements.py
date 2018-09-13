@@ -224,6 +224,10 @@ class ProfilePage:
                                    'input[placeholder="Organization(s)"]')
         self.save = SiteElement(By.CSS_SELECTOR,
                                 'button.btn-save-profile:first-of-type')
+        self.add_cv = SiteElement(By.CSS_SELECTOR, 'input[name="cv"]')
+        self.view_cv = SiteElement(By.XPATH, '(//a[@class= "btn btn-default"]/span)[3]')
+        self.delete_cv = SiteElement(By.ID, 'btn-delete-cv')
+        self.confirm_delete_cv = SiteElement(By.ID, 'cv-clear_id')
 
     def delete_org(self, index):
         return SiteElement(By.CSS_SELECTOR,

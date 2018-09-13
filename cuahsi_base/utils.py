@@ -28,6 +28,7 @@ class External:
         win_handle = driver.window_handles[-2]
         driver.switch_to.window(win_handle)
 
+
     def close_new_page(self, driver):
         orig_handle = driver.current_window_handle
         new_handle = driver.window_handles[-1]
@@ -47,9 +48,19 @@ class External:
 
         return source
 
+    def to_file(self, driver, num_windows_before, title):
+        WebDriverWait(driver, NEW_PAGE_LOAD).until(
+            EC.number_of_windows_to_be(num_windows_before+1))
+        win_handle = driver.window_handles[-1]
+        driver.switch_to.window(win_handle)
+        WebDriverWait(driver, NEW_PAGE_LOAD).until(
+            EC.title_contains(title))
 
 class TestSystem:
     """ General utilities for Hydroclient test case creation """
+    def scroll_to_top(self, driver):
+        driver.execute_script("window.scrollTo(0, 0)")
+
     def to_url(self, driver, url):
         driver.get(url)
         time.sleep(NEW_PAGE_LOAD)

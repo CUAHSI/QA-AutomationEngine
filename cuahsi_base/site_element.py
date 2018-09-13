@@ -151,6 +151,13 @@ class SiteElement:
         for i in range(0, len(field_text)):
             target_el.send_keys(field_text[i])
 
+    def set_path(self, el_driver, field_text):
+        """ Enters text into a field or other input-capable html
+        element using send keys, best for setting path to files for upload
+        """
+        target_el = self.loc_it(el_driver)
+        target_el.send_keys(field_text)
+
     def iframe_in(self, el_driver):
         """ Switches driver focus to an iframe within a page """
         target_el = self.loc_it(el_driver)
