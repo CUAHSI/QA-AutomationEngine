@@ -34,6 +34,7 @@ class SearchPage:
         self.about = SiteElement(By.ID, 'ddAbout')
         self.quickstart = SiteElement(By.ID, 'quickStartModalTab')
         self.zendesk = SiteElement(By.ID, 'launcher')
+        self.no_results_ok = SiteElement(By.CSS_SELECTOR, 'button[data-bb-handler="ok"]')
 
     def layer(self, name):
         return SiteElement(By.XPATH, '//label[contains(text(), "{}")]'.format(name))

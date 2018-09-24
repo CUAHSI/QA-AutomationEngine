@@ -384,6 +384,15 @@ class HydroclientTestSuite(BaseTest):
         oracle_data_prop_selection(data_props, should_be_selected=False)
         oracle_data_service_selection(data_services, should_be_selected=False)
 
+    def test_A_000018(self):
+        """ Search results for Antarctica is greater than 0 """
+        def oracle():
+            """ Search result is greater than zero """
+            self.assertGreater(Search.count_results(self.driver),  0)
+        Search.search_location(self.driver, 'Antarctica')
+        Search.search(self.driver)
+        oracle()
+        
     def test_A_000019(self):
         """ Confirm empty operations on the filter modals don't affect the
         results set or the persistance of the searchbox entry """

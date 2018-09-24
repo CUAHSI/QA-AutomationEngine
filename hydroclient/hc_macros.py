@@ -111,6 +111,10 @@ class Search:
         for i in range(0, count):
             SearchPage.zoom_in.click(driver)
 
+    def dismiss_no_results(self, driver):
+        SearchPage.no_results_ok.click(driver)
+        time.sleep(MODAL_FADE)
+
     def get_searchbox_text(self, driver):
         return SearchPage.map_search.get_attribute(driver, 'value')
 
