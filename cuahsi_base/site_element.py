@@ -212,3 +212,8 @@ class SiteElement:
         target_el = self.loc_it(el_driver)
         target_class = target_el.get_attribute('class')
         return target_class
+
+    def get_style(self, el_driver):
+        target_el = self.loc_it(el_driver)
+        target_style = target_el.get_attribute('style')
+        return target_style

@@ -227,6 +227,9 @@ class ProfilePage:
         self.save = SiteElement(By.CSS_SELECTOR,
                                 'button.btn-save-profile:first-of-type')
         self.image_upload = SiteElement(By.CSS_SELECTOR, 'input.upload-picture')
+        self.image = SiteElement(By.CSS_SELECTOR, 'div.profile-pic.round-image')
+        self.delete_image = SiteElement(By.CSS_SELECTOR, '#btn-delete-profile-pic')
+        self.submit_delete_image = SiteElement(By.CSS_SELECTOR, '#picture-clear_id')
         self.add_cv = SiteElement(By.CSS_SELECTOR, 'input[name="cv"]')
         self.view_cv = SiteElement(By.XPATH, '(//a[@class= "btn btn-default"]/span)[3]')
         self.delete_cv = SiteElement(By.ID, 'btn-delete-cv')

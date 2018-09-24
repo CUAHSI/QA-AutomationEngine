@@ -402,6 +402,35 @@ class HydroshareTestSuite(BaseTest):
         Profile.to_editor(self.driver)
         Profile.delete_cv(self.driver)
 
+    def test_B_000022(self):
+        """ Confirm image upload to user profile runs smoothly """
+        def oracle(img_filename, is_uploaded):
+            """ Checks profile pic div contains the image filename
+            in it's style attribute (the system uses style background image
+            approach) """
+            if is_uploaded:
+                self.assertTrue(
+                    Profile.confirm_photo_uploaded(self.driver, img_filename)
+                )
+            else:
+                self.assertFalse(
+                    Profile.confirm_photo_uploaded(self.driver, img_filename)
+                )
+        Home.login(self.driver, USERNAME, PASSWORD)
+        Home.to_profile(self.driver)
+        Profile.to_editor(self.driver)
+        urllib.request.urlretrieve ('http://www.bu.edu/emd/files/2017/03/rhett_alone1.jpg', 'profile.jpg')
+        cwd = os.getcwd()
+        profile_img_path = os.path.join(cwd, 'profile.jpg')
+        Profile.add_photo(self.driver, profile_img_path)
+        Profile.save(self.driver)
+        TestSystem.wait(30)
+        oracle('profile', True)
+        os.remove(profile_img_path)
+        Profile.to_editor(self.driver)
+        Profile.remove_photo(self.driver)
+        oracle('profile', False)
+
     def test_B_000023(self):
         """ Ensure resource links to profile work """
         def oracle(contribution_counts):

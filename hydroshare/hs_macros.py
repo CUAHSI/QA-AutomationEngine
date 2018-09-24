@@ -316,6 +316,16 @@ class Profile:
     def save(self, driver):
         ProfilePage.save.click(driver)
 
+    def add_photo(self, driver, link):
+        ProfilePage.image_upload.set_path(driver, link)
+
+    def remove_photo(self, driver):
+        ProfilePage.delete_image.click(driver)
+        ProfilePage.submit_delete_image.click(driver)
+
+    def confirm_photo_uploaded(self, driver, contains):
+        return contains in ProfilePage.image.get_style(driver)
+
     def view_cv(self, driver):
         ProfilePage.view_cv.click(driver)
 
@@ -335,6 +345,7 @@ class Profile:
     def get_contribution_type_count(self, driver, ind):
         type_count = ProfilePage.contribution_type_count(ind).get_text(driver)
         return int(type_count)
+
 
 class Groups:
     def create_group(self, driver, name, purpose, about, privacy):
