@@ -52,6 +52,15 @@ class External:
         WebDriverWait(driver, NEW_PAGE_LOAD).until(
             EC.title_contains(title))
 
+    def to_file(self, driver, num_windows_before, title):
+        WebDriverWait(driver, NEW_PAGE_LOAD).until(
+            EC.number_of_windows_to_be(num_windows_before+1))
+        win_handle = driver.window_handles[-1]
+        driver.switch_to.window(win_handle)
+        WebDriverWait(driver, NEW_PAGE_LOAD).until(
+            EC.title_contains(title))
+
+
 class TestSystem:
     """ General utilities for Hydroclient test case creation """
     def scroll_to_top(self, driver):

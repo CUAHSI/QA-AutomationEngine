@@ -7,10 +7,11 @@ from selenium.webdriver.support import expected_conditions as EC
 
 from hc_elements import SearchPage, MarkerModal, ServicesModal, \
     KeywordsModal, AdvancedModal, FilterModal, AboutModal, \
-    QuickStartModal, ZendeskWidget, WorkspacePage
+    QuickStartModal, ZendeskWidget, WorkspacePage, \
+    ResourceCreatorPage
 from timing import WORKSPACE_CREATE_ARCHIVE, SEARCH_IN_PROGRESS, \
     SEARCH_AUTOCOMPLETE, WORKSPACE_TOOLTIP_DISAPPEAR, MODAL_FADE, \
-    FILTER_MODAL_OPEN, RESULTS_MULTISELECT
+    FILTER_MODAL_OPEN, RESULTS_MULTISELECT, APP_INITIALIZATION
 
 
 class Search:
@@ -169,6 +170,20 @@ class Services:
             EC.visibility_of_element_located(SearchPage.modal_fade_locator))
         Search.search(driver)
 
+    def search(self, driver, search_text, result_num):
+        """ Click on the "Data Services" button to open the service filtering
+        capabilities.  Next, use the searchbar and select a result from the list
+        using result_num as the desired row index
+        """
+        SearchPage.services.click(driver)
+        ServicesModal.input_search.inject_text(driver, search_text)
+        ServicesModal.select_item_num('{}'.format(result_num)).passive_click(driver)
+        ServicesModal.search.click(driver)
+        time.sleep(SEARCH_IN_PROGRESS)
+
+    def select_result(self, driver,  num):
+        ServicesModal.select_item_num(num).click(driver)
+
     def empty_services(self, driver):
         SearchPage.services.click(driver)
         ServicesModal.save.click(driver)
@@ -318,6 +333,8 @@ class Filter:
         FilterModal.count.select_option(driver, '100')
 
     def to_workspace_all(self, driver):
+        """ Select all the results in the Filter Results dialog, then
+        export them to the workspace """
         FilterModal.selections.click(driver)
         FilterModal.select_all.click(driver)
         FilterModal.action.click(driver)
@@ -372,6 +389,7 @@ class Filter:
             checkbox_label = FilterModal.data_service_list_label(i).get_text(driver)
             if checkbox_label == service:
                 return FilterModal.data_service_list_entry(i).get_attribute(driver, 'aria-selected') == 'true'
+
 
 class About:
     def to_helpcenter(self, driver):
@@ -479,12 +497,18 @@ class Workspace:
 
     def to_viewer(self, driver):
         """ Open the tools dropdown and choose the option to explore
-        the data using the Data Viewer
-        """
+        the data using the Data Viewer """
         WorkspacePage.tools.passive_click(driver)
         WorkspacePage.to_viewer.click(driver)
 
+    def to_hydroshare(self, driver):
+        """ Open the tools dropdown and choose the option to
+        Export to HydroShare """
+        WorkspacePage.tools.passive_click(driver)
+        WorkspacePage.to_hydroshare.click(driver)
+
     def launch_tool(self, driver):
+        """ Click on the Launch Tool button """
         WorkspacePage.launch_tool.passive_click(driver)
 
     def to_none(self, driver):
@@ -516,6 +540,15 @@ class Workspace:
         return FilterModal.launch_tool.get_attribute(driver, 'disabled') is None
 
 
+class ResourceCreator:
+    def create_resource(self, driver):
+        """ Clicks on the Create Time Series Resource button """
+        time.sleep(APP_INITIALIZATION)
+        ResourceCreatorPage.create_time_resource.click(driver)
+
+    def is_initialized(self, driver):
+        return ResourceCreatorPage.login_button.is_visible(self.driver)
+
 Search = Search()
 Marker = Marker()
 Services = Services()
@@ -526,3 +559,4 @@ About = About()
 QuickStart = QuickStart()
 Zendesk = Zendesk()
 Workspace = Workspace()
+ResourceCreator = ResourceCreator()

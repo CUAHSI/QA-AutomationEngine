@@ -1,6 +1,6 @@
 """ Runs various smoke tests for the data.cuahsi.org """
 from hc_macros import Search, Marker, Services, Keywords, Advanced, \
-    Filter, About, QuickStart, Zendesk, Workspace
+    Filter, About, QuickStart, Zendesk, Workspace, ResourceCreator
 from hc_elements import ZendeskArticlePage
 
 from cuahsi_base.utils import External, TestSystem
@@ -8,8 +8,7 @@ from cuahsi_base.cuahsi_base import BaseTest, parse_args_run_tests
 
 # Test case parameters
 # BASE_URL = 'https://stage-data.cuahsi.org'  # production
-BASE_URL = 'http://qa-hiswebclient.azurewebsites.net/'
-
+BASE_URL = 'http://qa-hiswebclient.azurewebsites.net'
 
 # Test cases definition
 class HydroclientTestSuite(BaseTest):
@@ -458,6 +457,30 @@ class HydroclientTestSuite(BaseTest):
         Workspace.to_viewer(self.driver)
         TestSystem.wait(10)
         oracle()
+
+    def test_A_000022(self):
+        """ Confirm data series export to the Resource Creator app can be executed
+        successfully """
+        def oracle_completion_count():
+            """ Returned results set from Trinidad is not too large """
+            self.assertLess(Workspace.count_complete(self.driver), 5)
+        def oracle_resource_creator_up():
+            """ Resource creator seems to be functioning """
+            self.assertTrue(ResourceCreator.is_initialized(self.driver))
+
+        Search.search_location(self.driver, 'Trinidad, Trinidad and Tobago')
+        Search.search(self.driver)
+        Services.search(self.driver, 'World War', result_num=1)
+        Search.search(self.driver)
+        Filter.open(self.driver)
+        Filter.to_workspace_all(self.driver)
+        oracle_completion_count()
+        Workspace.select_all(self.driver)
+        Workspace.to_hydroshare(self.driver)
+        num_windows_opened = len(self.driver.window_handles)
+        Workspace.launch_tool(self.driver)
+        External.to_file(self.driver, num_windows_opened, 'HydroShare')
+        ResourceCreator.create_resource(self.driver)
 
 
 if __name__ == '__main__':

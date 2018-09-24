@@ -83,6 +83,11 @@ class ServicesModal:
         self.search = SiteElement(By.ID, 'btnServicesModalSearch')
         self.table_count = SiteElement(By.CSS_SELECTOR,
                                        'select[name="tblDataServices_length"]')
+        self.input_search = SiteElement(By.CSS_SELECTOR, 'div[id="tblDataServices_filter"] label input')
+
+    def select_item_num(self, num):
+        return SiteElement(By.XPATH,
+                           '(//div[@id="tblDataServices_wrapper"]//tr[@class!="disable-selection"])[{}]//td'.format(num))
         self.select_all_non_gridded = SiteElement(By.ID, 'checkOnlyObservedValues')
 
     def select_org(self, org):
@@ -250,6 +255,7 @@ class WorkspacePage:
         self.tools = SiteElement(By.ID, 'ddHydrodataToolDataMgr')
         self.to_csv = SiteElement(By.ID, 'idDownloadToClient')
         self.to_viewer = SiteElement(By.CSS_SELECTOR, '#byuApps ul li a')
+        self.to_hydroshare = SiteElement(By.CSS_SELECTOR, '#byuApps ul li:nth-child(2) a')
         self.to_none = SiteElement(By.ID, 'idNone')
         self.launch_tool = SiteElement(By.ID, 'btnLaunchHydrodataToolDataMgr')
 
@@ -257,6 +263,15 @@ class WorkspacePage:
     def tooltip_locator(self):
         return By.CSS_SELECTOR, 'div.tooltip-inner'
 
+
+class ResourceCreatorPage:
+    def __init__(self):
+        self.create_time_resource = SiteElement(By.ID, 'btn-create-timeseries-resource')
+        self.login_button = SiteElement(By.ID, 'login-link')
+
+    @property
+    def article_header_locator(self):
+        return By.ID, 'btn-create-timeseries-resource'
 
 class ExternalPage:
     def __init__(self):
@@ -275,3 +290,4 @@ ZendeskWidget = ZendeskWidget()
 WorkspacePage = WorkspacePage()
 ExternalPage = ExternalPage()
 ZendeskArticlePage = ZendeskArticlePage()
+ResourceCreatorPage = ResourceCreatorPage()
