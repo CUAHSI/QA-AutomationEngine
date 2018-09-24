@@ -454,6 +454,33 @@ class HydroshareTestSuite(BaseTest):
             )
         oracle(contribution_counts)
 
+    def test_B_000026(self):
+        """ Slider is functional for both anonymous and logged in users """
+        images = ['background-image: url("/static/img/home-page/carousel/bg1.jpg");',
+                  'background-image: url("/static/img/home-page/carousel/bg2.JPG");',
+                  'background-image: url("/static/img/home-page/carousel/bg3.jpg");']
+        def oracle_active():
+            """ Checks if at least one slider is active """
+            self.assertTrue(Home.a_slider_is_active(self.driver))
+        def oracle_image(images):
+            """ Confirms slider background image is in the list of images """
+            self.assertTrue(Home.slider_has_valid_img(self.driver, images))
+        Home.scroll_to_button(self.driver)
+        Home.scroll_to_top(self.driver)
+        for i in range(0, 5):
+            Home.slider_left(self.driver)
+            TestSystem.wait()
+            oracle_active()
+            oracle_image(images)
+        Home.login(self.driver, USERNAME, PASSWORD)
+        Home.scroll_to_button(self.driver)
+        Home.scroll_to_top(self.driver)
+        for i in range(0, 5):
+            Home.slider_right(self.driver)
+            TestSystem.wait()
+            oracle_active()
+            oracle_image(images)
+
 
 if __name__ == '__main__':
     parse_args_run_tests(HydroshareTestSuite)

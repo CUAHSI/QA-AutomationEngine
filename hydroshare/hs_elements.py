@@ -22,6 +22,11 @@ class HomePage:
         self.profile_button = SiteElement(By.CSS_SELECTOR,
                                           '.account div.dropdown-footer '
                                           '.btn.btn-primary')
+        self.go_up = SiteElement(By.CSS_SELECTOR, '.fa-angle-up')
+        self.body = SiteElement(By.XPATH, '//body[1]')
+        self.scroll_slider_right = SiteElement(By.CSS_SELECTOR, '.glyphicon-chevron-right')
+        self.scroll_slider_left = SiteElement(By.CSS_SELECTOR, '.glyphicon-chevron-left')
+        self.slider = SiteElement(By.CSS_SELECTOR, 'div.item.parallax-window.active')
 
 
 class AppsPage:

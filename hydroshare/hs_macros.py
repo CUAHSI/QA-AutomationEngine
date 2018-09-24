@@ -39,6 +39,24 @@ class Home:
         HomePage.profile_image.click(driver)
         HomePage.profile_button.click(driver)
 
+    def scroll_to_top(self, driver):
+        HomePage.go_up.click(driver)
+
+    def scroll_to_button(self, driver):
+        HomePage.body.set_path(driver, Keys.CONTROL + Keys.ARROW_DOWN)
+
+    def slider_right(self, driver):
+        HomePage.scroll_slider_right.click(driver)
+
+    def slider_left(self, driver):
+        HomePage.scroll_slider_left.click(driver)
+
+    def a_slider_is_active(self, driver):
+        return HomePage.slider
+
+    def slider_has_valid_img(self, driver, images):
+        return HomePage.slider.get_attribute(driver, 'style') in images
+
 
 class Apps:
     def show_info(self, driver, num):
