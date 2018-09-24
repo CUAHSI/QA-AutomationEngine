@@ -1,6 +1,4 @@
 """ Runs various smoke tests for the data.cuahsi.org """
-
-
 from hc_macros import Search, Marker, Services, Keywords, Advanced, \
     Filter, About, QuickStart, Zendesk, Workspace
 from hc_elements import ZendeskArticlePage
@@ -9,7 +7,7 @@ from cuahsi_base.utils import External, TestSystem
 from cuahsi_base.cuahsi_base import BaseTest, parse_args_run_tests
 
 # Test case parameters
-BASE_URL = 'https://stage-data.cuahsi.org'  # production
+BASE_URL = 'https://data.cuahsi.org'  # production
 
 
 # Test cases definition
@@ -47,7 +45,7 @@ class HydroclientTestSuite(BaseTest):
             when the search is filtered to only include "Archbold Biological
             Center" service
             """
-            self.assertIn('51', Search.count_results(self.driver))
+            self.assertEqual(51, Search.count_results(self.driver))
 
         Search.search_location(self.driver, 'Lake Annie Highlands County')
         Services.filters(self.driver, orgs='Archbold Biological Station')
@@ -247,7 +245,7 @@ class HydroclientTestSuite(BaseTest):
             """ Results count is nonzero after map navigations and a map
             location search (in that order)
             """
-            self.assertNotEqual(Search.count_results(self.driver), '0')
+            self.assertNotEqual(Search.count_results(self.driver), 0)
 
         Search.scroll_map(self.driver, 25)
         Search.search_location(self.driver, 'Raleigh')
@@ -286,7 +284,7 @@ class HydroclientTestSuite(BaseTest):
             """ The results count over Cape Cod Bay (no land in view)
             is 0 after filtering for only NLDAS services
             """
-            self.assertEqual(Search.count_results(self.driver), '0')
+            self.assertEqual(Search.count_results(self.driver), 0)
 
         Search.search_location(self.driver, 'Cape Cod Bay')
         Search.zoom_in(self.driver, 3)
@@ -385,6 +383,31 @@ class HydroclientTestSuite(BaseTest):
         Filter.open(self.driver)
         oracle_data_prop_selection(data_props, should_be_selected=False)
         oracle_data_service_selection(data_services, should_be_selected=False)
+
+    def test_A_000019(self):
+        """ Confirm empty operations on the filter modals don't affect the
+        results set or the persistance of the searchbox entry """
+        def oracle_search_text_is_same(text):
+            """ Check if the text is the same in the search field """
+            self.assertEqual(Search.get_searchbox_text(self.driver), text)
+        def oracle_result(init_result):
+            """ Compare search results count to the initial level """
+            self.assertEqual(init_result, Search.count_results(self.driver))
+
+        location = 'NUIO üł. 54343nt, 342sf 234sdf, 12...'  # deliberately random
+        Search.search_location(self.driver, location)
+        Search.search(self.driver)
+        init_result_count = Search.count_results(self.driver)
+        Services.filters(self.driver)  # apply no services filters
+        Keywords.empty_keywords(self.driver)  # no keyword filters
+        Advanced.empty_advanced(self.driver)  # no advanced filters
+        Search.search(self.driver)
+        oracle_result(init_result_count)
+        oracle_search_text_is_same(location)
+        Search.reset(self.driver)
+        Search.search(self.driver)
+        oracle_result(init_result_count)
+        oracle_search_text_is_same(location)
 
 
 if __name__ == '__main__':

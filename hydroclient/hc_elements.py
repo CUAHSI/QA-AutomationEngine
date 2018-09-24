@@ -82,6 +82,7 @@ class ServicesModal:
         self.search = SiteElement(By.ID, 'btnServicesModalSearch')
         self.table_count = SiteElement(By.CSS_SELECTOR,
                                        'select[name="tblDataServices_length"]')
+        self.select_all_non_gridded = SiteElement(By.ID, 'checkOnlyObservedValues')
 
     def select_org(self, org):
         return SiteElement(By.XPATH,
@@ -99,6 +100,7 @@ class KeywordsModal:
     def __init__(self):
         self.full_list = SiteElement(By.CSS_SELECTOR, 'a[href="#tab2"]')
         self.search = SiteElement(By.ID, 'btnFullKeywordModalSearch')
+        self.save = SiteElement(By.ID, 'btnCommonKeywordModalSave')
 
     def full_list_checkbox(self, item_name):
         return SiteElement(By.XPATH,
@@ -117,6 +119,7 @@ class AdvancedModal:
     def __init__(self):
         self.value_type = SiteElement(By.CSS_SELECTOR, 'a[href="#valueTypePane"]')
         self.search = SiteElement(By.ID, 'btnAdvancedSearchModalSearch')
+        self.save = SiteElement(By.ID, 'btnAdvancedSearchModalSave')
 
     def value_type_sort(self, sort_by):
         return SiteElement(By.XPATH, '//table[@id="tblCvValueType"]/thead/tr/'

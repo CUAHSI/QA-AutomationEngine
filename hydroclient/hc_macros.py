@@ -12,6 +12,7 @@ from timing import WORKSPACE_CREATE_ARCHIVE, SEARCH_IN_PROGRESS, \
     SEARCH_AUTOCOMPLETE, WORKSPACE_TOOLTIP_DISAPPEAR, MODAL_FADE, \
     FILTER_MODAL_OPEN
 
+
 class Search:
     def scroll_map(self, driver, count=1):
         """ Make a large scroll with the map {{count}} times to the
@@ -71,7 +72,12 @@ class Search:
         """ Check the number of results using the "Time Series Found"
         area of the sidebar
         """
-        return SearchPage.results_count.get_text(driver)
+        results_count = SearchPage.results_count.get_text(driver)
+        # Account for multiple localization settings with respect to thousands
+        # separator.  Safe since results count will always be integer.
+        results_count = re.sub('[,]', '', results_count)
+        results_count = re.sub('[.]', '', results_count)
+        return int(results_count)
 
     def filter_dates(self, driver, start_date, end_date):
         """ Use the "Date Range" option when doing a map search to filter
@@ -105,6 +111,9 @@ class Search:
         for i in range(0, count):
             SearchPage.zoom_in.click(driver)
 
+    def get_searchbox_text(self, driver):
+        return SearchPage.map_search.get_attribute(driver, 'value')
+
 
 class Marker:
     def to_workspace_all(self, driver):
@@ -129,7 +138,7 @@ class Marker:
 
 
 class Services:
-    def filters(self, driver, orgs=None, titles=None):
+    def filters(self, driver, orgs=None, titles=None, non_gridded_only=False):
         """ Click on the "Data Services" button to open the service filtering
         capabilities.  Next, filter the search results by multi-selecting
         the {{org}} organization(s) and the {{titles}} titles
@@ -149,10 +158,17 @@ class Services:
                 ServicesModal.select_title(title).multi_click(driver)
         elif titles is not None:
             ServicesModal.select_title(titles).click(driver)
+        if non_gridded_only == True:
+            ServicesModal.select_all_non_gridded.click(driver)
         ServicesModal.save.click(driver)
         WebDriverWait(driver, MODAL_FADE).until_not(
             EC.visibility_of_element_located(SearchPage.modal_fade_locator))
         Search.search(driver)
+
+    def empty_services(self, driver):
+        SearchPage.services.click(driver)
+        ServicesModal.save.click(driver)
+        time.sleep(MODAL_FADE)
 
 
 class Keywords:
@@ -170,6 +186,11 @@ class Keywords:
         KeywordsModal.search.click(driver)
         time.sleep(SEARCH_IN_PROGRESS)
 
+    def empty_keywords(self, driver):
+        SearchPage.keywords.click(driver)
+        KeywordsModal.save.click(driver)
+        time.sleep(MODAL_FADE)
+
 
 class Advanced:
     def filter_all_value_types(self, driver):
@@ -186,6 +207,11 @@ class Advanced:
         AdvancedModal.search.click(driver)
         time.sleep(SEARCH_IN_PROGRESS)
 
+    def empty_advanced(self, driver):
+        SearchPage.advanced.click(driver)
+        AdvancedModal.save.click(driver)
+        time.sleep(MODAL_FADE)
+
 
 class Filter:
     def count_results(self, driver):
@@ -193,6 +219,11 @@ class Filter:
         results_info = results_info.replace(',', '')
         nums = re.findall(r'\d+', results_info)
         return nums
+
+    def empty_filters(self, driver):
+        SearchPage.map_filter.click(driver)
+        FilterModal.close.click(driver)
+        time.sleep(MODAL_FADE)
 
     def open(self, driver):
         # SearchPage.map_filter.click(driver)
