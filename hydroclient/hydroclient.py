@@ -341,7 +341,6 @@ class HydroclientTestSuite(BaseTest):
                     self.assertTrue(Filter.data_prop_is_selected(self.driver, data_prop))
                 else:
                     self.assertFalse(Filter.data_prop_is_selected(self.driver, data_prop))
-
         def oracle_data_service_selection(data_services, should_be_selected):
             """ Checks that filter options not selected """
             for data_service in data_services:
@@ -393,7 +392,7 @@ class HydroclientTestSuite(BaseTest):
         Search.search_location(self.driver, 'Antarctica')
         Search.search(self.driver)
         oracle()
-        
+
     def test_A_000019(self):
         """ Confirm empty operations on the filter modals don't affect the
         results set or the persistance of the searchbox entry """
@@ -440,6 +439,25 @@ class HydroclientTestSuite(BaseTest):
         Workspace.launch_tool(self.driver)
         TestSystem.wait(5)
         oracle_viewer_opened()
+
+    def test_A_000021(self):
+        """" Confirm the Data Series Viewer application can't be sent more
+        than 10 time series records """
+        def oracle():
+            """ Checks that the Launch Tool is disabled """
+            self.assertTrue(Workspace.launch_is_disabled(self.driver))
+
+        Search.search_location(self.driver, 'Panama City, Pana')
+        Search.search(self.driver)
+        Services.filters(self.driver, non_gridded_only=True)
+        Search.search(self.driver)
+        Filter.open(self.driver)
+        Filter.show_25(self.driver)
+        Filter.to_workspace_all(self.driver)
+        Workspace.select_all(self.driver)
+        Workspace.to_viewer(self.driver)
+        TestSystem.wait(10)
+        oracle()
 
 
 if __name__ == '__main__':

@@ -146,6 +146,7 @@ class FilterModal:
                                   '#tblDetailedSearchResults_filter input')
         self.selections = SiteElement(By.ID, 'ddMenuSelectionsDSR')
         self.select_all = SiteElement(By.ID, 'anchorAllSelectionsDSR')
+        self.launch_tool = SiteElement(By.ID, 'divLaunchHydrodataToolDataMgr')
         self.find_in_table = SiteElement(By.CSS_SELECTOR, 'input[aria-controls="tblDetailedSearchResults"]')
         self.apply_filters = SiteElement(By.ID, 'btnApplyFilters')
         self.data_props_list = SiteElement(By.CSS_SELECTOR, '#treeSearchSummaryControlledVocabularies ul')

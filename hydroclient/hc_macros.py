@@ -317,6 +317,16 @@ class Filter:
         FilterModal.sort('Service Title').click(driver)
         FilterModal.count.select_option(driver, '100')
 
+    def to_workspace_all(self, driver):
+        FilterModal.selections.click(driver)
+        FilterModal.select_all.click(driver)
+        FilterModal.action.click(driver)
+        FilterModal.to_workspace.click(driver)
+        FilterModal.workspace.click(driver)
+
+    def show_25(self, driver):
+        FilterModal.count.select_option(driver, '25')
+
     def selection(self, driver):
         FilterModal.selections.click(driver)
         FilterModal.select_all.click(driver)
@@ -362,7 +372,6 @@ class Filter:
             checkbox_label = FilterModal.data_service_list_label(i).get_text(driver)
             if checkbox_label == service:
                 return FilterModal.data_service_list_entry(i).get_attribute(driver, 'aria-selected') == 'true'
-
 
 class About:
     def to_helpcenter(self, driver):
@@ -502,6 +511,9 @@ class Workspace:
             if strings not in driver.page_source:
                 return False
         return True
+
+    def launch_is_disabled(self, driver):
+        return FilterModal.launch_tool.get_attribute(driver, 'disabled') is None
 
 
 Search = Search()
