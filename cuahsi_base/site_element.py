@@ -67,6 +67,7 @@ class SiteElement:
         """
         target_el = self.loc_it(el_driver)
         actions = ActionChains(el_driver)
+        actions.move_to_element(target_el)
         actions.key_down(Keys.LEFT_CONTROL)
         actions.click(target_el)
         actions.key_up(Keys.LEFT_CONTROL)
@@ -78,6 +79,7 @@ class SiteElement:
         """
         target_el = self.loc_it(el_driver)
         actions = ActionChains(el_driver)
+        actions.move_to_element(target_el)
         actions.key_down(Keys.LEFT_SHIFT)
         actions.click(target_el)
         actions.key_up(Keys.LEFT_SHIFT)

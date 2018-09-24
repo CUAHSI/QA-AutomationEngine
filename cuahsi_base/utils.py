@@ -13,7 +13,6 @@ from .delays import NEW_PAGE_LOAD
 
 class External:
     """ Utilities for handling new tabs/windows """
-
     def switch_new_page(self, driver, num_windows_before, new_window_load_locator):
         WebDriverWait(driver, NEW_PAGE_LOAD).until(
             EC.number_of_windows_to_be(num_windows_before+1))
@@ -21,7 +20,6 @@ class External:
         driver.switch_to.window(win_handle)
         WebDriverWait(driver, NEW_PAGE_LOAD).until(
             EC.visibility_of_element_located(new_window_load_locator))
-
         TestSystem.check_language(driver)
 
     def switch_old_page(self, driver):
@@ -44,7 +42,6 @@ class External:
         TestSystem.check_language(driver)
         driver.switch_to.window(orig_handle)
         time.sleep(NEW_PAGE_LOAD)
-
         return source
 
     def to_file(self, driver, num_windows_before, title):

@@ -7,7 +7,8 @@ from cuahsi_base.utils import External, TestSystem
 from cuahsi_base.cuahsi_base import BaseTest, parse_args_run_tests
 
 # Test case parameters
-BASE_URL = 'https://data.cuahsi.org'  # production
+# BASE_URL = 'https://stage-data.cuahsi.org'  # production
+BASE_URL = 'http://qa-hiswebclient.azurewebsites.net/'
 
 
 # Test cases definition
@@ -417,6 +418,28 @@ class HydroclientTestSuite(BaseTest):
         Search.search(self.driver)
         oracle_result(init_result_count)
         oracle_search_text_is_same(location)
+
+    def test_A_000020(self):
+        """ Confirms sample Buffalo NY data exports successfully to the Data
+        Series Viewer """
+        def oracle_processed_count():
+            """ The Buffalo NY three time series process successfully """
+            self.assertEqual(Workspace.count_complete(self.driver), 3)
+        def oracle_viewer_opened():
+            """ The Data Series viewer application initializes and the data table
+            near the bottom of the application is loaded """
+            self.assertIn('id="stat_div"', External.source_new_page(self.driver))
+
+        Search.search_location(self.driver, 'Buffalo')
+        Search.search(self.driver)
+        Filter.open(self.driver)
+        Filter.to_workspace_cell_range(self.driver, 1, 3)
+        oracle_processed_count()
+        Workspace.select_all(self.driver)
+        Workspace.to_viewer(self.driver)
+        Workspace.launch_tool(self.driver)
+        TestSystem.wait(5)
+        oracle_viewer_opened()
 
 
 if __name__ == '__main__':

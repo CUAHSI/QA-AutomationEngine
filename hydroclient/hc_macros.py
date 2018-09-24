@@ -10,7 +10,7 @@ from hc_elements import SearchPage, MarkerModal, ServicesModal, \
     QuickStartModal, ZendeskWidget, WorkspacePage
 from timing import WORKSPACE_CREATE_ARCHIVE, SEARCH_IN_PROGRESS, \
     SEARCH_AUTOCOMPLETE, WORKSPACE_TOOLTIP_DISAPPEAR, MODAL_FADE, \
-    FILTER_MODAL_OPEN
+    FILTER_MODAL_OPEN, RESULTS_MULTISELECT
 
 
 class Search:
@@ -262,6 +262,7 @@ class Filter:
         FilterModal.cell(last_row, 3).scroll_to(driver)
         FilterModal.cell(last_row, 3).range_click(driver)
         FilterModal.action.click(driver)
+        FilterModal.to_workspace.scroll_to(driver)
         FilterModal.to_workspace.click(driver)
         FilterModal.workspace.click(driver)
 
@@ -272,6 +273,7 @@ class Filter:
         FilterModal.cell(rows[0], 3).click(driver)
         for i in range(1, len(rows)):
             FilterModal.cell(rows[i], 3).scroll_to(driver)
+            time.sleep(RESULTS_MULTISELECT)
             FilterModal.cell(rows[i], 3).multi_click(driver)
         FilterModal.action.click(driver)
         FilterModal.to_workspace.click(driver)
@@ -360,6 +362,7 @@ class Filter:
             checkbox_label = FilterModal.data_service_list_label(i).get_text(driver)
             if checkbox_label == service:
                 return FilterModal.data_service_list_entry(i).get_attribute(driver, 'aria-selected') == 'true'
+
 
 class About:
     def to_helpcenter(self, driver):
@@ -471,6 +474,9 @@ class Workspace:
         """
         WorkspacePage.tools.passive_click(driver)
         WorkspacePage.to_viewer.click(driver)
+
+    def launch_tool(self, driver):
+        WorkspacePage.launch_tool.passive_click(driver)
 
     def to_none(self, driver):
         """ Open the tools dropdown and choose the "None" option """

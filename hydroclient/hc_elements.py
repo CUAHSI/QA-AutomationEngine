@@ -250,6 +250,7 @@ class WorkspacePage:
         self.to_csv = SiteElement(By.ID, 'idDownloadToClient')
         self.to_viewer = SiteElement(By.CSS_SELECTOR, '#byuApps ul li a')
         self.to_none = SiteElement(By.ID, 'idNone')
+        self.launch_tool = SiteElement(By.ID, 'btnLaunchHydrodataToolDataMgr')
 
     @property
     def tooltip_locator(self):
