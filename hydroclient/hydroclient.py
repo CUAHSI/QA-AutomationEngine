@@ -1,14 +1,14 @@
 """ Runs various smoke tests for the data.cuahsi.org """
-
 from hc_macros import Search, Marker, Services, Keywords, Advanced, \
-    Filter, About, QuickStart, Zendesk, Workspace
+    Filter, About, QuickStart, Zendesk, Workspace, ResourceCreator
 from hc_elements import ZendeskArticlePage
 
 from cuahsi_base.utils import External, TestSystem
 from cuahsi_base.cuahsi_base import BaseTest, parse_args_run_tests
 
 # Test case parameters
-BASE_URL = 'https://stage-data.cuahsi.org'  # production
+# BASE_URL = 'https://stage-data.cuahsi.org'  # production
+BASE_URL = 'http://qa-hiswebclient.azurewebsites.net'
 
 
 # Test cases definition
@@ -46,7 +46,7 @@ class HydroclientTestSuite(BaseTest):
             when the search is filtered to only include "Archbold Biological
             Center" service
             """
-            self.assertIn('51', Search.count_results(self.driver))
+            self.assertEqual(51, Search.count_results(self.driver))
 
         Search.search_location(self.driver, 'Lake Annie Highlands County')
         Services.filters(self.driver, orgs='Archbold Biological Station')
@@ -246,7 +246,7 @@ class HydroclientTestSuite(BaseTest):
             """ Results count is nonzero after map navigations and a map
             location search (in that order)
             """
-            self.assertNotEqual(Search.count_results(self.driver), '0')
+            self.assertNotEqual(Search.count_results(self.driver), 0)
 
         Search.scroll_map(self.driver, 25)
         Search.search_location(self.driver, 'Raleigh')
@@ -285,7 +285,7 @@ class HydroclientTestSuite(BaseTest):
             """ The results count over Cape Cod Bay (no land in view)
             is 0 after filtering for only NLDAS services
             """
-            self.assertEqual(Search.count_results(self.driver), '0')
+            self.assertEqual(Search.count_results(self.driver), 0)
 
         Search.search_location(self.driver, 'Cape Cod Bay')
         Search.zoom_in(self.driver, 3)
@@ -326,6 +326,181 @@ class HydroclientTestSuite(BaseTest):
         result_nums = Filter.count_results(self.driver)
         result_nums = [int(result_num) for result_num in result_nums]
         oracle(result_nums)
+
+    def test_A_000017(self):
+        """ Confirm Reset button clears Filter Results text and categorical
+        filters """
+        def oracle_results_count(expected_results, should_match):
+            if should_match:
+                self.assertEqual(
+                    Search.count_results(self.driver),
+                    expected_results
+                )
+            else:
+                self.assertNotEqual(
+                    Search.count_results(self.driver),
+                    expected_results
+                )
+
+        def oracle_data_prop_selection(data_props, should_be_selected):
+            """ Checks that filter options not selected """
+            for data_prop in data_props:
+                if should_be_selected:
+                    self.assertTrue(
+                        Filter.data_prop_is_selected(self.driver, data_prop)
+                    )
+                else:
+                    self.assertFalse(
+                        Filter.data_prop_is_selected(self.driver, data_prop)
+                    )
+
+        def oracle_data_service_selection(data_services, should_be_selected):
+            """ Checks that filter options not selected """
+            for data_service in data_services:
+                if should_be_selected:
+                    self.assertTrue(
+                        Filter.data_service_is_selected(self.driver, data_service)
+                    )
+                else:
+                    self.assertFalse(
+                        Filter.data_service_is_selected(self.driver, data_service)
+                    )
+
+        data_props = ['Data Type', 'Sample Medium']
+        data_services = ['Community Collaborative Rain, Hail and Snow Network']
+        Search.search_location(self.driver, 'Montreal ')
+        Search.search(self.driver)
+        expected_results = Search.count_results(self.driver)
+        Filter.open(self.driver)
+        Filter.selection(self.driver)
+        Filter.close(self.driver)
+        TestSystem.wait(5)
+        Search.reset(self.driver)
+        Search.search(self.driver)
+        oracle_results_count(expected_results, should_match=True)
+        Filter.open(self.driver)
+        Filter.find_in_table(self.driver, 'DOLLARD')
+        oracle_results_count(expected_results, should_match=False)
+        Search.reset(self.driver)
+        Search.search(self.driver)
+        oracle_results_count(expected_results, should_match=True)
+        Filter.open(self.driver)
+        Filter.set_data_props(self.driver, data_props)
+        Filter.open(self.driver)
+        Filter.set_data_services(self.driver, data_services)
+        oracle_results_count(expected_results, should_match=False)
+        Filter.open(self.driver)
+        oracle_data_prop_selection(data_props, should_be_selected=True)
+        oracle_data_service_selection(data_services, should_be_selected=True)
+        Filter.close(self.driver)
+        Search.reset(self.driver)
+        Search.search(self.driver)
+        oracle_results_count(expected_results, should_match=True)
+        Filter.open(self.driver)
+        oracle_data_prop_selection(data_props, should_be_selected=False)
+        oracle_data_service_selection(data_services, should_be_selected=False)
+
+    def test_A_000018(self):
+        """ Search results for Antarctica is greater than 0 """
+        def oracle():
+            """ Search result is greater than zero """
+            self.assertGreater(Search.count_results(self.driver),  0)
+        Search.search_location(self.driver, 'Antarctica')
+        Search.search(self.driver)
+        oracle()
+
+    def test_A_000019(self):
+        """ Confirm empty operations on the filter modals don't affect the
+        results set or the persistance of the searchbox entry """
+        def oracle_search_text_is_same(text):
+            """ Check if the text is the same in the search field """
+            self.assertEqual(Search.get_searchbox_text(self.driver), text)
+
+        def oracle_result(init_result):
+            """ Compare search results count to the initial level """
+            self.assertEqual(init_result, Search.count_results(self.driver))
+
+        location = 'NUIO üł. 54343nt, 342sf 234sdf, 12...'  # deliberately random
+        Search.search_location(self.driver, location)
+        Search.search(self.driver)
+        init_result_count = Search.count_results(self.driver)
+        Services.filters(self.driver)  # apply no services filters
+        Keywords.empty_keywords(self.driver)  # no keyword filters
+        Advanced.empty_advanced(self.driver)  # no advanced filters
+        Search.search(self.driver)
+        oracle_result(init_result_count)
+        oracle_search_text_is_same(location)
+        Search.reset(self.driver)
+        Search.search(self.driver)
+        oracle_result(init_result_count)
+        oracle_search_text_is_same(location)
+
+    def test_A_000020(self):
+        """ Confirms sample Buffalo NY data exports successfully to the Data
+        Series Viewer """
+        def oracle_processed_count():
+            """ The Buffalo NY three time series process successfully """
+            self.assertEqual(Workspace.count_complete(self.driver), 3)
+
+        def oracle_viewer_opened():
+            """ The Data Series viewer application initializes and the data table
+            near the bottom of the application is loaded """
+            self.assertIn('id="stat_div"', External.source_new_page(self.driver))
+
+        Search.search_location(self.driver, 'Buffalo')
+        Search.search(self.driver)
+        Filter.open(self.driver)
+        Filter.to_workspace_cell_range(self.driver, 1, 3)
+        oracle_processed_count()
+        Workspace.select_all(self.driver)
+        Workspace.to_viewer(self.driver)
+        Workspace.launch_tool(self.driver)
+        TestSystem.wait(5)
+        oracle_viewer_opened()
+
+    def test_A_000021(self):
+        """" Confirm the Data Series Viewer application can't be sent more
+        than 10 time series records """
+        def oracle():
+            """ Checks that the Launch Tool is disabled """
+            self.assertTrue(Workspace.launch_is_disabled(self.driver))
+
+        Search.search_location(self.driver, 'Panama City, Pana')
+        Search.search(self.driver)
+        Services.filters(self.driver, non_gridded_only=True)
+        Search.search(self.driver)
+        Filter.open(self.driver)
+        Filter.show_25(self.driver)
+        Filter.to_workspace_all(self.driver)
+        Workspace.select_all(self.driver)
+        Workspace.to_viewer(self.driver)
+        TestSystem.wait(10)
+        oracle()
+
+    def test_A_000022(self):
+        """ Confirm data series export to the Resource Creator app can be executed
+        successfully """
+        def oracle_completion_count():
+            """ Returned results set from Trinidad is not too large """
+            self.assertLess(Workspace.count_complete(self.driver), 5)
+
+        def oracle_resource_creator_up():
+            """ Resource creator seems to be functioning """
+            self.assertTrue(ResourceCreator.is_initialized(self.driver))
+
+        Search.search_location(self.driver, 'Trinidad, Trinidad and Tobago')
+        Search.search(self.driver)
+        Services.search(self.driver, 'World War', result_num=1)
+        Search.search(self.driver)
+        Filter.open(self.driver)
+        Filter.to_workspace_all(self.driver)
+        oracle_completion_count()
+        Workspace.select_all(self.driver)
+        Workspace.to_hydroshare(self.driver)
+        num_windows_opened = len(self.driver.window_handles)
+        Workspace.launch_tool(self.driver)
+        External.to_file(self.driver, num_windows_opened, 'HydroShare')
+        ResourceCreator.create_resource(self.driver)
 
 
 if __name__ == '__main__':

@@ -67,6 +67,7 @@ class SiteElement:
         """
         target_el = self.loc_it(el_driver)
         actions = ActionChains(el_driver)
+        actions.move_to_element(target_el)
         actions.key_down(Keys.LEFT_CONTROL)
         actions.click(target_el)
         actions.key_up(Keys.LEFT_CONTROL)
@@ -78,6 +79,7 @@ class SiteElement:
         """
         target_el = self.loc_it(el_driver)
         actions = ActionChains(el_driver)
+        actions.move_to_element(target_el)
         actions.key_down(Keys.LEFT_SHIFT)
         actions.click(target_el)
         actions.key_up(Keys.LEFT_SHIFT)
@@ -151,6 +153,13 @@ class SiteElement:
         for i in range(0, len(field_text)):
             target_el.send_keys(field_text[i])
 
+    def set_path(self, el_driver, field_text):
+        """ Enters text into a field or other input-capable html
+        element using send keys, best for setting path to files for upload
+        """
+        target_el = self.loc_it(el_driver)
+        target_el.send_keys(field_text)
+
     def iframe_in(self, el_driver):
         """ Switches driver focus to an iframe within a page """
         target_el = self.loc_it(el_driver)
@@ -205,3 +214,8 @@ class SiteElement:
         target_el = self.loc_it(el_driver)
         target_class = target_el.get_attribute('class')
         return target_class
+
+    def get_style(self, el_driver):
+        target_el = self.loc_it(el_driver)
+        target_style = target_el.get_attribute('style')
+        return target_style

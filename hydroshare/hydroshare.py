@@ -1,6 +1,8 @@
 """ Runs various smoke tests for the hydroshare.org """
+import os
 import random
 import re
+import urllib.request
 
 from hs_macros import Home, Apps, Discover, Resource, Help, API, About, Profile, \
     Groups, Group, MyResources
@@ -269,7 +271,8 @@ class HydroshareTestSuite(BaseTest):
         oracle(resource_title)
 
     def test_B_000017(self):
-        """ Confirm applying resource type filters in My Resources does not break system """
+        """ Confirm applying resource type filters in My Resources does not
+        break the system """
         def oracle(page_title):
             """ My Resources page is still clean/active """
             self.assertIn('My Resources', page_title)
@@ -299,23 +302,41 @@ class HydroshareTestSuite(BaseTest):
         def oracle_type(is_applied):
             """ Search bar shows the resource type filter """
             if is_applied:
-                self.assertIn('[type:', MyResources.read_searchbar(self.driver))
+                self.assertIn(
+                    '[type:',
+                    MyResources.read_searchbar(self.driver)
+                )
             else:
-                self.assertNotIn('[type:', MyResources.read_searchbar(self.driver))
+                self.assertNotIn(
+                    '[type:',
+                    MyResources.read_searchbar(self.driver)
+                )
 
         def oracle_author(is_applied):
             """ Search bar shows the author filter """
             if is_applied:
-                self.assertIn('[author:Über', MyResources.read_searchbar(self.driver))
+                self.assertIn(
+                    '[author:Über',
+                    MyResources.read_searchbar(self.driver)
+                )
             else:
-                self.assertNotIn('[author:', MyResources.read_searchbar(self.driver))
+                self.assertNotIn(
+                    '[author:',
+                    MyResources.read_searchbar(self.driver)
+                )
 
         def oracle_subject(is_applied):
             """ Search bar shows the subject filter """
             if is_applied:
-                self.assertIn('[subject:Über', MyResources.read_searchbar(self.driver))
+                self.assertIn(
+                    '[subject:Über',
+                    MyResources.read_searchbar(self.driver)
+                )
             else:
-                self.assertNotIn('[subject:', MyResources.read_searchbar(self.driver))
+                self.assertNotIn(
+                    '[subject:',
+                    MyResources.read_searchbar(self.driver)
+                )
 
         Home.login(self.driver, USERNAME, PASSWORD)
         Home.to_my_resources(self.driver)
@@ -374,6 +395,135 @@ class HydroshareTestSuite(BaseTest):
         MyResources.toggle_label(self.driver, 'Test')
         oracle_deselected()
         MyResources.delete_label(self.driver)
+
+    def test_B_000021(self):
+        """ Confirm ability to upload CV file to users profile """
+        def oracle(cv_filename):
+            """ Checks "View CV" window page title contains the file name """
+            self.assertTrue(cv_filename in TestSystem.title(self.driver))
+
+        Home.login(self.driver, USERNAME, PASSWORD)
+        Home.to_profile(self.driver)
+        Profile.to_editor(self.driver)
+        urllib.request.urlretrieve(
+            'https://www.bu.edu/com-csc/resume/resume_samples.pdf',
+            'cv-test.pdf'
+        )
+        cwd = os.getcwd()
+        cv_path = os.path.join(cwd, 'cv-test.pdf')
+        Profile.add_cv(self.driver, cv_path)
+        TestSystem.scroll_to_top(self.driver)
+        Profile.save(self.driver)
+        num_windows_now = len(self.driver.window_handles)
+        Profile.view_cv(self.driver)
+        External.to_file(self.driver, num_windows_now, 'cv-test')
+        oracle('cv-test')
+        os.remove(cv_path)
+        External.switch_old_page(self.driver)
+        External.close_new_page(self.driver)
+        Profile.to_editor(self.driver)
+        Profile.delete_cv(self.driver)
+
+    def test_B_000022(self):
+        """ Confirm image upload to user profile runs smoothly """
+        def oracle(img_filename, is_uploaded):
+            """ Checks profile pic div contains the image filename
+            in it's style attribute (the system uses style background image
+            approach) """
+            if is_uploaded:
+                self.assertTrue(
+                    Profile.confirm_photo_uploaded(self.driver, img_filename)
+                )
+            else:
+                self.assertFalse(
+                    Profile.confirm_photo_uploaded(self.driver, img_filename)
+                )
+        Home.login(self.driver, USERNAME, PASSWORD)
+        Home.to_profile(self.driver)
+        Profile.to_editor(self.driver)
+        urllib.request.urlretrieve(
+            'http://www.bu.edu/emd/files/2017/03/rhett_alone1.jpg',
+            'profile.jpg'
+        )
+        cwd = os.getcwd()
+        profile_img_path = os.path.join(cwd, 'profile.jpg')
+        Profile.add_photo(self.driver, profile_img_path)
+        Profile.save(self.driver)
+        TestSystem.wait(30)
+        oracle('profile', True)
+        os.remove(profile_img_path)
+        Profile.to_editor(self.driver)
+        Profile.remove_photo(self.driver)
+        oracle('profile', False)
+
+    def test_B_000023(self):
+        """ Ensure resource links to profile work """
+        def oracle(contribution_counts):
+            """ Confirm the "All" contibutions count is the sum of all the other
+            resource type contributions """
+            self.assertEqual(
+                contribution_counts[0],  # count for "All"
+                sum(contribution_counts[1:])  # count for the rest
+            )
+        Home.to_discover(self.driver)
+        Discover.filters(self.driver, author='Castronova, Anthony')
+        Discover.to_resource(
+            self.driver,
+            'Lowering the barriers to Computational Modeling of the Earth Surface'
+        )
+        Discover.to_last_updated_profile(self.driver)
+        Profile.view_contributions(self.driver)
+        resource_types_count = Profile.get_resource_type_count(self.driver)
+        contribution_counts = []
+        for i in range(0, resource_types_count):
+            Profile.view_contribution_type(self.driver, i)
+            contribution_counts.append(
+                Profile.get_contribution_type_count(self.driver, i)
+            )
+        oracle(contribution_counts)
+
+    def test_B_000026(self):
+        """ Slider is functional for both anonymous and logged in users """
+        def oracle_active():
+            """ Checks if at least one slider is active """
+            self.assertTrue(Home.a_slider_is_active(self.driver))
+
+        def oracle_image(images):
+            """ Confirms slider background image is in the list of images """
+            self.assertTrue(Home.slider_has_valid_img(self.driver, images))
+
+        images = ['background-image: url("/static/img/home-page/carousel/bg1.jpg");',
+                  'background-image: url("/static/img/home-page/carousel/bg2.JPG");',
+                  'background-image: url("/static/img/home-page/carousel/bg3.jpg");']
+        Home.scroll_to_button(self.driver)
+        Home.scroll_to_top(self.driver)
+        for i in range(0, 5):
+            Home.slider_left(self.driver)
+            TestSystem.wait()
+            oracle_active()
+            oracle_image(images)
+        Home.login(self.driver, USERNAME, PASSWORD)
+        Home.scroll_to_button(self.driver)
+        Home.scroll_to_top(self.driver)
+        for i in range(0, 5):
+            Home.slider_right(self.driver)
+            TestSystem.wait()
+            oracle_active()
+            oracle_image(images)
+
+    def test_B_000027(self):
+        """ The MyResources and Discover pages have the same labels and resources
+        listed in their legends """
+        def oracle(legend_one, legend_two):
+            """ Compare text from the legends on the MyResources and Discover
+            pages """
+            self.assertEqual(legend_one, legend_two)
+        Home.login(self.driver, USERNAME, PASSWORD)
+        Home.to_my_resources(self.driver)
+        my_resource_legend = MyResources.legend_text(self.driver)
+        Home.to_discover(self.driver)
+        discover_legend = Discover.legend_text(self.driver)
+        oracle(my_resource_legend, discover_legend)
 
 
 if __name__ == '__main__':
