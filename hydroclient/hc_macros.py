@@ -163,7 +163,7 @@ class Services:
                 ServicesModal.select_title(title).multi_click(driver)
         elif titles is not None:
             ServicesModal.select_title(titles).click(driver)
-        if non_gridded_only == True:
+        if non_gridded_only:
             ServicesModal.select_all_non_gridded.click(driver)
         ServicesModal.save.click(driver)
         WebDriverWait(driver, MODAL_FADE).until_not(
@@ -355,7 +355,8 @@ class Filter:
         time.sleep(MODAL_FADE)
 
     def set_data_props(self, driver, data_props):
-        count_data_props = FilterModal.data_props_list.get_immediate_child_count(driver)
+        data_props_list = FilterModal.data_props_list
+        count_data_props = data_props_list.get_immediate_child_count(driver)
         for i in range(0, count_data_props):
             checkbox_label = FilterModal.data_prop_list_label(i).get_text(driver)
             if checkbox_label in data_props:
@@ -366,14 +367,21 @@ class Filter:
         time.sleep(MODAL_FADE)
 
     def data_prop_is_selected(self, driver, prop):
-        count_data_props = FilterModal.data_props_list.get_immediate_child_count(driver)
+        data_props_list = FilterModal.data_props_list
+        count_data_props = data_props_list.get_immediate_child_count(driver)
         for i in range(0, count_data_props):
             checkbox_label = FilterModal.data_prop_list_label(i).get_text(driver)
             if checkbox_label == prop:
-                return FilterModal.data_prop_list_entry(i).get_attribute(driver, 'aria-selected') == 'true'
+                aria_selected = FilterModal.data_prop_list_entry(i).get_attribute(
+                    driver,
+                    'aria-selected'
+                )
+                return aria_selected == 'true'
+        return False
 
     def set_data_services(self, driver, data_services):
-        count_data_services = FilterModal.data_services_list.get_immediate_child_count(driver)
+        data_services_list = FilterModal.data_services_list
+        count_data_services = data_services_list.get_immediate_child_count(driver)
         for i in range(0, count_data_services):
             checkbox_label = FilterModal.data_service_list_label(i).get_text(driver)
             if checkbox_label in data_services:
@@ -384,11 +392,17 @@ class Filter:
         time.sleep(MODAL_FADE)
 
     def data_service_is_selected(self, driver, service):
-        count_data_services = FilterModal.data_services_list.get_immediate_child_count(driver)
+        data_services_list = FilterModal.data_services_list
+        count_data_services = data_services_list.get_immediate_child_count(driver)
         for i in range(0, count_data_services):
             checkbox_label = FilterModal.data_service_list_label(i).get_text(driver)
             if checkbox_label == service:
-                return FilterModal.data_service_list_entry(i).get_attribute(driver, 'aria-selected') == 'true'
+                aria_selected = FilterModal.data_service_list_entry(i).get_attribute(
+                    driver,
+                    'aria-selected'
+                )
+                return aria_selected == 'true'
+        return False
 
 
 class About:
@@ -548,6 +562,7 @@ class ResourceCreator:
 
     def is_initialized(self, driver):
         return ResourceCreatorPage.login_button.is_visible(self.driver)
+
 
 Search = Search()
 Marker = Marker()

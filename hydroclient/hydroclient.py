@@ -10,6 +10,7 @@ from cuahsi_base.cuahsi_base import BaseTest, parse_args_run_tests
 # BASE_URL = 'https://stage-data.cuahsi.org'  # production
 BASE_URL = 'http://qa-hiswebclient.azurewebsites.net'
 
+
 # Test cases definition
 class HydroclientTestSuite(BaseTest):
     """ Test suite for the HydroClient software system """
@@ -327,30 +328,46 @@ class HydroclientTestSuite(BaseTest):
         oracle(result_nums)
 
     def test_A_000017(self):
-        """ Confirm Reset button clears Filter Results text and categorical filters """
+        """ Confirm Reset button clears Filter Results text and categorical
+        filters """
         def oracle_results_count(expected_results, should_match):
             if should_match:
-                self.assertEqual(Search.count_results(self.driver), expected_results)
+                self.assertEqual(
+                    Search.count_results(self.driver),
+                    expected_results
+                )
             else:
-                self.assertNotEqual(Search.count_results(self.driver), expected_results)
+                self.assertNotEqual(
+                    Search.count_results(self.driver),
+                    expected_results
+                )
+
         def oracle_data_prop_selection(data_props, should_be_selected):
             """ Checks that filter options not selected """
             for data_prop in data_props:
                 if should_be_selected:
-                    self.assertTrue(Filter.data_prop_is_selected(self.driver, data_prop))
+                    self.assertTrue(
+                        Filter.data_prop_is_selected(self.driver, data_prop)
+                    )
                 else:
-                    self.assertFalse(Filter.data_prop_is_selected(self.driver, data_prop))
+                    self.assertFalse(
+                        Filter.data_prop_is_selected(self.driver, data_prop)
+                    )
+
         def oracle_data_service_selection(data_services, should_be_selected):
             """ Checks that filter options not selected """
             for data_service in data_services:
                 if should_be_selected:
-                    self.assertTrue(Filter.data_service_is_selected(self.driver, data_service))
+                    self.assertTrue(
+                        Filter.data_service_is_selected(self.driver, data_service)
+                    )
                 else:
-                    self.assertFalse(Filter.data_service_is_selected(self.driver, data_service))
+                    self.assertFalse(
+                        Filter.data_service_is_selected(self.driver, data_service)
+                    )
 
         data_props = ['Data Type', 'Sample Medium']
-        data_services = ['National Oceanic and Atmospheric Administration (NOAA)',
-                         'Community Collaborative Rain, Hail and Snow Network']
+        data_services = ['Community Collaborative Rain, Hail and Snow Network']
         Search.search_location(self.driver, 'Montreal ')
         Search.search(self.driver)
         expected_results = Search.count_results(self.driver)
@@ -398,6 +415,7 @@ class HydroclientTestSuite(BaseTest):
         def oracle_search_text_is_same(text):
             """ Check if the text is the same in the search field """
             self.assertEqual(Search.get_searchbox_text(self.driver), text)
+
         def oracle_result(init_result):
             """ Compare search results count to the initial level """
             self.assertEqual(init_result, Search.count_results(self.driver))
@@ -423,6 +441,7 @@ class HydroclientTestSuite(BaseTest):
         def oracle_processed_count():
             """ The Buffalo NY three time series process successfully """
             self.assertEqual(Workspace.count_complete(self.driver), 3)
+
         def oracle_viewer_opened():
             """ The Data Series viewer application initializes and the data table
             near the bottom of the application is loaded """
@@ -464,6 +483,7 @@ class HydroclientTestSuite(BaseTest):
         def oracle_completion_count():
             """ Returned results set from Trinidad is not too large """
             self.assertLess(Workspace.count_complete(self.driver), 5)
+
         def oracle_resource_creator_up():
             """ Resource creator seems to be functioning """
             self.assertTrue(ResourceCreator.is_initialized(self.driver))

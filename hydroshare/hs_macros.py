@@ -2,6 +2,7 @@ import os
 import time
 
 from selenium.webdriver.common.keys import Keys
+from selenium.common.exceptions import TimeoutException
 from dateutil import parser
 
 from hs_elements import HomePage, AppsPage, DiscoverPage, ResourcePage, \
@@ -86,11 +87,12 @@ class Discover:
         on it within the table.  If the resource is not visible will switch to
         the next result page
         """
-        while True:
+        resource_found = False
+        while not resource_found:
             try:
                 DiscoverPage.to_resource(title).click(driver)
-                break
-            except:
+                resource_found = True
+            except TimeoutException:
                 DiscoverPage.next_page.click(driver)
 
     def to_last_updated_profile(self, driver):
@@ -364,7 +366,8 @@ class Profile:
         ProfilePage.contribution_type(ind).javascript_click(driver)
 
     def get_resource_type_count(self, driver):
-        return ProfilePage.contribution_types_breakdown.get_immediate_child_count(driver)
+        contribution_types_breakdown = ProfilePage.contribution_types_breakdown
+        return contribution_types_breakdown.get_immediate_child_count(driver)
 
     def get_contribution_type_count(self, driver, ind):
         type_count = ProfilePage.contribution_type_count(ind).get_text(driver)
@@ -435,8 +438,7 @@ class MyResources:
         MyResourcesPage.add_label.click(driver)
 
     def check_label_applied(self, driver):
-        is_label_applied = 'has-labels' in MyResourcesPage.add_label.get_class(driver)
-        return is_label_applied
+        return 'has-labels' in MyResourcesPage.add_label.get_class(driver)
 
     def delete_label(self, driver):
         MyResourcesPage.label.click(driver)
