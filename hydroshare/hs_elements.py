@@ -68,6 +68,9 @@ class DiscoverPage:
         self.sort_direction = SiteElement(By.ID, 'id_sort_direction')
         self.col_headers = SiteElement(By.CSS_SELECTOR,
                                        '#items-discovered thead tr')
+        self.legend = SiteElement(By.CSS_SELECTOR, '#headingLegend h4 a')
+        self.legend_labels = SiteElement(By.CSS_SELECTOR, '#legend-collapse div:first-child div:first-child div.col-xs-12.col-sm-5')
+        self.legend_resources = SiteElement(By.CSS_SELECTOR, '#legend-collapse div:first-child div:first-child div.col-xs-12.col-sm-7')
         self.next_page = SiteElement(By.XPATH, '//a[contains(text(), "Next")][1]')
         self.last_updated_by = SiteElement(By.XPATH, '//th[text() = "Last updated:"]/following-sibling::td/a')
 
@@ -309,13 +312,15 @@ class MyResourcesPage:
                                      'tr.data-row:nth-child(1) > td:nth-child(1) > span[data-toggle="dropdown"]:nth-child(5)')
         self.manage_labels = SiteElement(By.XPATH, '//li[@data-target="#modalManageLabels"]')
         self.remove_label = SiteElement(By.CSS_SELECTOR, '.btn-label-remove')
+        self.legend = SiteElement(By.CSS_SELECTOR, '#headingLegend h4 a')
+        self.legend_labels = SiteElement(By.CSS_SELECTOR, '#legend-collapse div:first-child div:first-child div.col-xs-12.col-sm-5')
+        self.legend_resources = SiteElement(By.CSS_SELECTOR, '#legend-collapse div:first-child div:first-child div.col-xs-12.col-sm-7')
 
     def label_name(self, label_name):
         return SiteElement(By.XPATH, '(//input[@ value="{}"])[2]'.format(label_name))
 
     def resource_type(self, option):
             return SiteElement(By.XPATH, '//option[contains(text(), "{}")]'.format(option))
-
 
 
 HomePage = HomePage()

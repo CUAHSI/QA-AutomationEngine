@@ -224,6 +224,12 @@ class Discover:
             filter_el = DiscoverPage.filter_availability(availability)
             filter_el.click(driver)
 
+    def legend_text(self, driver):
+        DiscoverPage.legend.click(driver)
+        labels = str(DiscoverPage.legend_labels.get_text(driver))
+        resources = str(DiscoverPage.legend_resources.get_text(driver))
+        return labels, resources
+
 
 class Resource:
     def size_download(self, driver, BASE_URL):
@@ -436,6 +442,12 @@ class MyResources:
         MyResourcesPage.label.click(driver)
         MyResourcesPage.manage_labels.click(driver)
         MyResourcesPage.remove_label.click(driver)
+
+    def legend_text(self, driver):
+        MyResourcesPage.legend.click(driver)
+        labels = str(MyResourcesPage.legend_labels.get_text(driver))
+        resources = str(MyResourcesPage.legend_resources.get_text(driver))
+        return labels, resources
 
 
 Home = Home()

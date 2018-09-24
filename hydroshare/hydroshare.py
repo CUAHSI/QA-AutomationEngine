@@ -481,6 +481,20 @@ class HydroshareTestSuite(BaseTest):
             oracle_active()
             oracle_image(images)
 
+    def test_B_000027(self):
+        """ The MyResources and Discover pages have the same labels and resources
+        listed in their legends """
+        def oracle(legend_one, legend_two):
+            """ Compare text from the legends on the MyResources and Discover
+            pages """
+            self.assertEqual(legend_one, legend_two)
+        Home.login(self.driver, USERNAME, PASSWORD)
+        Home.to_my_resources(self.driver)
+        my_resource_legend = MyResources.legend_text(self.driver)
+        Home.to_discover(self.driver)
+        discover_legend = Discover.legend_text(self.driver)
+        oracle(my_resource_legend, discover_legend)
+
 
 if __name__ == '__main__':
     parse_args_run_tests(HydroshareTestSuite)
