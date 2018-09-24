@@ -1,5 +1,6 @@
 """ Runs various smoke tests for the data.cuahsi.org """
 
+
 from hc_macros import Search, Marker, Services, Keywords, Advanced, \
     Filter, About, QuickStart, Zendesk, Workspace
 from hc_elements import ZendeskArticlePage
@@ -326,6 +327,64 @@ class HydroclientTestSuite(BaseTest):
         result_nums = Filter.count_results(self.driver)
         result_nums = [int(result_num) for result_num in result_nums]
         oracle(result_nums)
+
+    def test_A_000017(self):
+        """ Confirm Reset button clears Filter Results text and categorical filters """
+        def oracle_results_count(expected_results, should_match):
+            if should_match:
+                self.assertEqual(Search.count_results(self.driver), expected_results)
+            else:
+                self.assertNotEqual(Search.count_results(self.driver), expected_results)
+        def oracle_data_prop_selection(data_props, should_be_selected):
+            """ Checks that filter options not selected """
+            for data_prop in data_props:
+                if should_be_selected:
+                    self.assertTrue(Filter.data_prop_is_selected(self.driver, data_prop))
+                else:
+                    self.assertFalse(Filter.data_prop_is_selected(self.driver, data_prop))
+
+        def oracle_data_service_selection(data_services, should_be_selected):
+            """ Checks that filter options not selected """
+            for data_service in data_services:
+                if should_be_selected:
+                    self.assertTrue(Filter.data_service_is_selected(self.driver, data_service))
+                else:
+                    self.assertFalse(Filter.data_service_is_selected(self.driver, data_service))
+
+        data_props = ['Data Type', 'Sample Medium']
+        data_services = ['National Oceanic and Atmospheric Administration (NOAA)',
+                         'Community Collaborative Rain, Hail and Snow Network']
+        Search.search_location(self.driver, 'Montreal ')
+        Search.search(self.driver)
+        expected_results = Search.count_results(self.driver)
+        Filter.open(self.driver)
+        Filter.selection(self.driver)
+        Filter.close(self.driver)
+        TestSystem.wait(5)
+        Search.reset(self.driver)
+        Search.search(self.driver)
+        oracle_results_count(expected_results, should_match=True)
+        Filter.open(self.driver)
+        Filter.find_in_table(self.driver, 'DOLLARD')
+        oracle_results_count(expected_results, should_match=False)
+        Search.reset(self.driver)
+        Search.search(self.driver)
+        oracle_results_count(expected_results, should_match=True)
+        Filter.open(self.driver)
+        Filter.set_data_props(self.driver, data_props)
+        Filter.open(self.driver)
+        Filter.set_data_services(self.driver, data_services)
+        oracle_results_count(expected_results, should_match=False)
+        Filter.open(self.driver)
+        oracle_data_prop_selection(data_props, should_be_selected=True)
+        oracle_data_service_selection(data_services, should_be_selected=True)
+        Filter.close(self.driver)
+        Search.reset(self.driver)
+        Search.search(self.driver)
+        oracle_results_count(expected_results, should_match=True)
+        Filter.open(self.driver)
+        oracle_data_prop_selection(data_props, should_be_selected=False)
+        oracle_data_service_selection(data_services, should_be_selected=False)
 
 
 if __name__ == '__main__':

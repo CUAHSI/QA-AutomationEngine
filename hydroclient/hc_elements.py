@@ -140,6 +140,12 @@ class FilterModal:
         self.close = SiteElement(By.ID, 'closeSearchSummary')
         self.search = SiteElement(By.CSS_SELECTOR,
                                   '#tblDetailedSearchResults_filter input')
+        self.selections = SiteElement(By.ID, 'ddMenuSelectionsDSR')
+        self.select_all = SiteElement(By.ID, 'anchorAllSelectionsDSR')
+        self.find_in_table = SiteElement(By.CSS_SELECTOR, 'input[aria-controls="tblDetailedSearchResults"]')
+        self.apply_filters = SiteElement(By.ID, 'btnApplyFilters')
+        self.data_props_list = SiteElement(By.CSS_SELECTOR, '#treeSearchSummaryControlledVocabularies ul')
+        self.data_services_list = SiteElement(By.CSS_SELECTOR, '#treeSearchSummaryServices ul')
 
     def cell(self, row, col):
         return SiteElement(By.XPATH,
@@ -155,6 +161,24 @@ class FilterModal:
         return SiteElement(By.XPATH,
                            '//div[@id="tblDetailedSearchResults_wrapper"]//'
                            'thead/tr/th[contains(text(), "{}")]'.format(sort_by))
+
+    def data_prop_list_label(self, index):
+        return SiteElement(By.CSS_SELECTOR, '#treeSearchSummaryControlledVocabularies ul li:nth-of-type({}) span.fancytree-node span.fancytree-title'.format(index+1))  # 1-based index, not 0 based
+
+    def data_prop_list_checkbox(self, index):
+        return SiteElement(By.CSS_SELECTOR, '#treeSearchSummaryControlledVocabularies ul li:nth-of-type({}) span.fancytree-node span.fancytree-checkbox'.format(index+1))  # 1-based index, not 0 based
+
+    def data_prop_list_entry(self, index):
+        return SiteElement(By.CSS_SELECTOR, '#treeSearchSummaryControlledVocabularies ul li:nth-of-type({})'.format(index+1))  # 1-based index, not 0 based
+
+    def data_service_list_label(self, index):
+        return SiteElement(By.CSS_SELECTOR, '#treeSearchSummaryServices ul li:nth-of-type({}) span.fancytree-node span.fancytree-title'.format(index+1))  # 1-based index, not 0 based
+
+    def data_service_list_checkbox(self, index):
+        return SiteElement(By.CSS_SELECTOR, '#treeSearchSummaryServices ul li:nth-of-type({}) span.fancytree-node span.fancytree-checkbox'.format(index+1))  # 1-based index, not 0 based
+
+    def data_service_list_entry(self, index):
+        return SiteElement(By.CSS_SELECTOR, '#treeSearchSummaryServices ul li:nth-of-type({})'.format(index+1))  # 1-based index, not 0 based
 
     @property
     def window_locator(self):

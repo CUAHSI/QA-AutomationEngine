@@ -12,9 +12,7 @@ from timing import WORKSPACE_CREATE_ARCHIVE, SEARCH_IN_PROGRESS, \
     SEARCH_AUTOCOMPLETE, WORKSPACE_TOOLTIP_DISAPPEAR, MODAL_FADE, \
     FILTER_MODAL_OPEN
 
-
 class Search:
-
     def scroll_map(self, driver, count=1):
         """ Make a large scroll with the map {{count}} times to the
         right
@@ -207,6 +205,7 @@ class Filter:
 
     def close(self, driver):
         FilterModal.close.click(driver)
+        time.sleep(MODAL_FADE)
 
     def to_workspace_cell(self, driver, row, col):
         """ Click on the "Filter Results" button.  Then, click on the
@@ -281,6 +280,51 @@ class Filter:
         FilterModal.sort('Service Title').click(driver)
         FilterModal.count.select_option(driver, '100')
 
+    def selection(self, driver):
+        FilterModal.selections.click(driver)
+        FilterModal.select_all.click(driver)
+
+    def find_in_table(self, driver, text):
+        FilterModal.find_in_table.inject_text(driver, text)
+        time.sleep(SEARCH_IN_PROGRESS)
+        FilterModal.close.click(driver)
+        time.sleep(MODAL_FADE)
+
+    def set_data_props(self, driver, data_props):
+        count_data_props = FilterModal.data_props_list.get_immediate_child_count(driver)
+        for i in range(0, count_data_props):
+            checkbox_label = FilterModal.data_prop_list_label(i).get_text(driver)
+            if checkbox_label in data_props:
+                FilterModal.data_prop_list_checkbox(i).click(driver)
+        FilterModal.apply_filters.click(driver)
+        time.sleep(SEARCH_IN_PROGRESS)
+        FilterModal.close.click(driver)
+        time.sleep(MODAL_FADE)
+
+    def data_prop_is_selected(self, driver, prop):
+        count_data_props = FilterModal.data_props_list.get_immediate_child_count(driver)
+        for i in range(0, count_data_props):
+            checkbox_label = FilterModal.data_prop_list_label(i).get_text(driver)
+            if checkbox_label == prop:
+                return FilterModal.data_prop_list_entry(i).get_attribute(driver, 'aria-selected') == 'true'
+
+    def set_data_services(self, driver, data_services):
+        count_data_services = FilterModal.data_services_list.get_immediate_child_count(driver)
+        for i in range(0, count_data_services):
+            checkbox_label = FilterModal.data_service_list_label(i).get_text(driver)
+            if checkbox_label in data_services:
+                FilterModal.data_service_list_checkbox(i).click(driver)
+        FilterModal.apply_filters.click(driver)
+        time.sleep(SEARCH_IN_PROGRESS)
+        FilterModal.close.click(driver)
+        time.sleep(MODAL_FADE)
+
+    def data_service_is_selected(self, driver, service):
+        count_data_services = FilterModal.data_services_list.get_immediate_child_count(driver)
+        for i in range(0, count_data_services):
+            checkbox_label = FilterModal.data_service_list_label(i).get_text(driver)
+            if checkbox_label == service:
+                return FilterModal.data_service_list_entry(i).get_attribute(driver, 'aria-selected') == 'true'
 
 class About:
     def to_helpcenter(self, driver):
