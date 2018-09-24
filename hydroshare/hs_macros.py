@@ -2,7 +2,7 @@ import os
 import time
 
 from selenium.webdriver.common.keys import Keys
-
+from selenium.common.exceptions import TimeoutException
 from dateutil import parser
 
 from hs_elements import HomePage, AppsPage, DiscoverPage, ResourcePage, \
@@ -40,6 +40,24 @@ class Home:
         HomePage.profile_image.click(driver)
         HomePage.profile_button.click(driver)
 
+    def scroll_to_top(self, driver):
+        HomePage.go_up.click(driver)
+
+    def scroll_to_button(self, driver):
+        HomePage.body.set_path(driver, Keys.CONTROL + Keys.ARROW_DOWN)
+
+    def slider_right(self, driver):
+        HomePage.scroll_slider_right.click(driver)
+
+    def slider_left(self, driver):
+        HomePage.scroll_slider_left.click(driver)
+
+    def a_slider_is_active(self, driver):
+        return HomePage.slider
+
+    def slider_has_valid_img(self, driver, images):
+        return HomePage.slider.get_attribute(driver, 'style') in images
+
 
 class Apps:
     def show_info(self, driver, num):
@@ -66,9 +84,19 @@ class Discover:
 
     def to_resource(self, driver, title):
         """ Navigate to the {{title}} resource landing page by clicking
-        on it within the table
+        on it within the table.  If the resource is not visible will switch to
+        the next result page
         """
-        DiscoverPage.to_resource(title).click(driver)
+        resource_found = False
+        while not resource_found:
+            try:
+                DiscoverPage.to_resource(title).click(driver)
+                resource_found = True
+            except TimeoutException:
+                DiscoverPage.next_page.click(driver)
+
+    def to_last_updated_profile(self, driver):
+        DiscoverPage.last_updated_by.click(driver)
 
     def col_index(self, driver, col_name):
         """ Indentify the index for a discover page column, given the
@@ -198,6 +226,12 @@ class Discover:
             filter_el = DiscoverPage.filter_availability(availability)
             filter_el.click(driver)
 
+    def legend_text(self, driver):
+        DiscoverPage.legend.click(driver)
+        labels = str(DiscoverPage.legend_labels.get_text(driver))
+        resources = str(DiscoverPage.legend_resources.get_text(driver))
+        return labels, resources
+
 
 class Resource:
     def size_download(self, driver, BASE_URL):
@@ -302,8 +336,42 @@ class Profile:
     def delete_org(self, driver, index):
         ProfilePage.delete_org(index).click(driver)
 
+    def add_cv(self, driver, link):
+        ProfilePage.add_cv.set_path(driver, link)
+
     def save(self, driver):
         ProfilePage.save.click(driver)
+
+    def add_photo(self, driver, link):
+        ProfilePage.image_upload.set_path(driver, link)
+
+    def remove_photo(self, driver):
+        ProfilePage.delete_image.click(driver)
+        ProfilePage.submit_delete_image.click(driver)
+
+    def confirm_photo_uploaded(self, driver, contains):
+        return contains in ProfilePage.image.get_style(driver)
+
+    def view_cv(self, driver):
+        ProfilePage.view_cv.click(driver)
+
+    def delete_cv(self, driver):
+        ProfilePage.delete_cv.click(driver)
+        ProfilePage.confirm_delete_cv.click(driver)
+
+    def view_contributions(self, driver):
+        ProfilePage.contribution.click(driver)
+
+    def view_contribution_type(self, driver, ind):
+        ProfilePage.contribution_type(ind).javascript_click(driver)
+
+    def get_resource_type_count(self, driver):
+        contribution_types_breakdown = ProfilePage.contribution_types_breakdown
+        return contribution_types_breakdown.get_immediate_child_count(driver)
+
+    def get_contribution_type_count(self, driver, ind):
+        type_count = ProfilePage.contribution_type_count(ind).get_text(driver)
+        return int(type_count)
 
 
 class Groups:
@@ -370,13 +438,18 @@ class MyResources:
         MyResourcesPage.add_label.click(driver)
 
     def check_label_applied(self, driver):
-        is_label_applied = 'has-labels' in MyResourcesPage.add_label.get_class(driver)
-        return is_label_applied
+        return 'has-labels' in MyResourcesPage.add_label.get_class(driver)
 
     def delete_label(self, driver):
         MyResourcesPage.label.click(driver)
         MyResourcesPage.manage_labels.click(driver)
         MyResourcesPage.remove_label.click(driver)
+
+    def legend_text(self, driver):
+        MyResourcesPage.legend.click(driver)
+        labels = str(MyResourcesPage.legend_labels.get_text(driver))
+        resources = str(MyResourcesPage.legend_resources.get_text(driver))
+        return labels, resources
 
 
 Home = Home()
