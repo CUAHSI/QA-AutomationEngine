@@ -2,7 +2,6 @@ import os
 import time
 
 from selenium.webdriver.common.keys import Keys
-
 from dateutil import parser
 
 from hs_elements import HomePage, AppsPage, DiscoverPage, ResourcePage, \
@@ -66,9 +65,18 @@ class Discover:
 
     def to_resource(self, driver, title):
         """ Navigate to the {{title}} resource landing page by clicking
-        on it within the table
+        on it within the table.  If the resource is not visible will switch to
+        the next result page
         """
-        DiscoverPage.to_resource(title).click(driver)
+        while True:
+            try:
+                DiscoverPage.to_resource(title).click(driver)
+                break
+            except:
+                DiscoverPage.next_page.click(driver)
+
+    def to_last_updated_profile(self, driver):
+        DiscoverPage.last_updated_by.click(driver)
 
     def col_index(self, driver, col_name):
         """ Indentify the index for a discover page column, given the
@@ -302,11 +310,11 @@ class Profile:
     def delete_org(self, driver, index):
         ProfilePage.delete_org(index).click(driver)
 
-    def save(self, driver):
-        ProfilePage.save.click(driver)
-
     def add_cv(self, driver, link):
         ProfilePage.add_cv.set_path(driver, link)
+
+    def save(self, driver):
+        ProfilePage.save.click(driver)
 
     def view_cv(self, driver):
         ProfilePage.view_cv.click(driver)
@@ -315,6 +323,18 @@ class Profile:
         ProfilePage.delete_cv.click(driver)
         ProfilePage.confirm_delete_cv.click(driver)
 
+    def view_contributions(self, driver):
+        ProfilePage.contribution.click(driver)
+
+    def view_contribution_type(self, driver, ind):
+        ProfilePage.contribution_type(ind).javascript_click(driver)
+
+    def get_resource_type_count(self, driver):
+        return ProfilePage.contribution_types_breakdown.get_immediate_child_count(driver)
+
+    def get_contribution_type_count(self, driver, ind):
+        type_count = ProfilePage.contribution_type_count(ind).get_text(driver)
+        return int(type_count)
 
 class Groups:
     def create_group(self, driver, name, purpose, about, privacy):

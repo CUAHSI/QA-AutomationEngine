@@ -28,7 +28,6 @@ class External:
         win_handle = driver.window_handles[-2]
         driver.switch_to.window(win_handle)
 
-
     def close_new_page(self, driver):
         orig_handle = driver.current_window_handle
         new_handle = driver.window_handles[-1]

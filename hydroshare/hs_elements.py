@@ -63,6 +63,8 @@ class DiscoverPage:
         self.sort_direction = SiteElement(By.ID, 'id_sort_direction')
         self.col_headers = SiteElement(By.CSS_SELECTOR,
                                        '#items-discovered thead tr')
+        self.next_page = SiteElement(By.XPATH, '//a[contains(text(), "Next")][1]')
+        self.last_updated_by = SiteElement(By.XPATH, '//th[text() = "Last updated:"]/following-sibling::td/a')
 
     def to_resource(self, title):
         return SiteElement(By.XPATH,
@@ -224,10 +226,28 @@ class ProfilePage:
                                    'input[placeholder="Organization(s)"]')
         self.save = SiteElement(By.CSS_SELECTOR,
                                 'button.btn-save-profile:first-of-type')
+        self.image_upload = SiteElement(By.CSS_SELECTOR, 'input.upload-picture')
         self.add_cv = SiteElement(By.CSS_SELECTOR, 'input[name="cv"]')
         self.view_cv = SiteElement(By.XPATH, '(//a[@class= "btn btn-default"]/span)[3]')
         self.delete_cv = SiteElement(By.ID, 'btn-delete-cv')
         self.confirm_delete_cv = SiteElement(By.ID, 'cv-clear_id')
+        self.contribution = SiteElement(By.CSS_SELECTOR, 'a[aria-controls="profile"]')
+        self.contribution_types_breakdown = SiteElement(
+            By.CSS_SELECTOR, 'table.table-user-contributions tbody'
+        )
+
+    def contribution_type(self, index):
+        return SiteElement(
+            By.CSS_SELECTOR,
+            'table.table-user-contributions tbody tr:nth-of-type({})'.format(index+1)
+        )
+
+    def contribution_type_count(self, index):
+        return SiteElement(
+            By.CSS_SELECTOR,
+            'table.table-user-contributions tbody tr:nth-of-type({})'.format(index+1) +
+            ' td:nth-of-type(2) span'
+        )
 
     def delete_org(self, index):
         return SiteElement(By.CSS_SELECTOR,

@@ -402,6 +402,29 @@ class HydroshareTestSuite(BaseTest):
         Profile.to_editor(self.driver)
         Profile.delete_cv(self.driver)
 
+    def test_B_000023(self):
+        """ Ensure resource links to profile work """
+        def oracle(contribution_counts):
+            """ Confirm the "All" contibutions count is the sum of all the other
+            resource type contributions """
+            self.assertEqual(
+                contribution_counts[0],  # count for "All"
+                sum(contribution_counts[1:])  # count for the rest
+            )
+        Home.to_discover(self.driver)
+        Discover.filters(self.driver, author='Castronova, Anthony')
+        Discover.to_resource(self.driver, 'Lowering the barriers to Computational Modeling of the Earth Surface')
+        Discover.to_last_updated_profile(self.driver)
+        Profile.view_contributions(self.driver)
+        resource_types_count = Profile.get_resource_type_count(self.driver)
+        contribution_counts = []
+        for i in range(0, resource_types_count):
+            Profile.view_contribution_type(self.driver, i)
+            contribution_counts.append(
+                Profile.get_contribution_type_count(self.driver, i)
+            )
+        oracle(contribution_counts)
+
 
 if __name__ == '__main__':
     parse_args_run_tests(HydroshareTestSuite)
