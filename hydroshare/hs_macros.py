@@ -395,6 +395,27 @@ class Group:
 
 
 class MyResources:
+    def setup_new_resource_title(self, driver, title):
+        MyResourcesPage.create_new.click(driver)
+        MyResourcesPage.title.click(driver)
+        MyResourcesPage.title.inject_text(driver, title)
+
+    def get_resource_type_indexes(self, driver):
+        MyResourcesPage.resource_type_selector.click(driver)
+        resource_creation_list = MyResourcesPage.resource_creation_list
+        count = resource_creation_list.get_immediate_child_count(driver)
+        resource_type_indexes = []
+        for i in range(1, count+1):
+            el_class = MyResourcesPage.resource_creation_type(i).get_class(driver)
+            if el_class not in ['dropdown-header', 'divider']:
+                resource_type_indexes.append(i)
+        MyResourcesPage.resource_type_selector.click(driver)
+        return resource_type_indexes
+
+    def select_resource_type(self, driver, index):
+        MyResourcesPage.resource_type_selector.click(driver)
+        MyResourcesPage.resource_creation_type(index).click(driver)
+
     def create_resource(self, driver, title):
         MyResourcesPage.create_new.click(driver)
         MyResourcesPage.title.click(driver)
@@ -450,6 +471,12 @@ class MyResources:
         labels = str(MyResourcesPage.legend_labels.get_text(driver))
         resources = str(MyResourcesPage.legend_resources.get_text(driver))
         return labels, resources
+
+    def exists_create_btn(self, driver):
+        return 'disabled' not in MyResourcesPage.create_resource.get_class(driver)
+
+    def exists_cancel_btn(self, driver):
+        return 'disabled' not in MyResourcesPage.cancel_resource.get_class(driver)
 
 
 Home = Home()

@@ -525,6 +525,20 @@ class HydroshareTestSuite(BaseTest):
         discover_legend = Discover.legend_text(self.driver)
         oracle(my_resource_legend, discover_legend)
 
+    def test_B_000028(self):
+        """ When creating a resource, ensure all resource types have a "Create
+        Resource" button available """
+        def oracle():
+            MyResources.exists_create_btn(self.driver)
+            MyResources.exists_cancel_btn(self.driver)
+        Home.login(self.driver, USERNAME, PASSWORD)
+        Home.to_my_resources(self.driver)
+        MyResources.setup_new_resource_title(self.driver, 'TEST TITLE')
+        resource_type_indexes = MyResources.get_resource_type_indexes(self.driver)
+        for resource_type_index in resource_type_indexes:
+            MyResources.select_resource_type(self.driver, resource_type_index)
+            oracle()
+
 
 if __name__ == '__main__':
     parse_args_run_tests(HydroshareTestSuite)
