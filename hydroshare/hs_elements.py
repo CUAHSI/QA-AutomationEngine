@@ -154,7 +154,7 @@ class DiscoverPage:
         return SiteElement(By.ID, 'subject-{}'.format(subject))
 
     def filter_resource_type(self, resource_type):
-        return SiteElement(By.ID, 'resource_type-{}'.format(resource_type))
+        return SiteElement(By.ID, 'content_type-{}'.format(resource_type))
 
     def filter_owner(self, owner):
         return SiteElement(By.ID, 'owner_names-{}'.format(owner))

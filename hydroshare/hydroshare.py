@@ -30,7 +30,10 @@ class HydroshareTestSuite(BaseTest):
             """ The Beaver Divide BagIt zip file matches expected file
             size (in Bytes)
             """
-            self.assertEqual(Resource.size_download(self.driver, BASE_URL), 512000)
+            self.assertEqual(
+                Resource.size_download(self.driver, BASE_URL),
+                512000
+            )
 
         Home.to_discover(self.driver)
         Discover.filters(self.driver, subject='iUTAH', resource_type='Generic',
