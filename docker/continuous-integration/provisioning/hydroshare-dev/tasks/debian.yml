@@ -1,0 +1,30 @@
+# roles/hydroshare-dev/tasks/debian.yml
+- name: Ensure git is present
+  apt:
+    name: git
+    state: present
+
+- name: Ensure python-pip is present
+  apt:
+    name: python-pip
+    state: present
+
+- name: Ensure kdiff3 is present
+  apt:
+    name: kdiff3
+    state: present
+
+- name: Ensure vim is present
+  apt:
+    name: vim
+    state: present
+
+- name: Ensure vim-gtk is present
+  apt:
+    name: vim-gtk
+    state: present
+
+- name: Ensure mc is present
+  apt:
+    name: mc
+    state: present

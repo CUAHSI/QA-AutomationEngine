@@ -1,0 +1,40 @@
+---
+- hosts: all
+
+  # ignore_errors: yes
+
+  vars:
+    docker_users:
+      - hydro
+
+  become: yes
+
+  pre_tasks:
+    - name: Update packages
+      raw: bash -c "[[ -f /usr/bin/yum ]] && yum update || apt-get -qqy update"
+      register: output
+      changed_when: output.stdout != "\r\n"
+
+    - name: Install python for Ansible
+      raw: bash -c "[[ -f /usr/bin/yum ]] && yum install python || apt-get -qqy install python-minimal"
+      register: output
+      changed_when: output.stdout != "\r\n"
+
+    - name: Gathering Facts
+      setup:
+  
+  roles:
+    # Play role hydroshare-dev with base packages
+    - role: hydroshare-dev
+
+    # Play role geerlingguy.docker to install docker and docker-compose
+    - role: geerlingguy.docker
+
+    # Play role geerlingguy.java to install java for pycharm
+    - role: geerlingguy.java
+      when: "ansible_os_family == 'Debian'"
+      java_packages:
+        - openjdk-8-jdk
+
+    # Play role oefenweb.pycharm to install pycharm
+    - role: oefenweb.pycharm

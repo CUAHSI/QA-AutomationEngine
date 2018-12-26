@@ -1,0 +1,8 @@
+# Install geerlingguy.docker role from the Ansible Galaxy
+- src: geerlingguy.docker
+
+# Install geerlingguy.java role from the Ansible Galaxy
+- src: geerlingguy.java
+
+# Install oefenweb.pycharm role from the Ansible Galaxy
+- src: oefenweb.pycharm
