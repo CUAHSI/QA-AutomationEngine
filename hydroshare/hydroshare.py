@@ -35,8 +35,8 @@ class HydroshareTestSuite(BaseTest):
         resource_type_indexes = MyResources.get_resource_type_indexes(self.driver)
         for resource_type_index in resource_type_indexes:
             MyResources.select_resource_type(self.driver, resource_type_index)
-            oracle()        
-        
+            oracle()
+
     def test_B_000003(self):
         """
         Confirms Beaver Divide Air Temperature resource landing page is
