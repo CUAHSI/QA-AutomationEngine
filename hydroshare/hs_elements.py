@@ -194,7 +194,7 @@ class DiscoverPage:
         return SiteElement(By.ID, 'subject-{}'.format(subject))
 
     def filter_resource_type(self, resource_type):
-        return SiteElement(By.ID, 'resource_type-{}'.format(resource_type))
+        return SiteElement(By.ID, 'content_type-{}'.format(resource_type))
 
     def filter_owner(self, owner):
         return SiteElement(By.ID, 'owner-{}'.format(owner))
@@ -416,9 +416,14 @@ class MyResourcesPage:
     def __init__(self):
         self.create_new = SiteElement(By.CSS_SELECTOR, '#facets a')
         self.title = SiteElement(By.ID, 'txtTitle')
+        self.resource_type_selector = SiteElement(By.ID, 'select-resource-type')
         self.create_resource = SiteElement(
             By.CSS_SELECTOR,
-            '.btn-create-resource:nth-of-type(1)'
+            '.btn-create-resource'
+        )
+        self.cancel_resource = SiteElement(
+            By.CSS_SELECTOR,
+            '.btn-cancel-create-resource'
         )
         self.resource_types = SiteElement(By.CSS_SELECTOR, '#input-resource-type')
         self.search_options = SiteElement(
@@ -472,6 +477,9 @@ class MyResourcesPage:
             By.CSS_SELECTOR,
             '#legend-collapse div:first-child div:first-child div.col-xs-12.col-sm-7'
         )
+        self.resource_creation_list = SiteElement(
+            By.CSS_SELECTOR, '#dropdown-resource-type ul'
+        )
 
     def label_name(self, label_name):
         return SiteElement(By.XPATH, '(//input[@ value="{}"])[2]'.format(label_name))
@@ -487,6 +495,12 @@ class MyResourcesPage:
 
     def value(self, value):
         return SiteElement(By.XPATH, '//td[text()= "{}"]'.format(value))
+
+    def resource_creation_type(self, index):
+        return SiteElement(
+            By.CSS_SELECTOR,
+            '#dropdown-resource-type ul li:nth-of-type({})'.format(index),
+        )
 
 
 HomePage = HomePage()

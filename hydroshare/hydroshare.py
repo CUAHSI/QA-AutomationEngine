@@ -23,6 +23,20 @@ class HydroshareTestSuite(BaseTest):
         super(HydroshareTestSuite, self).setUp()
         self.driver.get(BASE_URL)
 
+    def test_B_000001(self):
+        """ When creating a resource, ensure all resource types have a "Create
+        Resource" button available """
+        def oracle():
+            MyResources.exists_create_btn(self.driver)
+            MyResources.exists_cancel_btn(self.driver)
+        Home.login(self.driver, USERNAME, PASSWORD)
+        Home.to_my_resources(self.driver)
+        MyResources.setup_new_resource_title(self.driver, 'TEST TITLE')
+        resource_type_indexes = MyResources.get_resource_type_indexes(self.driver)
+        for resource_type_index in resource_type_indexes:
+            MyResources.select_resource_type(self.driver, resource_type_index)
+            oracle()        
+        
     def test_B_000003(self):
         """
         Confirms Beaver Divide Air Temperature resource landing page is
@@ -34,7 +48,10 @@ class HydroshareTestSuite(BaseTest):
             The Beaver Divide BagIt zip file matches expected file
             size (in Bytes)
             """
-            self.assertEqual(Resource.size_download(self.driver, BASE_URL), 512000)
+            self.assertEqual(
+                Resource.size_download(self.driver, BASE_URL),
+                512000
+            )
 
         Home.to_discover(self.driver)
         Discover.filters(self.driver, subject='iUTAH', resource_type='Generic',
