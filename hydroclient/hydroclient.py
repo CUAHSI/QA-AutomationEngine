@@ -1,7 +1,7 @@
 """ Runs various smoke tests for the data.cuahsi.org """
 from hc_macros import Search, Marker, Services, Keywords, Advanced, \
     Filter, About, QuickStart, Zendesk, Workspace, ResourceCreator
-from hc_elements import ZendeskArticlePage, FilterModal
+from hc_elements import ZendeskArticlePage
 
 from cuahsi_base.utils import External, TestSystem
 from cuahsi_base.cuahsi_base import BaseTest, parse_args_run_tests

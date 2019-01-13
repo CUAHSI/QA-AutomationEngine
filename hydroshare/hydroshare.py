@@ -24,12 +24,14 @@ class HydroshareTestSuite(BaseTest):
         self.driver.get(BASE_URL)
 
     def test_B_000003(self):
-        """ Confirms Beaver Divide Air Temperature resource landing page is
+        """
+        Confirms Beaver Divide Air Temperature resource landing page is
         online via navigation and title check, then downloads the BagIt
         archive and confirms the BagIt file size matches expectation
         """
         def oracle():
-            """ The Beaver Divide BagIt zip file matches expected file
+            """
+            The Beaver Divide BagIt zip file matches expected file
             size (in Bytes)
             """
             self.assertEqual(Resource.size_download(self.driver, BASE_URL), 512000)
@@ -41,16 +43,21 @@ class HydroshareTestSuite(BaseTest):
         oracle()
 
     def test_B_000006(self):
-        """ Confirms the sorting behavior on the Discover page (both sort
+        """
+        Confirms the sorting behavior on the Discover page (both sort
         direction and sort field) functions correctly, as evaluated by a few
         of the first rows being ordered correctly
         """
         def oracle(driver, column_name, ascend_or_descend):
-            """ Sorting is correctly implemented, as measured by a sample
+            """
+            Sorting is correctly implemented, as measured by a sample
             of row comparisons (not exhaustive)
             """
-            self.assertTrue(Discover.check_sorting_multi(driver, column_name,
-                                                         ascend_or_descend))
+            self.assertTrue(
+                Discover.check_sorting_multi(
+                    driver, column_name, ascend_or_descend
+                )
+            )
 
         driver = self.driver
         Home.to_discover(driver)
@@ -83,11 +90,13 @@ class HydroshareTestSuite(BaseTest):
         oracle(driver, 'Title', 'Ascending')
 
     def test_B_000007(self):
-        """ Confirms all apps have an associated resource page which is
+        """
+        Confirms all apps have an associated resource page which is
         correctly linked and correctly listed within the app info on the
         apps page
         """
         def oracle(app_name, resource_page):
+            """ The resource page contains the associated app name """
             self.assertIn(app_name, resource_page)
 
         driver = self.driver
@@ -96,18 +105,20 @@ class HydroshareTestSuite(BaseTest):
         External.switch_new_page(driver, num_windows_now,
                                  AppsPage.apps_container_locator)
         apps_count = Apps.count(driver)
-        for i in range(0, apps_count):  # +1 used below - xpath start at 1
-            app_name = Apps.get_title(driver, i+1)
-            Apps.show_info(driver, i+1)
-            Apps.to_resource(driver, i+1)
+        for i in range(1, apps_count+1):  # xpath start at 1
+            app_name = Apps.get_title(driver, i)
+            Apps.show_info(driver, i)
+            Apps.to_resource(driver, i)
             oracle(app_name, External.source_new_page(driver))
             TestSystem.back(driver)
 
     def test_B_000008(self):
-        """ Checks all HydroShare Help links to confirm links are intact
+        """
+        Checks all HydroShare Help links to confirm links are intact
         and that the topic title words come up in the associated help page
         """
         def oracle(core_topic):
+            """ The help link text is contained in the help page """
             words_string = re.sub('[^A-Za-z]', ' ', core_topic)
             for word in words_string.split(' '):
                 self.assertIn(word, TestSystem.page_source(self.driver))
@@ -122,10 +133,13 @@ class HydroshareTestSuite(BaseTest):
             Help.to_core_breadcrumb(self.driver)
 
     def test_B_000009(self):
-        """ Confirms absense of errors for the basic get methods within hydroshare
-        api that use just a resource id required parameter
+        """
+        Confirms the basic get methods within hydroshare api do not return
+        errors.  These basic get methods are accessible from the GUI and
+        use just a resource id required parameter
         """
         def oracle(response_code):
+            """ Response code is 200 - an "OK" response """
             self.assertEqual(response_code, '200')
 
         resource_id = '927094481da54af38ffb6f0c39ad8787'
@@ -145,11 +159,12 @@ class HydroshareTestSuite(BaseTest):
             API.toggle_endpoint(self.driver, endpoint, 'GET')
 
     def test_B_000010(self):
-        """ Confirms absense of errors for the basic get methods within hydroshare
-        api that require no parameters
+        """
+        Confirms the basic get methods within hydroshare api, which require
+        no parameters, can be ran through the GUI
         """
         def oracle(response_code):
-            """ Response code from api endpoint call is 200 """
+            """ Response code is 200 - response "OK" """
             self.assertEqual(response_code, '200')
 
         endpoints = ['/hsapi/dictionary/universities/',
@@ -171,7 +186,8 @@ class HydroshareTestSuite(BaseTest):
     def test_B_000011(self):
         """ Check Hydroshare About policy pages to confirm links and content """
         def oracle(policy, article_title, webpage_title):
-            """ Confirms the policy link text matches up with the opened policy
+            """
+            The policy link text matches up with the opened policy
             page title and webpage title
             """
             self.assertIn(policy, article_title)
@@ -192,14 +208,16 @@ class HydroshareTestSuite(BaseTest):
             oracle(policy, article_title, webpage_title)
 
     def test_B_000012(self):
-        """ Confirm footer links redirect to valid pages and are available
-        at the bottom of a sample of pages """
+        """
+        Confirm footer links redirect to valid pages and are available
+        at the bottom of a sample of pages
+        """
         def oracle_helppage(webpage_title, expected_title):
-            """ Expected title is actual page title """
+            """ Help page title from the link matches the actual page title """
             self.assertIn(expected_title.lower(), webpage_title.lower())
 
         def oracle_sitemap(webpage_title):
-            """ Resulting page exists """
+            """ Page is found - no 404 page returned """
             self.assertNotIn('Page not found', webpage_title)
 
         Home.to_help(self.driver)
@@ -211,9 +229,12 @@ class HydroshareTestSuite(BaseTest):
         oracle_sitemap(TestSystem.title(self.driver))
 
     def test_B_000013(self):
-        """ Confirms clean removal, then readdition, of user organizations using
-        the user profile interface """
+        """
+        Confirms clean removal, then readdition, of user organizations using
+        the user profile interface
+        """
         def oracle():
+            """ Profile is updated successfully with the organizations change """
             self.assertIn('Your profile has been successfully updated.',
                           TestSystem.page_source(self.driver))
 
@@ -228,9 +249,12 @@ class HydroshareTestSuite(BaseTest):
         oracle()
 
     def test_B_000014(self):
-        """ Confirms ability to create HydroShare groups through standard
-        graphical interface and workflow """
+        """
+        Confirms ability to create HydroShare groups through standard
+        graphical interface and workflow
+        """
         def oracle(group_name):
+            """ Group name is visible in the new group page """
             self.assertEqual(Group.check_title(self.driver), group_name)
         Home.login(self.driver, USERNAME, PASSWORD)
         Home.to_collaborate(self.driver)
@@ -245,7 +269,7 @@ class HydroshareTestSuite(BaseTest):
     def test_B_000015(self):
         """ Confirms Resource "Open With" successfully redirects to JupyterHub """
         def oracle(webpage_title):
-            """ Resulting page exists """
+            """ JupyterHub page opens without a 404 or missing page error """
             self.assertNotIn('Page not found', webpage_title)
 
         Home.to_discover(self.driver)
@@ -255,9 +279,12 @@ class HydroshareTestSuite(BaseTest):
         oracle(TestSystem.title(self.driver))
 
     def test_B_000016(self):
-        """ Create basic resource without any files """
+        """
+        Create basic resource without any files and confirm that the resulting
+        resource landing page is OK
+        """
         def oracle(resource_title):
-            """ Check title to make sure it matches initial input """
+            """ Test resource landing page shows the right resource name """
             self.assertEqual('Test Resource', resource_title)
 
         Home.login(self.driver, USERNAME, PASSWORD)
@@ -267,8 +294,8 @@ class HydroshareTestSuite(BaseTest):
         oracle(resource_title)
 
     def test_B_000017(self):
-        """ Confirm applying resource type filters in My Resources does not
-        break the system """
+        """
+        Confirm resource type filters can be applied in My Resources """
         def oracle(page_title):
             """ My Resources page is still clean/active """
             self.assertIn('My Resources', page_title)
@@ -294,9 +321,12 @@ class HydroshareTestSuite(BaseTest):
             oracle(TestSystem.title(self.driver))
 
     def test_B_000018(self):
-        """ Use My Resources search bar filters and non-ASCII characters """
+        """
+        Use My Resources search bar filters and non-ASCII characters, in
+        order to verify filter usability for non-English resources
+        """
         def oracle_type(is_applied):
-            """ Search bar shows the resource type filter """
+            """ Search bar shows the correct resource type filter """
             if is_applied:
                 self.assertIn(
                     '[type:',
@@ -309,7 +339,7 @@ class HydroshareTestSuite(BaseTest):
                 )
 
         def oracle_author(is_applied):
-            """ Search bar shows the author filter """
+            """ Search bar shows the correct author filter """
             if is_applied:
                 self.assertIn(
                     '[author:Über',
@@ -322,7 +352,7 @@ class HydroshareTestSuite(BaseTest):
                 )
 
         def oracle_subject(is_applied):
-            """ Search bar shows the subject filter """
+            """ Search bar shows the correct subject filter """
             if is_applied:
                 self.assertIn(
                     '[subject:Über',
@@ -374,13 +404,16 @@ class HydroshareTestSuite(BaseTest):
         oracle_subject(False)
 
     def test_B_000019(self):
-        """ Create a new resources label """
+        """
+        Create a new resources label and verify it can be added to existing
+        resources in the My Resources page
+        """
         def oracle_selected():
-            """ The label class is showing as selected """
+            """ The label is showing as selected """
             self.assertTrue(MyResources.check_label_applied(self.driver))
 
         def oracle_deselected():
-            """ The label class is showing as deselected """
+            """ The label is showing as deselected """
             self.assertFalse(MyResources.check_label_applied(self.driver))
 
         Home.login(self.driver, USERNAME, PASSWORD)
@@ -395,14 +428,16 @@ class HydroshareTestSuite(BaseTest):
     def test_B_000021(self):
         """ Confirm ability to upload CV file to users profile """
         def oracle(cv_filename):
-            """ Checks "View CV" window page title contains the file name """
+            """ "View CV" window page title contains the file name """
             self.assertTrue(cv_filename in TestSystem.title(self.driver))
 
         Home.login(self.driver, USERNAME, PASSWORD)
         Home.to_profile(self.driver)
         Profile.to_editor(self.driver)
-        urlretrieve('https://www.bu.edu/com-csc/resume/resume_samples.pdf',
-                    'cv-test.pdf')
+        urlretrieve(
+            'https://www.bu.edu/com-csc/resume/resume_samples.pdf',
+            'cv-test.pdf'
+        )
         cwd = os.getcwd()
         cv_path = os.path.join(cwd, 'cv-test.pdf')
         Profile.add_cv(self.driver, cv_path)
@@ -419,11 +454,12 @@ class HydroshareTestSuite(BaseTest):
         Profile.delete_cv(self.driver)
 
     def test_B_000022(self):
-        """ Confirm image upload to user profile runs smoothly """
+        """ Confirm profile image upload, within the profile page """
         def oracle(img_filename, is_uploaded):
-            """ Checks profile pic div contains the image filename
-            in it's style attribute (the system uses style background image
-            approach) """
+            """
+            Profile pic div contains the image filename in it's style
+            attribute (the system uses style background image approach)
+            """
             if is_uploaded:
                 self.assertTrue(
                     Profile.confirm_photo_uploaded(self.driver, img_filename)
@@ -435,8 +471,10 @@ class HydroshareTestSuite(BaseTest):
         Home.login(self.driver, USERNAME, PASSWORD)
         Home.to_profile(self.driver)
         Profile.to_editor(self.driver)
-        urlretrieve('http://www.bu.edu/emd/files/2017/03/rhett_alone1.jpg',
-                    'profile.jpg')
+        urlretrieve(
+            'http://www.bu.edu/emd/files/2017/03/rhett_alone1.jpg',
+            'profile.jpg'
+        )
         cwd = os.getcwd()
         profile_img_path = os.path.join(cwd, 'profile.jpg')
         Profile.add_photo(self.driver, profile_img_path)
@@ -448,10 +486,16 @@ class HydroshareTestSuite(BaseTest):
         oracle('profile', False)
 
     def test_B_000023(self):
-        """ Ensure resource links to profile work """
+        """
+        Ensure that the user links within a resource landing page redirect to
+        the associated user landing page, and that the contribution counts in
+        the resulting page are summed correctly
+        """
         def oracle(contribution_counts):
-            """ Confirm the "All" contibutions count is the sum of all the other
-            resource type contributions """
+            """
+            The "All" contibutions count is the sum of all the other
+            resource type contributions
+            """
             self.assertEqual(
                 contribution_counts[0],  # count for "All"
                 sum(contribution_counts[1:])  # count for the rest
@@ -474,12 +518,12 @@ class HydroshareTestSuite(BaseTest):
         oracle(contribution_counts)
 
     def test_B_000024(self):
-        """Test working functionality of extending metadata for resource"""
+        """ Verify the ability to extend metadata on resource landing pages """
         name_ex = 'name_ex'
         value_ex = 'value_ex'
 
         def oracle(name, value):
-            """Checks that metadata was created  with corresponding name and value"""
+            """ The metadata was created with the right name and value """
             self.assertTrue(MyResourcesPage.name(name))
             self.assertTrue(MyResourcesPage.value(value))
 
@@ -491,13 +535,16 @@ class HydroshareTestSuite(BaseTest):
         oracle(name_ex, value_ex)
 
     def test_B_000026(self):
-        """ Slider is functional for both anonymous and logged in users """
+        """
+        Confirm that the home page slider is functional for both anonymous
+        and logged in users
+        """
         def oracle_active():
-            """ Checks if at least one slider is active """
+            """ At least one slider is active """
             self.assertTrue(Home.a_slider_is_active(self.driver))
 
         def oracle_image(images):
-            """ Confirms slider background image is in the list of images """
+            """ The slider background image is in the list of images """
             self.assertTrue(Home.slider_has_valid_img(self.driver, images))
 
         images = ['background-image: url("/static/img/home-page/carousel/bg1.jpg");',
@@ -518,11 +565,12 @@ class HydroshareTestSuite(BaseTest):
             oracle_image(images)
 
     def test_B_000027(self):
-        """ The MyResources and Discover pages have the same labels and resources
-        listed in their legends """
+        """
+        Confirm that the MyResources and Discover pages have the same labels and
+        resources listed in their legends
+        """
         def oracle(legend_one, legend_two):
-            """ Compare text from the legends on the MyResources and Discover
-            pages """
+            """ Text from the legends on MyResources and Discover match """
             self.assertEqual(legend_one, legend_two)
         Home.login(self.driver, USERNAME, PASSWORD)
         Home.to_my_resources(self.driver)
@@ -532,12 +580,16 @@ class HydroshareTestSuite(BaseTest):
         oracle(my_resource_legend, discover_legend)
 
     def test_B_000028(self):
-        """Checks that the each social media account is accessible."""
+        """
+        Checks that the each social media account is accessible from
+        the links in the footer
+        """
 
         def get_link_href(link_element):
             return link_element.get_attribute(self.driver, 'href')
 
         def oracle(expected_href, target_link):
+            """ Href matches the expected social media account url """
             actual_href = get_link_href(target_link)
             self.assertEqual(expected_href, actual_href)
 
@@ -551,9 +603,12 @@ class HydroshareTestSuite(BaseTest):
         oracle('https://www.linkedin.com/company/2632114', HomePage.linkedin_link)
 
     def test_B_000029(self):
-        """ Confirm that the external pages links are not broken """
+        """
+        Confirm that the Creative Commons and BagIt reference links
+        redirect to valid external sites
+        """
         def oracle(title):
-            """Check that a title contains the particular text."""
+            """ The reference page contains expected keywords """
             self.assertTrue(title in TestSystem.title(self.driver))
 
         Home.to_discover(self.driver)
@@ -568,9 +623,9 @@ class HydroshareTestSuite(BaseTest):
         oracle('BagIt - Wikipedia')
 
     def test_B_000031(self):
-        """ Checking resources availability """
+        """ Confirm that resources can be accessed from the sitemap links """
         def oracle(text):
-            """ Checks resource to be in page title """
+            """ Page title matches with the resource title """
             self.assertTrue(text in TestSystem.title(self.driver))
             TestSystem.back(self.driver)
 
@@ -582,13 +637,15 @@ class HydroshareTestSuite(BaseTest):
         oracle('Flow measurements at Manabao, Dominican Republic')
 
     def test_B_000032(self):
-        """Checks that the latest version is deployed."""
+        """
+        Confirm that the hydroshare footer version number matches up with the
+        latest version number in GitHub
+        """
 
         def github_latest_release():
             """
             Retrieves the version of the latest published release of 'hydroshare'
             repository.
-
             """
             # See https://developer.github.com/v3/repos/
             # releases/#get-the-latest-release
@@ -599,6 +656,7 @@ class HydroshareTestSuite(BaseTest):
             return release_version
 
         def oracle(expected, actual):
+            """ Versions in the hydroshare footer and github match """
             self.assertEqual(expected, actual)
 
         displayed_release_version = Home.version(self.driver)
@@ -609,7 +667,7 @@ class HydroshareTestSuite(BaseTest):
         """ Ensure Discover page "show all" clears all filter types """
 
         def oracle():
-            """ All previous filters inactive due to "Show All" """
+            """ All previous filters are inactive due to "Show All" """
             self.assertFalse(DiscoverPage.filter_author(
                 'Myers, Jessie').is_selected(self.driver))
             self.assertFalse(DiscoverPage.filter_contributor(
