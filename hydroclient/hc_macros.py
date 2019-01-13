@@ -251,13 +251,7 @@ class Filter:
         time.sleep(MODAL_FADE)
 
     def open(self, driver):
-        # SearchPage.map_filter.click(driver)
-        # TODO Should use regular webdriver .click(), however 'Help?' launcher
-        # (iframe[@id="launcher"]) obscures 'Filter Results' button
-        # fix is in the works by Brian
-        SearchPage.map_filter.javascript_click(driver)
-        WebDriverWait(driver, FILTER_MODAL_OPEN).until(
-            EC.visibility_of_element_located(FilterModal.window_locator))
+        SearchPage.map_filter.click(driver)
 
     def close(self, driver):
         FilterModal.close.click(driver)

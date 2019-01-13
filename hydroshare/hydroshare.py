@@ -164,8 +164,6 @@ class HydroshareTestSuite(BaseTest):
         for endpoint in endpoints:
             API.toggle_endpoint(self.driver, endpoint, 'GET')
             API.submit(self.driver, endpoint, 'GET')
-            API.response_code(self.driver, endpoint, 'GET')
-            TestSystem.wait(3)  # wait 3 seconds for empty field population
             response_code = API.response_code(self.driver, endpoint, 'GET')
             oracle(response_code)
             API.toggle_endpoint(self.driver, endpoint, 'GET')
@@ -181,9 +179,7 @@ class HydroshareTestSuite(BaseTest):
 
         Home.to_about(self.driver)
         About.toggle_tree(self.driver)
-        TestSystem.wait(1)
         About.toggle_tree(self.driver)
-        TestSystem.wait(1)
         About.expand_tree_top(self.driver, 'Policies')
         policies = ['HydroShare Publication Agreement',
                     'Quota',
@@ -229,7 +225,6 @@ class HydroshareTestSuite(BaseTest):
         Profile.add_org(self.driver, 'Freie Universität Berlin')
         Profile.add_org(self.driver, 'Agricultural University of Warsaw')
         Profile.save(self.driver)
-        TestSystem.wait(3)  # TODO setup config file for delays
         oracle()
 
     def test_B_000014(self):
@@ -268,7 +263,6 @@ class HydroshareTestSuite(BaseTest):
         Home.login(self.driver, USERNAME, PASSWORD)
         Home.to_my_resources(self.driver)
         MyResources.create_resource(self.driver, 'Test Resource')
-        TestSystem.wait()
         resource_title = Resource.get_title(self.driver)
         oracle(resource_title)
 
@@ -447,7 +441,6 @@ class HydroshareTestSuite(BaseTest):
         profile_img_path = os.path.join(cwd, 'profile.jpg')
         Profile.add_photo(self.driver, profile_img_path)
         Profile.save(self.driver)
-        TestSystem.wait(30)
         oracle('profile', True)
         os.remove(profile_img_path)
         Profile.to_editor(self.driver)
@@ -514,7 +507,6 @@ class HydroshareTestSuite(BaseTest):
         Home.scroll_to_top(self.driver)
         for i in range(0, 5):
             Home.slider_left(self.driver)
-            TestSystem.wait()
             oracle_active()
             oracle_image(images)
         Home.login(self.driver, USERNAME, PASSWORD)
@@ -522,7 +514,6 @@ class HydroshareTestSuite(BaseTest):
         Home.scroll_to_top(self.driver)
         for i in range(0, 5):
             Home.slider_right(self.driver)
-            TestSystem.wait()
             oracle_active()
             oracle_image(images)
 
@@ -550,8 +541,6 @@ class HydroshareTestSuite(BaseTest):
             actual_href = get_link_href(target_link)
             self.assertEqual(expected_href, actual_href)
 
-        # TODO: This can be reported for improvement: all links should try to
-        # use "https" protocol whenever possible.
         oracle('http://twitter.com/cuahsi', HomePage.twitter_link)
         exp_fb_href = 'https://www.facebook.com/pages/CUAHSI-Consortium-' \
                       'of-Universities-for-the-Advancement-of-Hydrologic-' \
@@ -617,10 +606,10 @@ class HydroshareTestSuite(BaseTest):
         oracle(expected_release_version, displayed_release_version)
 
     def test_B_000033(self):
-        """ TODO: Requires description """
+        """ Ensure Discover page "show all" clears all filter types """
 
         def oracle():
-            """ TODO: Requires description """
+            """ All previous filters inactive due to "Show All" """
             self.assertFalse(DiscoverPage.filter_author(
                 'Myers, Jessie').is_selected(self.driver))
             self.assertFalse(DiscoverPage.filter_contributor(

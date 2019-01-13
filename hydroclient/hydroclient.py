@@ -505,7 +505,7 @@ class HydroclientTestSuite(BaseTest):
 
     def test_A_000023(self):
         """
-        TODO: Requires description
+        Confirm workspace maximum count limits are enforced
         """
         def oracle():
             """ Checks that Ok button of warning window is displayed """
@@ -526,7 +526,10 @@ class HydroclientTestSuite(BaseTest):
         oracle()
 
     def test_A_000024(self):
-        """ TODO: requires description """
+        """
+        Confirms cycling of panel visibility and date filters does not
+        result in result count problems
+        """
 
         def oracle():
             """ Checks that search result is greater than 0 """
@@ -545,11 +548,11 @@ class HydroclientTestSuite(BaseTest):
         """ Verifies availability of University of New Hampshire data """
 
         def oracle_search():
-            """ Checks search result """
+            """ Checks search result is greater than 8000 """
             self.assertGreater(Search.count_results(self.driver), 8000)
 
         def oracle_filters():
-            """ Checks search results with applied filters """
+            """ Checks search results with applied filters is greater than 97 """
             self.assertGreater(Search.count_results(self.driver), 97)
 
         Search.hybrid(self.driver)

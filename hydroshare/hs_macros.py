@@ -8,7 +8,9 @@ from dateutil import parser
 from hs_elements import HomePage, AppsPage, DiscoverPage, ResourcePage, \
      HelpPage, AboutPage, APIPage, LoginPage, ProfilePage, GroupsPage, \
      GroupPage, NewGroupModal, MyResourcesPage
-from timing import HSAPI_GUI_RESPONSE
+from timing import HSAPI_GUI_RESPONSE, PROFILE_SAVE, HELP_DOCS_TREE_ANIMATIONS, \
+     RESOURCE_CREATION, HOME_PAGE_SLIDER_ANIMATION, LABEL_CREATION, \
+     HSAPI_RESPONSE_CODE
 
 
 class Home:
@@ -48,9 +50,11 @@ class Home:
 
     def slider_right(self, driver):
         HomePage.scroll_slider_right.click(driver)
+        time.sleep(HOME_PAGE_SLIDER_ANIMATION)
 
     def slider_left(self, driver):
         HomePage.scroll_slider_left.click(driver)
+        time.sleep(HOME_PAGE_SLIDER_ANIMATION)
 
     def a_slider_is_active(self, driver):
         return HomePage.slider
@@ -319,6 +323,7 @@ class Help:
 class About:
     def toggle_tree(self, driver):
         AboutPage.tree_root.click(driver)
+        time.sleep(HELP_DOCS_TREE_ANIMATIONS)
 
     def expand_tree_top(self, driver, item):
         item = item.replace(' ', '-').lower()
@@ -359,6 +364,7 @@ class API:
         time.sleep(HSAPI_GUI_RESPONSE)
 
     def response_code(self, driver, path, method):
+        time.sleep(HSAPI_RESPONSE_CODE)
         endpoint_ind = self.endpoint_index(driver, path, method)
         return APIPage.response_code(endpoint_ind).get_text(driver)
 
@@ -380,6 +386,7 @@ class Profile:
 
     def save(self, driver):
         ProfilePage.save.click(driver)
+        time.sleep(PROFILE_SAVE)
 
     def add_photo(self, driver, link):
         ProfilePage.image_upload.set_path(driver, link)
@@ -441,6 +448,7 @@ class MyResources:
         MyResourcesPage.title.inject_text(driver, title)
         MyResourcesPage.create_resource.scroll_to(driver)
         MyResourcesPage.create_resource.javascript_click(driver)
+        time.sleep(RESOURCE_CREATION)
 
     def edit_this_resource(self, driver):
         MyResourcesPage.edit_resource.click(driver)
@@ -481,7 +489,7 @@ class MyResources:
         MyResourcesPage.create_label.click(driver)
         MyResourcesPage.new_label_name.inject_text(driver, new_name)
         MyResourcesPage.create_label_submit.click(driver)
-        time.sleep(2)
+        time.sleep(LABEL_CREATION)
 
     def toggle_label(self, driver, label):
         MyResourcesPage.add_label.click(driver)
