@@ -119,6 +119,12 @@ class Search:
     def get_searchbox_text(self, driver):
         return SearchPage.map_search.get_attribute(driver, 'value')
 
+    def hybrid(self, driver):
+        return SearchPage.hybrid.click(driver)
+
+    def show_hide_panel(self, driver):
+        SearchPage.show_hide_panel.click(driver)
+
 
 class Marker:
     def to_workspace_all(self, driver):
@@ -341,6 +347,24 @@ class Filter:
         FilterModal.to_workspace.click(driver)
         FilterModal.workspace.click(driver)
 
+    def complex_selection_to_workspace(self, driver,
+                                       double=False,
+                                       to_workspace=False):
+        """ Use double click for workspace selections,
+        instead of single click selections,
+        due to issues with single-click selection of large result sets
+        """
+        FilterModal.selections.click(driver)
+        FilterModal.selections.scroll_to(driver)
+        if double:
+            FilterModal.select_all.double_click(driver)
+        else:
+            FilterModal.select_all.click(driver)
+        FilterModal.action.click(driver)
+        FilterModal.to_workspace.click(driver)
+        if to_workspace:
+            FilterModal.workspace.click(driver)
+
     def show_25(self, driver):
         FilterModal.count.select_option(driver, '25')
 
@@ -403,6 +427,15 @@ class Filter:
                 )
                 return aria_selected == 'true'
         return False
+
+    def ok_is_visible(self, driver):
+        if FilterModal.ok:
+            return True
+        else:
+            return False
+
+    def apply_filters(self, driver):
+        return FilterModal.apply_filters.click(driver)
 
 
 class About:

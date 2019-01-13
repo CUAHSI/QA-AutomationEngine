@@ -58,6 +58,15 @@ class Home:
     def slider_has_valid_img(self, driver, images):
         return HomePage.slider.get_attribute(driver, 'style') in images
 
+    def to_site_map(self, driver):
+        return HomePage.to_site_map.click(driver)
+
+    def select_resource(self, driver, res):
+        HomePage.select_resource(res).click(driver)
+
+    def version(self, driver):
+        return HomePage.version.get_text(driver).strip()
+
 
 class Apps:
     def show_info(self, driver, num):
@@ -160,9 +169,12 @@ class Discover:
             elif ascend_or_descend == 'Ascending':
                 return value_one <= value_two
 
+    def show_all(self, driver):
+        DiscoverPage.show_all.click(driver)
+
     def filters(self, driver, author=None, subject=None, resource_type=None,
                 owner=None, variable=None, sample_medium=None, unit=None,
-                availability=None):
+                availability=None, contributor=None, content_type=None):
         """ Use the filters on the left side of the Discover interface.
         Filters should include author(s) {{author}}, subject(s) {{subject}},
         resource type(s) {{resource_type}}, owner(s) {{owner}}, variables
@@ -175,6 +187,20 @@ class Discover:
                 filter_el.click(driver)
         elif author is not None:
             filter_el = DiscoverPage.filter_author(author)
+            filter_el.click(driver)
+        if type(contributor) is list:
+            for contributor_item in contributor:
+                filter_el = DiscoverPage.filter_contributor(contributor_item)
+                filter_el.click(driver)
+        elif contributor is not None:
+            filter_el = DiscoverPage.filter_contributor(contributor)
+            filter_el.click(driver)
+        if type(content_type) is list:
+            for content_item in content_type:
+                filter_el = DiscoverPage.filter_contributor(content_item)
+                filter_el.click(driver)
+        elif content_type is not None:
+            filter_el = DiscoverPage.filter_content_type(content_type)
             filter_el.click(driver)
         if type(subject) is list:
             for subject_item in subject:
@@ -231,6 +257,19 @@ class Discover:
         labels = str(DiscoverPage.legend_labels.get_text(driver))
         resources = str(DiscoverPage.legend_resources.get_text(driver))
         return labels, resources
+
+    def search(self, driver, text):
+        DiscoverPage.search.inject_text(driver, text)
+        DiscoverPage.search.submit(driver)
+
+    def to_search_result_item(self, driver, col_ind, row_one):
+        DiscoverPage.cell_href(col_ind, row_one).click(driver)
+
+    def click_on_link(self, driver, how_to=None, learn_more=None):
+        if how_to:
+            DiscoverPage.how_to_cite.click(driver)
+        elif learn_more:
+            DiscoverPage.learn_more.click(driver)
 
 
 class Resource:
@@ -396,10 +435,22 @@ class Group:
 
 class MyResources:
     def create_resource(self, driver, title):
+        """ Creates new resource with provided title"""
         MyResourcesPage.create_new.click(driver)
         MyResourcesPage.title.click(driver)
         MyResourcesPage.title.inject_text(driver, title)
-        MyResourcesPage.create_resource.click(driver)
+        MyResourcesPage.create_resource.scroll_to(driver)
+        MyResourcesPage.create_resource.javascript_click(driver)
+
+    def edit_this_resource(self, driver):
+        MyResourcesPage.edit_resource.click(driver)
+
+    def add_metadata(self, driver, name, value):
+        MyResourcesPage.extend_metadata.click(driver)
+        MyResourcesPage.add_new_entry.click(driver)
+        MyResourcesPage.metadata_name.inject_text(driver, name)
+        MyResourcesPage.metadata_value.inject_text(driver, value)
+        MyResourcesPage.confirm_extend_metadata.click(driver)
 
     def search_resource_type(self, driver):
         MyResourcesPage.search_options.click(driver)

@@ -31,15 +31,42 @@ class HomePage:
         )
         self.go_up = SiteElement(By.CSS_SELECTOR, '.fa-angle-up')
         self.body = SiteElement(By.XPATH, '//body[1]')
-        self.scroll_slider_right = SiteElement(
-            By.CSS_SELECTOR,
-            '.glyphicon-chevron-right'
-        )
-        self.scroll_slider_left = SiteElement(
-            By.CSS_SELECTOR,
-            '.glyphicon-chevron-left'
-        )
+        self.scroll_slider_right = SiteElement(By.CSS_SELECTOR,
+                                               '.glyphicon-chevron-right')
+        self.scroll_slider_left = SiteElement(By.CSS_SELECTOR,
+                                              '.glyphicon-chevron-left')
+
         self.slider = SiteElement(By.CSS_SELECTOR, 'div.item.parallax-window.active')
+
+        # Links to social media accounts
+        self.twitter_link = SiteElement(
+            By.CSS_SELECTOR,
+            '.content.social ul li:nth-child(1) > a'
+        )
+        self.facebook_link = SiteElement(
+            By.CSS_SELECTOR,
+            '.content.social ul li:nth-child(2) > a'
+        )
+        self.youtube_link = SiteElement(
+            By.CSS_SELECTOR,
+            '.content.social ul li:nth-child(3) > a'
+        )
+        self.git_link = SiteElement(
+            By.CSS_SELECTOR,
+            '.content.social ul li:nth-child(4) > a'
+        )
+        self.linkedin_link = SiteElement(
+            By.CSS_SELECTOR,
+            '.content.social ul li:nth-child(5) > a'
+        )
+
+        self.slider = SiteElement(By.CSS_SELECTOR, 'div.item.parallax-window.active')
+        self.to_site_map = SiteElement(By.LINK_TEXT, 'Site Map')
+
+        self.version = SiteElement(By.CSS_SELECTOR, '.content p b')
+
+    def select_resource(self, resource):
+        return SiteElement(By.LINK_TEXT, '{}'.format(resource))
 
 
 class AppsPage:
@@ -100,6 +127,13 @@ class DiscoverPage:
             By.XPATH,
             '//th[text() = "Last updated:"]/following-sibling::td/a'
         )
+        self.search = SiteElement(By.ID, 'id_q')
+        self.how_to_cite = SiteElement(
+            By.CSS_SELECTOR,
+            '#rights > span:nth-child(2) > a:nth-child(1)'
+        )
+        self.learn_more = SiteElement(By.PARTIAL_LINK_TEXT, 'Learn more about')
+        self.show_all = SiteElement(By.ID, 'btn-show-all')
 
     def to_resource(self, title):
         return SiteElement(
@@ -150,6 +184,12 @@ class DiscoverPage:
     def filter_author(self, author):
         return SiteElement(By.ID, 'creator-{}'.format(author))
 
+    def filter_contributor(self, author):
+        return SiteElement(By.ID, 'contributor-{}'.format(author))
+
+    def filter_content_type(self, content_type):
+        return SiteElement(By.ID, 'content_type-{}'.format(content_type))
+
     def filter_subject(self, subject):
         return SiteElement(By.ID, 'subject-{}'.format(subject))
 
@@ -157,7 +197,7 @@ class DiscoverPage:
         return SiteElement(By.ID, 'resource_type-{}'.format(resource_type))
 
     def filter_owner(self, owner):
-        return SiteElement(By.ID, 'owner_names-{}'.format(owner))
+        return SiteElement(By.ID, 'owner-{}'.format(owner))
 
     def filter_variable(self, variable):
         return SiteElement(By.ID, 'variable_name-{}'.format(variable))
@@ -414,6 +454,15 @@ class MyResourcesPage:
             '//li[@data-target="#modalManageLabels"]'
         )
         self.remove_label = SiteElement(By.CSS_SELECTOR, '.btn-label-remove')
+        self.edit_resource = SiteElement(By.ID, 'edit-metadata')
+        self.extend_metadata = SiteElement(By.CSS_SELECTOR,
+                                           'a[title="Extended Metadata" ]')
+        self.add_new_entry = SiteElement(By.ID, 'btn-add-new-entry')
+        self.metadata_name = SiteElement(By.ID, 'extra_meta_name_input')
+        self.metadata_value = SiteElement(By.ID, 'extra_meta_value_input')
+        self.confirm_extend_metadata = SiteElement(By.ID,
+                                                   'btn-confirm-extended-metadata')
+
         self.legend = SiteElement(By.CSS_SELECTOR, '#headingLegend h4 a')
         self.legend_labels = SiteElement(
             By.CSS_SELECTOR,
@@ -432,6 +481,12 @@ class MyResourcesPage:
                 By.XPATH,
                 '//option[contains(text(), "{}")]'.format(option)
             )
+
+    def name(self, name):
+        return SiteElement(By.XPATH, '//td[text()= "{}"]'.format(name))
+
+    def value(self, value):
+        return SiteElement(By.XPATH, '//td[text()= "{}"]'.format(value))
 
 
 HomePage = HomePage()

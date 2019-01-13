@@ -1,16 +1,18 @@
 """ Runs various smoke tests for the hydroshare.org """
+import json
 import os
 import random
 import re
-import urllib.request
+
+from urllib.request import urlretrieve, urlopen
 
 from hs_macros import Home, Apps, Discover, Resource, Help, API, About, Profile, \
     Groups, Group, MyResources
-from hs_elements import AppsPage
+from hs_elements import AppsPage, MyResourcesPage, HomePage, DiscoverPage
 
 from cuahsi_base.cuahsi_base import BaseTest, parse_args_run_tests
 from cuahsi_base.utils import External, TestSystem
-from config import BASE_URL, USERNAME, PASSWORD
+from config import BASE_URL, USERNAME, PASSWORD, GITHUB_ORG, GITHUB_REPO
 
 
 # Test cases definition
@@ -405,10 +407,8 @@ class HydroshareTestSuite(BaseTest):
         Home.login(self.driver, USERNAME, PASSWORD)
         Home.to_profile(self.driver)
         Profile.to_editor(self.driver)
-        urllib.request.urlretrieve(
-            'https://www.bu.edu/com-csc/resume/resume_samples.pdf',
-            'cv-test.pdf'
-        )
+        urlretrieve('https://www.bu.edu/com-csc/resume/resume_samples.pdf',
+                    'cv-test.pdf')
         cwd = os.getcwd()
         cv_path = os.path.join(cwd, 'cv-test.pdf')
         Profile.add_cv(self.driver, cv_path)
@@ -441,10 +441,8 @@ class HydroshareTestSuite(BaseTest):
         Home.login(self.driver, USERNAME, PASSWORD)
         Home.to_profile(self.driver)
         Profile.to_editor(self.driver)
-        urllib.request.urlretrieve(
-            'http://www.bu.edu/emd/files/2017/03/rhett_alone1.jpg',
-            'profile.jpg'
-        )
+        urlretrieve('http://www.bu.edu/emd/files/2017/03/rhett_alone1.jpg',
+                    'profile.jpg')
         cwd = os.getcwd()
         profile_img_path = os.path.join(cwd, 'profile.jpg')
         Profile.add_photo(self.driver, profile_img_path)
@@ -481,6 +479,23 @@ class HydroshareTestSuite(BaseTest):
                 Profile.get_contribution_type_count(self.driver, i)
             )
         oracle(contribution_counts)
+
+    def test_B_000024(self):
+        """Test working functionality of extending metadata for resource"""
+        name_ex = 'name_ex'
+        value_ex = 'value_ex'
+
+        def oracle(name, value):
+            """Checks that metadata was created  with corresponding name and value"""
+            self.assertTrue(MyResourcesPage.name(name))
+            self.assertTrue(MyResourcesPage.value(value))
+
+        Home.login(self.driver, USERNAME, PASSWORD)
+        Home.to_my_resources(self.driver)
+        MyResources.create_resource(self.driver, 'test')
+        MyResources.edit_this_resource(self.driver)
+        MyResources.add_metadata(self.driver, name_ex, value_ex)
+        oracle(name_ex, value_ex)
 
     def test_B_000026(self):
         """ Slider is functional for both anonymous and logged in users """
@@ -524,6 +539,115 @@ class HydroshareTestSuite(BaseTest):
         Home.to_discover(self.driver)
         discover_legend = Discover.legend_text(self.driver)
         oracle(my_resource_legend, discover_legend)
+
+    def test_B_000028(self):
+        """Checks that the each social media account is accessible."""
+
+        def get_link_href(link_element):
+            return link_element.get_attribute(self.driver, 'href')
+
+        def oracle(expected_href, target_link):
+            actual_href = get_link_href(target_link)
+            self.assertEqual(expected_href, actual_href)
+
+        # TODO: This can be reported for improvement: all links should try to
+        # use "https" protocol whenever possible.
+        oracle('http://twitter.com/cuahsi', HomePage.twitter_link)
+        exp_fb_href = 'https://www.facebook.com/pages/CUAHSI-Consortium-' \
+                      'of-Universities-for-the-Advancement-of-Hydrologic-' \
+                      'Science-Inc/179921902590'
+        oracle(exp_fb_href, HomePage.facebook_link)
+        oracle('http://youtube.hydroshare.org/', HomePage.youtube_link)
+        oracle('http://github.com/hydroshare', HomePage.git_link)
+        oracle('https://www.linkedin.com/company/2632114', HomePage.linkedin_link)
+
+    def test_B_000029(self):
+        """ Confirm that the external pages links are not broken """
+        def oracle(title):
+            """Check that a title contains the particular text."""
+            self.assertTrue(title in TestSystem.title(self.driver))
+
+        Home.to_discover(self.driver)
+        Discover.search(self.driver, 'beaver')
+        Discover.to_search_result_item(self.driver, 2, 1)
+        Discover.click_on_link(self.driver, how_to=True)
+        oracle('Creative Commons')
+        TestSystem.back(self.driver)
+        num_windows_now = len(self.driver.window_handles)
+        Discover.click_on_link(self.driver, learn_more=True)
+        External.to_file(self.driver, num_windows_now, 'BagIt - Wikipedia')
+        oracle('BagIt - Wikipedia')
+
+    def test_B_000031(self):
+        """ Checking resources availability """
+        def oracle(text):
+            """ Checks resource to be in page title """
+            self.assertTrue(text in TestSystem.title(self.driver))
+            TestSystem.back(self.driver)
+
+        Home.to_site_map(self.driver)
+        Home.select_resource(self.driver, 'GIS in Water Resources Term Project 2015')
+        oracle('GIS in Water Resources Term Project 2015')
+        Home.select_resource(self.driver,
+                             'Flow measurements at Manabao, Dominican Republic')
+        oracle('Flow measurements at Manabao, Dominican Republic')
+
+    def test_B_000032(self):
+        """Checks that the latest version is deployed."""
+
+        def github_latest_release():
+            """
+            Retrieves the version of the latest published release of 'hydroshare'
+            repository.
+
+            """
+            # See https://developer.github.com/v3/repos/
+            # releases/#get-the-latest-release
+            request_url = f'https://api.github.com/repos/{GITHUB_ORG}/' \
+                          f'{GITHUB_REPO}/releases/latest'
+            response_data = urlopen(request_url).read()
+            release_version = json.loads(response_data)['tag_name']
+            return release_version
+
+        def oracle(expected, actual):
+            self.assertEqual(expected, actual)
+
+        displayed_release_version = Home.version(self.driver)
+        expected_release_version = github_latest_release()
+        oracle(expected_release_version, displayed_release_version)
+
+    def test_B_000033(self):
+        """ TODO: Requires description """
+
+        def oracle():
+            """ TODO: Requires description """
+            self.assertFalse(DiscoverPage.filter_author(
+                'Myers, Jessie').is_selected(self.driver))
+            self.assertFalse(DiscoverPage.filter_contributor(
+                'Cox, Chris').is_selected(self.driver))
+            self.assertFalse(DiscoverPage.filter_owner(
+                'Christopher, Adrian').is_selected(self.driver))
+            self.assertFalse(DiscoverPage.filter_content_type(
+                'Model Instance').is_selected(self.driver))
+            self.assertFalse(
+              DiscoverPage
+                .filter_subject('USACE Corps Water Management System (CWMS)')
+                .is_selected(self.driver)
+            )
+            self.assertFalse(DiscoverPage.filter_availability(
+                'public').is_selected(self.driver))
+
+        Home.to_discover(self.driver)
+        Discover.filters(self.driver,
+                         author='Myers, Jessie',
+                         contributor='Cox, Chris',
+                         owner='Christopher, Adrian',
+                         content_type='Model Instance',
+                         subject='USACE Corps Water Management System (CWMS)',
+                         availability='public'
+                         )
+        Discover.show_all(self.driver)
+        oracle()
 
 
 if __name__ == '__main__':
