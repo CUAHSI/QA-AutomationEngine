@@ -5,10 +5,7 @@ from hc_elements import ZendeskArticlePage
 
 from cuahsi_base.utils import External, TestSystem
 from cuahsi_base.cuahsi_base import BaseTest, parse_args_run_tests
-
-# Test case parameters
-# BASE_URL = 'https://stage-data.cuahsi.org'  # production
-BASE_URL = 'http://qa-hiswebclient.azurewebsites.net'
+from config import BASE_URL
 
 
 # Test cases definition
@@ -501,6 +498,70 @@ class HydroclientTestSuite(BaseTest):
         Workspace.launch_tool(self.driver)
         External.to_file(self.driver, num_windows_opened, 'HydroShare')
         ResourceCreator.create_resource(self.driver)
+
+    def test_A_000023(self):
+        """
+        Confirm workspace maximum count limits are enforced
+        """
+        def oracle():
+            """ Checks that Ok button of warning window is displayed """
+            # self.assertTrue(FilterModal.ok.is_visible(self.driver))
+            self.assertTrue(Filter.ok_is_visible(self.driver))
+
+        Search.search_location(self.driver, 'Dubai International Airport')
+        Search.search(self.driver)
+        Filter.open(self.driver)
+        Filter.complex_selection_to_workspace(self.driver)
+        Filter.close(self.driver)
+        Search.search_location(self.driver, 'Abu Dhabi')
+        Search.search(self.driver)
+        Filter.open(self.driver)
+        Filter.complex_selection_to_workspace(self.driver,
+                                              double=True,
+                                              to_workspace=False)
+        oracle()
+
+    def test_A_000024(self):
+        """
+        Confirms cycling of panel visibility and date filters does not
+        result in result count problems
+        """
+
+        def oracle():
+            """ Checks that search result is greater than 0 """
+            self.assertGreater(Search.count_results(self.driver), 0)
+
+        Search.show_hide_panel(self.driver)
+        Search.show_hide_panel(self.driver)
+        Search.reset(self.driver)
+        Search.search(self.driver)
+        Search.filter_dates(self.driver, '11/12/2018', '11/13/2018')
+        Search.reset(self.driver)
+        Search.search(self.driver)
+        oracle()
+
+    def test_A_000025(self):
+        """ Verifies availability of University of New Hampshire data """
+
+        def oracle_search():
+            """ Checks search result is greater than 8000 """
+            self.assertGreater(Search.count_results(self.driver), 8000)
+
+        def oracle_filters():
+            """ Checks search results with applied filters is greater than 97 """
+            self.assertGreater(Search.count_results(self.driver), 97)
+
+        Search.hybrid(self.driver)
+        Search.search_location(self.driver, 'new york city')
+        Search.search(self.driver)
+        oracle_search()
+        Filter.open(self.driver)
+        Filter.set_data_services(
+            self.driver, 'University of New Hampshire Environmental Research Group'
+        )
+        oracle_filters()
+        Search.search(self.driver)
+        oracle_search()
 
 
 if __name__ == '__main__':
