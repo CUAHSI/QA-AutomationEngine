@@ -5,11 +5,7 @@ from hc_elements import ZendeskArticlePage, FilterModal
 
 from cuahsi_base.utils import External, TestSystem
 from cuahsi_base.cuahsi_base import BaseTest, parse_args_run_tests
-
-# Test case parameters
-# BASE_URL = 'https://stage-data.cuahsi.org'  # production
-# BASE_URL = 'http://qa-hiswebclient.azurewebsites.net'
-BASE_URL = 'https://data.cuahsi.org/'
+from config import BASE_URL
 
 
 # Test cases definition
