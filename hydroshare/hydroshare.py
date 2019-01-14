@@ -3,6 +3,7 @@ import json
 import os
 import random
 import re
+import time
 
 from urllib.request import urlretrieve, urlopen
 
@@ -36,6 +37,18 @@ class HydroshareTestSuite(BaseTest):
         for resource_type_index in resource_type_indexes:
             MyResources.select_resource_type(self.driver, resource_type_index)
             oracle()
+
+    def test_B_000002(self):
+        """
+        Test to exercise various elements for a metrics POC
+        """
+        start_time = time.time()
+        Home.login(self.driver, USERNAME, PASSWORD)
+        Home.to_discover(self.driver)
+        Discover.filters(self.driver, subject='iUTAH', resource_type='Generic',
+                         availability=['discoverable', 'public'])
+        Discover.to_resource(self.driver, 'Beaver Divide Air Temperature')
+        print("!--- %s seconds ---!" % (time.time() - start_time))
 
     def test_B_000003(self):
         """
