@@ -47,6 +47,13 @@ class SiteElement:
         target_elt = driver.find_element(self.by, self.locator)
         return target_elt.is_displayed()
 
+    def is_selected(self, driver):
+        """
+        Checks if element is visible on the page.
+        """
+        target_elt = driver.find_element(self.by, self.locator)
+        return target_elt.is_selected()
+
     def click(self, el_driver):
         """ Identifies an element on the page.  After identification
         the element is then clicked.
@@ -54,12 +61,25 @@ class SiteElement:
         target_el = self.loc_it(el_driver)
         target_el.click()
 
+    def double_click(self, el_driver):
+        """
+        Double click on element.
+        """
+        target_el = self.loc_it(el_driver)
+        actionchains = ActionChains(el_driver)
+        actionchains.double_click(target_el).perform()
+
     def javascript_click(self, driver):
         """
         Clicks an element using JavaScript
         """
         target_el = self.loc_it(driver)
         driver.execute_script('arguments[0].click();', target_el)
+
+    def submit(self, el_driver):
+        """ Send ENTER to element, simulates submit """
+        target_el = self.loc_it(el_driver)
+        target_el.send_keys(Keys.ENTER)
 
     def multi_click(self, el_driver):
         """ Clicks an element while holding the control key, as to enable

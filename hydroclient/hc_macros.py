@@ -11,7 +11,7 @@ from hc_elements import SearchPage, MarkerModal, ServicesModal, \
     ResourceCreatorPage
 from timing import WORKSPACE_CREATE_ARCHIVE, SEARCH_IN_PROGRESS, \
     SEARCH_AUTOCOMPLETE, WORKSPACE_TOOLTIP_DISAPPEAR, MODAL_FADE, \
-    FILTER_MODAL_OPEN, RESULTS_MULTISELECT, APP_INITIALIZATION
+    RESULTS_MULTISELECT, APP_INITIALIZATION
 
 
 class Search:
@@ -118,6 +118,12 @@ class Search:
 
     def get_searchbox_text(self, driver):
         return SearchPage.map_search.get_attribute(driver, 'value')
+
+    def hybrid(self, driver):
+        return SearchPage.hybrid.click(driver)
+
+    def show_hide_panel(self, driver):
+        SearchPage.show_hide_panel.click(driver)
 
 
 class Marker:
@@ -245,13 +251,7 @@ class Filter:
         time.sleep(MODAL_FADE)
 
     def open(self, driver):
-        # SearchPage.map_filter.click(driver)
-        # TODO Should use regular webdriver .click(), however 'Help?' launcher
-        # (iframe[@id="launcher"]) obscures 'Filter Results' button
-        # fix is in the works by Brian
-        SearchPage.map_filter.javascript_click(driver)
-        WebDriverWait(driver, FILTER_MODAL_OPEN).until(
-            EC.visibility_of_element_located(FilterModal.window_locator))
+        SearchPage.map_filter.click(driver)
 
     def close(self, driver):
         FilterModal.close.click(driver)
@@ -341,6 +341,24 @@ class Filter:
         FilterModal.to_workspace.click(driver)
         FilterModal.workspace.click(driver)
 
+    def complex_selection_to_workspace(self, driver,
+                                       double=False,
+                                       to_workspace=False):
+        """ Use double click for workspace selections,
+        instead of single click selections,
+        due to issues with single-click selection of large result sets
+        """
+        FilterModal.selections.click(driver)
+        FilterModal.selections.scroll_to(driver)
+        if double:
+            FilterModal.select_all.double_click(driver)
+        else:
+            FilterModal.select_all.click(driver)
+        FilterModal.action.click(driver)
+        FilterModal.to_workspace.click(driver)
+        if to_workspace:
+            FilterModal.workspace.click(driver)
+
     def show_25(self, driver):
         FilterModal.count.select_option(driver, '25')
 
@@ -403,6 +421,15 @@ class Filter:
                 )
                 return aria_selected == 'true'
         return False
+
+    def ok_is_visible(self, driver):
+        if FilterModal.ok:
+            return True
+        else:
+            return False
+
+    def apply_filters(self, driver):
+        return FilterModal.apply_filters.click(driver)
 
 
 class About:

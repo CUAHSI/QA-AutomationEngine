@@ -35,10 +35,14 @@ class SearchPage:
         self.about = SiteElement(By.ID, 'ddAbout')
         self.quickstart = SiteElement(By.ID, 'quickStartModalTab')
         self.zendesk = SiteElement(By.ID, 'launcher')
+        self.hybrid = SiteElement(
+            By.CSS_SELECTOR,
+            'div[aria-label="Show imagery with street names"]')
         self.no_results_ok = SiteElement(
             By.CSS_SELECTOR,
             'button[data-bb-handler="ok"]'
         )
+        self.show_hide_panel = SiteElement(By.ID, 'trigger')
 
     def layer(self, name):
         return SiteElement(By.XPATH, '//label[contains(text(), "{}")]'.format(name))
@@ -184,6 +188,7 @@ class FilterModal:
         self.exports = SiteElement(By.ID, 'tableModal-DownloadMgrSearchSummary')
         self.workspace = SiteElement(By.ID, 'tableModal-DataMgrSearchSummary')
         self.close = SiteElement(By.ID, 'closeSearchSummary')
+        self.ok = SiteElement(By.CSS_SELECTOR, 'button[data-bb-handler="ok"]')
         self.search = SiteElement(
             By.CSS_SELECTOR,
             '#tblDetailedSearchResults_filter input'

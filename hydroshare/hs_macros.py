@@ -8,7 +8,9 @@ from dateutil import parser
 from hs_elements import HomePage, AppsPage, DiscoverPage, ResourcePage, \
      HelpPage, AboutPage, APIPage, LoginPage, ProfilePage, GroupsPage, \
      GroupPage, NewGroupModal, MyResourcesPage
-from timing import HSAPI_GUI_RESPONSE
+from timing import HSAPI_GUI_RESPONSE, PROFILE_SAVE, HELP_DOCS_TREE_ANIMATIONS, \
+     RESOURCE_CREATION, HOME_PAGE_SLIDER_ANIMATION, LABEL_CREATION, \
+     HSAPI_RESPONSE_CODE
 
 
 class Home:
@@ -48,15 +50,26 @@ class Home:
 
     def slider_right(self, driver):
         HomePage.scroll_slider_right.click(driver)
+        time.sleep(HOME_PAGE_SLIDER_ANIMATION)
 
     def slider_left(self, driver):
         HomePage.scroll_slider_left.click(driver)
+        time.sleep(HOME_PAGE_SLIDER_ANIMATION)
 
     def a_slider_is_active(self, driver):
         return HomePage.slider
 
     def slider_has_valid_img(self, driver, images):
         return HomePage.slider.get_attribute(driver, 'style') in images
+
+    def to_site_map(self, driver):
+        return HomePage.to_site_map.click(driver)
+
+    def select_resource(self, driver, res):
+        HomePage.select_resource(res).click(driver)
+
+    def version(self, driver):
+        return HomePage.version.get_text(driver).strip()
 
 
 class Apps:
@@ -160,9 +173,12 @@ class Discover:
             elif ascend_or_descend == 'Ascending':
                 return value_one <= value_two
 
+    def show_all(self, driver):
+        DiscoverPage.show_all.click(driver)
+
     def filters(self, driver, author=None, subject=None, resource_type=None,
                 owner=None, variable=None, sample_medium=None, unit=None,
-                availability=None):
+                availability=None, contributor=None, content_type=None):
         """ Use the filters on the left side of the Discover interface.
         Filters should include author(s) {{author}}, subject(s) {{subject}},
         resource type(s) {{resource_type}}, owner(s) {{owner}}, variables
@@ -175,6 +191,20 @@ class Discover:
                 filter_el.click(driver)
         elif author is not None:
             filter_el = DiscoverPage.filter_author(author)
+            filter_el.click(driver)
+        if type(contributor) is list:
+            for contributor_item in contributor:
+                filter_el = DiscoverPage.filter_contributor(contributor_item)
+                filter_el.click(driver)
+        elif contributor is not None:
+            filter_el = DiscoverPage.filter_contributor(contributor)
+            filter_el.click(driver)
+        if type(content_type) is list:
+            for content_item in content_type:
+                filter_el = DiscoverPage.filter_contributor(content_item)
+                filter_el.click(driver)
+        elif content_type is not None:
+            filter_el = DiscoverPage.filter_content_type(content_type)
             filter_el.click(driver)
         if type(subject) is list:
             for subject_item in subject:
@@ -232,6 +262,19 @@ class Discover:
         resources = str(DiscoverPage.legend_resources.get_text(driver))
         return labels, resources
 
+    def search(self, driver, text):
+        DiscoverPage.search.inject_text(driver, text)
+        DiscoverPage.search.submit(driver)
+
+    def to_search_result_item(self, driver, col_ind, row_one):
+        DiscoverPage.cell_href(col_ind, row_one).click(driver)
+
+    def click_on_link(self, driver, how_to=None, learn_more=None):
+        if how_to:
+            DiscoverPage.how_to_cite.click(driver)
+        elif learn_more:
+            DiscoverPage.learn_more.click(driver)
+
 
 class Resource:
     def size_download(self, driver, BASE_URL):
@@ -280,6 +323,7 @@ class Help:
 class About:
     def toggle_tree(self, driver):
         AboutPage.tree_root.click(driver)
+        time.sleep(HELP_DOCS_TREE_ANIMATIONS)
 
     def expand_tree_top(self, driver, item):
         item = item.replace(' ', '-').lower()
@@ -320,6 +364,7 @@ class API:
         time.sleep(HSAPI_GUI_RESPONSE)
 
     def response_code(self, driver, path, method):
+        time.sleep(HSAPI_RESPONSE_CODE)
         endpoint_ind = self.endpoint_index(driver, path, method)
         return APIPage.response_code(endpoint_ind).get_text(driver)
 
@@ -341,6 +386,7 @@ class Profile:
 
     def save(self, driver):
         ProfilePage.save.click(driver)
+        time.sleep(PROFILE_SAVE)
 
     def add_photo(self, driver, link):
         ProfilePage.image_upload.set_path(driver, link)
@@ -395,11 +441,45 @@ class Group:
 
 
 class MyResources:
-    def create_resource(self, driver, title):
+    def setup_new_resource_title(self, driver, title):
         MyResourcesPage.create_new.click(driver)
         MyResourcesPage.title.click(driver)
         MyResourcesPage.title.inject_text(driver, title)
-        MyResourcesPage.create_resource.click(driver)
+
+    def get_resource_type_indexes(self, driver):
+        MyResourcesPage.resource_type_selector.click(driver)
+        resource_creation_list = MyResourcesPage.resource_creation_list
+        count = resource_creation_list.get_immediate_child_count(driver)
+        resource_type_indexes = []
+        for i in range(1, count+1):
+            el_class = MyResourcesPage.resource_creation_type(i).get_class(driver)
+            if el_class not in ['dropdown-header', 'divider']:
+                resource_type_indexes.append(i)
+        MyResourcesPage.resource_type_selector.click(driver)
+        return resource_type_indexes
+
+    def select_resource_type(self, driver, index):
+        MyResourcesPage.resource_type_selector.click(driver)
+        MyResourcesPage.resource_creation_type(index).click(driver)
+
+    def create_resource(self, driver, title):
+        """ Creates new resource with provided title"""
+        MyResourcesPage.create_new.click(driver)
+        MyResourcesPage.title.click(driver)
+        MyResourcesPage.title.inject_text(driver, title)
+        MyResourcesPage.create_resource.scroll_to(driver)
+        MyResourcesPage.create_resource.javascript_click(driver)
+        time.sleep(RESOURCE_CREATION)
+
+    def edit_this_resource(self, driver):
+        MyResourcesPage.edit_resource.click(driver)
+
+    def add_metadata(self, driver, name, value):
+        MyResourcesPage.extend_metadata.click(driver)
+        MyResourcesPage.add_new_entry.click(driver)
+        MyResourcesPage.metadata_name.inject_text(driver, name)
+        MyResourcesPage.metadata_value.inject_text(driver, value)
+        MyResourcesPage.confirm_extend_metadata.click(driver)
 
     def search_resource_type(self, driver):
         MyResourcesPage.search_options.click(driver)
@@ -430,7 +510,7 @@ class MyResources:
         MyResourcesPage.create_label.click(driver)
         MyResourcesPage.new_label_name.inject_text(driver, new_name)
         MyResourcesPage.create_label_submit.click(driver)
-        time.sleep(2)
+        time.sleep(LABEL_CREATION)
 
     def toggle_label(self, driver, label):
         MyResourcesPage.add_label.click(driver)
@@ -450,6 +530,12 @@ class MyResources:
         labels = str(MyResourcesPage.legend_labels.get_text(driver))
         resources = str(MyResourcesPage.legend_resources.get_text(driver))
         return labels, resources
+
+    def exists_create_btn(self, driver):
+        return 'disabled' not in MyResourcesPage.create_resource.get_class(driver)
+
+    def exists_cancel_btn(self, driver):
+        return 'disabled' not in MyResourcesPage.cancel_resource.get_class(driver)
 
 
 Home = Home()
