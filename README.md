@@ -1,6 +1,7 @@
 # QA Automation Engine
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/a60ce4abfde04602821ff7e6dda491a8)](https://www.codacy.com/app/ndebuhr/QA-AutomationEngine?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=CUAHSI/QA-AutomationEngine&amp;utm_campaign=Badge_Grade)
+[![Requirements Status](https://requires.io/github/CUAHSI/QA-AutomationEngine/requirements.svg?branch=develop)](https://requires.io/github/CUAHSI/QA-AutomationEngine/requirements/?branch=develop)
 [![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-green.svg)](https://github.com/RichardLitt/standard-readme)
 
 > Automated test suites for multiple CUAHSI software systems, along with associated tools and infrastructure
