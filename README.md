@@ -1,7 +1,7 @@
 # QA Automation Engine
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/a60ce4abfde04602821ff7e6dda491a8)](https://www.codacy.com/app/ndebuhr/QA-AutomationEngine?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=CUAHSI/QA-AutomationEngine&amp;utm_campaign=Badge_Grade)
-[![Maintainability](https://api.codeclimate.com/v1/badges/e28586264996fcc52cc0/maintainability)](https://codeclimate.com/github/CUAHSI/QA-AutomationEngine/maintainability)
+[![Known Vulnerabilities](https://snyk.io/test/github/CUAHSI/QA-AutomationEngine/badge.svg)](https://snyk.io/test/github/CUAHSI/QA-AutomationEngine) 
 [![Requirements Status](https://requires.io/github/CUAHSI/QA-AutomationEngine/requirements.svg?branch=develop)](https://requires.io/github/CUAHSI/QA-AutomationEngine/requirements/?branch=develop)
 [![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-green.svg)](https://github.com/RichardLitt/standard-readme)
 
