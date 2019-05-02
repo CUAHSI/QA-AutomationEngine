@@ -7,13 +7,16 @@ from dateutil import parser
 
 from hs_elements import HomePage, AppsPage, DiscoverPage, ResourcePage, \
      HelpPage, AboutPage, APIPage, LoginPage, ProfilePage, GroupsPage, \
-     GroupPage, NewGroupModal, MyResourcesPage
+     GroupPage, NewGroupModal, MyResourcesPage, DashboardPage
 from timing import HSAPI_GUI_RESPONSE, PROFILE_SAVE, HELP_DOCS_TREE_ANIMATIONS, \
      RESOURCE_CREATION, HOME_PAGE_SLIDER_ANIMATION, LABEL_CREATION, \
      HSAPI_RESPONSE_CODE
 
 
 class Home:
+    def to_home(self, driver):
+        HomePage.to_home.click(driver)
+
     def to_my_resources(self, driver):
         HomePage.to_my_resources.click(driver)
 
@@ -537,6 +540,12 @@ class MyResources:
     def exists_cancel_btn(self, driver):
         return 'disabled' not in MyResourcesPage.cancel_resource.get_class(driver)
 
+class Dashboard:
+    def toggle_get_started(self, driver): 
+        DashboardPage.get_started_toggle.click(driver)
+
+    def is_get_started_showing(self, driver):
+        return DashboardPage.get_started_toggle.get_text(driver) == "Hide get started"
 
 Home = Home()
 Apps = Apps()
@@ -549,3 +558,4 @@ Profile = Profile()
 Groups = Groups()
 Group = Group()
 MyResources = MyResources()
+Dashboard = Dashboard()

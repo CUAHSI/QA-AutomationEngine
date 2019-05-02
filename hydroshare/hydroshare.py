@@ -7,7 +7,7 @@ import re
 from urllib.request import urlretrieve, urlopen
 
 from hs_macros import Home, Apps, Discover, Resource, Help, API, About, Profile, \
-    Groups, Group, MyResources
+    Groups, Group, MyResources, Dashboard
 from hs_elements import AppsPage, MyResourcesPage, HomePage, DiscoverPage
 
 from cuahsi_base.cuahsi_base import BaseTest, parse_args_run_tests
@@ -713,6 +713,22 @@ class HydroshareTestSuite(BaseTest):
         Discover.show_all(self.driver)
         oracle()
 
+    def test_B_000034(self):
+        """ Basic navigation to dashboard """
+
+        def oracle():
+            """ Expect get started to be showing """
+            self.assertTrue(Dashboard.is_get_started_showing(self.driver))
+
+        Home.login(self.driver, USERNAME, PASSWORD)
+        Dashboard.toggle_get_started(self.driver)
+        Dashboard.toggle_get_started(self.driver)
+        Home.to_home(self.driver)
+        oracle()
+        
+
 
 if __name__ == '__main__':
     parse_args_run_tests(HydroshareTestSuite)
+
+   

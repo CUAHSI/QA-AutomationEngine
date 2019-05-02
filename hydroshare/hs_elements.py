@@ -5,6 +5,7 @@ from cuahsi_base.site_element import SiteElement
 
 class HomePage:
     def __init__(self):
+        self.to_home = SiteElement(By.ID, 'dropdown-menu-home')
         self.to_my_resources = SiteElement(By.ID, 'dropdown-menu-my-resources')
         self.to_discover = SiteElement(By.ID, 'dropdown-menu-search')
         self.to_apps = SiteElement(
@@ -502,7 +503,11 @@ class MyResourcesPage:
             '#dropdown-resource-type ul li:nth-of-type({})'.format(index),
         )
 
+class DashboardPage:
+    def __init__(self):
+        self.get_started_toggle = SiteElement(By.ID, 'change_me')
 
+DashboardPage = DashboardPage()
 HomePage = HomePage()
 AppsPage = AppsPage()
 DiscoverPage = DiscoverPage()
