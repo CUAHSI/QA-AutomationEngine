@@ -730,5 +730,3 @@ class HydroshareTestSuite(BaseTest):
 
 if __name__ == '__main__':
     parse_args_run_tests(HydroshareTestSuite)
-
-   

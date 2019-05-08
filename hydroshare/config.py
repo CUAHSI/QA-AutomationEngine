@@ -1,4 +1,4 @@
-BASE_URL = 'https://dev-hs-5.cuahsi.org/'
+BASE_URL = 'https://beta.hydroshare.org/'
 USERNAME = 'jim'
 PASSWORD = '62meister'
 
