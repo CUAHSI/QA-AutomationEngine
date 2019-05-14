@@ -505,7 +505,7 @@ class MyResourcesPage:
 
 class DashboardPage:
     def __init__(self):
-        self.get_started_toggle = SiteElement(By.ID, 'change_me')
+        self.get_started_toggle = SiteElement(By.ID, 'id-getting-started-toggle')
 
 DashboardPage = DashboardPage()
 HomePage = HomePage()
