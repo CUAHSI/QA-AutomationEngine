@@ -545,7 +545,7 @@ class Dashboard:
         DashboardPage.get_started_toggle.click(driver)
 
     def is_get_started_showing(self, driver):
-        return DashboardPage.get_started_toggle.get_text(driver) == "Hide get started"
+        return DashboardPage.get_started_toggle.get_text(driver) == "Hide Getting Started"
 
 Home = Home()
 Apps = Apps()
