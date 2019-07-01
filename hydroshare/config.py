@@ -1,4 +1,4 @@
-BASE_URL = 'https://www.hydroshare.org/'
+BASE_URL = 'https://beta.hydroshare.org/'
 USERNAME = 'jim'
 PASSWORD = '62meister'
 
