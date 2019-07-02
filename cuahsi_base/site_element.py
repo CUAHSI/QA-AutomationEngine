@@ -44,15 +44,15 @@ class SiteElement:
         """
         Checks if element is visible on the page.
         """
-        target_elt = driver.find_element(self.by, self.locator)
-        return target_elt.is_displayed()
+        target_el = driver.find_element(self.by, self.locator)
+        return target_el.is_displayed()
 
     def is_selected(self, driver):
         """
         Checks if element is visible on the page.
         """
-        target_elt = driver.find_element(self.by, self.locator)
-        return target_elt.is_selected()
+        target_el = driver.find_element(self.by, self.locator)
+        return target_el.is_selected()
 
     def click(self, el_driver):
         """ Identifies an element on the page.  After identification

@@ -2,3 +2,4 @@ propsfile
 *.bak
 *.log
 __pycache__
+.idea/

@@ -1,5 +1,4 @@
 """ Runs various smoke tests for the hydroshare.org """
-import json
 import os
 import random
 import re
@@ -7,7 +6,7 @@ import re
 from urllib.request import urlretrieve, urlopen
 
 from hs_macros import Home, Apps, Discover, Resource, Help, API, About, Profile, \
-    Groups, Group, MyResources, Dashboard
+    Groups, Group, MyResources, Dashboard, NewResource
 from hs_elements import AppsPage, MyResourcesPage, HomePage, DiscoverPage
 
 from cuahsi_base.cuahsi_base import BaseTest, parse_args_run_tests
@@ -24,18 +23,23 @@ class HydroshareTestSuite(BaseTest):
         self.driver.get(BASE_URL)
 
     def test_B_000001(self):
-        """ When creating a resource, ensure all resource types have a "Create
-        Resource" button available """
-        def oracle():
-            MyResources.exists_create_btn(self.driver)
-            MyResources.exists_cancel_btn(self.driver)
+        """ When creating a resource, ensure all resource types have a "Cancel"
+        button available """
         Home.login(self.driver, USERNAME, PASSWORD)
         Home.to_my_resources(self.driver)
-        MyResources.setup_new_resource_title(self.driver, 'TEST TITLE')
-        resource_type_indexes = MyResources.get_resource_type_indexes(self.driver)
-        for resource_type_index in resource_type_indexes:
-            MyResources.select_resource_type(self.driver, resource_type_index)
-            oracle()
+        resource_types = [
+            'CompositeResource',
+            'CollectionResource',
+            'ToolResource',
+            'ModelProgramResource',
+            'ModelInstanceResource',
+            'SWATModelInstanceResource',
+            'MODFLOWModelInstanceResource'
+        ]
+        for resource_type in resource_types:
+            Home.create_resource(self.driver, resource_type)
+            NewResource.configure(self.driver, 'TEST TITLE')
+            NewResource.cancel(self.driver)
 
     def test_B_000003(self):
         """
@@ -54,8 +58,12 @@ class HydroshareTestSuite(BaseTest):
             )
 
         Home.to_discover(self.driver)
-        Discover.filters(self.driver, subject='iUTAH', resource_type='Generic',
-                         availability=['discoverable', 'public'])
+        Discover.filters(
+            self.driver,
+            subject='iUTAH',
+            resource_type='Generic',
+            availability=['discoverable', 'public']
+        )
         Discover.to_resource(self.driver, 'Beaver Divide Air Temperature')
         oracle()
 
@@ -78,33 +86,19 @@ class HydroshareTestSuite(BaseTest):
 
         driver = self.driver
         Home.to_discover(driver)
-        Discover.sort_direction(driver, 'Ascending')
-        Discover.sort_order(driver, 'Last Modified')
-        oracle(driver, 'Last Modified', 'Ascending')
-        Discover.sort_order(driver, 'Title')
-        oracle(driver, 'Title', 'Ascending')
-        Discover.sort_order(driver, 'First Author')
-        oracle(driver, 'First Author', 'Ascending')
-        Discover.sort_order(driver, 'Date Created')
-        oracle(driver, 'Date Created', 'Ascending')
-        Discover.sort_direction(driver, 'Descending')
-        Discover.sort_order(driver, 'Title')
-        oracle(driver, 'Title', 'Descending')
-        Discover.sort_order(driver, 'Date Created')
-        oracle(driver, 'Date Created', 'Descending')
-        Discover.sort_order(driver, 'Last Modified')
-        oracle(driver, 'Last Modified', 'Descending')
-        Discover.sort_order(driver, 'First Author')
-        oracle(driver, 'First Author', 'Descending')
-        Discover.sort_direction(driver, 'Ascending')
-        Discover.sort_order(driver, 'Date Created')
-        oracle(driver, 'Date Created', 'Ascending')
-        Discover.sort_order(driver, 'Last Modified')
-        oracle(driver, 'Last Modified', 'Ascending')
-        Discover.sort_order(driver, 'First Author')
-        oracle(driver, 'First Author', 'Ascending')
-        Discover.sort_order(driver, 'Title')
-        oracle(driver, 'Title', 'Ascending')
+        orderings = [
+            'Last Modified',
+            'Title',
+            'First Author',
+            'Date Created',
+        ]
+        for ordering in orderings:
+            Discover.sort_direction(driver, 'Ascending')
+            Discover.sort_order(driver, ordering)
+            oracle(driver, ordering, 'Ascending')
+            Discover.sort_direction(driver, 'Descending')
+            Discover.sort_order(driver, ordering)
+            oracle(driver, ordering, 'Descending')
 
     def test_B_000007(self):
         """
@@ -160,20 +154,25 @@ class HydroshareTestSuite(BaseTest):
             self.assertEqual(response_code, '200')
 
         resource_id = '927094481da54af38ffb6f0c39ad8787'
-        endpoints = ['/hsapi/resource/{id}/',
-                     '/hsapi/resource/{id}/file_list/',
-                     '/hsapi/resource/{id}/files/',
-                     '/hsapi/resource/{id}/map/',
-                     '/hsapi/resource/{id}/scimeta/']
+        endpoints = [
+            {'id':'operations-hsapi-hsapi_resource_read', 'resource_param_ind': 1},
+            {'id':'operations-hsapi-hsapi_resource_file_list_list', 'resource_param_ind': 3},
+            {'id':'operations-hsapi-hsapi_resource_files_list', 'resource_param_ind': 3},
+            {'id':'operations-hsapi-hsapi_resource_map_list', 'resource_param_ind': 1},
+            {'id':'operations-hsapi-hsapi_resource_scimeta_list', 'resource_param_ind': 1},
+            {'id': 'operations-hsapi-hsapi_resource_scimeta_elements_read', 'resource_param_ind': 1},
+            {'id': 'operations-hsapi-hsapi_resource_sysmeta_list', 'resource_param_ind': 1}
+        ]
+
         TestSystem.to_url(self.driver, '{}/hsapi/'.format(BASE_URL))
-        API.expand_hsapi(self.driver)
         for endpoint in endpoints:
-            API.toggle_endpoint(self.driver, endpoint, 'GET')
-            API.set_resource_id(self.driver, endpoint, 'GET', resource_id)
-            API.submit(self.driver, endpoint, 'GET')
-            response_code = API.response_code(self.driver, endpoint, 'GET')
+            API.toggle_endpoint(self.driver, endpoint['id'])
+            API.try_endpoint(self.driver)
+            API.set_parameter(self.driver, endpoint['resource_param_ind'], resource_id)
+            API.submit(self.driver)
+            response_code = API.get_response_code(self.driver)
             oracle(response_code)
-            API.toggle_endpoint(self.driver, endpoint, 'GET')
+            API.toggle_endpoint(self.driver, endpoint['id'])
 
     def test_B_000010(self):
         """
@@ -184,21 +183,20 @@ class HydroshareTestSuite(BaseTest):
             """ Response code is 200 - response "OK" """
             self.assertEqual(response_code, '200')
 
-        endpoints = ['/hsapi/dictionary/universities/',
-                     '/hsapi/resource/',
-                     '/hsapi/resource/types/',
-                     '/hsapi/resourceList/',
-                     '/hsapi/resourceTypes/',
-                     '/hsapi/user/',
-                     '/hsapi/userInfo/']
+        endpoints = [
+            'operations-hsapi-hsapi_resource_content_types_list',
+            'operations-hsapi-hsapi_resource_types_list',
+            'operations-hsapi-hsapi_user_list',
+            'operations-hsapi-hsapi_userInfo_list'
+        ]
         TestSystem.to_url(self.driver, '{}/hsapi/'.format(BASE_URL))
-        API.expand_hsapi(self.driver)
         for endpoint in endpoints:
-            API.toggle_endpoint(self.driver, endpoint, 'GET')
-            API.submit(self.driver, endpoint, 'GET')
-            response_code = API.response_code(self.driver, endpoint, 'GET')
+            API.toggle_endpoint(self.driver, endpoint)
+            API.try_endpoint(self.driver)
+            API.submit(self.driver)
+            response_code = API.get_response_code(self.driver)
             oracle(response_code)
-            API.toggle_endpoint(self.driver, endpoint, 'GET')
+            API.toggle_endpoint(self.driver, endpoint)
 
     def test_B_000011(self):
         """ Check Hydroshare About policy pages to confirm links and content """
@@ -214,10 +212,12 @@ class HydroshareTestSuite(BaseTest):
         About.toggle_tree(self.driver)
         About.toggle_tree(self.driver)
         About.expand_tree_top(self.driver, 'Policies')
-        policies = ['HydroShare Publication Agreement',
-                    'Quota',
-                    'Statement of Privacy',
-                    'Terms of Use']
+        policies = [
+            'HydroShare Publication Agreement',
+            'Quota',
+            'Statement of Privacy',
+            'Terms of Use'
+        ]
         for policy in policies:
             About.open_policy(self.driver, policy)
             article_title = About.get_title(self.driver)
@@ -305,8 +305,10 @@ class HydroshareTestSuite(BaseTest):
             self.assertEqual('Test Resource', resource_title)
 
         Home.login(self.driver, USERNAME, PASSWORD)
-        Home.to_my_resources(self.driver)
-        MyResources.create_resource(self.driver, 'Test Resource')
+        Home.create_resource(self.driver, 'CompositeResource')
+        NewResource.configure(self.driver, 'Test Resource')
+        NewResource.create(self.driver)
+        Resource.view(self.driver)
         resource_title = Resource.get_title(self.driver)
         oracle(resource_title)
 
@@ -316,20 +318,22 @@ class HydroshareTestSuite(BaseTest):
         def oracle(page_title):
             """ My Resources page is still clean/active """
             self.assertIn('My Resources', page_title)
-        options = ['Collection',
-                   'Composite Resource',
-                   'Generic',
-                   'Geographic Feature',
-                   'Geographic Raster',
-                   'HIS Referenced',
-                   'Model Instance',
-                   'Model Program',
-                   'MODFLOW',
-                   'Multidimensional',
-                   'Script Resource',
-                   'Swat Model Instance',
-                   'Time Series',
-                   'Web App']
+        options = [
+            'Collection',
+            'Composite Resource',
+            'Generic',
+            'Geographic Feature',
+            'Geographic Raster',
+            'HIS Referenced',
+            'Model Instance',
+            'Model Program',
+            'MODFLOW',
+            'Multidimensional',
+            'Script Resource',
+            'Swat Model Instance',
+            'Time Series',
+            'Web App'
+        ]
         Home.login(self.driver, USERNAME, PASSWORD)
         Home.to_my_resources(self.driver)
         MyResources.search_resource_type(self.driver)
@@ -442,7 +446,7 @@ class HydroshareTestSuite(BaseTest):
         oracle_deselected()
         MyResources.delete_label(self.driver)
 
-    def test_B_000021(self):
+    def hold_test_B_000021(self):  # BROKEN DUE TO HYDROSHARE JS FRAMEWORK USE
         """ Confirm ability to upload CV file to users profile """
         def oracle(cv_filename):
             """ "View CV" window page title contains the file name """
@@ -451,14 +455,7 @@ class HydroshareTestSuite(BaseTest):
         Home.login(self.driver, USERNAME, PASSWORD)
         Home.to_profile(self.driver)
         Profile.to_editor(self.driver)
-        urlretrieve(
-            'https://www.bu.edu/com-csc/resume/resume_samples.pdf',
-            'cv-test.pdf'
-        )
-        cwd = os.getcwd()
-        cv_path = os.path.join(cwd, 'cv-test.pdf')
-        Profile.add_cv(self.driver, cv_path)
-        TestSystem.scroll_to_top(self.driver)
+        Profile.upload_cv(self.driver, 'http://www.bu.edu/careers/files/2012/08/Resume-Guide-2012.pdf')
         Profile.save(self.driver)
         num_windows_now = len(self.driver.window_handles)
         Profile.view_cv(self.driver)
@@ -470,7 +467,7 @@ class HydroshareTestSuite(BaseTest):
         Profile.to_editor(self.driver)
         Profile.delete_cv(self.driver)
 
-    def test_B_000022(self):
+    def hold_test_B_000022(self):  # BROKEN DUE TO HYDROSHARE JS FRAMEWORK USE
         """ Confirm profile image upload, within the profile page """
         def oracle(img_filename, is_uploaded):
             """
@@ -518,10 +515,10 @@ class HydroshareTestSuite(BaseTest):
                 sum(contribution_counts[1:])  # count for the rest
             )
         Home.to_discover(self.driver)
-        Discover.filters(self.driver, author='Castronova, Anthony')
+        Discover.filters(self.driver, author='Brazil, Liza')
         Discover.to_resource(
             self.driver,
-            'Lowering the barriers to Computational Modeling of the Earth Surface'
+            'University of Arizona CUAHSI Data Services Workshop'
         )
         Discover.to_last_updated_profile(self.driver)
         Profile.view_contributions(self.driver)
@@ -541,20 +538,21 @@ class HydroshareTestSuite(BaseTest):
 
         def oracle(name, value):
             """ The metadata was created with the right name and value """
-            self.assertTrue(MyResourcesPage.name(name))
-            self.assertTrue(MyResourcesPage.value(value))
+            Resource.exists_name(self.driver, name)
+            Resource.exists_value(self.driver, value)
 
         Home.login(self.driver, USERNAME, PASSWORD)
-        Home.to_my_resources(self.driver)
-        MyResources.create_resource(self.driver, 'test')
-        MyResources.edit_this_resource(self.driver)
-        MyResources.add_metadata(self.driver, name_ex, value_ex)
+        Home.create_resource(self.driver, 'CompositeResource')
+        NewResource.configure(self.driver, 'Test Metadata')
+        NewResource.create(self.driver)
+        Resource.view(self.driver)
+        Resource.edit(self.driver)
+        Resource.add_metadata(self.driver, name_ex, value_ex)
         oracle(name_ex, value_ex)
 
     def test_B_000026(self):
         """
-        Confirm that the home page slider is functional for both anonymous
-        and logged in users
+        Confirm that the home page slider is functional
         """
         def oracle_active():
             """ At least one slider is active """
@@ -571,13 +569,6 @@ class HydroshareTestSuite(BaseTest):
         Home.scroll_to_top(self.driver)
         for i in range(0, 5):
             Home.slider_left(self.driver)
-            oracle_active()
-            oracle_image(images)
-        Home.login(self.driver, USERNAME, PASSWORD)
-        Home.scroll_to_button(self.driver)
-        Home.scroll_to_top(self.driver)
-        for i in range(0, 5):
-            Home.slider_right(self.driver)
             oracle_active()
             oracle_image(images)
 
@@ -619,26 +610,6 @@ class HydroshareTestSuite(BaseTest):
         oracle('http://github.com/hydroshare', HomePage.git_link)
         oracle('https://www.linkedin.com/company/2632114', HomePage.linkedin_link)
 
-    def test_B_000029(self):
-        """
-        Confirm that the Creative Commons and BagIt reference links
-        redirect to valid external sites
-        """
-        def oracle(title):
-            """ The reference page contains expected keywords """
-            self.assertTrue(title in TestSystem.title(self.driver))
-
-        Home.to_discover(self.driver)
-        Discover.search(self.driver, 'beaver')
-        Discover.to_search_result_item(self.driver, 2, 1)
-        Discover.click_on_link(self.driver, how_to=True)
-        oracle('Creative Commons')
-        TestSystem.back(self.driver)
-        num_windows_now = len(self.driver.window_handles)
-        Discover.click_on_link(self.driver, learn_more=True)
-        External.to_file(self.driver, num_windows_now, 'BagIt - Wikipedia')
-        oracle('BagIt - Wikipedia')
-
     def test_B_000031(self):
         """ Confirm that resources can be accessed from the sitemap links """
         def oracle(text):
@@ -658,26 +629,12 @@ class HydroshareTestSuite(BaseTest):
         Confirm that the hydroshare footer version number matches up with the
         latest version number in GitHub
         """
-
-        def github_latest_release():
-            """
-            Retrieves the version of the latest published release of 'hydroshare'
-            repository.
-            """
-            # See https://developer.github.com/v3/repos/
-            # releases/#get-the-latest-release
-            request_url = f'https://api.github.com/repos/{GITHUB_ORG}/' \
-                          f'{GITHUB_REPO}/releases/latest'
-            response_data = urlopen(request_url).read()
-            release_version = json.loads(response_data)['tag_name']
-            return release_version
-
         def oracle(expected, actual):
             """ Versions in the hydroshare footer and github match """
             self.assertEqual(expected, actual)
 
         displayed_release_version = Home.version(self.driver)
-        expected_release_version = github_latest_release()
+        expected_release_version = Home.get_hs_latest_release(GITHUB_ORG, GITHUB_REPO)
         oracle(expected_release_version, displayed_release_version)
 
     def test_B_000033(self):

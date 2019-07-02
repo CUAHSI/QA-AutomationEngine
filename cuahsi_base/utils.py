@@ -99,6 +99,9 @@ class TestSystem:
         for bad_word in bad_words:
             print('{} -> {}'.format(bad_word, lang_dict[bad_word]))
 
+    def execute_javascript(self, driver, script):
+        driver.execute_script(script)
+
 
 External = External()
 TestSystem = TestSystem()

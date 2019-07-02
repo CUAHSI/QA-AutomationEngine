@@ -1,16 +1,22 @@
+import json
 import os
+import requests
 import time
 
 from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import TimeoutException
 from dateutil import parser
+from urllib.request import urlretrieve, urlopen
+
+from cuahsi_base.utils import TestSystem
 
 from hs_elements import HomePage, AppsPage, DiscoverPage, ResourcePage, \
      HelpPage, AboutPage, APIPage, LoginPage, ProfilePage, GroupsPage, \
-     GroupPage, NewGroupModal, MyResourcesPage, DashboardPage
+     GroupPage, NewGroupModal, MyResourcesPage, DashboardPage, \
+     NewResourceModal
 from timing import HSAPI_GUI_RESPONSE, PROFILE_SAVE, HELP_DOCS_TREE_ANIMATIONS, \
      RESOURCE_CREATION, HOME_PAGE_SLIDER_ANIMATION, LABEL_CREATION, \
-     HSAPI_RESPONSE_CODE
+     HSAPI_RESPONSE_CODE, DISCOVER_TABLE_UPDATE, EXTERNAL_PAGE_LOAD
 
 
 class Home:
@@ -28,9 +34,12 @@ class Home:
 
     def to_help(self, driver):
         HomePage.to_help.click(driver)
+        time.sleep(EXTERNAL_PAGE_LOAD)
 
     def to_about(self, driver):
-        HomePage.to_about.click(driver)
+        HomePage.to_help.click(driver)
+        time.sleep(EXTERNAL_PAGE_LOAD)
+        HelpPage.to_about.javascript_click(driver)
 
     def to_collaborate(self, driver):
         HomePage.to_collaborate.click(driver)
@@ -74,6 +83,23 @@ class Home:
     def version(self, driver):
         return HomePage.version.get_text(driver).strip()
 
+    def create_resource(self, driver, type):
+        HomePage.create.click(driver)
+        HomePage.create_type(type).click(driver)
+
+    def get_hs_latest_release(self, org, repo):
+        """
+        Retrieves the version of the latest published release of 'hydroshare'
+        repository.
+        """
+        # See https://developer.github.com/v3/repos/
+        # releases/#get-the-latest-release
+        request_url = f'https://api.github.com/repos/{org}/' \
+                      f'{repo}/releases/latest'
+        response_data = urlopen(request_url).read()
+        release_version = json.loads(response_data)['tag_name']
+        return release_version
+
 
 class Apps:
     def show_info(self, driver, num):
@@ -93,10 +119,12 @@ class Discover:
     def sort_order(self, driver, option):
         """ Set the sort order to {{option}} """
         DiscoverPage.sort_order.select_option_text(driver, option)
+        time.sleep(DISCOVER_TABLE_UPDATE)
 
     def sort_direction(self, driver, option):
         """ Set the sort direction to {{option}} """
         DiscoverPage.sort_direction.select_option_text(driver, option)
+        time.sleep(DISCOVER_TABLE_UPDATE)
 
     def to_resource(self, driver, title):
         """ Navigate to the {{title}} resource landing page by clicking
@@ -113,6 +141,7 @@ class Discover:
 
     def to_last_updated_profile(self, driver):
         DiscoverPage.last_updated_by.click(driver)
+        DiscoverPage.user_modal_to_profile.click(driver)
 
     def col_index(self, driver, col_name):
         """ Indentify the index for a discover page column, given the
@@ -272,22 +301,13 @@ class Discover:
     def to_search_result_item(self, driver, col_ind, row_one):
         DiscoverPage.cell_href(col_ind, row_one).click(driver)
 
-    def click_on_link(self, driver, how_to=None, learn_more=None):
-        if how_to:
-            DiscoverPage.how_to_cite.click(driver)
-        elif learn_more:
-            DiscoverPage.learn_more.click(driver)
-
 
 class Resource:
     def size_download(self, driver, BASE_URL):
         """ Check the size of the BagIt download """
         download_href = ResourcePage.bagit.get_href(driver, BASE_URL)
-        os.system('wget -q {}'.format(download_href))
-        download_file = download_href.split('/')[-1]
-        file_size = os.stat(download_file).st_size
-        os.system('rm {}'.format(download_file))
-        return file_size
+        r = requests.get(download_href)
+        return len(r.content)
 
     def open_with_jupyterhub(self, driver):
         ResourcePage.open_with.click(driver)
@@ -295,6 +315,31 @@ class Resource:
 
     def get_title(self, driver):
         return ResourcePage.title.get_text(driver)
+
+    def view(self, driver):
+        ResourcePage.view.click(driver)
+        TestSystem.wait(EXTERNAL_PAGE_LOAD)
+
+    def edit(self, driver):
+        ResourcePage.edit_resource.click(driver)
+
+    def add_metadata(self, driver, name, value):
+        ResourcePage.add_metadata.click(driver)
+        ResourcePage.metadata_name.inject_text(driver, name)
+        ResourcePage.metadata_value.inject_text(driver, value)
+        ResourcePage.confirm_metadata.click(driver)
+
+    def exists_name(self, driver, name):
+        ResourcePage.name(name).get_text(driver)
+
+    def exists_value(self, driver, value):
+        ResourcePage.value(value).get_text(driver)
+
+    def to_reference_citation(self, driver):
+        ResourcePage.how_to_cite.click(driver)
+
+    def to_reference_bagit(self, driver):
+        ResourcePage.learn_more.click(driver)
 
 
 class Help:
@@ -341,35 +386,22 @@ class About:
 
 
 class API:
-    def expand_hsapi(self, driver):
-        APIPage.hsapi.click(driver)
+    def toggle_endpoint(self, driver, endpoint):
+        APIPage.path(endpoint).click(driver)
 
-    def endpoint_index(self, driver, path, method):
-        num_endpoints = APIPage.endpoint_list.get_immediate_child_count(driver)
-        for i in range(1, num_endpoints+1):
-            check_path = APIPage.path_by_index(i).get_text(driver)
-            check_method = APIPage.type_by_index(i).get_text(driver)
-            if check_path == path and check_method == method:
-                return i
-        return 0
+    def try_endpoint(self, driver):
+        APIPage.try_endpoint.click(driver)
 
-    def toggle_endpoint(self, driver, path, method):
-        endpoint_ind = self.endpoint_index(driver, path, method)
-        APIPage.path_by_index(endpoint_ind).click(driver)
+    def set_parameter(self, driver, param_ind, param_val):
+        APIPage.parameter(param_ind).click(driver)
+        APIPage.parameter(param_ind).inject_text(driver, param_val)
 
-    def set_resource_id(self, driver, path, method, resource_id):
-        endpoint_ind = self.endpoint_index(driver, path, method)
-        APIPage.parameter_by_index(endpoint_ind).inject_text(driver, resource_id)
-
-    def submit(self, driver, path, method):
-        endpoint_ind = self.endpoint_index(driver, path, method)
-        APIPage.submit(endpoint_ind).click(driver)
+    def submit(self, driver):
+        APIPage.submit.click(driver)
         time.sleep(HSAPI_GUI_RESPONSE)
 
-    def response_code(self, driver, path, method):
-        time.sleep(HSAPI_RESPONSE_CODE)
-        endpoint_ind = self.endpoint_index(driver, path, method)
-        return APIPage.response_code(endpoint_ind).get_text(driver)
+    def get_response_code(self, driver):
+        return APIPage.response_code.get_text(driver)
 
 
 class Profile:
@@ -383,9 +415,6 @@ class Profile:
 
     def delete_org(self, driver, index):
         ProfilePage.delete_org(index).click(driver)
-
-    def add_cv(self, driver, link):
-        ProfilePage.add_cv.set_path(driver, link)
 
     def save(self, driver):
         ProfilePage.save.click(driver)
@@ -422,6 +451,17 @@ class Profile:
         type_count = ProfilePage.contribution_type_count(ind).get_text(driver)
         return int(type_count)
 
+    def upload_cv(self, driver, cv):
+        urlretrieve(
+            cv,
+            'cv-test.pdf'
+        )
+        cwd = os.getcwd()
+        cv_path = os.path.join(cwd, 'cv-test.pdf')
+        TestSystem.execute_javascript(
+            driver,
+            "document.getElementsByName('cv').path={}".format(cv_path)
+        )
 
 class Groups:
     def create_group(self, driver, name, purpose, about, privacy):
@@ -444,11 +484,6 @@ class Group:
 
 
 class MyResources:
-    def setup_new_resource_title(self, driver, title):
-        MyResourcesPage.create_new.click(driver)
-        MyResourcesPage.title.click(driver)
-        MyResourcesPage.title.inject_text(driver, title)
-
     def get_resource_type_indexes(self, driver):
         MyResourcesPage.resource_type_selector.click(driver)
         resource_creation_list = MyResourcesPage.resource_creation_list
@@ -464,25 +499,6 @@ class MyResources:
     def select_resource_type(self, driver, index):
         MyResourcesPage.resource_type_selector.click(driver)
         MyResourcesPage.resource_creation_type(index).click(driver)
-
-    def create_resource(self, driver, title):
-        """ Creates new resource with provided title"""
-        MyResourcesPage.create_new.click(driver)
-        MyResourcesPage.title.click(driver)
-        MyResourcesPage.title.inject_text(driver, title)
-        MyResourcesPage.create_resource.scroll_to(driver)
-        MyResourcesPage.create_resource.javascript_click(driver)
-        time.sleep(RESOURCE_CREATION)
-
-    def edit_this_resource(self, driver):
-        MyResourcesPage.edit_resource.click(driver)
-
-    def add_metadata(self, driver, name, value):
-        MyResourcesPage.extend_metadata.click(driver)
-        MyResourcesPage.add_new_entry.click(driver)
-        MyResourcesPage.metadata_name.inject_text(driver, name)
-        MyResourcesPage.metadata_value.inject_text(driver, value)
-        MyResourcesPage.confirm_extend_metadata.click(driver)
 
     def search_resource_type(self, driver):
         MyResourcesPage.search_options.click(driver)
@@ -534,18 +550,26 @@ class MyResources:
         resources = str(MyResourcesPage.legend_resources.get_text(driver))
         return labels, resources
 
-    def exists_create_btn(self, driver):
-        return 'disabled' not in MyResourcesPage.create_resource.get_class(driver)
-
-    def exists_cancel_btn(self, driver):
-        return 'disabled' not in MyResourcesPage.cancel_resource.get_class(driver)
-
 class Dashboard:
     def toggle_get_started(self, driver): 
         DashboardPage.get_started_toggle.click(driver)
 
     def is_get_started_showing(self, driver):
         return DashboardPage.get_started_toggle.get_text(driver) == "Hide Getting Started"
+
+class NewResource:
+    def configure(self, driver, title):
+        NewResourceModal.title.click(driver)
+        NewResourceModal.title.inject_text(driver, title)
+
+    def cancel(self, driver):
+        NewResourceModal.cancel.click(driver)
+        time.sleep(RESOURCE_CREATION/2)
+
+    def create(self, driver):
+        NewResourceModal.create.click(driver)
+        time.sleep(RESOURCE_CREATION)
+
 
 Home = Home()
 Apps = Apps()
@@ -559,3 +583,4 @@ Groups = Groups()
 Group = Group()
 MyResources = MyResources()
 Dashboard = Dashboard()
+NewResource = NewResource()

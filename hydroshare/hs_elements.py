@@ -12,14 +12,7 @@ class HomePage:
             By.ID,
             'dropdown-menu-https:--www.hydroshare.org-apps-'
         )
-        self.to_help = SiteElement(
-            By.ID,
-            'dropdown-menu-http:--help.hydroshare.org'
-        )
-        self.to_about = SiteElement(
-            By.ID,
-            'dropdown-menu-https:--help.hydroshare.org-about-hydroshare-'
-        )
+        self.to_help = SiteElement(By.CSS_SELECTOR, 'a[href="{}"]'.format('http://help.hydroshare.org'))
         self.to_login = SiteElement(By.CSS_SELECTOR, '#signin-menu a')
         self.to_collaborate = SiteElement(
             By.CSS_SELECTOR,
@@ -65,6 +58,10 @@ class HomePage:
         self.to_site_map = SiteElement(By.LINK_TEXT, 'Site Map')
 
         self.version = SiteElement(By.CSS_SELECTOR, '.content p b')
+        self.create = SiteElement(By.ID, 'select-resource-type')
+
+    def create_type(self, resource_type):
+        return SiteElement(By.CSS_SELECTOR, 'a[data-value="{}"]'.format(resource_type))
 
     def select_resource(self, resource):
         return SiteElement(By.LINK_TEXT, '{}'.format(resource))
@@ -129,12 +126,12 @@ class DiscoverPage:
             '//th[text() = "Last updated:"]/following-sibling::td/a'
         )
         self.search = SiteElement(By.ID, 'id_q')
-        self.how_to_cite = SiteElement(
-            By.CSS_SELECTOR,
-            '#rights > span:nth-child(2) > a:nth-child(1)'
-        )
-        self.learn_more = SiteElement(By.PARTIAL_LINK_TEXT, 'Learn more about')
         self.show_all = SiteElement(By.ID, 'btn-show-all')
+        self.user_modal_to_profile = SiteElement(
+            By.CSS_SELECTOR,
+            '.open > ul:nth-child(2) > li:nth-child(1) > div:nth-child(1) '
+            '> div:nth-child(2) > h4:nth-child(1) > a:nth-child(1)'
+        )
 
     def to_resource(self, title):
         return SiteElement(
@@ -219,10 +216,32 @@ class ResourcePage:
         self.open_with = SiteElement(By.ID, 'apps-dropdown')
         self.open_jupyterhub = SiteElement(
             By.CSS_SELECTOR,
-            'li[title="JupyterHub"]'
+            'li[title="CUAHSI JupyterHub"]'
         )
         self.title = SiteElement(By.ID, 'resource-title')
+        self.view = SiteElement(By.CSS_SELECTOR, '.glyphicon-circle-arrow-left')
+        self.edit_resource = SiteElement(By.ID, 'edit-metadata')
+        self.add_metadata = SiteElement(
+            By.CSS_SELECTOR,
+            'a[title="Add New Entry"]'
+        )
+        self.metadata_name = SiteElement(By.ID, 'extra_meta_name_input')
+        self.metadata_value = SiteElement(By.ID, 'extra_meta_value_input')
+        self.confirm_metadata = SiteElement(
+            By.ID,
+            'btn-confirm-extended-metadata'
+        )
+        self.learn_more = SiteElement(By.PARTIAL_LINK_TEXT, 'Learn more')
+        self.how_to_cite = SiteElement(
+            By.CSS_SELECTOR,
+            '#rights > span:nth-child(2) > a:nth-child(1)'
+        )
 
+    def name(self, name):
+        return SiteElement(By.XPATH, '//td[text()= "{}"]'.format(name))
+
+    def value(self, value):
+        return SiteElement(By.XPATH, '//td[text()= "{}"]'.format(value))
 
 class HelpPage:
     def __init__(self):
@@ -241,6 +260,7 @@ class HelpPage:
             'footer a[href=\'/sitemap/\']'
         )
         self.title = SiteElement(By.CSS_SELECTOR, 'h1.page-title')
+        self.to_about = SiteElement(By.CSS_SELECTOR, 'a[href="{}"]'.format('/about-hydroshare'))
 
     def core_item(self, index):
         return SiteElement(
@@ -278,43 +298,26 @@ class AboutPage:
 class APIPage:
     def __init__(self):
         self.hsapi = SiteElement(By.ID, 'endpointListTogger_hsapi')
-        self.endpoint_list = SiteElement(By.ID, 'hsapi_endpoint_list')
+        self.endpoint_list = SiteElement(By.CSS_SELECTOR, 'div.opblock-tag-section div:first-child')
+        self.try_endpoint = SiteElement(
+            By.CSS_SELECTOR,
+            'div.try-out > button.btn:nth-child(1)'
+        )
+        self.submit = SiteElement(By.CSS_SELECTOR, '.execute')
+        self.response_code = SiteElement(By.CSS_SELECTOR, '.response_current > td:nth-child(1)')
 
-    def path_by_index(self, index):
+    def path(self, endpoint):
         return SiteElement(
             By.CSS_SELECTOR,
-            '#hsapi_endpoint_list li:nth-of-type({}) '
-            'span.path a'.format(index)
+            '#{} > div:nth-child(1)'.format(endpoint)
         )
 
-    def type_by_index(self, index):
+    def parameter(self, index):
         return SiteElement(
             By.CSS_SELECTOR,
-            '#hsapi_endpoint_list li:nth-of-type({}) '
-            'span.http_method a'.format(index)
+            '.parameters > tbody:nth-child(2) > tr:nth-child({}) > '
+            'td:nth-child(2) > input:nth-child(1)'.format(index)
         )
-
-    def parameter_by_index(self, index):
-        return SiteElement(
-            By.CSS_SELECTOR,
-            '#hsapi_endpoint_list li:nth-of-type({}) '
-            'tbody.operation-params input.parameter.required'.format(index)
-        )
-
-    def submit(self, index):
-        return SiteElement(
-            By.CSS_SELECTOR,
-            '#hsapi_endpoint_list li:nth-of-type({}) '
-            'input.submit'.format(index)
-        )
-
-    def response_code(self, index):
-        return SiteElement(
-            By.CSS_SELECTOR,
-            '#hsapi_endpoint_list li:nth-of-type({}) '
-            'div.block.response_code pre'.format(index)
-        )
-
 
 class LoginPage:
     def __init__(self):
@@ -341,7 +344,7 @@ class ProfilePage:
         self.image = SiteElement(By.CSS_SELECTOR, 'div.profile-pic.round-image')
         self.delete_image = SiteElement(By.CSS_SELECTOR, '#btn-delete-profile-pic')
         self.submit_delete_image = SiteElement(By.CSS_SELECTOR, '#picture-clear_id')
-        self.add_cv = SiteElement(By.CSS_SELECTOR, 'input[name="cv"]')
+        self.add_cv = SiteElement(By.XPATH, '//input[@type="file"]')
         self.view_cv = SiteElement(
             By.XPATH,
             '(//a[@class= "btn btn-default"]/span)[3]'
@@ -395,15 +398,9 @@ class GroupPage:
 
 class NewGroupModal:
     def __init__(self):
-        self.name = SiteElement(By.CSS_SELECTOR, 'input.form-control[name="name"]')
-        self.purpose = SiteElement(
-            By.CSS_SELECTOR,
-            'textarea.form-control[name="purpose"]'
-        )
-        self.about = SiteElement(
-            By.CSS_SELECTOR,
-            'textarea.form-control[name="description"]'
-        )
+        self.name = SiteElement(By.CSS_SELECTOR, 'fieldset.col-sm-12:nth-child(1) textarea')
+        self.purpose = SiteElement(By.CSS_SELECTOR, 'fieldset.col-sm-12:nth-child(2) textarea')
+        self.about = SiteElement(By.CSS_SELECTOR, 'fieldset.col-sm-12:nth-child(3) textarea')
         self.public = SiteElement(By.CSS_SELECTOR, 'input[value="public"]')
         self.discoverable = SiteElement(
             By.CSS_SELECTOR,
@@ -415,13 +412,7 @@ class NewGroupModal:
 
 class MyResourcesPage:
     def __init__(self):
-        self.create_new = SiteElement(By.CSS_SELECTOR, '#facets a')
-        self.title = SiteElement(By.ID, 'txtTitle')
         self.resource_type_selector = SiteElement(By.ID, 'select-resource-type')
-        self.create_resource = SiteElement(
-            By.CSS_SELECTOR,
-            '.btn-create-resource'
-        )
         self.cancel_resource = SiteElement(
             By.CSS_SELECTOR,
             '.btn-cancel-create-resource'
@@ -460,15 +451,6 @@ class MyResourcesPage:
             '//li[@data-target="#modalManageLabels"]'
         )
         self.remove_label = SiteElement(By.CSS_SELECTOR, '.btn-label-remove')
-        self.edit_resource = SiteElement(By.ID, 'edit-metadata')
-        self.extend_metadata = SiteElement(By.CSS_SELECTOR,
-                                           'a[title="Extended Metadata" ]')
-        self.add_new_entry = SiteElement(By.ID, 'btn-add-new-entry')
-        self.metadata_name = SiteElement(By.ID, 'extra_meta_name_input')
-        self.metadata_value = SiteElement(By.ID, 'extra_meta_value_input')
-        self.confirm_extend_metadata = SiteElement(By.ID,
-                                                   'btn-confirm-extended-metadata')
-
         self.legend = SiteElement(By.CSS_SELECTOR, '#headingLegend h4 a')
         self.legend_labels = SiteElement(
             By.CSS_SELECTOR,
@@ -478,12 +460,9 @@ class MyResourcesPage:
             By.CSS_SELECTOR,
             '#legend-collapse div:first-child div:first-child div.col-xs-12.col-sm-7'
         )
-        self.resource_creation_list = SiteElement(
-            By.CSS_SELECTOR, '#dropdown-resource-type ul'
-        )
 
     def label_name(self, label_name):
-        return SiteElement(By.XPATH, '(//input[@ value="{}"])[2]'.format(label_name))
+        return SiteElement(By.XPATH, '//label[text()="{}"]'.format(label_name))
 
     def resource_type(self, option):
             return SiteElement(
@@ -491,23 +470,28 @@ class MyResourcesPage:
                 '//option[contains(text(), "{}")]'.format(option)
             )
 
-    def name(self, name):
-        return SiteElement(By.XPATH, '//td[text()= "{}"]'.format(name))
-
-    def value(self, value):
-        return SiteElement(By.XPATH, '//td[text()= "{}"]'.format(value))
-
     def resource_creation_type(self, index):
         return SiteElement(
             By.CSS_SELECTOR,
             '#dropdown-resource-type ul li:nth-of-type({})'.format(index),
         )
 
+
 class DashboardPage:
     def __init__(self):
         self.get_started_toggle = SiteElement(By.ID, 'id-getting-started-toggle')
 
-DashboardPage = DashboardPage()
+
+class NewResourceModal:
+    def __init__(self):
+        self.title = SiteElement(By.ID, 'input-title')
+        self.create = SiteElement(By.ID, 'btn-resource-create')
+        self.cancel = SiteElement(
+            By.CSS_SELECTOR,
+            '#submit-title-dialog div.modal-dialog div.modal-content div.modal-footer button:nth-of-type(1)')
+
+
+
 HomePage = HomePage()
 AppsPage = AppsPage()
 DiscoverPage = DiscoverPage()
@@ -521,3 +505,5 @@ GroupsPage = GroupsPage()
 GroupPage = GroupPage()
 NewGroupModal = NewGroupModal()
 MyResourcesPage = MyResourcesPage()
+DashboardPage = DashboardPage()
+NewResourceModal = NewResourceModal()
