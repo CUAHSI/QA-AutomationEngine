@@ -1,1 +1,1 @@
-BASE_URL = 'https://data.cuahsi.org/'
+BASE_URL = "https://data.cuahsi.org/"

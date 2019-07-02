@@ -18,6 +18,7 @@ class SiteElement:
     """ Defines site elements in a structured way and provides a convenient
     means for element manipulations (clicking, entering text, etc.)
     """
+
     def __init__(self, by, locator):
         self.by = by
         self.locator = locator
@@ -31,11 +32,12 @@ class SiteElement:
         wait = WebDriverWait(el_driver, 10)
         try:
             wait.until(EC.visibility_of_element_located((self.by, self.locator)))
-            target_el = wait.until(EC.element_to_be_clickable(
-                (self.by, self.locator)))
+            target_el = wait.until(EC.element_to_be_clickable((self.by, self.locator)))
         except TimeoutException as e:
-            print("\nUnable to locate element by {}, "
-                  "locator: '{}'".format(self.by, self.locator))
+            print(
+                "\nUnable to locate element by {}, "
+                "locator: '{}'".format(self.by, self.locator)
+            )
             raise e
 
         return target_el
@@ -74,7 +76,7 @@ class SiteElement:
         Clicks an element using JavaScript
         """
         target_el = self.loc_it(driver)
-        driver.execute_script('arguments[0].click();', target_el)
+        driver.execute_script("arguments[0].click();", target_el)
 
     def submit(self, el_driver):
         """ Send ENTER to element, simulates submit """
@@ -118,12 +120,13 @@ class SiteElement:
         BACKSPACE key to delete it
         """
         target_el = self.loc_it(el_driver)
-        if platform.system() == 'Darwin':   # MacOs
+        if platform.system() == "Darwin":  # MacOs
             ctrl_key = Keys.COMMAND
         else:
             ctrl_key = Keys.CONTROL
-        ActionChains(el_driver).move_to_element(target_el).key_down(ctrl_key).\
-            send_keys('a').key_up(ctrl_key).send_keys(Keys.BACKSPACE).perform()
+        ActionChains(el_driver).move_to_element(target_el).key_down(ctrl_key).send_keys(
+            "a"
+        ).key_up(ctrl_key).send_keys(Keys.BACKSPACE).perform()
 
     def clear_text(self, el_driver, size):
         """ Uses backspace to clear text from a field """
@@ -204,7 +207,7 @@ class SiteElement:
     def get_value(self, el_driver):
         """ Returns content text of website element """
         target_el = self.loc_it(el_driver)
-        return target_el.get_attribute('value')
+        return target_el.get_attribute("value")
 
     def get_href(self, el_driver, base_url):
         """ Returns element href link, with relative links expanded
@@ -212,7 +215,7 @@ class SiteElement:
         """
         target_el = self.loc_it(el_driver)
         target_href = target_el.get_attribute("href")
-        if target_href[0] == '/':
+        if target_href[0] == "/":
             target_href = base_url + target_href
         return target_href
 
@@ -232,10 +235,10 @@ class SiteElement:
 
     def get_class(self, el_driver):
         target_el = self.loc_it(el_driver)
-        target_class = target_el.get_attribute('class')
+        target_class = target_el.get_attribute("class")
         return target_class
 
     def get_style(self, el_driver):
         target_el = self.loc_it(el_driver)
-        target_style = target_el.get_attribute('style')
+        target_style = target_el.get_attribute("style")
         return target_style

@@ -10,13 +10,34 @@ from urllib.request import urlretrieve, urlopen
 
 from cuahsi_base.utils import TestSystem
 
-from hs_elements import HomePage, AppsPage, DiscoverPage, ResourcePage, \
-     HelpPage, AboutPage, APIPage, LoginPage, ProfilePage, GroupsPage, \
-     GroupPage, NewGroupModal, MyResourcesPage, DashboardPage, \
-     NewResourceModal
-from timing import HSAPI_GUI_RESPONSE, PROFILE_SAVE, HELP_DOCS_TREE_ANIMATIONS, \
-     RESOURCE_CREATION, HOME_PAGE_SLIDER_ANIMATION, LABEL_CREATION, \
-     HSAPI_RESPONSE_CODE, DISCOVER_TABLE_UPDATE, EXTERNAL_PAGE_LOAD
+from hs_elements import (
+    HomePage,
+    AppsPage,
+    DiscoverPage,
+    ResourcePage,
+    HelpPage,
+    AboutPage,
+    APIPage,
+    LoginPage,
+    ProfilePage,
+    GroupsPage,
+    GroupPage,
+    NewGroupModal,
+    MyResourcesPage,
+    DashboardPage,
+    NewResourceModal,
+)
+from timing import (
+    HSAPI_GUI_RESPONSE,
+    PROFILE_SAVE,
+    HELP_DOCS_TREE_ANIMATIONS,
+    RESOURCE_CREATION,
+    HOME_PAGE_SLIDER_ANIMATION,
+    LABEL_CREATION,
+    HSAPI_RESPONSE_CODE,
+    DISCOVER_TABLE_UPDATE,
+    EXTERNAL_PAGE_LOAD,
+)
 
 
 class Home:
@@ -72,7 +93,7 @@ class Home:
         return HomePage.slider
 
     def slider_has_valid_img(self, driver, images):
-        return HomePage.slider.get_attribute(driver, 'style') in images
+        return HomePage.slider.get_attribute(driver, "style") in images
 
     def to_site_map(self, driver):
         return HomePage.to_site_map.click(driver)
@@ -94,10 +115,9 @@ class Home:
         """
         # See https://developer.github.com/v3/repos/
         # releases/#get-the-latest-release
-        request_url = f'https://api.github.com/repos/{org}/' \
-                      f'{repo}/releases/latest'
+        request_url = f"https://api.github.com/repos/{org}/" f"{repo}/releases/latest"
         response_data = urlopen(request_url).read()
-        release_version = json.loads(response_data)['tag_name']
+        release_version = json.loads(response_data)["tag_name"]
         return release_version
 
 
@@ -149,7 +169,7 @@ class Discover:
         end application here is xpath, and those indexes are 1 based
         """
         num_cols = DiscoverPage.col_headers.get_child_count(driver)
-        for i in range(1, num_cols+1):
+        for i in range(1, num_cols + 1):
             name_to_check = DiscoverPage.col_index(i).get_text(driver)
             if name_to_check == col_name:
                 return i
@@ -165,52 +185,71 @@ class Discover:
         all_pass = True
         for i in range(1, baseline_rows):
             for j in range(1, 4):
-                if not self.check_sorting_single(driver, column_name,
-                                                 ascend_or_descend, i, i+j):
+                if not self.check_sorting_single(
+                    driver, column_name, ascend_or_descend, i, i + j
+                ):
                     all_pass = False
         return all_pass
 
-    def check_sorting_single(self, driver, column_name, ascend_or_descend,
-                             row_one, row_two):
+    def check_sorting_single(
+        self, driver, column_name, ascend_or_descend, row_one, row_two
+    ):
         """ Confirm that two rows are sorted correctly relative to
         eachother
         """
         col_ind = self.col_index(driver, column_name)
-        if column_name == 'Title':
+        if column_name == "Title":
             first_element = DiscoverPage.cell_strong_href(col_ind, row_one)
             second_element = DiscoverPage.cell_strong_href(col_ind, row_two)
-            first_two_vals = [first_element.get_text(driver),
-                              second_element.get_text(driver)]
-        elif column_name == 'First Author':
+            first_two_vals = [
+                first_element.get_text(driver),
+                second_element.get_text(driver),
+            ]
+        elif column_name == "First Author":
             first_element = DiscoverPage.cell_href(col_ind, row_one)
             second_element = DiscoverPage.cell_href(col_ind, row_two)
-            first_two_vals = [first_element.get_text(driver),
-                              second_element.get_text(driver)]
+            first_two_vals = [
+                first_element.get_text(driver),
+                second_element.get_text(driver),
+            ]
         else:
             first_element = DiscoverPage.cell(col_ind, row_one)
             second_element = DiscoverPage.cell(col_ind, row_two)
-            first_two_vals = [first_element.get_text(driver),
-                              second_element.get_text(driver)]
-        if ('Date' in column_name) or (column_name == 'Last Modified'):
+            first_two_vals = [
+                first_element.get_text(driver),
+                second_element.get_text(driver),
+            ]
+        if ("Date" in column_name) or (column_name == "Last Modified"):
             date_one = parser.parse(first_two_vals[0])
             date_two = parser.parse(first_two_vals[1])
-            if ascend_or_descend == 'Descending':
+            if ascend_or_descend == "Descending":
                 return date_one >= date_two
-            elif ascend_or_descend == 'Ascending':
+            elif ascend_or_descend == "Ascending":
                 return date_one <= date_two
         else:
             value_one, value_two = first_two_vals
-            if ascend_or_descend == 'Descending':
+            if ascend_or_descend == "Descending":
                 return value_one >= value_two
-            elif ascend_or_descend == 'Ascending':
+            elif ascend_or_descend == "Ascending":
                 return value_one <= value_two
 
     def show_all(self, driver):
         DiscoverPage.show_all.click(driver)
 
-    def filters(self, driver, author=None, subject=None, resource_type=None,
-                owner=None, variable=None, sample_medium=None, unit=None,
-                availability=None, contributor=None, content_type=None):
+    def filters(
+        self,
+        driver,
+        author=None,
+        subject=None,
+        resource_type=None,
+        owner=None,
+        variable=None,
+        sample_medium=None,
+        unit=None,
+        availability=None,
+        contributor=None,
+        content_type=None,
+    ):
         """ Use the filters on the left side of the Discover interface.
         Filters should include author(s) {{author}}, subject(s) {{subject}},
         resource type(s) {{resource_type}}, owner(s) {{owner}}, variables
@@ -374,11 +413,11 @@ class About:
         time.sleep(HELP_DOCS_TREE_ANIMATIONS)
 
     def expand_tree_top(self, driver, item):
-        item = item.replace(' ', '-').lower()
+        item = item.replace(" ", "-").lower()
         AboutPage.tree_top(item).click(driver)
 
     def open_policy(self, driver, policy):
-        policy = policy.replace(' ', '-').lower()
+        policy = policy.replace(" ", "-").lower()
         AboutPage.tree_policy(policy).click(driver)
 
     def get_title(self, driver):
@@ -452,16 +491,13 @@ class Profile:
         return int(type_count)
 
     def upload_cv(self, driver, cv):
-        urlretrieve(
-            cv,
-            'cv-test.pdf'
-        )
+        urlretrieve(cv, "cv-test.pdf")
         cwd = os.getcwd()
-        cv_path = os.path.join(cwd, 'cv-test.pdf')
+        cv_path = os.path.join(cwd, "cv-test.pdf")
         TestSystem.execute_javascript(
-            driver,
-            "document.getElementsByName('cv').path={}".format(cv_path)
+            driver, "document.getElementsByName('cv').path={}".format(cv_path)
         )
+
 
 class Groups:
     def create_group(self, driver, name, purpose, about, privacy):
@@ -469,9 +505,9 @@ class Groups:
         NewGroupModal.name.inject_text(driver, name)
         NewGroupModal.purpose.inject_text(driver, purpose)
         NewGroupModal.about.inject_text(driver, about)
-        if privacy.lower() == 'public':
+        if privacy.lower() == "public":
             NewGroupModal.public.click(driver)
-        elif privacy.lower() == 'discoverable':
+        elif privacy.lower() == "discoverable":
             NewGroupModal.discoverable.click(driver)
         else:
             NewGroupModal.private.click(driver)
@@ -489,9 +525,9 @@ class MyResources:
         resource_creation_list = MyResourcesPage.resource_creation_list
         count = resource_creation_list.get_immediate_child_count(driver)
         resource_type_indexes = []
-        for i in range(1, count+1):
+        for i in range(1, count + 1):
             el_class = MyResourcesPage.resource_creation_type(i).get_class(driver)
-            if el_class not in ['dropdown-header', 'divider']:
+            if el_class not in ["dropdown-header", "divider"]:
                 resource_type_indexes.append(i)
         MyResourcesPage.resource_type_selector.click(driver)
         return resource_type_indexes
@@ -537,7 +573,7 @@ class MyResources:
         MyResourcesPage.add_label.click(driver)
 
     def check_label_applied(self, driver):
-        return 'has-labels' in MyResourcesPage.add_label.get_class(driver)
+        return "has-labels" in MyResourcesPage.add_label.get_class(driver)
 
     def delete_label(self, driver):
         MyResourcesPage.label.click(driver)
@@ -550,12 +586,16 @@ class MyResources:
         resources = str(MyResourcesPage.legend_resources.get_text(driver))
         return labels, resources
 
+
 class Dashboard:
-    def toggle_get_started(self, driver): 
+    def toggle_get_started(self, driver):
         DashboardPage.get_started_toggle.click(driver)
 
     def is_get_started_showing(self, driver):
-        return DashboardPage.get_started_toggle.get_text(driver) == "Hide Getting Started"
+        return (
+            DashboardPage.get_started_toggle.get_text(driver) == "Hide Getting Started"
+        )
+
 
 class NewResource:
     def configure(self, driver, title):
@@ -564,7 +604,7 @@ class NewResource:
 
     def cancel(self, driver):
         NewResourceModal.cancel.click(driver)
-        time.sleep(RESOURCE_CREATION/2)
+        time.sleep(RESOURCE_CREATION / 2)
 
     def create(self, driver):
         NewResourceModal.create.click(driver)

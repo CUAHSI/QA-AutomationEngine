@@ -7,9 +7,10 @@ from selenium import webdriver
 
 from .browser import USER_AGENT
 
+
 class BaseTest(unittest.TestCase):
     grid_hub_ip = None
-    browser = 'firefox'
+    browser = "firefox"
 
     def setUp(self):
         """ Setup driver for use in automation tests """
@@ -17,40 +18,43 @@ class BaseTest(unittest.TestCase):
         if self.grid_hub_ip is not None:
             if not sys.warnoptions:
                 warnings.simplefilter("ignore", ResourceWarning)
-            remote_args = {'command_executor':
-                           'http://{}:4444/wd/hub'.format(self.grid_hub_ip),
-                           'desired_capabilities': {'browserName': self.browser}}
-            if self.browser == 'firefox':
-                remote_args['browser_profile'] = self._firefox_profile()
-            elif self.browser == 'chrome':
-                remote_args['options'] = self._chrome_options()
+            remote_args = {
+                "command_executor": "http://{}:4444/wd/hub".format(self.grid_hub_ip),
+                "desired_capabilities": {"browserName": self.browser},
+            }
+            if self.browser == "firefox":
+                remote_args["browser_profile"] = self._firefox_profile()
+            elif self.browser == "chrome":
+                remote_args["options"] = self._chrome_options()
             driver = webdriver.Remote(**remote_args)
         else:
-            if self.browser == 'firefox':
+            if self.browser == "firefox":
                 driver = webdriver.Firefox(self._firefox_profile())
-            elif self.browser == 'chrome':
+            elif self.browser == "chrome":
                 driver = webdriver.Chrome(options=self._chrome_options())
-            elif self.browser == 'safari':
+            elif self.browser == "safari":
                 # Fails with 'AttributeError' at time of writing this comment
                 # (selenium==3.11.0) because of a bug in selenium code.
                 # See https://github.com/SeleniumHQ/selenium/issues/5578
                 driver = webdriver.Safari()
             else:
-                raise RuntimeError('Unknown browser type. Supported browser types '
-                                   'are: "firefox", "chrome", "safari".')
+                raise RuntimeError(
+                    "Unknown browser type. Supported browser types "
+                    'are: "firefox", "chrome", "safari".'
+                )
 
         self.driver = driver
 
     @staticmethod
     def _firefox_profile():
         profile = webdriver.FirefoxProfile()
-        profile.set_preference('general.useragent.override', USER_AGENT)
+        profile.set_preference("general.useragent.override", USER_AGENT)
         return profile
 
     @staticmethod
     def _chrome_options():
         options = webdriver.ChromeOptions()
-        options.add_argument('--user-agent={}'.format(USER_AGENT))
+        options.add_argument("--user-agent={}".format(USER_AGENT))
         return options
 
     def tearDown(self):
@@ -59,9 +63,9 @@ class BaseTest(unittest.TestCase):
 
 def basecli():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--grid')
-    parser.add_argument('--browser')
-    parser.add_argument('unittest_args', nargs='*')
+    parser.add_argument("--grid")
+    parser.add_argument("--browser")
+    parser.add_argument("unittest_args", nargs="*")
 
     return parser
 
