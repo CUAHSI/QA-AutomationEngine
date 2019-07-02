@@ -1,8 +1,6 @@
 import numpy as np
 import pylab as plt
 
-import random
-
 XLABEL = "Number of Users"
 YLABEL = "Passing Rate"
 TITLE = "Performance Profile"

@@ -443,7 +443,8 @@ class NewResourceModal:
         self.create = SiteElement(By.ID, "btn-resource-create")
         self.cancel = SiteElement(
             By.CSS_SELECTOR,
-            "#submit-title-dialog div.modal-dialog div.modal-content div.modal-footer button:nth-of-type(1)",
+            "#submit-title-dialog div.modal-dialog div.modal-content div.modal-footer "
+            + "button:nth-of-type(1)",
         )
 
 

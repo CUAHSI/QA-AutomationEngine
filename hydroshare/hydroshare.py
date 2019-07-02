@@ -3,7 +3,7 @@ import os
 import random
 import re
 
-from urllib.request import urlretrieve, urlopen
+from urllib.request import urlretrieve
 
 from hs_macros import (
     Home,
@@ -20,7 +20,7 @@ from hs_macros import (
     Dashboard,
     NewResource,
 )
-from hs_elements import AppsPage, MyResourcesPage, HomePage, DiscoverPage
+from hs_elements import AppsPage, HomePage, DiscoverPage
 
 from cuahsi_base.cuahsi_base import BaseTest, parse_args_run_tests
 from cuahsi_base.utils import External, TestSystem
@@ -487,7 +487,6 @@ class HydroshareTestSuite(BaseTest):
         Profile.view_cv(self.driver)
         External.to_file(self.driver, num_windows_now, "cv-test")
         oracle("cv-test")
-        os.remove(cv_path)
         External.switch_old_page(self.driver)
         External.close_new_page(self.driver)
         Profile.to_editor(self.driver)
