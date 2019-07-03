@@ -1,1 +1,1 @@
-USER_AGENT = 'CUAHSI-QA-Selenium'
+USER_AGENT = "CUAHSI-QA-Selenium"

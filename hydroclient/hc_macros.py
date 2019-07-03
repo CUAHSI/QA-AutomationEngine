@@ -5,13 +5,28 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-from hc_elements import SearchPage, MarkerModal, ServicesModal, \
-    KeywordsModal, AdvancedModal, FilterModal, AboutModal, \
-    QuickStartModal, ZendeskWidget, WorkspacePage, \
-    ResourceCreatorPage
-from timing import WORKSPACE_CREATE_ARCHIVE, SEARCH_IN_PROGRESS, \
-    SEARCH_AUTOCOMPLETE, WORKSPACE_TOOLTIP_DISAPPEAR, MODAL_FADE, \
-    RESULTS_MULTISELECT, APP_INITIALIZATION
+from hc_elements import (
+    SearchPage,
+    MarkerModal,
+    ServicesModal,
+    KeywordsModal,
+    AdvancedModal,
+    FilterModal,
+    AboutModal,
+    QuickStartModal,
+    ZendeskWidget,
+    WorkspacePage,
+    ResourceCreatorPage,
+)
+from timing import (
+    WORKSPACE_CREATE_ARCHIVE,
+    SEARCH_IN_PROGRESS,
+    SEARCH_AUTOCOMPLETE,
+    WORKSPACE_TOOLTIP_DISAPPEAR,
+    MODAL_FADE,
+    RESULTS_MULTISELECT,
+    APP_INITIALIZATION,
+)
 
 
 class Search:
@@ -76,8 +91,8 @@ class Search:
         results_count = SearchPage.results_count.get_text(driver)
         # Account for multiple localization settings with respect to thousands
         # separator.  Safe since results count will always be integer.
-        results_count = re.sub('[,]', '', results_count)
-        results_count = re.sub('[.]', '', results_count)
+        results_count = re.sub("[,]", "", results_count)
+        results_count = re.sub("[.]", "", results_count)
         return int(results_count)
 
     def filter_dates(self, driver, start_date, end_date):
@@ -93,8 +108,9 @@ class Search:
         SearchPage.date_end.inject_text(driver, end_date)
         SearchPage.date_start.inject_text(driver, Keys.TAB)
         SearchPage.date_save.click(driver)
-        WebDriverWait(driver, MODAL_FADE+1).until_not(
-            EC.visibility_of_element_located(SearchPage.modal_fade_locator))
+        WebDriverWait(driver, MODAL_FADE + 1).until_not(
+            EC.visibility_of_element_located(SearchPage.modal_fade_locator)
+        )
         Search.search(driver)
 
     def clear_date_filter(self, driver):
@@ -117,7 +133,7 @@ class Search:
         time.sleep(MODAL_FADE)
 
     def get_searchbox_text(self, driver):
-        return SearchPage.map_search.get_attribute(driver, 'value')
+        return SearchPage.map_search.get_attribute(driver, "value")
 
     def hybrid(self, driver):
         return SearchPage.hybrid.click(driver)
@@ -132,7 +148,7 @@ class Marker:
         results, clicking "Select Action", and then selecting the workspace
         export option
         """
-        MarkerModal.table_count.select_option(driver, '100')
+        MarkerModal.table_count.select_option(driver, "100")
         MarkerModal.cell(1, 1).scroll_to(driver)
         MarkerModal.cell(1, 1).click(driver)
         MarkerModal.cell_last_row(1).scroll_to(driver)
@@ -155,7 +171,7 @@ class Services:
         the {{org}} organization(s) and the {{titles}} titles
         """
         SearchPage.services.click(driver)
-        ServicesModal.table_count.select_option(driver, '100')
+        ServicesModal.table_count.select_option(driver, "100")
         ServicesModal.sort_org.click(driver)
         if type(orgs) is list:
             for org in orgs:
@@ -173,7 +189,8 @@ class Services:
             ServicesModal.select_all_non_gridded.click(driver)
         ServicesModal.save.click(driver)
         WebDriverWait(driver, MODAL_FADE).until_not(
-            EC.visibility_of_element_located(SearchPage.modal_fade_locator))
+            EC.visibility_of_element_located(SearchPage.modal_fade_locator)
+        )
         Search.search(driver)
 
     def search(self, driver, search_text, result_num):
@@ -183,11 +200,11 @@ class Services:
         """
         SearchPage.services.click(driver)
         ServicesModal.input_search.inject_text(driver, search_text)
-        ServicesModal.select_item_num('{}'.format(result_num)).passive_click(driver)
+        ServicesModal.select_item_num("{}".format(result_num)).passive_click(driver)
         ServicesModal.search.click(driver)
         time.sleep(SEARCH_IN_PROGRESS)
 
-    def select_result(self, driver,  num):
+    def select_result(self, driver, num):
         ServicesModal.select_item_num(num).click(driver)
 
     def empty_services(self, driver):
@@ -225,9 +242,9 @@ class Advanced:
         """
         SearchPage.advanced.click(driver)
         AdvancedModal.value_type.click(driver)
-        AdvancedModal.value_type_sort('Term').click(driver)
+        AdvancedModal.value_type_sort("Term").click(driver)
         AdvancedModal.value_type_cell(1, 1).click(driver)
-        AdvancedModal.value_type_sort('Term').click(driver)
+        AdvancedModal.value_type_sort("Term").click(driver)
         AdvancedModal.value_type_cell(1, 1).range_click(driver)
         AdvancedModal.search.click(driver)
         time.sleep(SEARCH_IN_PROGRESS)
@@ -241,8 +258,8 @@ class Advanced:
 class Filter:
     def count_results(self, driver):
         results_info = FilterModal.info.get_text(driver)
-        results_info = results_info.replace(',', '')
-        nums = re.findall(r'\d+', results_info)
+        results_info = results_info.replace(",", "")
+        nums = re.findall(r"\d+", results_info)
         return nums
 
     def empty_filters(self, driver):
@@ -262,7 +279,7 @@ class Filter:
         cell in the {{row}} row and {{col}} column, then
         click "Select Action" and choose the workspace option
         """
-        FilterModal.count.select_option(driver, '100')
+        FilterModal.count.select_option(driver, "100")
         FilterModal.close.scroll_to(driver)
         FilterModal.cell(row, col).click(driver)
         FilterModal.action.click(driver)
@@ -271,7 +288,7 @@ class Filter:
 
     def to_workspace_cell_range(self, driver, first_row, last_row):
         """ Select a range of rows from the Filter Results modal """
-        FilterModal.count.select_option(driver, '100')
+        FilterModal.count.select_option(driver, "100")
         FilterModal.cell(first_row, 3).scroll_to(driver)
         FilterModal.cell(first_row, 3).click(driver)
         FilterModal.cell(last_row, 3).scroll_to(driver)
@@ -283,7 +300,7 @@ class Filter:
 
     def to_workspace_cell_multi(self, driver, rows):
         """ Select multiple rows within Filter Results modal """
-        FilterModal.count.select_option(driver, '100')
+        FilterModal.count.select_option(driver, "100")
         FilterModal.cell(rows[0], 3).scroll_to(driver)
         FilterModal.cell(rows[0], 3).click(driver)
         for i in range(1, len(rows)):
@@ -302,9 +319,9 @@ class Filter:
         hold the Shift key and click the second cell.  Finally, click
         "Select Tool" and choose the workspace export option
         """
-        FilterModal.count.select_option(driver, '100')
+        FilterModal.count.select_option(driver, "100")
         FilterModal.cell_text(texts[0]).click(driver)
-        FilterModal.sort('Service Title').click(driver)
+        FilterModal.sort("Service Title").click(driver)
         FilterModal.cell_text(texts[1]).scroll_to(driver)
         FilterModal.cell_text(texts[1]).multi_click(driver)
         FilterModal.action.click(driver)
@@ -316,7 +333,7 @@ class Filter:
         which contains the text {{text}} and click on it.  Next, click
         on "Select Tool" and choose the workspace option
         """
-        FilterModal.count.select_option(driver, '100')
+        FilterModal.count.select_option(driver, "100")
         FilterModal.cell_text(text).click(driver)
         FilterModal.action.click(driver)
         FilterModal.to_workspace.click(driver)
@@ -329,8 +346,8 @@ class Filter:
         """
         FilterModal.search.inject_text(driver, search_string)
         time.sleep(SEARCH_AUTOCOMPLETE)
-        FilterModal.sort('Service Title').click(driver)
-        FilterModal.count.select_option(driver, '100')
+        FilterModal.sort("Service Title").click(driver)
+        FilterModal.count.select_option(driver, "100")
 
     def to_workspace_all(self, driver):
         """ Select all the results in the Filter Results dialog, then
@@ -341,9 +358,7 @@ class Filter:
         FilterModal.to_workspace.click(driver)
         FilterModal.workspace.click(driver)
 
-    def complex_selection_to_workspace(self, driver,
-                                       double=False,
-                                       to_workspace=False):
+    def complex_selection_to_workspace(self, driver, double=False, to_workspace=False):
         """ Use double click for workspace selections,
         instead of single click selections,
         due to issues with single-click selection of large result sets
@@ -360,7 +375,7 @@ class Filter:
             FilterModal.workspace.click(driver)
 
     def show_25(self, driver):
-        FilterModal.count.select_option(driver, '25')
+        FilterModal.count.select_option(driver, "25")
 
     def selection(self, driver):
         FilterModal.selections.click(driver)
@@ -391,10 +406,9 @@ class Filter:
             checkbox_label = FilterModal.data_prop_list_label(i).get_text(driver)
             if checkbox_label == prop:
                 aria_selected = FilterModal.data_prop_list_entry(i).get_attribute(
-                    driver,
-                    'aria-selected'
+                    driver, "aria-selected"
                 )
-                return aria_selected == 'true'
+                return aria_selected == "true"
         return False
 
     def set_data_services(self, driver, data_services):
@@ -416,10 +430,9 @@ class Filter:
             checkbox_label = FilterModal.data_service_list_label(i).get_text(driver)
             if checkbox_label == service:
                 aria_selected = FilterModal.data_service_list_entry(i).get_attribute(
-                    driver,
-                    'aria-selected'
+                    driver, "aria-selected"
                 )
-                return aria_selected == 'true'
+                return aria_selected == "true"
         return False
 
     def ok_is_visible(self, driver):
@@ -461,7 +474,8 @@ class About:
     def licensing_close(self, driver):
         AboutModal.licensing_close.click(driver)
         WebDriverWait(driver, MODAL_FADE).until_not(
-            EC.visibility_of_element_located(SearchPage.modal_fade_locator))
+            EC.visibility_of_element_located(SearchPage.modal_fade_locator)
+        )
 
     def to_contact(self, driver):
         """ Open the contact modal using the About button at the top of
@@ -475,7 +489,8 @@ class About:
     def contact_close(self, driver):
         AboutModal.contact_close.click(driver)
         WebDriverWait(driver, MODAL_FADE).until_not(
-            EC.visibility_of_element_located(SearchPage.modal_fade_locator))
+            EC.visibility_of_element_located(SearchPage.modal_fade_locator)
+        )
 
 
 class QuickStart:
@@ -533,7 +548,8 @@ class Workspace:
         """
         WorkspacePage.tools.passive_click(driver)
         WebDriverWait(driver, WORKSPACE_TOOLTIP_DISAPPEAR).until_not(
-            EC.visibility_of_element_located(WorkspacePage.tooltip_locator))
+            EC.visibility_of_element_located(WorkspacePage.tooltip_locator)
+        )
         WorkspacePage.to_csv.click(driver)
 
     def to_viewer(self, driver):
@@ -561,8 +577,8 @@ class Workspace:
         """ Check the number of rows in the workspace which are processed
         and show a status of "Completed"
         """
-        time.sleep(WORKSPACE_CREATE_ARCHIVE*wait_multiplier)
-        return driver.page_source.count('<em> Completed</em>')
+        time.sleep(WORKSPACE_CREATE_ARCHIVE * wait_multiplier)
+        return driver.page_source.count("<em> Completed</em>")
 
     def is_in_results(self, driver, strings, time_mult):
         """ Check the table to see if the text(s) {{strings}} are present
@@ -578,7 +594,7 @@ class Workspace:
         return True
 
     def launch_is_disabled(self, driver):
-        return FilterModal.launch_tool.get_attribute(driver, 'disabled') is None
+        return FilterModal.launch_tool.get_attribute(driver, "disabled") is None
 
 
 class ResourceCreator:
