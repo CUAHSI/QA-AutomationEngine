@@ -26,6 +26,7 @@ from hs_elements import (
     MyResourcesPage,
     DashboardPage,
     NewResourceModal,
+    RegistrationPage,
 )
 from timing import (
     HSAPI_GUI_RESPONSE,
@@ -144,6 +145,40 @@ class Home:
             "linkedin": HomePage.linkedin,
         }
         return social_links[social].get_attribute(driver, "href")
+
+    def signup(
+        self,
+        driver,
+        first_name=None,
+        last_name=None,
+        email=None,
+        username=None,
+        organizations=[],
+        password=None,
+    ):
+        HomePage.signup.click(driver)
+        if first_name is not None:
+            RegistrationPage.first_name.click(driver)
+            RegistrationPage.first_name.inject_text(driver, first_name)
+        if last_name is not None:
+            RegistrationPage.last_name.click(driver)
+            RegistrationPage.last_name.inject_text(driver, last_name)
+        if email is not None:
+            RegistrationPage.email.click(driver)
+            RegistrationPage.email.inject_text(driver, email)
+        if username is not None:
+            RegistrationPage.username.click(driver)
+            RegistrationPage.username.inject_text(driver, username)
+        for organization in organizations:
+            RegistrationPage.organizations.click(driver)
+            RegistrationPage.organizations.inject_text(driver, organization)
+            RegistrationPage.organizations.inject_text(driver, Keys.ENTER)
+        if password is not None:
+            RegistrationPage.password1.click(driver)
+            RegistrationPage.password1.inject_text(driver, username)
+            RegistrationPage.password2.click(driver)
+            RegistrationPage.password2.inject_text(driver, username)
+        RegistrationPage.signup.click(driver)
 
 
 class Apps:
@@ -659,6 +694,11 @@ class NewResource:
         time.sleep(RESOURCE_CREATION)
 
 
+class Registration:
+    def check_error(self, driver):
+        return RegistrationPage.error.get_text(driver)
+
+
 Home = Home()
 Apps = Apps()
 Discover = Discover()
@@ -672,3 +712,4 @@ Group = Group()
 MyResources = MyResources()
 Dashboard = Dashboard()
 NewResource = NewResource()
+Registration = Registration()
