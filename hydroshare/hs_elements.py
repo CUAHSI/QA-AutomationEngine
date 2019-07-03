@@ -34,19 +34,19 @@ class HomePage:
         self.slider = SiteElement(By.CSS_SELECTOR, "div.item.parallax-window.active")
 
         # Links to social media accounts
-        self.twitter_link = SiteElement(
+        self.twitter = SiteElement(
             By.CSS_SELECTOR, ".content.social ul li:nth-child(1) > a"
         )
-        self.facebook_link = SiteElement(
+        self.facebook = SiteElement(
             By.CSS_SELECTOR, ".content.social ul li:nth-child(2) > a"
         )
-        self.youtube_link = SiteElement(
+        self.youtube = SiteElement(
             By.CSS_SELECTOR, ".content.social ul li:nth-child(3) > a"
         )
-        self.git_link = SiteElement(
+        self.github = SiteElement(
             By.CSS_SELECTOR, ".content.social ul li:nth-child(4) > a"
         )
-        self.linkedin_link = SiteElement(
+        self.linkedin = SiteElement(
             By.CSS_SELECTOR, ".content.social ul li:nth-child(5) > a"
         )
 

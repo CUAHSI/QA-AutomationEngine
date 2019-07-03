@@ -20,7 +20,6 @@ from hs_macros import (
     Dashboard,
     NewResource,
 )
-from hs_elements import AppsPage, HomePage, DiscoverPage
 
 from cuahsi_base.cuahsi_base import BaseTest, parse_args_run_tests
 from cuahsi_base.utils import External, TestSystem
@@ -117,11 +116,7 @@ class HydroshareTestSuite(BaseTest):
             self.assertIn(app_name, resource_page)
 
         driver = self.driver
-        num_windows_now = len(driver.window_handles)
         Home.to_apps(driver)
-        External.switch_new_page(
-            driver, num_windows_now, AppsPage.apps_container_locator
-        )
         apps_count = Apps.count(driver)
         for i in range(1, apps_count + 1):  # xpath start at 1
             app_name = Apps.get_title(driver, i)
@@ -625,24 +620,17 @@ class HydroshareTestSuite(BaseTest):
         the links in the footer
         """
 
-        def get_link_href(link_element):
-            return link_element.get_attribute(self.driver, "href")
-
-        def oracle(expected_href, target_link):
+        def oracle(expected, actual):
             """ Href matches the expected social media account url """
-            actual_href = get_link_href(target_link)
-            self.assertEqual(expected_href, actual_href)
+            self.assertEqual(expected, actual)
 
-        oracle("http://twitter.com/cuahsi", HomePage.twitter_link)
-        exp_fb_href = (
-            "https://www.facebook.com/pages/CUAHSI-Consortium-"
-            "of-Universities-for-the-Advancement-of-Hydrologic-"
-            "Science-Inc/179921902590"
-        )
-        oracle(exp_fb_href, HomePage.facebook_link)
-        oracle("http://youtube.hydroshare.org/", HomePage.youtube_link)
-        oracle("http://github.com/hydroshare", HomePage.git_link)
-        oracle("https://www.linkedin.com/company/2632114", HomePage.linkedin_link)
+        socials = ["twitter", "facebook", "youtube", "github", "linkedin"]
+
+        for social in socials:
+            oracle(
+                Home.get_social_link_expected(social),
+                Home.get_social_link_actual(self.driver, social),
+            )
 
     def test_B_000031(self):
         """ Confirm that resources can be accessed from the sitemap links """
@@ -679,30 +667,22 @@ class HydroshareTestSuite(BaseTest):
 
         def oracle():
             """ All previous filters are inactive due to "Show All" """
+            self.assertFalse(Discover.is_selected(self.driver, author="Myers, Jessie"))
             self.assertFalse(
-                DiscoverPage.filter_author("Myers, Jessie").is_selected(self.driver)
+                Discover.is_selected(self.driver, contributor="Cox, Chris")
             )
             self.assertFalse(
-                DiscoverPage.filter_contributor("Cox, Chris").is_selected(self.driver)
+                Discover.is_selected(self.driver, owner="Christopher, Adrian")
             )
             self.assertFalse(
-                DiscoverPage.filter_owner("Christopher, Adrian").is_selected(
-                    self.driver
+                Discover.is_selected(self.driver, content_type="Model Instance")
+            )
+            self.assertFalse(
+                Discover.is_selected(
+                    self.driver, subject="USACE Corps Water Management System (CWMS)"
                 )
             )
-            self.assertFalse(
-                DiscoverPage.filter_content_type("Model Instance").is_selected(
-                    self.driver
-                )
-            )
-            self.assertFalse(
-                DiscoverPage.filter_subject(
-                    "USACE Corps Water Management System (CWMS)"
-                ).is_selected(self.driver)
-            )
-            self.assertFalse(
-                DiscoverPage.filter_availability("public").is_selected(self.driver)
-            )
+            self.assertFalse(Discover.is_selected(self.driver, availability="public"))
 
         Home.to_discover(self.driver)
         Discover.filters(

@@ -8,7 +8,7 @@ from selenium.common.exceptions import TimeoutException
 from dateutil import parser
 from urllib.request import urlretrieve, urlopen
 
-from cuahsi_base.utils import TestSystem
+from cuahsi_base.utils import External, TestSystem
 
 from hs_elements import (
     HomePage,
@@ -50,7 +50,11 @@ class Home:
         HomePage.to_discover.click(driver)
 
     def to_apps(self, driver):
+        num_windows_now = len(driver.window_handles)
         HomePage.to_apps.click(driver)
+        External.switch_new_page(
+            driver, num_windows_now, AppsPage.apps_container_locator
+        )
 
     def to_help(self, driver):
         HomePage.to_help.click(driver)
@@ -118,6 +122,28 @@ class Home:
         response_data = urlopen(request_url).read()
         release_version = json.loads(response_data)["tag_name"]
         return release_version
+
+    def get_social_link_expected(self, social):
+        social_links = {
+            "facebook": "https://www.facebook.com/pages/CUAHSI-Consortium-"
+            "of-Universities-for-the-Advancement-of-Hydrologic-"
+            "Science-Inc/179921902590",
+            "twitter": "http://twitter.com/cuahsi",
+            "youtube": "http://youtube.hydroshare.org/",
+            "github": "http://github.com/hydroshare",
+            "linkedin": "https://www.linkedin.com/company/2632114",
+        }
+        return social_links[social]
+
+    def get_social_link_actual(self, driver, social):
+        social_links = {
+            "facebook": HomePage.facebook,
+            "twitter": HomePage.twitter,
+            "youtube": HomePage.youtube,
+            "github": HomePage.github,
+            "linkedin": HomePage.linkedin,
+        }
+        return social_links[social].get_attribute(driver, "href")
 
 
 class Apps:
@@ -338,6 +364,29 @@ class Discover:
 
     def to_search_result_item(self, driver, col_ind, row_one):
         DiscoverPage.cell_href(col_ind, row_one).click(driver)
+
+    def is_selected(
+        self,
+        driver,
+        author=None,
+        contributor=None,
+        owner=None,
+        content_type=None,
+        subject=None,
+        availability=None,
+    ):
+        if author is not None:
+            return DiscoverPage.filter_author(author).is_selected(driver)
+        elif contributor is not None:
+            return DiscoverPage.filter_contributor(contributor).is_selected(driver)
+        elif owner is not None:
+            return DiscoverPage.filter_owner(owner).is_selected(driver)
+        elif content_type is not None:
+            return DiscoverPage.filter_content_type(content_type).is_selected(driver)
+        elif subject is not None:
+            return DiscoverPage.filter_subject(subject).is_selected(driver)
+        elif availability is not None:
+            return DiscoverPage.filter_availability(availability).is_selected(driver)
 
 
 class Resource:
