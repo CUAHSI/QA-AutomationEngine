@@ -55,6 +55,7 @@ class HomePage:
 
         self.version = SiteElement(By.CSS_SELECTOR, ".content p b")
         self.create = SiteElement(By.ID, "select-resource-type")
+        self.signup = SiteElement(By.CSS_SELECTOR, "a.btn-signup")
 
     def create_type(self, resource_type):
         return SiteElement(By.CSS_SELECTOR, 'a[data-value="{}"]'.format(resource_type))
@@ -448,6 +449,21 @@ class NewResourceModal:
         )
 
 
+class RegistrationPage:
+    def __init__(self):
+        self.first_name = SiteElement(By.ID, "id_first_name")
+        self.last_name = SiteElement(By.ID, "id_last_name")
+        self.email = SiteElement(By.ID, "id_email")
+        self.username = SiteElement(By.ID, "id_username")
+        self.organizations = SiteElement(
+            By.CSS_SELECTOR, 'input[placeholder="Organization(s)"]'
+        )
+        self.password1 = SiteElement(By.ID, "id_password1")
+        self.password2 = SiteElement(By.ID, "id_password2")
+        self.signup = SiteElement(By.ID, "signup")
+        self.error = SiteElement(By.CSS_SELECTOR, "p.alert")
+
+
 HomePage = HomePage()
 AppsPage = AppsPage()
 DiscoverPage = DiscoverPage()
@@ -463,3 +479,4 @@ NewGroupModal = NewGroupModal()
 MyResourcesPage = MyResourcesPage()
 DashboardPage = DashboardPage()
 NewResourceModal = NewResourceModal()
+RegistrationPage = RegistrationPage()
