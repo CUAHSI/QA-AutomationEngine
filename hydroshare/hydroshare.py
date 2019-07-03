@@ -19,6 +19,7 @@ from hs_macros import (
     MyResources,
     Dashboard,
     NewResource,
+    Registration,
 )
 
 from cuahsi_base.cuahsi_base import BaseTest, parse_args_run_tests
@@ -709,6 +710,24 @@ class HydroshareTestSuite(BaseTest):
         Dashboard.toggle_get_started(self.driver)
         Home.to_home(self.driver)
         oracle()
+
+    def test_B_000035(self):
+        """ Ensure registration prompts for Organization entry """
+
+        def oracle(error_text):
+            """ Error message suggests Organization data is missing """
+            self.assertIn("Organization", error_text)
+
+        Home.signup(
+            self.driver,
+            first_name="Jane",
+            last_name="Doe",
+            email="jane.doe.123@example.com",
+            username="jdoe123",
+            password="mypass",
+        )
+        error_text = Registration.check_error(self.driver)
+        oracle(error_text)
 
 
 if __name__ == "__main__":
