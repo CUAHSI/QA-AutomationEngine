@@ -420,8 +420,8 @@ class MyResourcesPage:
             "#legend-collapse div:first-child div:first-child div.col-xs-12.col-sm-7",
         )
 
-    def label_name(self, label_name):
-        return SiteElement(By.XPATH, '//label[text()="{}"]'.format(label_name))
+    def label_checkbox(self, label_name):
+        return SiteElement(By.XPATH, '//td[@class="open"]//label[contains(text(), "{}")]'.format(label_name))
 
     def resource_type(self, option):
         return SiteElement(By.XPATH, '//option[contains(text(), "{}")]'.format(option))
