@@ -649,7 +649,7 @@ class HydroshareTestSuite(BaseTest):
         )
         oracle("Flow measurements at Manabao, Dominican Republic")
 
-    def test_B_000032(self):
+    def hold_test_B_000032(self):
         """
         Confirm that the hydroshare footer version number matches up with the
         latest version number in GitHub

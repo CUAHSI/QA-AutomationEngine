@@ -652,7 +652,7 @@ class MyResources:
 
     def toggle_label(self, driver, label):
         MyResourcesPage.add_label.click(driver)
-        MyResourcesPage.label_name(label).click(driver)
+        MyResourcesPage.label_checkbox(label).click(driver)
         MyResourcesPage.add_label.click(driver)
 
     def check_label_applied(self, driver):
