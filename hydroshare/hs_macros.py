@@ -27,6 +27,7 @@ from hs_elements import (
     DashboardPage,
     NewResourceModal,
     RegistrationPage,
+    SiteMapPage,
 )
 from timing import (
     HSAPI_GUI_RESPONSE,
@@ -699,6 +700,11 @@ class Registration:
         return RegistrationPage.error.get_text(driver)
 
 
+class SiteMap:
+    def get_resource_list(self, driver):
+        return list(SiteMapPage.all_resource_links(driver))
+
+
 Home = Home()
 Apps = Apps()
 Discover = Discover()
@@ -713,3 +719,4 @@ MyResources = MyResources()
 Dashboard = Dashboard()
 NewResource = NewResource()
 Registration = Registration()
+SiteMap = SiteMap()
