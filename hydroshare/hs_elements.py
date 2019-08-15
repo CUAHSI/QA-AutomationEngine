@@ -232,21 +232,23 @@ class WebAppPage(ResourcePage):
     def __init__(self):
         def save_button_selector(index):
             """Selects save buttons on web app resource by index"""
-            return "div.main-container:nth-child(3) div.container:nth-child(2) " \
-                   "div.col-xs-12.content-block:nth-child(14) " \
-                   "div.row div.form-group.col-lg-6.col-xs-12:nth-child({}) " \
-                   "form:nth-child(1) fieldset:nth-child(2) " \
-                   "div:nth-child(3) > " \
-                   "button.btn.btn-primary.pull-right.btn-form-submit".format(index)
+            return (
+                "div.main-container:nth-child(3) div.container:nth-child(2) "
+                "div.col-xs-12.content-block:nth-child(14) "
+                "div.row div.form-group.col-lg-6.col-xs-12:nth-child({}) "
+                "form:nth-child(1) fieldset:nth-child(2) "
+                "div:nth-child(3) > "
+                "button.btn.btn-primary.pull-right.btn-form-submit".format(index)
+            )
+
         ResourcePage.__init__()
-        self.supported_composite_resource = SiteElement(By.ID, "id_supported_res_types_13")
-        self.save_resource_type = SiteElement(
-            By.CSS_SELECTOR, save_button_selector(2)
+        self.supported_composite_resource = SiteElement(
+            By.ID, "id_supported_res_types_13"
         )
+        self.save_resource_type = SiteElement(By.CSS_SELECTOR, save_button_selector(2))
         self.add_open_with = SiteElement(By.ID, "btnOpenWithApp")
         self.app_launching_url = SiteElement(
-            By.XPATH,
-            "//form[@id='id-requesturlbase']//input[@id='id_value']"
+            By.XPATH, "//form[@id='id-requesturlbase']//input[@id='id_value']"
         )
         self.save_app_launching_url = SiteElement(
             By.CSS_SELECTOR, save_button_selector(7)

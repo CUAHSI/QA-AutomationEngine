@@ -6,12 +6,7 @@ import time
 
 from urllib.request import urlretrieve
 
-from hs_macros import (
-    Home,
-    Resource,
-    NewResource,
-    WebApp,
-)
+from hs_macros import Home, Resource, NewResource, WebApp
 
 from cuahsi_base.cuahsi_base import BaseTest, parse_args_run_tests
 from cuahsi_base.utils import External, TestSystem
@@ -51,6 +46,7 @@ class HydroshareTestSuite(BaseTest):
         # Validate new web app is a available on the composite resource page
         Resource.view(self.driver)
         Resource.open_with_by_title(self.driver, "TEST Web App")
+
 
 if __name__ == "__main__":
     parse_args_run_tests(HydroshareTestSuite)
