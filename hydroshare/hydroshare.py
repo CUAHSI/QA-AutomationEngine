@@ -743,7 +743,7 @@ class HydroshareTestSuite(BaseTest):
         NewResource.create(self.driver)
 
         # configure web app resource
-        WebApp.support_composite(self.driver)
+        WebApp.support_resource_type(self.driver, "CompositeResource")
         WebApp.set_app_launching_url(self.driver, "https://www.hydroshare.org")
         WebApp.view(self.driver)
         WebApp.add_to_open_with(self.driver)

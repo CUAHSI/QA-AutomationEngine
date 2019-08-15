@@ -471,9 +471,9 @@ class Resource:
 
 
 class WebApp(Resource):
-    def support_composite(self, driver):
-        WebAppPage.supported_composite_resource.click(driver)
-        WebAppPage.save_resource_type.click(driver)
+    def support_resource_type(self, driver, resource_type):
+        WebAppPage.supported_resource_type(resource_type).click(driver)
+        WebAppPage.save_supported_resource_types.click(driver)
 
     def set_app_launching_url(self, driver, url):
         WebAppPage.app_launching_url.inject_text(driver, url)
