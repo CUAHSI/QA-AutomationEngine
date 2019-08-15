@@ -27,6 +27,7 @@ from hs_elements import (
     DashboardPage,
     NewResourceModal,
     RegistrationPage,
+    WebAppPage,
     SiteMapPage,
 )
 from timing import (
@@ -436,6 +437,10 @@ class Resource:
         ResourcePage.open_with.click(driver)
         ResourcePage.open_jupyterhub.click(driver)
 
+    def open_with_by_title(self, driver, title):
+        ResourcePage.open_with.click(driver)
+        ResourcePage.open_with_title(title).click(driver)
+
     def get_title(self, driver):
         return ResourcePage.title.get_text(driver)
 
@@ -463,6 +468,19 @@ class Resource:
 
     def to_reference_bagit(self, driver):
         ResourcePage.learn_more.click(driver)
+
+
+class WebApp(Resource):
+    def support_resource_type(self, driver, resource_type):
+        WebAppPage.supported_resource_type(resource_type).click(driver)
+        WebAppPage.save_supported_resource_types.click(driver)
+
+    def set_app_launching_url(self, driver, url):
+        WebAppPage.app_launching_url.inject_text(driver, url)
+        WebAppPage.save_app_launching_url.click(driver)
+
+    def add_to_open_with(self, driver):
+        WebAppPage.add_open_with.click(driver)
 
 
 class Help:
@@ -709,6 +727,7 @@ Home = Home()
 Apps = Apps()
 Discover = Discover()
 Resource = Resource()
+WebApp = WebApp()
 Help = Help()
 About = About()
 API = API()

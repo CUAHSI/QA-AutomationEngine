@@ -218,11 +218,32 @@ class ResourcePage:
             By.CSS_SELECTOR, "#rights > span:nth-child(2) > a:nth-child(1)"
         )
 
+    def open_with_title(self, title):
+        return SiteElement(By.XPATH, '//li[@title="{}"]/a'.format(title))
+
     def name(self, name):
         return SiteElement(By.XPATH, '//td[text()= "{}"]'.format(name))
 
     def value(self, value):
         return SiteElement(By.XPATH, '//td[text()= "{}"]'.format(value))
+
+
+class WebAppPage(ResourcePage):
+    def __init__(self):
+        ResourcePage.__init__()
+        self.save_supported_resource_types = SiteElement(
+            By.CSS_SELECTOR, "#id-supportedrestypes button.btn-form-submit"
+        )
+        self.add_open_with = SiteElement(By.ID, "btnOpenWithApp")
+        self.app_launching_url = SiteElement(
+            By.CSS_SELECTOR, "form#id-requesturlbase input#id_value"
+        )
+        self.save_app_launching_url = SiteElement(
+            By.CSS_SELECTOR, "#id-requesturlbase button.btn-form-submit"
+        )
+
+    def supported_resource_type(self, resource_type):
+        return SiteElement(By.CSS_SELECTOR, 'input[value="{}"]'.format(resource_type))
 
 
 class HelpPage:
@@ -478,6 +499,7 @@ HomePage = HomePage()
 AppsPage = AppsPage()
 DiscoverPage = DiscoverPage()
 ResourcePage = ResourcePage()
+WebAppPage = WebAppPage()
 HelpPage = HelpPage()
 AboutPage = AboutPage()
 APIPage = APIPage()
