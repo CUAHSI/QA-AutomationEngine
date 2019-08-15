@@ -121,6 +121,8 @@ In the case of the HydroClient software system, test cases should be created in 
 
 The [utilities](cuahsi_base/utils.py) are also common to all CUAHSI test suites.  These utilities support those rare actions which do not involve page element interaction, and therefore cannot be handled through the framework above.
 
+![suite-design](documentation/suite-design.jpg)
+
 ## Maintainers
 
 [@cuahsi](https://github.com/cuahsi).

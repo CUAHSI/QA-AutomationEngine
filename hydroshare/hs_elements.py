@@ -1,6 +1,6 @@
 from selenium.webdriver.common.by import By
 
-from cuahsi_base.site_element import SiteElement
+from cuahsi_base.site_element import SiteElement, SiteElementsCollection
 
 
 class HomePage:
@@ -448,8 +448,11 @@ class MyResourcesPage:
             "#legend-collapse div:first-child div:first-child div.col-xs-12.col-sm-7",
         )
 
-    def label_name(self, label_name):
-        return SiteElement(By.XPATH, '//label[text()="{}"]'.format(label_name))
+    def label_checkbox(self, label_name):
+        return SiteElement(
+            By.XPATH,
+            '//td[@class="open"]//label[contains(text(), "{}")]'.format(label_name),
+        )
 
     def resource_type(self, option):
         return SiteElement(By.XPATH, '//option[contains(text(), "{}")]'.format(option))
@@ -492,6 +495,13 @@ class RegistrationPage:
         self.error = SiteElement(By.CSS_SELECTOR, "p.alert")
 
 
+class SiteMapPage:
+    def all_resource_links(self, driver):
+        return SiteElementsCollection(By.CSS_SELECTOR, 'a[href*="/resource"]').items(
+            driver
+        )
+
+
 HomePage = HomePage()
 AppsPage = AppsPage()
 DiscoverPage = DiscoverPage()
@@ -509,3 +519,4 @@ MyResourcesPage = MyResourcesPage()
 DashboardPage = DashboardPage()
 NewResourceModal = NewResourceModal()
 RegistrationPage = RegistrationPage()
+SiteMapPage = SiteMapPage()

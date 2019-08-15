@@ -20,6 +20,7 @@ from hs_macros import (
     Dashboard,
     NewResource,
     Registration,
+    SiteMap,
 )
 
 from cuahsi_base.cuahsi_base import BaseTest, parse_args_run_tests
@@ -649,7 +650,7 @@ class HydroshareTestSuite(BaseTest):
         )
         oracle("Flow measurements at Manabao, Dominican Republic")
 
-    def test_B_000032(self):
+    def hold_test_B_000032(self):
         """
         Confirm that the hydroshare footer version number matches up with the
         latest version number in GitHub
@@ -728,6 +729,127 @@ class HydroshareTestSuite(BaseTest):
         )
         error_text = Registration.check_error(self.driver)
         oracle(error_text)
+
+
+# Health cases definition
+class HydroshareHealthSuite(BaseTest):
+    """ Python unittest setup for health checks """
+
+    def setUp(self):
+        super(HydroshareHealthSuite, self).setUp()
+        self.driver.get(BASE_URL)
+
+    def test_sitemap_does_not_contain_spam_resources(self):
+        """
+        Tries to identify potential spam resources (e.g., advertisements) on the
+        SiteMap page.
+        To do this, it collects all links to resources from the SiteMap page,
+        and tests if a link text matches specific patterns (e.g., contains
+        specific keywords, or parts of words, or simply general patterns, such
+        as phone numbers).
+        The test will simply print all suspicious resources to stdout, there are
+        no assertions in it.
+        """
+
+        def check_links_against_patterns(links, patterns):
+            resources = []
+            # Compile a single regular expression that will match any individual
+            # pattern from a given list of patterns, case-insensitive.
+            # ( '|' is a special character in regular expressions. An expression
+            # 'A|B' will match either 'A' or 'B' ).
+            full_pattern = re.compile("|".join(patterns), re.IGNORECASE)
+            for link in links:
+                match = re.search(full_pattern, link.text)
+                # Link text matches one of the patterns.
+                if match is not None:
+                    link_url = link.get_attribute("href")
+                    match_text = match.group()
+                    resources.append([link.text, match_text, link_url])
+
+            return resources
+
+        def print_formatted_result(detected_resources, classification):
+            print(f"Found {len(detected_resources)} {classification} resources:\n")
+            detected_resources = [
+                f'"{item[0]}" (has word(s) "{item[1]}" '
+                f"in text). Resource URL: {item[2]}"
+                for item in detected_resources
+            ]
+            print("  * " + "\n  * ".join(detected_resources) + "\n\n")
+
+        Home.to_site_map(self.driver)
+        links = SiteMap.get_resource_list(self.driver)
+        print(
+            f"\nThere are {len(links)} resources at HydroShare " f'"Site Map" page.\n'
+        )
+
+        spam_patterns = [
+            "amazing",
+            "business",
+            "cheap[est]?",
+            "credit[s]?",
+            "customer[s]?",
+            "deal[s]?",
+            "phone number",
+            "price",
+            "4free",
+            # US phone number format (1-[3 digits]-[3 digits]-[4 digits]
+            # r'' is a 'raw' string (backslash symbol is treated as a literal
+            # backslash).
+            r"\d-[\d]{3}-[\d]{3}-[\d]{4}",
+            "airline[s]?",
+            "baggage",
+            "booking",
+            "flight[s]?",
+            "reservation",
+            "vacation[al]?",
+            "ticket[s]?",
+            "account",
+            "antivirus",
+            "cleaner",
+            "cookies",
+            "[e]?mail",
+            "laptop",
+            "password",
+            "sign up",
+            "sign in",
+            "wi[-]?fi",
+            # r'' is a 'raw' string (backslash symbol is treated as a literal
+            # backslash).
+            # '\b' stands for 'word boundary'.
+            r"\bgoogle\b",
+            "android",
+            "chrome",
+            "apple",
+            "icloud",
+            r"\bios\b",
+            "iphone",
+            r"\bmac\b",
+            "macbook",
+            "macos",
+            "facebook",
+            "microsoft",
+            "windows",
+            "internet explorer",
+            "adult",
+            "escort",
+            "porn",
+            "xxx",
+        ]
+        spam_resources = check_links_against_patterns(links, spam_patterns)
+        print_formatted_result(spam_resources, classification="potential spam")
+
+        # Not related to spam, but these are potentially useless resources.
+        verifyme_patterns = [
+            "hello",
+            "hello world",
+            "my first",
+            "test resource",
+            "untitled",
+            r"\b123\b",
+        ]
+        verifyme_resources = check_links_against_patterns(links, verifyme_patterns)
+        print_formatted_result(verifyme_resources, classification="potentially useless")
 
 
 if __name__ == "__main__":

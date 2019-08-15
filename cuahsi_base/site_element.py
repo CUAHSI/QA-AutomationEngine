@@ -242,3 +242,36 @@ class SiteElement:
         target_el = self.loc_it(el_driver)
         target_style = target_el.get_attribute("style")
         return target_style
+
+
+class SiteElementsCollection:
+    """
+    Provides a way to locate all page elements which are identified by a
+    common locator.
+    """
+
+    def __init__(self, by, locator):
+        self.by = by
+        self.locator = locator
+
+    def loc_them(self, el_driver):
+        """
+        Finds all elements on a page that match a given locator.
+        Waits until all elements become visible in a DOM.
+        """
+        wait = WebDriverWait(el_driver, 30)
+        try:
+            elements = wait.until(
+                EC.visibility_of_all_elements_located((self.by, self.locator))
+            )
+        except TimeoutException as e:
+            print(
+                "\nUnable to locate elements by {}, "
+                "locator: '{}'".format(self.by, self.locator)
+            )
+            raise e
+
+        return elements
+
+    def items(self, driver):
+        return self.loc_them(driver)

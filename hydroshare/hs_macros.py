@@ -28,6 +28,7 @@ from hs_elements import (
     NewResourceModal,
     RegistrationPage,
     WebAppPage,
+    SiteMapPage,
 )
 from timing import (
     HSAPI_GUI_RESPONSE,
@@ -670,7 +671,7 @@ class MyResources:
 
     def toggle_label(self, driver, label):
         MyResourcesPage.add_label.click(driver)
-        MyResourcesPage.label_name(label).click(driver)
+        MyResourcesPage.label_checkbox(label).click(driver)
         MyResourcesPage.add_label.click(driver)
 
     def check_label_applied(self, driver):
@@ -717,6 +718,11 @@ class Registration:
         return RegistrationPage.error.get_text(driver)
 
 
+class SiteMap:
+    def get_resource_list(self, driver):
+        return list(SiteMapPage.all_resource_links(driver))
+
+
 Home = Home()
 Apps = Apps()
 Discover = Discover()
@@ -732,4 +738,4 @@ MyResources = MyResources()
 Dashboard = Dashboard()
 NewResource = NewResource()
 Registration = Registration()
-
+SiteMap = SiteMap()
