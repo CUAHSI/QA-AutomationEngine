@@ -21,6 +21,7 @@ from hs_macros import (
     NewResource,
     Registration,
     SiteMap,
+    WebApp,
 )
 
 from cuahsi_base.cuahsi_base import BaseTest, parse_args_run_tests
@@ -729,6 +730,32 @@ class HydroshareTestSuite(BaseTest):
         )
         error_text = Registration.check_error(self.driver)
         oracle(error_text)
+
+    def test_B_000036(self):
+        """Ensure Correct Web apps show in Open With"""
+
+        # login
+        Home.login(self.driver, USERNAME, PASSWORD)
+        Home.create_resource(self.driver, "ToolResource")
+
+        # create web app resource
+        NewResource.configure(self.driver, "TEST Web App")
+        NewResource.create(self.driver)
+
+        # configure web app resource
+        WebApp.support_resource_type(self.driver, "CompositeResource")
+        WebApp.set_app_launching_url(self.driver, "https://www.hydroshare.org")
+        WebApp.view(self.driver)
+        WebApp.add_to_open_with(self.driver)
+
+        # create composite resource
+        Home.create_resource(self.driver, "CompositeResource")
+        NewResource.configure(self.driver, "TEST Web App Composite")
+        NewResource.create(self.driver)
+
+        # Validate new web app is a available on the composite resource page
+        Resource.view(self.driver)
+        Resource.open_with_by_title(self.driver, "TEST Web App")
 
 
 # Health cases definition
