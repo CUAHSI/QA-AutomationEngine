@@ -34,7 +34,7 @@ class SearchPage:
         self.search_tab = SiteElement(By.CSS_SELECTOR, 'a[href="#search"]')
         self.about = SiteElement(By.ID, "ddAbout")
         self.quickstart = SiteElement(By.ID, "quickStartModalTab")
-        self.zendesk = SiteElement(By.ID, "launcher")
+        self.zendesk = SiteElement(By.ID, "zenDeskLauncher")
         self.hybrid = SiteElement(
             By.CSS_SELECTOR, 'div[aria-label="Show imagery with street names"]'
         )
@@ -302,11 +302,11 @@ class ZendeskWidget:
         self.helping = SiteElement(By.ID, "Embed")
         self.results = SiteElement(By.ID, "webWidget")
         self.search = SiteElement(
-            By.CSS_SELECTOR, "input.src-component-field-SearchInput-searchInput"
+            By.CSS_SELECTOR, "input"
         )
         self.more = SiteElement(
             By.CSS_SELECTOR,
-            "div.src-component-helpCenter-HelpCenterArticle-originalArticleButton",
+            "svg",
         )
 
     def pull(self, text):

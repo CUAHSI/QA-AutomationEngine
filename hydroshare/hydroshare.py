@@ -74,7 +74,7 @@ class HydroshareTestSuite(BaseTest):
         Discover.filters(
             self.driver,
             subject="iUTAH",
-            resource_type="Generic",
+            resource_type="Generic Resource",
             availability=["discoverable", "public"],
         )
         Discover.to_resource(self.driver, "Beaver Divide Air Temperature")
@@ -305,7 +305,7 @@ class HydroshareTestSuite(BaseTest):
             self.assertEqual(Group.check_title(self.driver), group_name)
 
         Home.login(self.driver, USERNAME, PASSWORD)
-        Home.to_collaborate(self.driver)
+        Home.to_groups(self.driver)
         group_name = "QA Test Group {}".format(random.randint(1, 1000000))
         Groups.create_group(
             self.driver,
@@ -324,8 +324,8 @@ class HydroshareTestSuite(BaseTest):
             self.assertNotIn("Page not found", webpage_title)
 
         Home.to_discover(self.driver)
-        Discover.filters(self.driver, author="Castronova, Anthony")
-        Discover.to_resource(self.driver, "Terrain Processing - TauDem Example")
+        Discover.filters(self.driver, author="Tarboton, David")
+        Discover.to_resource(self.driver, "Hydrologic Terrain Analysis Using Web Based Tools")
         Resource.open_with_jupyterhub(self.driver)
         oracle(TestSystem.title(self.driver))
 
@@ -647,9 +647,9 @@ class HydroshareTestSuite(BaseTest):
         Home.select_resource(self.driver, "GIS in Water Resources Term Project 2015")
         oracle("GIS in Water Resources Term Project 2015")
         Home.select_resource(
-            self.driver, "Flow measurements at Manabao, Dominican Republic"
+            self.driver, "iUTAH Research Data Policy"
         )
-        oracle("Flow measurements at Manabao, Dominican Republic")
+        oracle("iUTAH Research Data Policy")
 
     def hold_test_B_000032(self):
         """

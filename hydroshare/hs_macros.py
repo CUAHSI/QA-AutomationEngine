@@ -20,6 +20,7 @@ from hs_elements import (
     APIPage,
     LoginPage,
     ProfilePage,
+    CollaboratePage,
     GroupsPage,
     GroupPage,
     NewGroupModal,
@@ -68,8 +69,9 @@ class Home:
         time.sleep(EXTERNAL_PAGE_LOAD)
         HelpPage.to_about.javascript_click(driver)
 
-    def to_collaborate(self, driver):
+    def to_groups(self, driver):
         HomePage.to_collaborate.click(driver)
+        CollaboratePage.to_groups.click(driver)
 
     def login(self, driver, username, password):
         HomePage.to_login.click(driver)
@@ -387,7 +389,7 @@ class Discover:
                 filter_el.click(driver)
         elif availability is not None:
             filter_el = DiscoverPage.filter_availability(availability)
-            filter_el.click(driver)
+            filnter_el.click(driver)
 
     def legend_text(self, driver):
         DiscoverPage.legend.click(driver)

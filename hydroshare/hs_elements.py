@@ -366,6 +366,11 @@ class ProfilePage:
     def delete_org(self, index):
         return SiteElement(By.CSS_SELECTOR, "span.tag:nth-of-type({}) a".format(index))
 
+class CollaboratePage:
+    def __init__(self):
+        self.to_groups = SiteElement(
+            By.CSS_SELECTOR, 'a[href="/groups"]'
+        )
 
 class GroupsPage:
     def __init__(self):
@@ -505,6 +510,7 @@ AboutPage = AboutPage()
 APIPage = APIPage()
 LoginPage = LoginPage()
 ProfilePage = ProfilePage()
+CollaboratePage = CollaboratePage()
 GroupsPage = GroupsPage()
 GroupPage = GroupPage()
 NewGroupModal = NewGroupModal()

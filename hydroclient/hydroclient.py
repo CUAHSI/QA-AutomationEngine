@@ -121,7 +121,7 @@ class HydroclientTestSuite(BaseTest):
 
         Search.search_location(self.driver, "Köln ")
         Search.search(self.driver)
-        Search.to_random_map_marker(self.driver, 24)
+        Search.to_random_map_marker(self.driver)
         Marker.to_workspace_one(self.driver)
         oracle()
 

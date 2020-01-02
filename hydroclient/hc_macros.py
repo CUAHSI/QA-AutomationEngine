@@ -4,6 +4,7 @@ import re
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import TimeoutException
 
 from hc_elements import (
     SearchPage,
@@ -68,9 +69,15 @@ class Search:
         SearchPage.layers.click(driver)
         SearchPage.layer(layer_name).click(driver)
 
-    def to_random_map_marker(self, driver, marker_size):
+    def to_random_map_marker(self, driver):
         """ Click on a map marker """
-        SearchPage.random_map_marker(marker_size).click(driver)
+        marker_sizes = [22, 24, 28, 32]
+        for marker_size in marker_sizes:
+            try:
+                SearchPage.random_map_marker(marker_size).click(driver)
+                break
+            except TimeoutException:
+                continue
 
     def search_location(self, driver, location):
         """ Use the search field to search for {{location}}, then click
@@ -511,9 +518,7 @@ class Zendesk:
         on the {{article_text}} option and click on the link to open the
         page in a new window
         """
-        SearchPage.zendesk.iframe_in(driver)
-        ZendeskWidget.helping.click(driver)
-        SearchPage.zendesk.iframe_out(driver)
+        SearchPage.zendesk.click(driver)
         ZendeskWidget.results.iframe_in(driver)
         ZendeskWidget.search.inject_text(driver, search_text)
         ZendeskWidget.search.inject_text(driver, Keys.RETURN)
