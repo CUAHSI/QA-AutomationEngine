@@ -7,6 +7,7 @@ from urllib.request import urlretrieve
 
 from hs_macros import (
     Home,
+    Login,
     Apps,
     Discover,
     Resource,
@@ -74,11 +75,23 @@ class HydroshareTestSuite(BaseTest):
         Discover.filters(
             self.driver,
             subject="iUTAH",
-            resource_type="Generic Resource",
+            resource_type="Composite",
             availability=["discoverable", "public"],
         )
         Discover.to_resource(self.driver, "Beaver Divide Air Temperature")
         oracle()
+
+    def test_B_000005(self):
+        """ Confirms password reset works for users """
+        Home.login(self.driver, USERNAME, PASSWORD)
+        Home.to_profile(self.driver)
+        Profile.to_editor(self.driver)
+        Profile.reset_password(self.driver, PASSWORD, PASSWORD + "test")
+        Home.login(self.driver, USERNAME, PASSWORD + "test")
+        Home.to_profile(self.driver)
+        Profile.to_editor(self.driver)
+        Profile.reset_password(self.driver, PASSWORD + "test", PASSWORD)
+        Home.login(self.driver, USERNAME, PASSWORD)
 
     def test_B_000006(self):
         """
@@ -324,8 +337,8 @@ class HydroshareTestSuite(BaseTest):
             self.assertNotIn("Page not found", webpage_title)
 
         Home.to_discover(self.driver)
-        Discover.filters(self.driver, author="Tarboton, David")
-        Discover.to_resource(self.driver, "Hydrologic Terrain Analysis Using Web Based Tools")
+        Discover.filters(self.driver, author="Castronova, Anthony")
+        Discover.to_resource(self.driver, "Beaver Divide Air Temperature")
         Resource.open_with_jupyterhub(self.driver)
         oracle(TestSystem.title(self.driver))
 
@@ -530,7 +543,7 @@ class HydroshareTestSuite(BaseTest):
         the resulting page are summed correctly
         """
 
-        def oracle(contribution_counts):
+        def oracle_total(contribution_counts):
             """
             The "All" contibutions count is the sum of all the other
             resource type contributions
@@ -539,22 +552,25 @@ class HydroshareTestSuite(BaseTest):
                 contribution_counts[0],  # count for "All"
                 sum(contribution_counts[1:]),  # count for the rest
             )
+        
+        def oracle_type(contributions_count, contributions_list_length):
+            self.assertEqual(contributions_count, contributions_list_length)
 
         Home.to_discover(self.driver)
-        Discover.filters(self.driver, author="Brazil, Liza")
-        Discover.to_resource(
-            self.driver, "University of Arizona CUAHSI Data Services Workshop"
-        )
+        Discover.filters(self.driver, owner="Castronova, Anthony")
+        Discover.to_resource(self.driver, "Beaver Divide Air Temperature")
         Discover.to_last_updated_profile(self.driver)
         Profile.view_contributions(self.driver)
         resource_types_count = Profile.get_resource_type_count(self.driver)
         contribution_counts = []
+        contributions_list_length = Profile.get_contributions_list_length(self.driver)
         for i in range(0, resource_types_count):
             Profile.view_contribution_type(self.driver, i)
             contribution_counts.append(
                 Profile.get_contribution_type_count(self.driver, i)
             )
-        oracle(contribution_counts)
+        oracle_type(sum(contribution_counts[1:]), contributions_list_length)
+        oracle_total(contribution_counts)
 
     def test_B_000024(self):
         """ Verify the ability to extend metadata on resource landing pages """
@@ -635,21 +651,37 @@ class HydroshareTestSuite(BaseTest):
                 Home.get_social_link_actual(self.driver, social),
             )
 
+    def test_B_000029(self):
+        """ Commenting requires a login """
+        def oracle_login_prompt():
+            self.assertIn("Please log in", Login.get_notification(self.driver))
+        def oracle_commented(initial, final):
+            self.assertTrue(initial < final)
+
+        Home.to_discover(self.driver)
+        Discover.filters(self.driver, author="Castronova, Anthony")
+        Discover.to_resource(self.driver, "Beaver Divide Air Temperature")
+        initial_comment_count = Resource.get_comment_count(self.driver)
+        Resource.add_comment(self.driver, 'Test Comment')
+        oracle_login_prompt()
+        Login.login(self.driver, USERNAME, PASSWORD)
+        Resource.add_comment(self.driver, 'Test Comment')
+        final_comment_count = Resource.get_comment_count(self.driver)
+        oracle_commented(initial_comment_count, final_comment_count)
+
     def test_B_000031(self):
         """ Confirm that resources can be accessed from the sitemap links """
 
         def oracle(text):
             """ Page title matches with the resource title """
-            self.assertTrue(text in TestSystem.title(self.driver))
+            self.assertIn(text, TestSystem.title(self.driver))
             TestSystem.back(self.driver)
 
         Home.to_site_map(self.driver)
-        Home.select_resource(self.driver, "GIS in Water Resources Term Project 2015")
-        oracle("GIS in Water Resources Term Project 2015")
-        Home.select_resource(
-            self.driver, "iUTAH Research Data Policy"
-        )
-        oracle("iUTAH Research Data Policy")
+        Home.select_resource(self.driver, "Beaver Divide Air Temperature")
+        oracle("Beaver Divide Air Temperature")
+        Home.select_resource(self.driver, "Beaver Divide Air Temperature")
+        oracle("Beaver Divide Air Temperature")
 
     def hold_test_B_000032(self):
         """
@@ -703,15 +735,17 @@ class HydroshareTestSuite(BaseTest):
     def test_B_000034(self):
         """ Basic navigation to dashboard """
 
-        def oracle():
+        def oracle(visibility):
             """ Expect get started to be showing """
-            self.assertTrue(Dashboard.is_get_started_showing(self.driver))
+            self.assertNotEqual(visibility[0], visibility[1])
 
         Home.login(self.driver, USERNAME, PASSWORD)
         Dashboard.toggle_get_started(self.driver)
+        visibility = [Dashboard.is_get_started_showing(self.driver)]
         Dashboard.toggle_get_started(self.driver)
+        visibility += [Dashboard.is_get_started_showing(self.driver)]
         Home.to_home(self.driver)
-        oracle()
+        oracle(visibility)
 
     def test_B_000035(self):
         """ Ensure registration prompts for Organization entry """
@@ -757,6 +791,36 @@ class HydroshareTestSuite(BaseTest):
         Resource.view(self.driver)
         Resource.open_with_by_title(self.driver, "TEST Web App")
 
+    def test_B_000038(self):
+        """ Ensure invalid logins generate a helpful error message """
+        def oracle(error_message):
+            self.assertIn("username", error_message)
+            self.assertIn("password", error_message)
+
+        Home.login(self.driver, "Invalid", "Invalid")
+        oracle(Login.get_login_error(self.driver))
+        Home.login(self.driver, USERNAME, PASSWORD)
+        Dashboard.toggle_get_started(self.driver)
+        Dashboard.toggle_get_started(self.driver)
+
+    def test_B_000039(self):
+        """ Ensure pre-login My Resources redirects to My Resources after login """
+        Home.to_my_resources(self.driver)
+        Login.login(self.driver, USERNAME, PASSWORD)
+        MyResources.search(self.driver, "Search bar text")
+
+    def test_B_000041(self):
+        """ Update profile About information """
+        Home.login(self.driver, USERNAME, PASSWORD)
+        Home.to_profile(self.driver)
+        Profile.to_editor(self.driver)
+        Profile.update_about(
+            self.driver,
+            "// TODO My Profile Description",
+            "United States",
+            "New York"
+        )
+        Profile.save(self.driver)
 
 # Health cases definition
 class HydroshareHealthSuite(BaseTest):

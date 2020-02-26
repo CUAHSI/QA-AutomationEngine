@@ -87,14 +87,14 @@ class Home:
         HomePage.go_up.click(driver)
 
     def scroll_to_button(self, driver):
-        HomePage.body.set_path(driver, Keys.CONTROL + Keys.ARROW_DOWN)
+        HomePage.footer.scroll_to(driver)
 
     def slider_right(self, driver):
-        HomePage.scroll_slider_right.click(driver)
+        HomePage.scroll_slider_right.javascript_click(driver)
         time.sleep(HOME_PAGE_SLIDER_ANIMATION)
 
     def slider_left(self, driver):
-        HomePage.scroll_slider_left.click(driver)
+        HomePage.scroll_slider_left.javascript_click(driver)
         time.sleep(HOME_PAGE_SLIDER_ANIMATION)
 
     def a_slider_is_active(self, driver):
@@ -108,6 +108,7 @@ class Home:
 
     def select_resource(self, driver, res):
         HomePage.select_resource(res).click(driver)
+        time.sleep(EXTERNAL_PAGE_LOAD)
 
     def version(self, driver):
         return HomePage.version.get_text(driver).strip()
@@ -185,6 +186,18 @@ class Home:
         RegistrationPage.signup.click(driver)
 
 
+class Login:
+    def get_login_error(self, driver):
+        return LoginPage.error.get_text(driver)
+
+    def get_notification(self, driver):
+        return LoginPage.notification.get_text(driver)
+
+    def login(self, driver, username, password):
+        LoginPage.username.inject_text(driver, username)
+        LoginPage.password.inject_text(driver, password)
+        LoginPage.submit.click(driver)
+
 class Apps:
     def show_info(self, driver, num):
         AppsPage.info(num).click(driver)
@@ -218,10 +231,12 @@ class Discover:
         resource_found = False
         while not resource_found:
             try:
+                DiscoverPage.next_page.scroll_to(driver)
                 DiscoverPage.to_resource(title).click(driver)
                 resource_found = True
             except TimeoutException:
-                DiscoverPage.next_page.click(driver)
+                DiscoverPage.next_page.scroll_to(driver)
+                DiscoverPage.next_page.javascript_click(driver)
 
     def to_last_updated_profile(self, driver):
         DiscoverPage.last_updated_by.click(driver)
@@ -323,73 +338,73 @@ class Discover:
         if type(author) is list:
             for author_item in author:
                 filter_el = DiscoverPage.filter_author(author_item)
-                filter_el.click(driver)
+                filter_el.javascript_click(driver)
         elif author is not None:
             filter_el = DiscoverPage.filter_author(author)
-            filter_el.click(driver)
+            filter_el.javascript_click(driver)
         if type(contributor) is list:
             for contributor_item in contributor:
                 filter_el = DiscoverPage.filter_contributor(contributor_item)
-                filter_el.click(driver)
+                filter_el.javascript_click(driver)
         elif contributor is not None:
             filter_el = DiscoverPage.filter_contributor(contributor)
-            filter_el.click(driver)
+            filter_el.javascript_click(driver)
         if type(content_type) is list:
             for content_item in content_type:
                 filter_el = DiscoverPage.filter_contributor(content_item)
-                filter_el.click(driver)
+                filter_el.javascript_click(driver)
         elif content_type is not None:
             filter_el = DiscoverPage.filter_content_type(content_type)
-            filter_el.click(driver)
+            filter_el.javascript_click(driver)
         if type(subject) is list:
             for subject_item in subject:
                 filter_el = DiscoverPage.filter_subject(subject_item)
-                filter_el.click(driver)
+                filter_el.javascript_click(driver)
         elif subject is not None:
             filter_el = DiscoverPage.filter_subject(subject)
-            filter_el.click(driver)
+            filter_el.javascript_click(driver)
         if type(resource_type) is list:
             for resource_type_item in resource_type:
                 filter_el = DiscoverPage.filter_resource_type(resource_type_item)
-                filter_el.click(driver)
+                filter_el.javascript_click(driver)
         elif resource_type is not None:
             filter_el = DiscoverPage.filter_resource_type(resource_type)
-            filter_el.click(driver)
+            filter_el.javascript_click(driver)
         if type(owner) is list:
             for owner_item in owner:
                 filter_el = DiscoverPage.filter_owner(owner_item)
-                filter_el.click(driver)
+                filter_el.javascript_click(driver)
         elif owner is not None:
             filter_el = DiscoverPage.filter_owner(owner)
-            filter_el.click(driver)
+            filter_el.javascript_click(driver)
         if type(variable) is list:
             for variable_item in variable:
                 filter_el = DiscoverPage.filter_variable(variable_item)
-                filter_el.click(driver)
+                filter_el.javascript_click(driver)
         elif variable is not None:
             filter_el = DiscoverPage.filter_variable(variable)
-            filter_el.click(driver)
+            filter_el.javascript_click(driver)
         if type(sample_medium) is list:
             for sample_medium_item in sample_medium:
                 filter_el = DiscoverPage.filter_sample_medium(sample_medium_item)
-                filter_el.click(driver)
+                filter_el.javascript_click(driver)
         elif sample_medium is not None:
             filter_el = DiscoverPage.filter_sample_medium(sample_medium)
-            filter_el.click(driver)
+            filter_el.javascript_click(driver)
         if type(unit) is list:
             for unit_item in unit:
                 filter_el = DiscoverPage.filter_unit(unit_item)
-                filter_el.click(driver)
+                filter_el.javascript_click(driver)
         elif unit is not None:
             filter_el = DiscoverPage.filter_unit(unit)
-            filter_el.click(driver)
+            filter_el.javascript_click(driver)
         if type(availability) is list:
             for availability_item in availability:
                 filter_el = DiscoverPage.filter_availability(availability_item)
-                filter_el.click(driver)
+                filter_el.javascript_click(driver)
         elif availability is not None:
             filter_el = DiscoverPage.filter_availability(availability)
-            filnter_el.click(driver)
+            filter_el.javascript_click(driver)
 
     def legend_text(self, driver):
         DiscoverPage.legend.click(driver)
@@ -400,6 +415,7 @@ class Discover:
     def search(self, driver, text):
         DiscoverPage.search.inject_text(driver, text)
         DiscoverPage.search.submit(driver)
+        time.sleep(DISCOVER_TABLE_UPDATE)
 
     def to_search_result_item(self, driver, col_ind, row_one):
         DiscoverPage.cell_href(col_ind, row_one).click(driver)
@@ -471,6 +487,13 @@ class Resource:
     def to_reference_bagit(self, driver):
         ResourcePage.learn_more.click(driver)
 
+    def add_comment(self, driver, text):
+        ResourcePage.comment_text.scroll_to(driver)
+        ResourcePage.comment_text.inject_text(driver, text)
+        ResourcePage.comment_submit.click(driver)
+
+    def get_comment_count(self, driver):
+        return ResourcePage.comment_section.get_immediate_child_count(driver) - 4
 
 class WebApp(Resource):
     def support_resource_type(self, driver, resource_type):
@@ -560,7 +583,7 @@ class Profile:
         ProfilePage.delete_org(index).click(driver)
 
     def save(self, driver):
-        ProfilePage.save.click(driver)
+        ProfilePage.save.javascript_click(driver)
         time.sleep(PROFILE_SAVE)
 
     def add_photo(self, driver, link):
@@ -594,6 +617,9 @@ class Profile:
         type_count = ProfilePage.contribution_type_count(ind).get_text(driver)
         return int(type_count)
 
+    def get_contributions_list_length(self, driver):
+        return ProfilePage.contributions_list.get_immediate_child_count(driver)
+
     def upload_cv(self, driver, cv):
         urlretrieve(cv, "cv-test.pdf")
         cwd = os.getcwd()
@@ -601,6 +627,23 @@ class Profile:
         TestSystem.execute_javascript(
             driver, "document.getElementsByName('cv').path={}".format(cv_path)
         )
+
+    def reset_password(self, driver, old_password, new_password):
+        ProfilePage.reset_password.click(driver)
+        ProfilePage.current_password.inject_text(driver, old_password)
+        ProfilePage.new_password.inject_text(driver, new_password)
+        ProfilePage.confirm_password.inject_text(driver, new_password)
+        ProfilePage.password_confirm.scroll_to(driver)
+        ProfilePage.password_confirm.click(driver)
+
+    def update_about(self, driver, description, country, province):
+        ProfilePage.description.click(driver)
+        ProfilePage.description.clear_all_text(driver)
+        ProfilePage.description.inject_text(driver, description)
+        ProfilePage.country.select_option_text(driver, country)
+        ProfilePage.province.click(driver)
+        ProfilePage.province.clear_all_text(driver)
+        ProfilePage.province.inject_text(driver, province)
 
 
 class Groups:
@@ -639,6 +682,9 @@ class MyResources:
     def select_resource_type(self, driver, index):
         MyResourcesPage.resource_type_selector.click(driver)
         MyResourcesPage.resource_creation_type(index).click(driver)
+
+    def search(self, driver, text):
+        MyResourcesPage.search.inject_text(driver, text)
 
     def search_resource_type(self, driver):
         MyResourcesPage.search_options.click(driver)
@@ -726,6 +772,7 @@ class SiteMap:
 
 
 Home = Home()
+Login = Login()
 Apps = Apps()
 Discover = Discover()
 Resource = Resource()

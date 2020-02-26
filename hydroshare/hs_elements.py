@@ -22,7 +22,7 @@ class HomePage:
         self.profile_button = SiteElement(
             By.CSS_SELECTOR, ".account div.dropdown-footer .btn.btn-primary"
         )
-        self.go_up = SiteElement(By.CSS_SELECTOR, ".fa-angle-up")
+        self.go_up = SiteElement(By.CSS_SELECTOR, ".scrolltotop")
         self.body = SiteElement(By.XPATH, "//body[1]")
         self.scroll_slider_right = SiteElement(
             By.CSS_SELECTOR, ".glyphicon-chevron-right"
@@ -56,6 +56,7 @@ class HomePage:
         self.version = SiteElement(By.CSS_SELECTOR, ".content p b")
         self.create = SiteElement(By.ID, "select-resource-type")
         self.signup = SiteElement(By.CSS_SELECTOR, "a.btn-signup")
+        self.footer = SiteElement(By.CSS_SELECTOR, "footer")
 
     def create_type(self, resource_type):
         return SiteElement(By.CSS_SELECTOR, 'a[data-value="{}"]'.format(resource_type))
@@ -217,6 +218,9 @@ class ResourcePage:
         self.how_to_cite = SiteElement(
             By.CSS_SELECTOR, "#rights > span:nth-child(2) > a:nth-child(1)"
         )
+        self.comment_text = SiteElement(By.CSS_SELECTOR, '#comment textarea')
+        self.comment_submit = SiteElement(By.CSS_SELECTOR, 'input[value="Comment"]')
+        self.comment_section = SiteElement(By.ID, "comments")
 
     def open_with_title(self, title):
         return SiteElement(By.XPATH, '//li[@title="{}"]/a'.format(title))
@@ -325,7 +329,11 @@ class LoginPage:
         self.submit = SiteElement(
             By.CSS_SELECTOR, "input.btn.btn-primary[type='submit']"
         )
-
+        self.error = SiteElement(By.CSS_SELECTOR, ".alert-danger")
+        self.notification = SiteElement(
+            By.CSS_SELECTOR,
+            'div[class="page-tip animated slideInDown"] p'
+        )
 
 class ProfilePage:
     def __init__(self):
@@ -348,6 +356,15 @@ class ProfilePage:
         self.contribution_types_breakdown = SiteElement(
             By.CSS_SELECTOR, "table.table-user-contributions tbody"
         )
+        self.contributions_list = SiteElement(By.CSS_SELECTOR, "#contributions > .row > .col-md-9")
+        self.reset_password = SiteElement(By.XPATH, '//a[contains(text(), "Change password")]')
+        self.current_password = SiteElement(By.CSS_SELECTOR, 'input[id="id_password"]')
+        self.new_password = SiteElement(By.CSS_SELECTOR, 'input[id="id_password1"]')
+        self.confirm_password = SiteElement(By.CSS_SELECTOR, 'input[id="id_password2"]')
+        self.password_confirm = SiteElement(By.XPATH, '//button[contains(text(), "Confirm")]')
+        self.description = SiteElement(By.CSS_SELECTOR, 'textarea[name="details"]')
+        self.country = SiteElement(By.CSS_SELECTOR, 'select[name="country"]')
+        self.province = SiteElement(By.CSS_SELECTOR, 'input[name="state"]')
 
     def contribution_type(self, index):
         return SiteElement(
@@ -366,11 +383,11 @@ class ProfilePage:
     def delete_org(self, index):
         return SiteElement(By.CSS_SELECTOR, "span.tag:nth-of-type({}) a".format(index))
 
+
 class CollaboratePage:
     def __init__(self):
-        self.to_groups = SiteElement(
-            By.CSS_SELECTOR, 'a[href="/groups"]'
-        )
+        self.to_groups = SiteElement(By.CSS_SELECTOR, 'a[href="/groups"]')
+
 
 class GroupsPage:
     def __init__(self):
