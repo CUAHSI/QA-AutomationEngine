@@ -1,0 +1,50 @@
+[
+	{
+		"id": "cuahsi",
+		"execute-command": "/etc/webhooks/deploy.sh",
+		"command-working-directory": "/var/webhooks",
+		"response-message": "Processing your request...",
+		"pass-arguments-to-command": [
+			{
+				"source": "payload",
+				"name": "text"
+			},
+			{
+				"source": "payload",
+				"name": "user_name"
+			},
+			{
+				"source": "payload",
+				"name": "response_url"
+			}
+		],
+		"trigger-rule": {
+			"and": [
+				{
+					"match":
+					{
+						"type": "value",
+						"value": "CHANGEME",
+						"parameter":
+						{
+							"source": "payload",
+							"name": "token"
+						}
+					}
+				},
+				{
+					"match":
+					{
+						"type": "value",
+						"value": "quality",
+						"parameter":
+						{
+							"source": "payload",
+							"name": "channel_name"
+						}
+					}
+				}
+			]
+		}
+	}
+]

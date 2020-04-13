@@ -1,0 +1,71 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: chatbot
+  name: chatbot
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: chatbot
+  template:
+    metadata:
+      labels:
+        app: chatbot
+    spec:
+      containers:
+      - name: chatbot
+        image: {{ .Values.image }}
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 9000
+        env:
+        - name: CLUSTER
+          value: "{{ .Values.cluster }}"
+        - name: ZONE
+          value: "{{ .Values.zone }}"
+        - name: REPO
+          value: "{{ .Values.repo }}"
+        - name: LANDING_IMAGE
+          value: "{{ .Values.landingImage }}"
+        - name: ROOT_DOMAIN
+          value: "{{ .Values.rootDomain }}"
+        - name: DNS_ZONE
+          value: "{{ .Values.dnsZone }}"
+        - name: EMAIL
+          value: "{{ .Values.email }}"
+        - name: PROJECT
+          value: "{{ .Values.project }}"
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "500m"
+        volumeMounts:
+        - name: google-json
+          mountPath: /etc/webhooks/google.json
+          subPath: google.json
+      volumes:
+      - name: google-json
+        secret:
+          secretName: google-json
+          defaultMode: 0400
+      restartPolicy: Always
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: chatbot
+  name: chatbot
+spec:
+  type: LoadBalancer
+  ports:
+  - name: chatbot
+    port: 9000
+  selector:
+    app: chatbot

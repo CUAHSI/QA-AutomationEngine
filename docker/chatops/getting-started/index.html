@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/styles/default.min.css">
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/highlight.min.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <title>CUAHSI Workstation - Getting Started</title>
+    <style>
+        body {
+            background-color: rgb(30, 30, 30);
+            color: #fff;
+        }
+        body a {
+            color: #fff;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <main role="main">
+        <div class="row">
+            <div class="col-md-8 offset-md-2">
+                <h1 style="margin-top: 32px;">Getting Started with CUAHSI QA Workstations</h1>
+                <ol>
+                    <li>Go to the Code Server IDE at <a id="code-server" target="_blank"></a></li>
+                    <li>Open Folder, and choose /home/coder/</li>
+                    <li>Open a terminal, from the Hamburger Icon > Terminal > New Terminal</li>
+                    <li><code class="language-bash">git clone https://github.com/CUAHSI/QA-AutomationEngine</code></li>
+                    <li><code class="language-bash">cd QA-AutomationEngine</code></li>
+                    <li>Install dependencies with <code class="language-bash">pip3 install -r requirements.txt</code></li>
+                    <li>Run <code class="language-bash">./hydrotest hydroshare --grid selenium --browser chrome</code></li>
+                    <li>Use <a id="novnc" target="_blank"></a> and <a id="grid" target="_blank"></a> to watch test execution and the test node status, respectively</li>
+                </ol>
+            </div>
+        </div>
+    </main>
+</body>
+<script>
+    document.getElementById("code-server").href = "https://" + window.location.hostname + ":3000"
+    document.getElementById("code-server").innerHTML = "https://" + window.location.hostname + ":3000"
+    document.getElementById("novnc").href = "https://" + window.location.hostname + ":6080/vnc.html"
+    document.getElementById("novnc").innerHTML = "https://" + window.location.hostname + ":6080/vnc.html"
+    document.getElementById("grid").href = "https://" + window.location.hostname + ":4444/grid/console"
+    document.getElementById("grid").innerHTML = "https://" + window.location.hostname + ":4444/grid/console"
+</script>
+
+</html>
