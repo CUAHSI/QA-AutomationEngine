@@ -30,6 +30,8 @@ from hs_elements import (
     RegistrationPage,
     WebAppPage,
     SiteMapPage,
+    JupyterHubPage,
+    JupyterHubNotebooks,
 )
 from timing import (
     HSAPI_GUI_RESPONSE,
@@ -771,6 +773,20 @@ class SiteMap:
         return list(SiteMapPage.all_resource_links(driver))
 
 
+class JupyterHub:
+    def to_hs_login(self, driver):
+        JupyterHubPage.login.click(driver)
+
+    def authorize(self, driver):
+        JupyterHubPage.authorize.javascript_click(driver)
+
+    def select_scientific_spawner(self, driver):
+        JupyterHubPage.scientific_spawner.click(driver)
+        JupyterHubPage.spawn.click(driver)
+
+    def sort_notebooks_by_name(self, driver):
+        JupyterHubNotebooks.sort_name.click(driver)
+
 Home = Home()
 Login = Login()
 Apps = Apps()
@@ -788,3 +804,4 @@ Dashboard = Dashboard()
 NewResource = NewResource()
 Registration = Registration()
 SiteMap = SiteMap()
+JupyterHub = JupyterHub()

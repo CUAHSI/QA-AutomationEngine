@@ -23,6 +23,7 @@ from hs_macros import (
     Registration,
     SiteMap,
     WebApp,
+    JupyterHub
 )
 
 from cuahsi_base.cuahsi_base import BaseTest, parse_args_run_tests
@@ -821,6 +822,23 @@ class HydroshareTestSuite(BaseTest):
             "New York"
         )
         Profile.save(self.driver)
+
+class JupyterhubTestSuite(BaseTest):
+    """ Python unittest setup for jupyterhub testing """
+
+    def setUp(self):
+        super(JupyterhubTestSuite, self).setUp()
+        self.driver.get(BASE_URL)
+
+    def test_000001(self):
+        """ Spawn and interact with a server """
+        TestSystem.to_url(self.driver, "https://whw.cuahsi.org/hub/login")
+        JupyterHub.to_hs_login(self.driver)
+        Login.login(self.driver, USERNAME, PASSWORD)
+        TestSystem.wait(3)
+        JupyterHub.authorize(self.driver)
+        JupyterHub.select_scientific_spawner(self.driver)
+        JupyterHub.sort_notebooks_by_name(self.driver)
 
 # Health cases definition
 class HydroshareHealthSuite(BaseTest):

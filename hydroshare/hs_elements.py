@@ -517,6 +517,17 @@ class SiteMapPage:
         )
 
 
+class JupyterHubPage:
+    def __init__(self):
+        self.login = SiteElement(By.CSS_SELECTOR, "#login-main > div > a")
+        self.authorize = SiteElement(By.CSS_SELECTOR, 'input[value="Authorize"]')
+        self.scientific_spawner = SiteElement(By.ID, 'profile-item-1')
+        self.spawn = SiteElement(By.CSS_SELECTOR, 'input[value="Spawn"]')
+
+class JupyterHubNotebooks:
+    def __init__(self):
+        self.sort_name = SiteElement(By.ID, 'sort-name')
+
 HomePage = HomePage()
 AppsPage = AppsPage()
 DiscoverPage = DiscoverPage()
@@ -536,3 +547,5 @@ DashboardPage = DashboardPage()
 NewResourceModal = NewResourceModal()
 RegistrationPage = RegistrationPage()
 SiteMapPage = SiteMapPage()
+JupyterHubPage = JupyterHubPage()
+JupyterHubNotebooks = JupyterHubNotebooks()
