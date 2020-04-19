@@ -23,7 +23,7 @@ from hs_macros import (
     Registration,
     SiteMap,
     WebApp,
-    JupyterHub
+    JupyterHub,
 )
 
 from cuahsi_base.cuahsi_base import BaseTest, parse_args_run_tests
@@ -151,8 +151,10 @@ class HydroshareTestSuite(BaseTest):
         def oracle(core_topic):
             """ The help link text is contained in the help page """
             words_string = re.sub("[^A-Za-z]", " ", core_topic)
-            for word in words_string.split(" "):
-                self.assertIn(word, TestSystem.page_source(self.driver))
+            matches = [
+                word in Help.get_title(self.driver) for word in words_string.split(" ")
+            ]
+            self.assertTrue(True in matches)
 
         Home.to_help(self.driver)
         core_count = Help.count_core(self.driver)
@@ -553,7 +555,7 @@ class HydroshareTestSuite(BaseTest):
                 contribution_counts[0],  # count for "All"
                 sum(contribution_counts[1:]),  # count for the rest
             )
-        
+
         def oracle_type(contributions_count, contributions_list_length):
             self.assertEqual(contributions_count, contributions_list_length)
 
@@ -654,8 +656,10 @@ class HydroshareTestSuite(BaseTest):
 
     def test_B_000029(self):
         """ Commenting requires a login """
+
         def oracle_login_prompt():
             self.assertIn("Please log in", Login.get_notification(self.driver))
+
         def oracle_commented(initial, final):
             self.assertTrue(initial < final)
 
@@ -663,10 +667,10 @@ class HydroshareTestSuite(BaseTest):
         Discover.filters(self.driver, author="Castronova, Anthony")
         Discover.to_resource(self.driver, "Beaver Divide Air Temperature")
         initial_comment_count = Resource.get_comment_count(self.driver)
-        Resource.add_comment(self.driver, 'Test Comment')
+        Resource.add_comment(self.driver, "Test Comment")
         oracle_login_prompt()
         Login.login(self.driver, USERNAME, PASSWORD)
-        Resource.add_comment(self.driver, 'Test Comment')
+        Resource.add_comment(self.driver, "Test Comment")
         final_comment_count = Resource.get_comment_count(self.driver)
         oracle_commented(initial_comment_count, final_comment_count)
 
@@ -794,6 +798,7 @@ class HydroshareTestSuite(BaseTest):
 
     def test_B_000038(self):
         """ Ensure invalid logins generate a helpful error message """
+
         def oracle(error_message):
             self.assertIn("username", error_message)
             self.assertIn("password", error_message)
@@ -816,12 +821,81 @@ class HydroshareTestSuite(BaseTest):
         Home.to_profile(self.driver)
         Profile.to_editor(self.driver)
         Profile.update_about(
-            self.driver,
-            "// TODO My Profile Description",
-            "United States",
-            "New York"
+            self.driver, "// TODO My Profile Description", "United States", "New York"
         )
         Profile.save(self.driver)
+
+    def test_B_000046(self):
+        """ Ensure clicking the Hydroshare logo links back to the home page """
+        Home.login(self.driver, USERNAME, PASSWORD)
+        Home.to_profile(self.driver)
+        Home.click_logo(self.driver)
+        Home.slider_left(self.driver)
+
+    def test_B_000047(self):
+        """ Ensure DEBUG=false for production hydroshare.org """
+        TestSystem.to_url(
+            self.driver, "https://www.hydroshare.org/landingPageDoesNotExist/"
+        )
+        Home.click_logo(self.driver)
+
+    def test_B_000048(self):
+        """ Ensure pre-login My Groups redirects to My Groups after login """
+
+        def oracle():
+            self.assertEqual("My Groups", Groups.get_title(self.driver))
+
+        Home.to_groups(self.driver)
+        Groups.to_my_groups(self.driver)
+        Login.login(self.driver, USERNAME, PASSWORD)
+        oracle()
+
+    def test_B_000049(self):
+        """ Ensure user can logout after logging in """
+        Home.login(self.driver, USERNAME, PASSWORD)
+        Home.logout(self.driver)
+        Home.login(self.driver, USERNAME, PASSWORD)
+        Home.logout(self.driver)
+
+    def test_B_000050(self):
+        """ Ensure the support email mailto is in the site footer """
+        self.assertIn("Support", Home.email_support(self.driver))
+
+    def test_B_000051(self):
+        """ Ensure all Getting Started links open correctly, and in the same tab """
+        Home.login(self.driver, USERNAME, PASSWORD)
+        for row in [1, 2]:
+            for column in [1, 2, 3]:
+                Dashboard.check_getting_started_link(self.driver, row, column)
+
+    def test_B_000052(self):
+        """ Verify Recently Visited resources and authors link to valid pages """
+
+        def oracle_resource(link_title, resource_title):
+            self.assertEqual(link_title, resource_title)
+
+        def oracle_author(link_author, profile_author):
+            """ Confirm first and last name from the profile are in the recent activity author cell """
+            for word in [profile_author.split(" ")[0], profile_author.split(" ")[-1]]:
+                self.assertIn(word, link_author)
+
+        Home.login(self.driver, USERNAME, PASSWORD)
+        recent_activity_len = Dashboard.get_recent_activity_length(self.driver)
+        for i in range(
+            1, recent_activity_len + 1
+        ):  # css selector nth-of-type starts at 1
+            link_title, resource_title = Dashboard.check_recent_activity_resource(
+                self.driver, i
+            )
+            oracle_resource(link_title, resource_title)
+        for i in range(
+            1, recent_activity_len + 1
+        ):  # css selector nth-of-type starts at 1
+            link_author, profile_author = Dashboard.check_recent_activity_author(
+                self.driver, i
+            )
+            oracle_author(link_author, profile_author)
+
 
 class JupyterhubTestSuite(BaseTest):
     """ Python unittest setup for jupyterhub testing """
@@ -839,6 +913,7 @@ class JupyterhubTestSuite(BaseTest):
         JupyterHub.authorize(self.driver)
         JupyterHub.select_scientific_spawner(self.driver)
         JupyterHub.sort_notebooks_by_name(self.driver)
+
 
 # Health cases definition
 class HydroshareHealthSuite(BaseTest):

@@ -187,6 +187,16 @@ class Home:
             RegistrationPage.password2.inject_text(driver, username)
         RegistrationPage.signup.click(driver)
 
+    def click_logo(self, driver):
+        HomePage.logo.click(driver)
+
+    def logout(self, driver):
+        HomePage.profile_menu.click(driver)
+        HomePage.sign_out.click(driver)
+
+    def email_support(self, driver):
+        return HomePage.email_support.get_text(driver)
+
 
 class Login:
     def get_login_error(self, driver):
@@ -199,6 +209,7 @@ class Login:
         LoginPage.username.inject_text(driver, username)
         LoginPage.password.inject_text(driver, password)
         LoginPage.submit.click(driver)
+
 
 class Apps:
     def show_info(self, driver, num):
@@ -497,6 +508,7 @@ class Resource:
     def get_comment_count(self, driver):
         return ResourcePage.comment_section.get_immediate_child_count(driver) - 4
 
+
 class WebApp(Resource):
     def support_resource_type(self, driver, resource_type):
         WebAppPage.supported_resource_type(resource_type).click(driver)
@@ -662,6 +674,12 @@ class Groups:
             NewGroupModal.private.click(driver)
         NewGroupModal.submit.click(driver)
 
+    def to_my_groups(self, driver):
+        GroupsPage.my_groups.click(driver)
+
+    def get_title(self, driver):
+        return GroupsPage.title.get_text(driver)
+
 
 class Group:
     def check_title(self, driver):
@@ -748,6 +766,32 @@ class Dashboard:
             DashboardPage.get_started_toggle.get_text(driver) == "Hide Getting Started"
         )
 
+    def check_getting_started_link(self, driver, row, column):
+        DashboardPage.links_by_row_and_index(row, column).click(driver)
+        time.sleep(EXTERNAL_PAGE_LOAD / 2)
+        HomePage.logo.click(driver)
+        time.sleep(EXTERNAL_PAGE_LOAD / 2)
+        TestSystem.back(driver)
+        time.sleep(EXTERNAL_PAGE_LOAD / 2)
+        TestSystem.back(driver)
+
+    def get_recent_activity_length(self, driver):
+        return DashboardPage.recently_visited_list.get_immediate_child_count(driver)
+
+    def check_recent_activity_resource(self, driver, row):
+        link_title = DashboardPage.recent_activity_resource(row).get_text(driver)
+        DashboardPage.recent_activity_resource(row).click(driver)
+        resource_title = ResourcePage.title.get_text(driver)
+        TestSystem.back(driver)
+        return link_title, resource_title
+
+    def check_recent_activity_author(self, driver, row):
+        link_author = DashboardPage.recent_activity_author(row).get_text(driver)
+        DashboardPage.recent_activity_author(row).click(driver)
+        profile_author = ProfilePage.name.get_text(driver)
+        TestSystem.back(driver)
+        return link_author, profile_author
+
 
 class NewResource:
     def configure(self, driver, title):
@@ -786,6 +830,7 @@ class JupyterHub:
 
     def sort_notebooks_by_name(self, driver):
         JupyterHubNotebooks.sort_name.click(driver)
+
 
 Home = Home()
 Login = Login()

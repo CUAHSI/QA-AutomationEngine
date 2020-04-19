@@ -30,9 +30,7 @@ class HomePage:
         self.scroll_slider_left = SiteElement(
             By.CSS_SELECTOR, ".glyphicon-chevron-left"
         )
-
         self.slider = SiteElement(By.CSS_SELECTOR, "div.item.parallax-window.active")
-
         # Links to social media accounts
         self.twitter = SiteElement(
             By.CSS_SELECTOR, ".content.social ul li:nth-child(1) > a"
@@ -49,14 +47,18 @@ class HomePage:
         self.linkedin = SiteElement(
             By.CSS_SELECTOR, ".content.social ul li:nth-child(5) > a"
         )
-
         self.slider = SiteElement(By.CSS_SELECTOR, "div.item.parallax-window.active")
         self.to_site_map = SiteElement(By.LINK_TEXT, "Site Map")
-
         self.version = SiteElement(By.CSS_SELECTOR, ".content p b")
         self.create = SiteElement(By.ID, "select-resource-type")
         self.signup = SiteElement(By.CSS_SELECTOR, "a.btn-signup")
         self.footer = SiteElement(By.CSS_SELECTOR, "footer")
+        self.logo = SiteElement(By.ID, "img-brand-logo")
+        self.profile_menu = SiteElement(By.ID, "profile-menu")
+        self.sign_out = SiteElement(By.ID, "signout-menu")
+        self.email_support = SiteElement(
+            By.CSS_SELECTOR, 'a[href="mailto:help@cuahsi.org"]'
+        )
 
     def create_type(self, resource_type):
         return SiteElement(By.CSS_SELECTOR, 'a[data-value="{}"]'.format(resource_type))
@@ -218,7 +220,7 @@ class ResourcePage:
         self.how_to_cite = SiteElement(
             By.CSS_SELECTOR, "#rights > span:nth-child(2) > a:nth-child(1)"
         )
-        self.comment_text = SiteElement(By.CSS_SELECTOR, '#comment textarea')
+        self.comment_text = SiteElement(By.CSS_SELECTOR, "#comment textarea")
         self.comment_submit = SiteElement(By.CSS_SELECTOR, 'input[value="Comment"]')
         self.comment_section = SiteElement(By.ID, "comments")
 
@@ -331,9 +333,9 @@ class LoginPage:
         )
         self.error = SiteElement(By.CSS_SELECTOR, ".alert-danger")
         self.notification = SiteElement(
-            By.CSS_SELECTOR,
-            'div[class="page-tip animated slideInDown"] p'
+            By.CSS_SELECTOR, 'div[class="page-tip animated slideInDown"] p'
         )
+
 
 class ProfilePage:
     def __init__(self):
@@ -356,15 +358,22 @@ class ProfilePage:
         self.contribution_types_breakdown = SiteElement(
             By.CSS_SELECTOR, "table.table-user-contributions tbody"
         )
-        self.contributions_list = SiteElement(By.CSS_SELECTOR, "#contributions > .row > .col-md-9")
-        self.reset_password = SiteElement(By.XPATH, '//a[contains(text(), "Change password")]')
+        self.contributions_list = SiteElement(
+            By.CSS_SELECTOR, "#contributions > .row > .col-md-9"
+        )
+        self.reset_password = SiteElement(
+            By.XPATH, '//a[contains(text(), "Change password")]'
+        )
         self.current_password = SiteElement(By.CSS_SELECTOR, 'input[id="id_password"]')
         self.new_password = SiteElement(By.CSS_SELECTOR, 'input[id="id_password1"]')
         self.confirm_password = SiteElement(By.CSS_SELECTOR, 'input[id="id_password2"]')
-        self.password_confirm = SiteElement(By.XPATH, '//button[contains(text(), "Confirm")]')
+        self.password_confirm = SiteElement(
+            By.XPATH, '//button[contains(text(), "Confirm")]'
+        )
         self.description = SiteElement(By.CSS_SELECTOR, 'textarea[name="details"]')
         self.country = SiteElement(By.CSS_SELECTOR, 'select[name="country"]')
         self.province = SiteElement(By.CSS_SELECTOR, 'input[name="state"]')
+        self.name = SiteElement(By.CSS_SELECTOR, "h2")
 
     def contribution_type(self, index):
         return SiteElement(
@@ -394,6 +403,8 @@ class GroupsPage:
         self.create_group = SiteElement(
             By.CSS_SELECTOR, 'a[data-target="#create-group-dialog"]'
         )
+        self.my_groups = SiteElement(By.CSS_SELECTOR, 'a[href="/my-groups/"]')
+        self.title = SiteElement(By.CSS_SELECTOR, ".page-title")
 
 
 class GroupPage:
@@ -482,6 +493,30 @@ class MyResourcesPage:
 class DashboardPage:
     def __init__(self):
         self.get_started_toggle = SiteElement(By.ID, "id-getting-started-toggle")
+        self.recently_visited_list = SiteElement(
+            By.CSS_SELECTOR, "#recently-visited-resources > tbody"
+        )
+
+    def links_by_row_and_index(self, row, column):
+        return SiteElement(
+            By.CSS_SELECTOR, "#row-{} > div:nth-child({}) > a".format(row, column)
+        )
+
+    def recent_activity_resource(self, row):
+        return SiteElement(
+            By.CSS_SELECTOR,
+            "#recently-visited-resources > tbody > tr:nth-child({}) > td:nth-child(2) > strong > a".format(
+                row
+            ),
+        )
+
+    def recent_activity_author(self, row):
+        return SiteElement(
+            By.CSS_SELECTOR,
+            "#recently-visited-resources > tbody > tr:nth-child({}) > td:nth-child(3) > a".format(
+                row
+            ),
+        )
 
 
 class NewResourceModal:
@@ -521,12 +556,14 @@ class JupyterHubPage:
     def __init__(self):
         self.login = SiteElement(By.CSS_SELECTOR, "#login-main > div > a")
         self.authorize = SiteElement(By.CSS_SELECTOR, 'input[value="Authorize"]')
-        self.scientific_spawner = SiteElement(By.ID, 'profile-item-1')
+        self.scientific_spawner = SiteElement(By.ID, "profile-item-1")
         self.spawn = SiteElement(By.CSS_SELECTOR, 'input[value="Spawn"]')
+
 
 class JupyterHubNotebooks:
     def __init__(self):
-        self.sort_name = SiteElement(By.ID, 'sort-name')
+        self.sort_name = SiteElement(By.ID, "sort-name")
+
 
 HomePage = HomePage()
 AppsPage = AppsPage()
