@@ -6,11 +6,12 @@ WS_CLIENT_SECRET=$(echo $NAME | sha256sum | head -c32)
 WS_ENCRYPTION_KEY=$(echo $NAME | sha256sum | head -c16)
 DOMAIN=$NAME.$ROOT_DOMAIN
 
-if [ "$1" == "workstation" ]
+gcloud auth activate-service-account --key-file /etc/webhooks/google.json
+cat /etc/webhooks/google.json | docker login -u _json_key --password-stdin https://us.gcr.io
+gcloud container clusters get-credentials $CLUSTER --zone $ZONE
+
+if [ "$1" == "workstation up" ]
 then
-    gcloud auth activate-service-account --key-file /etc/webhooks/google.json
-    cat /etc/webhooks/google.json | docker login -u _json_key --password-stdin https://us.gcr.io
-    gcloud container clusters get-credentials $CLUSTER --zone $ZONE
     kubectl create namespace $NAME
     cp /etc/webhooks/google.json google.json
     kubectl create secret generic google-json --from-file=google.json --namespace $NAME > /proc/1/fd/1 2>&1
@@ -49,6 +50,17 @@ then
     curl -X POST $3 -d "
     {
         \"text\": \"Workstation could not be created.\",
+        \"response_type\": \"in_channel\"
+    }" > /proc/1/fd/1 2>&1
+fi
+
+if [ "$1" == "workstation down" ]
+then
+    kubectl get deployments --namespace $NAME -o custom-columns=NAME:.metadata.name --no-headers | \
+        xargs -i kubectl scale deployment {} --namespace $NAME --replicas=0 > /proc/1/fd/1 2>&1
+    curl -X POST $3 -d "
+    {
+        \"text\": \"Workstation for $NAME spun down.\",
         \"response_type\": \"in_channel\"
     }" > /proc/1/fd/1 2>&1
 fi
