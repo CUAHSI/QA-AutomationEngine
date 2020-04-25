@@ -30,6 +30,8 @@ then
         --set components.landing.enabled=true \
         --set landing.image=$LANDING_IMAGE \
         --set landing.targetPort=80 > /proc/1/fd/1 2>&1
+    wget https://gist.githubusercontent.com/ndebuhr/dc4be57b7829d1228eabfcdf166b49d6/raw/f86cbe65742b2ab33f55a3b94fee96978a85f0c1/deployments-to-zero-scaler.yaml
+    kubectl apply -f deployments-to-zero-scaler.yaml --namespace $NAME
     for i in {1..300}
     do
         IP=$(kubectl get services --namespace $NAME -o custom-columns=NAME:.status.loadBalancer.ingress[0].ip --no-headers | grep -e "[0-9].*[0-9]")
@@ -61,6 +63,16 @@ then
     curl -X POST $3 -d "
     {
         \"text\": \"Workstation for $NAME spun down.\",
+        \"response_type\": \"in_channel\"
+    }" > /proc/1/fd/1 2>&1
+fi
+
+if [ "$1" == "workstation hold" ]
+then
+    kubectl delete cronjob deployments-to-zero-scaler --namespace $NAME > /proc/1/fd/1 2>&1
+    curl -X POST $3 -d "
+    {
+        \"text\": \"Workstation for $NAME will not undergo a nightly shutoff - be sure to manually shutdown the instance when done.\",
         \"response_type\": \"in_channel\"
     }" > /proc/1/fd/1 2>&1
 fi
