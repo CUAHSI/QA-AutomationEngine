@@ -3,36 +3,15 @@ import os
 import requests
 import time
 
+from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import TimeoutException
 from dateutil import parser
 from urllib.request import urlretrieve, urlopen
 
+from cuahsi_base.site_element import SiteElement, SiteElementsCollection
 from cuahsi_base.utils import External, TestSystem
 
-from hs_elements import (
-    HomePage,
-    AppsPage,
-    DiscoverPage,
-    ResourcePage,
-    HelpPage,
-    AboutPage,
-    APIPage,
-    LoginPage,
-    ProfilePage,
-    CollaboratePage,
-    GroupsPage,
-    GroupPage,
-    NewGroupModal,
-    MyResourcesPage,
-    DashboardPage,
-    NewResourceModal,
-    RegistrationPage,
-    WebAppPage,
-    SiteMapPage,
-    JupyterHubPage,
-    JupyterHubNotebooks,
-)
 from timing import (
     HSAPI_GUI_RESPONSE,
     PROFILE_SAVE,
@@ -46,79 +25,137 @@ from timing import (
 
 
 class Home:
+    nav_home = SiteElement(By.ID, "dropdown-menu-home")
+    nav_my_resources = SiteElement(By.ID, "dropdown-menu-my-resources")
+    nav_discover = SiteElement(By.ID, "dropdown-menu-search")
+    nav_apps = SiteElement(By.ID, "dropdown-menu-https:--www.hydroshare.org-apps-")
+    nav_help = SiteElement(
+        By.CSS_SELECTOR, 'a[href="{}"]'.format("http://help.hydroshare.org")
+    )
+    nav_login = SiteElement(By.CSS_SELECTOR, "#signin-menu a")
+    nav_collaborate = SiteElement(By.CSS_SELECTOR, "#dropdown-menu-collaborate a")
+    nav_groups = SiteElement(By.CSS_SELECTOR, 'a[href="/groups"]')
+    profile_image = SiteElement(By.ID, "profile-menu")
+    profile_button = SiteElement(
+        By.CSS_SELECTOR, ".account div.dropdown-footer .btn.btn-primary"
+    )
+    go_up = SiteElement(By.CSS_SELECTOR, ".scrolltotop")
+    body = SiteElement(By.XPATH, "//body[1]")
+    scroll_slider_right = SiteElement(By.CSS_SELECTOR, ".glyphicon-chevron-right")
+    scroll_slider_left = SiteElement(By.CSS_SELECTOR, ".glyphicon-chevron-left")
+    slider = SiteElement(By.CSS_SELECTOR, "div.item.parallax-window.active")
+    twitter = SiteElement(By.CSS_SELECTOR, ".content.social ul li:nth-child(1) > a")
+    facebook = SiteElement(By.CSS_SELECTOR, ".content.social ul li:nth-child(2) > a")
+    youtube = SiteElement(By.CSS_SELECTOR, ".content.social ul li:nth-child(3) > a")
+    github = SiteElement(By.CSS_SELECTOR, ".content.social ul li:nth-child(4) > a")
+    linkedin = SiteElement(By.CSS_SELECTOR, ".content.social ul li:nth-child(5) > a")
+    slider = SiteElement(By.CSS_SELECTOR, "div.item.parallax-window.active")
+    nav_site_map = SiteElement(By.LINK_TEXT, "Site Map")
+    version = SiteElement(By.CSS_SELECTOR, ".content p b")
+    create = SiteElement(By.ID, "select-resource-type")
+    nav_signup = SiteElement(By.CSS_SELECTOR, "a.btn-signup")
+    footer = SiteElement(By.CSS_SELECTOR, "footer")
+    logo = SiteElement(By.ID, "img-brand-logo")
+    profile_menu = SiteElement(By.ID, "profile-menu")
+    sign_out = SiteElement(By.ID, "signout-menu")
+    support_email = SiteElement(By.CSS_SELECTOR, 'a[href="mailto:help@cuahsi.org"]')
+
+    @classmethod
+    def create_type(self, resource_type):
+        return SiteElement(By.CSS_SELECTOR, 'a[data-value="{}"]'.format(resource_type))
+
+    @classmethod
+    def resource_selection(self, resource):
+        return SiteElement(By.LINK_TEXT, "{}".format(resource))
+
+    @classmethod
     def to_home(self, driver):
-        HomePage.to_home.click(driver)
+        self.nav_home.click(driver)
 
+    @classmethod
     def to_my_resources(self, driver):
-        HomePage.to_my_resources.click(driver)
+        self.nav_my_resources.click(driver)
 
+    @classmethod
     def to_discover(self, driver):
-        HomePage.to_discover.click(driver)
+        self.nav_discover.click(driver)
 
+    @classmethod
     def to_apps(self, driver):
         num_windows_now = len(driver.window_handles)
-        HomePage.to_apps.click(driver)
-        External.switch_new_page(
-            driver, num_windows_now, AppsPage.apps_container_locator
-        )
+        self.nav_apps.click(driver)
+        External.switch_new_page(driver, num_windows_now, Apps.apps_locator)
 
+    @classmethod
     def to_help(self, driver):
-        HomePage.to_help.click(driver)
+        self.nav_help.click(driver)
         time.sleep(EXTERNAL_PAGE_LOAD)
 
+    @classmethod
     def to_about(self, driver):
-        HomePage.to_help.click(driver)
+        self.nav_help.click(driver)
         time.sleep(EXTERNAL_PAGE_LOAD)
-        HelpPage.to_about.javascript_click(driver)
+        Help.to_about.javascript_click(driver)
 
+    @classmethod
     def to_groups(self, driver):
-        HomePage.to_collaborate.click(driver)
-        CollaboratePage.to_groups.click(driver)
+        self.nav_collaborate.click(driver)
+        self.nav_groups.click(driver)
 
-    def login(self, driver, username, password):
-        HomePage.to_login.click(driver)
-        LoginPage.username.inject_text(driver, username)
-        LoginPage.password.inject_text(driver, password)
-        LoginPage.submit.click(driver)
+    @classmethod
+    def to_login(self, driver):
+        self.nav_login.click(driver)
 
+    @classmethod
     def to_profile(self, driver):
-        HomePage.profile_image.click(driver)
-        HomePage.profile_button.click(driver)
+        self.profile_image.click(driver)
+        self.profile_button.click(driver)
 
+    @classmethod
     def scroll_to_top(self, driver):
-        HomePage.go_up.click(driver)
+        self.go_up.click(driver)
 
+    @classmethod
     def scroll_to_button(self, driver):
-        HomePage.footer.scroll_to(driver)
+        self.footer.scroll_to(driver)
 
+    @classmethod
     def slider_right(self, driver):
-        HomePage.scroll_slider_right.javascript_click(driver)
+        self.scroll_slider_right.javascript_click(driver)
         time.sleep(HOME_PAGE_SLIDER_ANIMATION)
 
+    @classmethod
     def slider_left(self, driver):
-        HomePage.scroll_slider_left.javascript_click(driver)
+        self.scroll_slider_left.javascript_click(driver)
         time.sleep(HOME_PAGE_SLIDER_ANIMATION)
 
+    @classmethod
     def a_slider_is_active(self, driver):
-        return HomePage.slider
+        return self.slider
 
+    @classmethod
     def slider_has_valid_img(self, driver, images):
-        return HomePage.slider.get_attribute(driver, "style") in images
+        return self.slider.get_attribute(driver, "style") in images
 
+    @classmethod
     def to_site_map(self, driver):
-        return HomePage.to_site_map.click(driver)
+        return self.nav_site_map.click(driver)
 
+    @classmethod
     def select_resource(self, driver, res):
-        HomePage.select_resource(res).click(driver)
+        self.resource_selection(res).click(driver)
         time.sleep(EXTERNAL_PAGE_LOAD)
 
+    @classmethod
     def version(self, driver):
-        return HomePage.version.get_text(driver).strip()
+        return self.version.get_text(driver).strip()
 
+    @classmethod
     def create_resource(self, driver, type):
-        HomePage.create.click(driver)
-        HomePage.create_type(type).click(driver)
+        self.create.click(driver)
+        self.create_type(type).click(driver)
 
+    @classmethod
     def get_hs_latest_release(self, org, repo):
         """
         Retrieves the version of the latest published release of 'hydroshare'
@@ -131,6 +168,7 @@ class Home:
         release_version = json.loads(response_data)["tag_name"]
         return release_version
 
+    @classmethod
     def get_social_link_expected(self, social):
         social_links = {
             "facebook": "https://www.facebook.com/pages/CUAHSI-Consortium-"
@@ -143,16 +181,18 @@ class Home:
         }
         return social_links[social]
 
+    @classmethod
     def get_social_link_actual(self, driver, social):
         social_links = {
-            "facebook": HomePage.facebook,
-            "twitter": HomePage.twitter,
-            "youtube": HomePage.youtube,
-            "github": HomePage.github,
-            "linkedin": HomePage.linkedin,
+            "facebook": self.facebook,
+            "twitter": self.twitter,
+            "youtube": self.youtube,
+            "github": self.github,
+            "linkedin": self.linkedin,
         }
         return social_links[social].get_attribute(driver, "href")
 
+    @classmethod
     def signup(
         self,
         driver,
@@ -163,79 +203,244 @@ class Home:
         organizations=[],
         password=None,
     ):
-        HomePage.signup.click(driver)
+        self.nav_signup.click(driver)
         if first_name is not None:
-            RegistrationPage.first_name.click(driver)
-            RegistrationPage.first_name.inject_text(driver, first_name)
+            Registration.first_name.click(driver)
+            Registration.first_name.inject_text(driver, first_name)
         if last_name is not None:
-            RegistrationPage.last_name.click(driver)
-            RegistrationPage.last_name.inject_text(driver, last_name)
+            Registration.last_name.click(driver)
+            Registration.last_name.inject_text(driver, last_name)
         if email is not None:
-            RegistrationPage.email.click(driver)
-            RegistrationPage.email.inject_text(driver, email)
+            Registration.email.click(driver)
+            Registration.email.inject_text(driver, email)
         if username is not None:
-            RegistrationPage.username.click(driver)
-            RegistrationPage.username.inject_text(driver, username)
+            Registration.username.click(driver)
+            Registration.username.inject_text(driver, username)
         for organization in organizations:
-            RegistrationPage.organizations.click(driver)
-            RegistrationPage.organizations.inject_text(driver, organization)
-            RegistrationPage.organizations.inject_text(driver, Keys.ENTER)
+            Registration.organizations.click(driver)
+            Registration.organizations.inject_text(driver, organization)
+            Registration.organizations.inject_text(driver, Keys.ENTER)
         if password is not None:
-            RegistrationPage.password1.click(driver)
-            RegistrationPage.password1.inject_text(driver, username)
-            RegistrationPage.password2.click(driver)
-            RegistrationPage.password2.inject_text(driver, username)
-        RegistrationPage.signup.click(driver)
+            Registration.password1.click(driver)
+            Registration.password1.inject_text(driver, username)
+            Registration.password2.click(driver)
+            Registration.password2.inject_text(driver, username)
+        Registration.signup.click(driver)
 
+    @classmethod
     def click_logo(self, driver):
-        HomePage.logo.click(driver)
+        self.logo.click(driver)
 
+    @classmethod
     def logout(self, driver):
-        HomePage.profile_menu.click(driver)
-        HomePage.sign_out.click(driver)
+        self.profile_menu.click(driver)
+        self.sign_out.click(driver)
 
+    @classmethod
     def email_support(self, driver):
-        return HomePage.email_support.get_text(driver)
+        return self.support_email.get_text(driver)
 
 
 class Login:
+    username = SiteElement(By.ID, "id_username")
+    password = SiteElement(By.ID, "id_password")
+    submit = SiteElement(By.CSS_SELECTOR, "input.btn.btn-primary[type='submit']")
+    error = SiteElement(By.CSS_SELECTOR, ".alert-danger")
+    notification = SiteElement(
+        By.CSS_SELECTOR, 'div[class="page-tip animated slideInDown"] p'
+    )
+
+    @classmethod
     def get_login_error(self, driver):
-        return LoginPage.error.get_text(driver)
+        return self.error.get_text(driver)
 
+    @classmethod
     def get_notification(self, driver):
-        return LoginPage.notification.get_text(driver)
+        return self.notification.get_text(driver)
 
+    @classmethod
     def login(self, driver, username, password):
-        LoginPage.username.inject_text(driver, username)
-        LoginPage.password.inject_text(driver, password)
-        LoginPage.submit.click(driver)
+        self.username.inject_text(driver, username)
+        self.password.inject_text(driver, password)
+        self.submit.click(driver)
 
 
 class Apps:
+    apps = SiteElementsCollection(By.CSS_SELECTOR, ".webapp")
+    apps_locator = By.CSS_SELECTOR, ".webapp"
+
+    @classmethod
+    def info(self, num):
+        return SiteElement(
+            By.CSS_SELECTOR,
+            "#body > div.main-container > div.container.apps-container > div "
+            "div:nth-of-type({}) a.app-info-toggle".format(num),
+        )
+
+    @classmethod
+    def resource(self, num):
+        return SiteElement(
+            By.CSS_SELECTOR,
+            "#body > div.main-container > div.container.apps-container > div "
+            "div:nth-of-type({}) p.app-description a".format(num),
+        )
+
+    @classmethod
+    def title(self, num):
+        return SiteElement(
+            By.CSS_SELECTOR,
+            "#body > div.main-container > div.container.apps-container > div "
+            "div:nth-of-type({}) h3".format(num),
+        )
+
+    @classmethod
     def show_info(self, driver, num):
-        AppsPage.info(num).click(driver)
+        self.info(num).click(driver)
 
-    def count(self, driver):
-        return AppsPage.container.get_immediate_child_count(driver)
+    @classmethod
+    def get_count(self, driver):
+        return len(self.apps.items(driver))
 
+    @classmethod
     def to_resource(self, driver, num):
-        AppsPage.resource(num).click(driver)
+        self.resource(num).click(driver)
 
+    @classmethod
     def get_title(self, driver, num):
-        return AppsPage.title(num).get_text(driver)
+        return self.title(num).get_text(driver)
 
 
 class Discover:
-    def sort_order(self, driver, option):
+    start_date = SiteElement(By.ID, "id_start_date")
+    end_date = SiteElement(By.ID, "id_end_date")
+    map_tab = SiteElement(By.CSS_SELECTOR, 'a[href="#map-view"]')
+    map_search = SiteElement(By.ID, "geocoder-address")
+    map_submit = SiteElement(By.ID, "geocoder-submit")
+    list_tab = SiteElement(By.CSS_SELECTOR, 'a[href="#list-view"]')
+    sort_order = SiteElement(By.ID, "id_sort_order")
+    sort_direction = SiteElement(By.ID, "id_sort_direction")
+    col_headers = SiteElement(By.CSS_SELECTOR, "#items-discovered thead tr")
+    legend = SiteElement(By.CSS_SELECTOR, "#headingLegend h4 a")
+    legend_labels = SiteElement(
+        By.CSS_SELECTOR,
+        "#legend-collapse div:first-child div:first-child div.col-xs-12.col-sm-5",
+    )
+    legend_resources = SiteElement(
+        By.CSS_SELECTOR,
+        "#legend-collapse div:first-child div:first-child div.col-xs-12.col-sm-7",
+    )
+    next_page = SiteElement(By.XPATH, '//a[contains(text(), "Next")][1]')
+    last_updated_by = SiteElement(
+        By.XPATH, '//th[text() = "Last updated:"]/following-sibling::td/a'
+    )
+    search = SiteElement(By.ID, "id_q")
+    show_all_btn = SiteElement(By.ID, "btn-show-all")
+    user_modal_to_profile = SiteElement(
+        By.CSS_SELECTOR,
+        ".open > ul:nth-child(2) > li:nth-child(1) > div:nth-child(1) "
+        "> div:nth-child(2) > h4:nth-child(1) > a:nth-child(1)",
+    )
+
+    @classmethod
+    def resource_link(self, title):
+        return SiteElement(By.XPATH, "//a[contains(text(), '{}')]".format(title))
+
+    @classmethod
+    def col_header(self, col_index):
+        """ Return the column header element, given the index """
+        return SiteElement(
+            By.CSS_SELECTOR,
+            "#items-discovered thead tr " "th:nth-of-type({})".format(col_index),
+        )
+
+    @classmethod
+    def cell(self, col, row):
+        """
+        Return the cell in the discover table, given row and column indicies
+        """
+        return SiteElement(
+            By.CSS_SELECTOR,
+            "#items-discovered tbody tr:nth-of-type({}) "
+            "td:nth-of-type({})".format(row, col),
+        )
+
+    @classmethod
+    def cell_href(self, col, row):
+        """
+        Return the cell's hyperlink in the discover table, given row and column
+        indicies.
+        """
+        return SiteElement(
+            By.CSS_SELECTOR,
+            "#items-discovered tbody tr:nth-of-type({}) "
+            "td:nth-of-type({}) a".format(row, col),
+        )
+
+    @classmethod
+    def cell_strong_href(self, col, row):
+        """
+        Return the cell's bolded hyperlink in the discover table,
+        given row and column indicies.
+        """
+        return SiteElement(
+            By.CSS_SELECTOR,
+            "#items-discovered tbody tr:nth-of-type({}) "
+            "td:nth-of-type({}) strong a".format(row, col),
+        )
+
+    @classmethod
+    def filter_author(self, author):
+        return SiteElement(By.ID, "creator-{}".format(author))
+
+    @classmethod
+    def filter_contributor(self, author):
+        return SiteElement(By.ID, "contributor-{}".format(author))
+
+    @classmethod
+    def filter_content_type(self, content_type):
+        return SiteElement(By.ID, "content_type-{}".format(content_type))
+
+    @classmethod
+    def filter_subject(self, subject):
+        return SiteElement(By.ID, "subject-{}".format(subject))
+
+    @classmethod
+    def filter_resource_type(self, resource_type):
+        return SiteElement(By.ID, "content_type-{}".format(resource_type))
+
+    @classmethod
+    def filter_owner(self, owner):
+        return SiteElement(By.ID, "owner-{}".format(owner))
+
+    @classmethod
+    def filter_variable(self, variable):
+        return SiteElement(By.ID, "variable_name-{}".format(variable))
+
+    @classmethod
+    def filter_sample_medium(self, sample_medium):
+        return SiteElement(By.ID, "sample_medium-{}".format(sample_medium))
+
+    @classmethod
+    def filter_unit(self, unit):
+        return SiteElement(By.ID, "units_name-{}".format(unit))
+
+    @classmethod
+    def filter_availability(self, availability):
+        return SiteElement(By.ID, "availability-{}".format(availability))
+
+    @classmethod
+    def set_sort_order(self, driver, option):
         """ Set the sort order to {{option}} """
-        DiscoverPage.sort_order.select_option_text(driver, option)
+        self.sort_order.select_option_text(driver, option)
         time.sleep(DISCOVER_TABLE_UPDATE)
 
-    def sort_direction(self, driver, option):
+    @classmethod
+    def set_sort_direction(self, driver, option):
         """ Set the sort direction to {{option}} """
-        DiscoverPage.sort_direction.select_option_text(driver, option)
+        self.sort_direction.select_option_text(driver, option)
         time.sleep(DISCOVER_TABLE_UPDATE)
 
+    @classmethod
     def to_resource(self, driver, title):
         """ Navigate to the {{title}} resource landing page by clicking
         on it within the table.  If the resource is not visible will switch to
@@ -244,29 +449,32 @@ class Discover:
         resource_found = False
         while not resource_found:
             try:
-                DiscoverPage.next_page.scroll_to(driver)
-                DiscoverPage.to_resource(title).click(driver)
+                self.next_page.scroll_to(driver)
+                self.resource_link(title).click(driver)
                 resource_found = True
             except TimeoutException:
-                DiscoverPage.next_page.scroll_to(driver)
-                DiscoverPage.next_page.javascript_click(driver)
+                self.next_page.scroll_to(driver)
+                self.next_page.javascript_click(driver)
 
+    @classmethod
     def to_last_updated_profile(self, driver):
-        DiscoverPage.last_updated_by.click(driver)
-        DiscoverPage.user_modal_to_profile.click(driver)
+        self.last_updated_by.click(driver)
+        self.user_modal_to_profile.click(driver)
 
+    @classmethod
     def col_index(self, driver, col_name):
         """ Indentify the index for a discover page column, given the
         column name.  Indexes here start at one since the
         end application here is xpath, and those indexes are 1 based
         """
-        num_cols = DiscoverPage.col_headers.get_child_count(driver)
+        num_cols = self.col_headers.get_child_count(driver)
         for i in range(1, num_cols + 1):
-            name_to_check = DiscoverPage.col_index(i).get_text(driver)
+            name_to_check = self.col_header(i).get_text(driver)
             if name_to_check == col_name:
                 return i
         return 0
 
+    @classmethod
     def check_sorting_multi(self, driver, column_name, ascend_or_descend):
         """ Check discover page rows are sorted correctly.  The automated
         testing system checks the first eight rows against the rows that
@@ -283,6 +491,7 @@ class Discover:
                     all_pass = False
         return all_pass
 
+    @classmethod
     def check_sorting_single(
         self, driver, column_name, ascend_or_descend, row_one, row_two
     ):
@@ -291,22 +500,22 @@ class Discover:
         """
         col_ind = self.col_index(driver, column_name)
         if column_name == "Title":
-            first_element = DiscoverPage.cell_strong_href(col_ind, row_one)
-            second_element = DiscoverPage.cell_strong_href(col_ind, row_two)
+            first_element = self.cell_strong_href(col_ind, row_one)
+            second_element = self.cell_strong_href(col_ind, row_two)
             first_two_vals = [
                 first_element.get_text(driver),
                 second_element.get_text(driver),
             ]
         elif column_name == "First Author":
-            first_element = DiscoverPage.cell_href(col_ind, row_one)
-            second_element = DiscoverPage.cell_href(col_ind, row_two)
+            first_element = self.cell_href(col_ind, row_one)
+            second_element = self.cell_href(col_ind, row_two)
             first_two_vals = [
                 first_element.get_text(driver),
                 second_element.get_text(driver),
             ]
         else:
-            first_element = DiscoverPage.cell(col_ind, row_one)
-            second_element = DiscoverPage.cell(col_ind, row_two)
+            first_element = self.cell(col_ind, row_one)
+            second_element = self.cell(col_ind, row_two)
             first_two_vals = [
                 first_element.get_text(driver),
                 second_element.get_text(driver),
@@ -325,9 +534,11 @@ class Discover:
             elif ascend_or_descend == "Ascending":
                 return value_one <= value_two
 
+    @classmethod
     def show_all(self, driver):
-        DiscoverPage.show_all.click(driver)
+        self.show_all_btn.click(driver)
 
+    @classmethod
     def filters(
         self,
         driver,
@@ -350,89 +561,93 @@ class Discover:
         """
         if type(author) is list:
             for author_item in author:
-                filter_el = DiscoverPage.filter_author(author_item)
+                filter_el = self.filter_author(author_item)
                 filter_el.javascript_click(driver)
         elif author is not None:
-            filter_el = DiscoverPage.filter_author(author)
+            filter_el = self.filter_author(author)
             filter_el.javascript_click(driver)
         if type(contributor) is list:
             for contributor_item in contributor:
-                filter_el = DiscoverPage.filter_contributor(contributor_item)
+                filter_el = self.filter_contributor(contributor_item)
                 filter_el.javascript_click(driver)
         elif contributor is not None:
-            filter_el = DiscoverPage.filter_contributor(contributor)
+            filter_el = self.filter_contributor(contributor)
             filter_el.javascript_click(driver)
         if type(content_type) is list:
             for content_item in content_type:
-                filter_el = DiscoverPage.filter_contributor(content_item)
+                filter_el = self.filter_contributor(content_item)
                 filter_el.javascript_click(driver)
         elif content_type is not None:
-            filter_el = DiscoverPage.filter_content_type(content_type)
+            filter_el = self.filter_content_type(content_type)
             filter_el.javascript_click(driver)
         if type(subject) is list:
             for subject_item in subject:
-                filter_el = DiscoverPage.filter_subject(subject_item)
+                filter_el = self.filter_subject(subject_item)
                 filter_el.javascript_click(driver)
         elif subject is not None:
-            filter_el = DiscoverPage.filter_subject(subject)
+            filter_el = self.filter_subject(subject)
             filter_el.javascript_click(driver)
         if type(resource_type) is list:
             for resource_type_item in resource_type:
-                filter_el = DiscoverPage.filter_resource_type(resource_type_item)
+                filter_el = self.filter_resource_type(resource_type_item)
                 filter_el.javascript_click(driver)
         elif resource_type is not None:
-            filter_el = DiscoverPage.filter_resource_type(resource_type)
+            filter_el = self.filter_resource_type(resource_type)
             filter_el.javascript_click(driver)
         if type(owner) is list:
             for owner_item in owner:
-                filter_el = DiscoverPage.filter_owner(owner_item)
+                filter_el = self.filter_owner(owner_item)
                 filter_el.javascript_click(driver)
         elif owner is not None:
-            filter_el = DiscoverPage.filter_owner(owner)
+            filter_el = self.filter_owner(owner)
             filter_el.javascript_click(driver)
         if type(variable) is list:
             for variable_item in variable:
-                filter_el = DiscoverPage.filter_variable(variable_item)
+                filter_el = self.filter_variable(variable_item)
                 filter_el.javascript_click(driver)
         elif variable is not None:
-            filter_el = DiscoverPage.filter_variable(variable)
+            filter_el = self.filter_variable(variable)
             filter_el.javascript_click(driver)
         if type(sample_medium) is list:
             for sample_medium_item in sample_medium:
-                filter_el = DiscoverPage.filter_sample_medium(sample_medium_item)
+                filter_el = self.filter_sample_medium(sample_medium_item)
                 filter_el.javascript_click(driver)
         elif sample_medium is not None:
-            filter_el = DiscoverPage.filter_sample_medium(sample_medium)
+            filter_el = self.filter_sample_medium(sample_medium)
             filter_el.javascript_click(driver)
         if type(unit) is list:
             for unit_item in unit:
-                filter_el = DiscoverPage.filter_unit(unit_item)
+                filter_el = self.filter_unit(unit_item)
                 filter_el.javascript_click(driver)
         elif unit is not None:
-            filter_el = DiscoverPage.filter_unit(unit)
+            filter_el = self.filter_unit(unit)
             filter_el.javascript_click(driver)
         if type(availability) is list:
             for availability_item in availability:
-                filter_el = DiscoverPage.filter_availability(availability_item)
+                filter_el = self.filter_availability(availability_item)
                 filter_el.javascript_click(driver)
         elif availability is not None:
-            filter_el = DiscoverPage.filter_availability(availability)
+            filter_el = self.filter_availability(availability)
             filter_el.javascript_click(driver)
 
+    @classmethod
     def legend_text(self, driver):
-        DiscoverPage.legend.click(driver)
-        labels = str(DiscoverPage.legend_labels.get_text(driver))
-        resources = str(DiscoverPage.legend_resources.get_text(driver))
+        self.legend.click(driver)
+        labels = str(self.legend_labels.get_text(driver))
+        resources = str(self.legend_resources.get_text(driver))
         return labels, resources
 
+    @classmethod
     def search(self, driver, text):
-        DiscoverPage.search.inject_text(driver, text)
-        DiscoverPage.search.submit(driver)
+        self.search.inject_text(driver, text)
+        self.search.submit(driver)
         time.sleep(DISCOVER_TABLE_UPDATE)
 
+    @classmethod
     def to_search_result_item(self, driver, col_ind, row_one):
-        DiscoverPage.cell_href(col_ind, row_one).click(driver)
+        self.cell_href(col_ind, row_one).click(driver)
 
+    @classmethod
     def is_selected(
         self,
         driver,
@@ -444,196 +659,397 @@ class Discover:
         availability=None,
     ):
         if author is not None:
-            return DiscoverPage.filter_author(author).is_selected(driver)
+            return self.filter_author(author).is_selected(driver)
         elif contributor is not None:
-            return DiscoverPage.filter_contributor(contributor).is_selected(driver)
+            return self.filter_contributor(contributor).is_selected(driver)
         elif owner is not None:
-            return DiscoverPage.filter_owner(owner).is_selected(driver)
+            return self.filter_owner(owner).is_selected(driver)
         elif content_type is not None:
-            return DiscoverPage.filter_content_type(content_type).is_selected(driver)
+            return self.filter_content_type(content_type).is_selected(driver)
         elif subject is not None:
-            return DiscoverPage.filter_subject(subject).is_selected(driver)
+            return self.filter_subject(subject).is_selected(driver)
         elif availability is not None:
-            return DiscoverPage.filter_availability(availability).is_selected(driver)
+            return self.filter_availability(availability).is_selected(driver)
 
 
 class Resource:
+    bagit = SiteElement(By.ID, "btn-download-all")
+    open_with = SiteElement(By.ID, "apps-dropdown")
+    open_jupyterhub = SiteElement(By.CSS_SELECTOR, 'li[title="CUAHSI JupyterHub"]')
+    title = SiteElement(By.ID, "resource-title")
+    resource_view = SiteElement(By.CSS_SELECTOR, ".glyphicon-circle-arrow-left")
+    edit_resource = SiteElement(By.ID, "edit-metadata")
+    metadata_entry = SiteElement(By.CSS_SELECTOR, 'a[title="Add New Entry"]')
+    metadata_name = SiteElement(By.ID, "extra_meta_name_input")
+    metadata_value = SiteElement(By.ID, "extra_meta_value_input")
+    confirm_metadata = SiteElement(By.ID, "btn-confirm-extended-metadata")
+    learn_more = SiteElement(By.PARTIAL_LINK_TEXT, "Learn more")
+    how_to_cite = SiteElement(
+        By.CSS_SELECTOR, "#rights > span:nth-child(2) > a:nth-child(1)"
+    )
+    comment_text = SiteElement(By.CSS_SELECTOR, "#comment textarea")
+    comment_submit = SiteElement(By.CSS_SELECTOR, 'input[value="Comment"]')
+    comment_section = SiteElement(By.ID, "comments")
+
+    @classmethod
+    def open_with_title(self, title):
+        return SiteElement(By.XPATH, '//li[@title="{}"]/a'.format(title))
+
+    @classmethod
+    def name(self, name):
+        return SiteElement(By.XPATH, '//td[text()= "{}"]'.format(name))
+
+    @classmethod
+    def value(self, value):
+        return SiteElement(By.XPATH, '//td[text()= "{}"]'.format(value))
+
+    @classmethod
     def size_download(self, driver, BASE_URL):
         """ Check the size of the BagIt download """
-        download_href = ResourcePage.bagit.get_href(driver, BASE_URL)
+        download_href = self.bagit.get_href(driver, BASE_URL)
         r = requests.get(download_href)
         return len(r.content)
 
+    @classmethod
     def open_with_jupyterhub(self, driver):
-        ResourcePage.open_with.click(driver)
-        ResourcePage.open_jupyterhub.click(driver)
+        self.open_with.click(driver)
+        self.open_jupyterhub.click(driver)
 
+    @classmethod
     def open_with_by_title(self, driver, title):
-        ResourcePage.open_with.click(driver)
-        ResourcePage.open_with_title(title).click(driver)
+        self.open_with.click(driver)
+        self.open_with_title(title).click(driver)
 
+    @classmethod
     def get_title(self, driver):
-        return ResourcePage.title.get_text(driver)
+        return self.title.get_text(driver)
 
+    @classmethod
     def view(self, driver):
-        ResourcePage.view.click(driver)
+        self.resource_view.click(driver)
         TestSystem.wait(EXTERNAL_PAGE_LOAD)
 
+    @classmethod
     def edit(self, driver):
-        ResourcePage.edit_resource.click(driver)
+        self.edit_resource.click(driver)
 
+    @classmethod
     def add_metadata(self, driver, name, value):
-        ResourcePage.add_metadata.click(driver)
-        ResourcePage.metadata_name.inject_text(driver, name)
-        ResourcePage.metadata_value.inject_text(driver, value)
-        ResourcePage.confirm_metadata.click(driver)
+        self.metadata_entry.click(driver)
+        self.metadata_name.inject_text(driver, name)
+        self.metadata_value.inject_text(driver, value)
+        self.confirm_metadata.click(driver)
 
+    @classmethod
     def exists_name(self, driver, name):
-        ResourcePage.name(name).get_text(driver)
+        self.name(name).get_text(driver)
 
+    @classmethod
     def exists_value(self, driver, value):
-        ResourcePage.value(value).get_text(driver)
+        self.value(value).get_text(driver)
 
+    @classmethod
     def to_reference_citation(self, driver):
-        ResourcePage.how_to_cite.click(driver)
+        self.how_to_cite.click(driver)
 
+    @classmethod
     def to_reference_bagit(self, driver):
-        ResourcePage.learn_more.click(driver)
+        self.learn_more.click(driver)
 
+    @classmethod
     def add_comment(self, driver, text):
-        ResourcePage.comment_text.scroll_to(driver)
-        ResourcePage.comment_text.inject_text(driver, text)
-        ResourcePage.comment_submit.click(driver)
+        self.comment_text.scroll_to(driver)
+        self.comment_text.inject_text(driver, text)
+        self.comment_submit.click(driver)
 
+    @classmethod
     def get_comment_count(self, driver):
-        return ResourcePage.comment_section.get_immediate_child_count(driver) - 4
+        return self.comment_section.get_immediate_child_count(driver) - 4
 
 
 class WebApp(Resource):
+    save_supported_resource_types = SiteElement(
+        By.CSS_SELECTOR, "#id-supportedrestypes button.btn-form-submit"
+    )
+    add_open_with = SiteElement(By.ID, "btnOpenWithApp")
+    app_launching_url = SiteElement(
+        By.CSS_SELECTOR, "form#id-requesturlbase input#id_value"
+    )
+    save_app_launching_url = SiteElement(
+        By.CSS_SELECTOR, "#id-requesturlbase button.btn-form-submit"
+    )
+
+    @classmethod
+    def supported_resource_type(self, resource_type):
+        return SiteElement(By.CSS_SELECTOR, 'input[value="{}"]'.format(resource_type))
+
+    @classmethod
     def support_resource_type(self, driver, resource_type):
-        WebAppPage.supported_resource_type(resource_type).click(driver)
-        WebAppPage.save_supported_resource_types.click(driver)
+        self.supported_resource_type(resource_type).click(driver)
+        self.save_supported_resource_types.click(driver)
 
+    @classmethod
     def set_app_launching_url(self, driver, url):
-        WebAppPage.app_launching_url.inject_text(driver, url)
-        WebAppPage.save_app_launching_url.click(driver)
+        self.app_launching_url.inject_text(driver, url)
+        self.save_app_launching_url.click(driver)
 
+    @classmethod
     def add_to_open_with(self, driver):
-        WebAppPage.add_open_with.click(driver)
+        self.add_open_with.click(driver)
 
 
 class Help:
+    core_root = SiteElement(By.CSS_SELECTOR, "#content div.row")
+    core_breadcrumb = SiteElement(By.ID, "breadcrumb-menu-home")
+    footer_terms = SiteElement(By.CSS_SELECTOR, "footer a[href='/terms-of-use']")
+    footer_privacy = SiteElement(By.CSS_SELECTOR, "footer a[href='/privacy']")
+    footer_sitemap = SiteElement(By.CSS_SELECTOR, "footer a[href='/sitemap/']")
+    title = SiteElement(By.CSS_SELECTOR, "h1.page-title")
+    to_about = SiteElement(By.CSS_SELECTOR, 'a[href="{}"]'.format("/about-hydroshare"))
+
+    @classmethod
+    def core_item(self, index):
+        return SiteElement(
+            By.CSS_SELECTOR,
+            "#content "
+            "div.row div:nth-of-type({}) "
+            "div.topic-name div".format(index),
+        )
+
+    @classmethod
     def open_core(self, driver, index):
-        HelpPage.core_item(index).click(driver)
+        self.core_item(index).click(driver)
 
+    @classmethod
     def count_core(self, driver):
-        return HelpPage.core_root.get_immediate_child_count(driver)
+        return self.core_root.get_immediate_child_count(driver)
 
+    @classmethod
     def get_core_topic(self, driver, index):
-        return HelpPage.core_item(index).get_text(driver)
+        return self.core_item(index).get_text(driver)
 
+    @classmethod
     def to_core_breadcrumb(self, driver):
-        HelpPage.core_breadcrumb.click(driver)
+        self.core_breadcrumb.click(driver)
 
+    @classmethod
     def to_footer_terms(self, driver):
-        HelpPage.footer_terms.click(driver)
+        self.footer_terms.click(driver)
 
+    @classmethod
     def to_footer_privacy(self, driver):
-        HelpPage.footer_privacy.click(driver)
+        self.footer_privacy.click(driver)
 
+    @classmethod
     def to_footer_sitemap(self, driver):
-        HelpPage.footer_sitemap.click(driver)
+        self.footer_sitemap.click(driver)
 
+    @classmethod
     def get_title(self, driver):
-        return HelpPage.title.get_text(driver)
+        return self.title.get_text(driver)
 
 
 class About:
+    tree_root = SiteElement(
+        By.CSS_SELECTOR, "#tree-menu-about-hydroshare div.tree-menu-item i"
+    )
+    article_title = SiteElement(By.CSS_SELECTOR, "h1.page-title")
+
+    @classmethod
+    def tree_top(self, item):
+        return SiteElement(
+            By.CSS_SELECTOR,
+            "#tree-menu-about-hydroshare "
+            "#tree-menu-about-hydroshare-{} "
+            "div.tree-menu-item i".format(item),
+        )
+
+    @classmethod
+    def tree_policy(self, item):
+        return SiteElement(
+            By.CSS_SELECTOR,
+            "#tree-menu-about-hydroshare "
+            "#tree-menu-about-hydroshare-policies-{} "
+            "div.tree-menu-item a".format(item),
+        )
+
+    @classmethod
     def toggle_tree(self, driver):
-        AboutPage.tree_root.click(driver)
+        self.tree_root.click(driver)
         time.sleep(HELP_DOCS_TREE_ANIMATIONS)
 
+    @classmethod
     def expand_tree_top(self, driver, item):
         item = item.replace(" ", "-").lower()
-        AboutPage.tree_top(item).click(driver)
+        self.tree_top(item).click(driver)
 
+    @classmethod
     def open_policy(self, driver, policy):
         policy = policy.replace(" ", "-").lower()
-        AboutPage.tree_policy(policy).click(driver)
+        self.tree_policy(policy).click(driver)
 
+    @classmethod
     def get_title(self, driver):
-        return AboutPage.article_title.get_text(driver)
+        return self.article_title.get_text(driver)
 
 
 class API:
+    hsapi = SiteElement(By.ID, "endpointListTogger_hsapi")
+    endpoint_list = SiteElement(
+        By.CSS_SELECTOR, "div.opblock-tag-section div:first-child"
+    )
+    try_out = SiteElement(By.CSS_SELECTOR, "div.try-out > button.btn:nth-child(1)")
+    execute = SiteElement(By.CSS_SELECTOR, ".execute")
+    response_code = SiteElement(By.CSS_SELECTOR, ".response_current > td:nth-child(1)")
+
+    @classmethod
+    def path(self, endpoint):
+        return SiteElement(By.CSS_SELECTOR, "#{} > div:nth-child(1)".format(endpoint))
+
+    @classmethod
+    def parameter(self, index):
+        return SiteElement(
+            By.CSS_SELECTOR,
+            ".parameters > tbody:nth-child(2) > tr:nth-child({}) > "
+            "td:nth-child(2) > input:nth-child(1)".format(index),
+        )
+
+    @classmethod
     def toggle_endpoint(self, driver, endpoint):
-        APIPage.path(endpoint).click(driver)
+        self.path(endpoint).click(driver)
 
+    @classmethod
     def try_endpoint(self, driver):
-        APIPage.try_endpoint.click(driver)
+        self.try_out.click(driver)
 
+    @classmethod
     def set_parameter(self, driver, param_ind, param_val):
-        APIPage.parameter(param_ind).click(driver)
-        APIPage.parameter(param_ind).inject_text(driver, param_val)
+        self.parameter(param_ind).click(driver)
+        self.parameter(param_ind).inject_text(driver, param_val)
 
-    def submit(self, driver):
-        APIPage.submit.click(driver)
+    @classmethod
+    def execute_request(self, driver):
+        self.execute.click(driver)
         time.sleep(HSAPI_GUI_RESPONSE)
 
+    @classmethod
     def get_response_code(self, driver):
-        return APIPage.response_code.get_text(driver)
+        return self.response_code.get_text(driver)
 
 
 class Profile:
+    edit = SiteElement(By.ID, "btn-edit-profile")
+    organizations = SiteElement(By.CSS_SELECTOR, 'input[placeholder="Organization(s)"]')
+    save = SiteElement(By.CSS_SELECTOR, "button.btn-save-profile:first-of-type")
+    image_upload = SiteElement(By.CSS_SELECTOR, "input.upload-picture")
+    image = SiteElement(By.CSS_SELECTOR, "div.profile-pic.round-image")
+    delete_image = SiteElement(By.CSS_SELECTOR, "#btn-delete-profile-pic")
+    submit_delete_image = SiteElement(By.CSS_SELECTOR, "#picture-clear_id")
+    add_cv = SiteElement(By.XPATH, '//input[@type="file"]')
+    view_cv = SiteElement(By.XPATH, '(//a[@class= "btn btn-default"]/span)[3]')
+    delete_cv = SiteElement(By.ID, "btn-delete-cv")
+    confirm_delete_cv = SiteElement(By.ID, "cv-clear_id")
+    contribution = SiteElement(By.CSS_SELECTOR, 'a[aria-controls="profile"]')
+    contribution_types_breakdown = SiteElement(
+        By.CSS_SELECTOR, "table.table-user-contributions tbody"
+    )
+    contributions_list = SiteElement(
+        By.CSS_SELECTOR, "#contributions > .row > .col-md-9"
+    )
+    password_change = SiteElement(By.XPATH, '//a[contains(text(), "Change password")]')
+    current_password = SiteElement(By.CSS_SELECTOR, 'input[id="id_password"]')
+    new_password = SiteElement(By.CSS_SELECTOR, 'input[id="id_password1"]')
+    confirm_password = SiteElement(By.CSS_SELECTOR, 'input[id="id_password2"]')
+    password_confirm = SiteElement(By.XPATH, '//button[contains(text(), "Confirm")]')
+    description = SiteElement(By.CSS_SELECTOR, 'textarea[name="details"]')
+    country = SiteElement(By.CSS_SELECTOR, 'select[name="country"]')
+    province = SiteElement(By.CSS_SELECTOR, 'input[name="state"]')
+    name = SiteElement(By.CSS_SELECTOR, "h2")
+
+    @classmethod
+    def contribution_type(self, index):
+        return SiteElement(
+            By.CSS_SELECTOR,
+            "table.table-user-contributions tbody tr:nth-of-type({})".format(index + 1),
+        )
+
+    @classmethod
+    def contribution_type_count(self, index):
+        return SiteElement(
+            By.CSS_SELECTOR,
+            "table.table-user-contributions tbody "
+            + "tr:nth-of-type({})".format(index + 1)
+            + " td:nth-of-type(2) span",
+        )
+
+    @classmethod
+    def organization_deletion(self, index):
+        return SiteElement(By.CSS_SELECTOR, "span.tag:nth-of-type({}) a".format(index))
+
+    @classmethod
     def to_editor(self, driver):
-        ProfilePage.edit.click(driver)
+        self.edit.click(driver)
 
-    def add_org(self, driver, org):
-        ProfilePage.add_org.inject_text(driver, org)
-        ProfilePage.add_org.inject_text(driver, Keys.ARROW_DOWN)
-        ProfilePage.add_org.inject_text(driver, Keys.ENTER)
+    @classmethod
+    def add_organization(self, driver, org):
+        self.organizations.inject_text(driver, org)
+        self.organizations.inject_text(driver, Keys.ARROW_DOWN)
+        self.organizations.inject_text(driver, Keys.ENTER)
 
-    def delete_org(self, driver, index):
-        ProfilePage.delete_org(index).click(driver)
+    @classmethod
+    def delete_organization(self, driver, index):
+        self.organization_deletion(index).click(driver)
 
-    def save(self, driver):
-        ProfilePage.save.javascript_click(driver)
+    @classmethod
+    def save_changes(self, driver):
+        self.save.javascript_click(driver)
         time.sleep(PROFILE_SAVE)
 
+    @classmethod
     def add_photo(self, driver, link):
-        ProfilePage.image_upload.set_path(driver, link)
+        self.image_upload.set_path(driver, link)
 
+    @classmethod
     def remove_photo(self, driver):
-        ProfilePage.delete_image.click(driver)
-        ProfilePage.submit_delete_image.click(driver)
+        self.delete_image.click(driver)
+        self.submit_delete_image.click(driver)
 
+    @classmethod
     def confirm_photo_uploaded(self, driver, contains):
-        return contains in ProfilePage.image.get_style(driver)
+        return contains in self.image.get_style(driver)
 
+    @classmethod
     def view_cv(self, driver):
-        ProfilePage.view_cv.click(driver)
+        self.view_cv.click(driver)
 
+    @classmethod
     def delete_cv(self, driver):
-        ProfilePage.delete_cv.click(driver)
-        ProfilePage.confirm_delete_cv.click(driver)
+        self.delete_cv.click(driver)
+        self.confirm_delete_cv.click(driver)
 
+    @classmethod
     def view_contributions(self, driver):
-        ProfilePage.contribution.click(driver)
+        self.contribution.click(driver)
 
+    @classmethod
     def view_contribution_type(self, driver, ind):
-        ProfilePage.contribution_type(ind).javascript_click(driver)
+        self.contribution_type(ind).javascript_click(driver)
 
+    @classmethod
     def get_resource_type_count(self, driver):
-        contribution_types_breakdown = ProfilePage.contribution_types_breakdown
+        contribution_types_breakdown = self.contribution_types_breakdown
         return contribution_types_breakdown.get_immediate_child_count(driver)
 
+    @classmethod
     def get_contribution_type_count(self, driver, ind):
-        type_count = ProfilePage.contribution_type_count(ind).get_text(driver)
+        type_count = self.contribution_type_count(ind).get_text(driver)
         return int(type_count)
 
+    @classmethod
     def get_contributions_list_length(self, driver):
-        return ProfilePage.contributions_list.get_immediate_child_count(driver)
+        return self.contributions_list.get_immediate_child_count(driver)
 
+    @classmethod
     def upload_cv(self, driver, cv):
         urlretrieve(cv, "cv-test.pdf")
         cwd = os.getcwd()
@@ -642,211 +1058,355 @@ class Profile:
             driver, "document.getElementsByName('cv').path={}".format(cv_path)
         )
 
+    @classmethod
     def reset_password(self, driver, old_password, new_password):
-        ProfilePage.reset_password.click(driver)
-        ProfilePage.current_password.inject_text(driver, old_password)
-        ProfilePage.new_password.inject_text(driver, new_password)
-        ProfilePage.confirm_password.inject_text(driver, new_password)
-        ProfilePage.password_confirm.scroll_to(driver)
-        ProfilePage.password_confirm.click(driver)
+        self.password_change.click(driver)
+        self.current_password.inject_text(driver, old_password)
+        self.new_password.inject_text(driver, new_password)
+        self.confirm_password.inject_text(driver, new_password)
+        self.password_confirm.scroll_to(driver)
+        self.password_confirm.click(driver)
 
+    @classmethod
     def update_about(self, driver, description, country, province):
-        ProfilePage.description.click(driver)
-        ProfilePage.description.clear_all_text(driver)
-        ProfilePage.description.inject_text(driver, description)
-        ProfilePage.country.select_option_text(driver, country)
-        ProfilePage.province.click(driver)
-        ProfilePage.province.clear_all_text(driver)
-        ProfilePage.province.inject_text(driver, province)
+        self.description.click(driver)
+        self.description.clear_all_text(driver)
+        self.description.inject_text(driver, description)
+        self.country.select_option_text(driver, country)
+        self.province.click(driver)
+        self.province.clear_all_text(driver)
+        self.province.inject_text(driver, province)
 
 
 class Groups:
-    def create_group(self, driver, name, purpose, about, privacy):
-        GroupsPage.create_group.click(driver)
-        NewGroupModal.name.inject_text(driver, name)
-        NewGroupModal.purpose.inject_text(driver, purpose)
-        NewGroupModal.about.inject_text(driver, about)
-        if privacy.lower() == "public":
-            NewGroupModal.public.click(driver)
-        elif privacy.lower() == "discoverable":
-            NewGroupModal.discoverable.click(driver)
-        else:
-            NewGroupModal.private.click(driver)
-        NewGroupModal.submit.click(driver)
+    group_creation = SiteElement(
+        By.CSS_SELECTOR, 'a[data-target="#create-group-dialog"]'
+    )
+    my_groups = SiteElement(By.CSS_SELECTOR, 'a[href="/my-groups/"]')
+    title = SiteElement(By.CSS_SELECTOR, ".page-title")
+    name = SiteElement(By.CSS_SELECTOR, "fieldset.col-sm-12:nth-child(1) textarea")
+    purpose = SiteElement(By.CSS_SELECTOR, "fieldset.col-sm-12:nth-child(2) textarea")
+    about = SiteElement(By.CSS_SELECTOR, "fieldset.col-sm-12:nth-child(3) textarea")
+    public = SiteElement(By.CSS_SELECTOR, 'input[value="public"]')
+    discoverable = SiteElement(By.CSS_SELECTOR, 'input[value="discoverable"]')
+    private = SiteElement(By.CSS_SELECTOR, 'input[value="private"]')
+    submit = SiteElement(By.CSS_SELECTOR, 'button[type="submit"]')
 
+    @classmethod
     def to_my_groups(self, driver):
-        GroupsPage.my_groups.click(driver)
+        self.my_groups.click(driver)
 
+    @classmethod
     def get_title(self, driver):
-        return GroupsPage.title.get_text(driver)
+        return self.title.get_text(driver)
+
+    @classmethod
+    def create_group(self, driver, name, purpose, about, privacy):
+        self.group_creation.click(driver)
+        self.name.inject_text(driver, name)
+        self.purpose.inject_text(driver, purpose)
+        self.about.inject_text(driver, about)
+        if privacy.lower() == "public":
+            self.public.click(driver)
+        elif privacy.lower() == "discoverable":
+            self.discoverable.click(driver)
+        else:
+            self.private.click(driver)
+        self.submit.click(driver)
 
 
 class Group:
+    name = SiteElement(By.CSS_SELECTOR, ".group-title")
+
+    @classmethod
     def check_title(self, driver):
-        return GroupPage.name.get_text(driver)
+        return self.name.get_text(driver)
 
 
 class MyResources:
+    resource_type_selector = SiteElement(By.ID, "select-resource-type")
+    cancel_resource = SiteElement(By.CSS_SELECTOR, ".btn-cancel-create-resource")
+    resource_types = SiteElement(By.CSS_SELECTOR, "#input-resource-type")
+    search_options = SiteElement(By.CSS_SELECTOR, ".btn.btn-default.dropdown-toggle")
+    search = SiteElement(By.CSS_SELECTOR, "#resource-search-input")
+    author = SiteElement(By.CSS_SELECTOR, "#input-author")
+    subject = SiteElement(By.CSS_SELECTOR, "#input-subject")
+    search_clear = SiteElement(By.CSS_SELECTOR, "#btn-clear-search-input")
+    author_search_clear = SiteElement(By.CSS_SELECTOR, "#btn-clear-author-input")
+    subject_search_clear = SiteElement(By.CSS_SELECTOR, "#btn-clear-subject-input")
+    label = SiteElement(By.CSS_SELECTOR, "#btn-label")
+    create_label_icon = SiteElement(By.XPATH, '//li[@data-target="#modalCreateLabel"]')
+    new_label_name = SiteElement(By.CSS_SELECTOR, "#txtLabelName")
+    create_label_submit = SiteElement(By.CSS_SELECTOR, "#btn-create-label")
+    add_label = SiteElement(
+        By.CSS_SELECTOR,
+        "tr.data-row:nth-child(1) > td:nth-child(1) > "
+        + 'span[data-toggle="dropdown"]:nth-child(5)',
+    )
+    manage_labels = SiteElement(By.XPATH, '//li[@data-target="#modalManageLabels"]')
+    remove_label = SiteElement(By.CSS_SELECTOR, ".btn-label-remove")
+    legend = SiteElement(By.CSS_SELECTOR, "#headingLegend h4 a")
+    legend_labels = SiteElement(
+        By.CSS_SELECTOR,
+        "#legend-collapse div:first-child div:first-child div.col-xs-12.col-sm-5",
+    )
+    legend_resources = SiteElement(
+        By.CSS_SELECTOR,
+        "#legend-collapse div:first-child div:first-child div.col-xs-12.col-sm-7",
+    )
+
+    @classmethod
+    def label_checkbox(self, label_name):
+        return SiteElement(
+            By.XPATH,
+            '//td[@class="open"]//label[contains(text(), "{}")]'.format(label_name),
+        )
+
+    @classmethod
+    def resource_type(self, option):
+        return SiteElement(By.XPATH, '//option[contains(text(), "{}")]'.format(option))
+
+    @classmethod
+    def resource_creation_type(self, index):
+        return SiteElement(
+            By.CSS_SELECTOR,
+            "#dropdown-resource-type ul li:nth-of-type({})".format(index),
+        )
+
+    @classmethod
     def get_resource_type_indexes(self, driver):
-        MyResourcesPage.resource_type_selector.click(driver)
-        resource_creation_list = MyResourcesPage.resource_creation_list
+        self.resource_type_selector.click(driver)
+        resource_creation_list = self.resource_creation_list
         count = resource_creation_list.get_immediate_child_count(driver)
         resource_type_indexes = []
         for i in range(1, count + 1):
-            el_class = MyResourcesPage.resource_creation_type(i).get_class(driver)
+            el_class = self.resource_creation_type(i).get_class(driver)
             if el_class not in ["dropdown-header", "divider"]:
                 resource_type_indexes.append(i)
-        MyResourcesPage.resource_type_selector.click(driver)
+        self.resource_type_selector.click(driver)
         return resource_type_indexes
 
+    @classmethod
     def select_resource_type(self, driver, index):
-        MyResourcesPage.resource_type_selector.click(driver)
-        MyResourcesPage.resource_creation_type(index).click(driver)
+        self.resource_type_selector.click(driver)
+        self.resource_creation_type(index).click(driver)
 
-    def search(self, driver, text):
-        MyResourcesPage.search.inject_text(driver, text)
+    @classmethod
+    def enter_search(self, driver, text):
+        self.search.inject_text(driver, text)
 
+    @classmethod
     def search_resource_type(self, driver):
-        MyResourcesPage.search_options.click(driver)
+        self.search_options.click(driver)
 
+    @classmethod
     def search_type(self, driver, option):
-        MyResourcesPage.resource_type(option).click(driver)
+        self.resource_type(option).click(driver)
 
+    @classmethod
     def search_author(self, driver, author):
-        MyResourcesPage.search_author.inject_text(driver, author)
+        self.author.inject_text(driver, author)
 
+    @classmethod
     def search_subject(self, driver, subject):
-        MyResourcesPage.search_subject.inject_text(driver, subject)
+        self.subject.inject_text(driver, subject)
 
+    @classmethod
     def clear_search(self, driver):
-        MyResourcesPage.clear_search.click(driver)
+        self.search_clear.click(driver)
 
+    @classmethod
     def clear_author_search(self, driver):
-        MyResourcesPage.clear_author_search.click(driver)
+        self.author_search_clear.click(driver)
 
+    @classmethod
     def clear_subject_search(self, driver):
-        MyResourcesPage.clear_subject_search.click(driver)
+        self.subject_search_clear.click(driver)
 
+    @classmethod
     def read_searchbar(self, driver):
-        return MyResourcesPage.search.get_value(driver)
+        return self.search.get_value(driver)
 
+    @classmethod
     def create_label(self, driver, new_name):
-        MyResourcesPage.label.click(driver)
-        MyResourcesPage.create_label.click(driver)
-        MyResourcesPage.new_label_name.inject_text(driver, new_name)
-        MyResourcesPage.create_label_submit.click(driver)
+        self.label.click(driver)
+        self.create_label_icon.click(driver)
+        self.new_label_name.inject_text(driver, new_name)
+        self.create_label_submit.click(driver)
         time.sleep(LABEL_CREATION)
 
+    @classmethod
     def toggle_label(self, driver, label):
-        MyResourcesPage.add_label.click(driver)
-        MyResourcesPage.label_checkbox(label).click(driver)
-        MyResourcesPage.add_label.click(driver)
+        self.add_label.click(driver)
+        self.label_checkbox(label).click(driver)
+        self.add_label.click(driver)
 
+    @classmethod
     def check_label_applied(self, driver):
-        return "has-labels" in MyResourcesPage.add_label.get_class(driver)
+        return "has-labels" in self.add_label.get_class(driver)
 
+    @classmethod
     def delete_label(self, driver):
-        MyResourcesPage.label.click(driver)
-        MyResourcesPage.manage_labels.click(driver)
-        MyResourcesPage.remove_label.click(driver)
+        self.label.click(driver)
+        self.manage_labels.click(driver)
+        self.remove_label.click(driver)
 
+    @classmethod
     def legend_text(self, driver):
-        MyResourcesPage.legend.click(driver)
-        labels = str(MyResourcesPage.legend_labels.get_text(driver))
-        resources = str(MyResourcesPage.legend_resources.get_text(driver))
+        self.legend.click(driver)
+        labels = str(self.legend_labels.get_text(driver))
+        resources = str(self.legend_resources.get_text(driver))
         return labels, resources
 
 
 class Dashboard:
-    def toggle_get_started(self, driver):
-        DashboardPage.get_started_toggle.click(driver)
+    get_started_toggle = SiteElement(By.ID, "id-getting-started-toggle")
+    recently_visited_list = SiteElement(
+        By.CSS_SELECTOR, "#recently-visited-resources > tbody"
+    )
 
-    def is_get_started_showing(self, driver):
-        return (
-            DashboardPage.get_started_toggle.get_text(driver) == "Hide Getting Started"
+    @classmethod
+    def links_by_row_and_index(self, row, column):
+        return SiteElement(
+            By.CSS_SELECTOR, "#row-{} > div:nth-child({}) > a".format(row, column)
         )
 
+    @classmethod
+    def recent_activity_resource(self, row):
+        return SiteElement(
+            By.CSS_SELECTOR,
+            "#recently-visited-resources > tbody > tr:nth-child({}) > td:nth-child(2) > strong > a".format(
+                row
+            ),
+        )
+
+    @classmethod
+    def recent_activity_author(self, row):
+        return SiteElement(
+            By.CSS_SELECTOR,
+            "#recently-visited-resources > tbody > tr:nth-child({}) > td:nth-child(3) > a".format(
+                row
+            ),
+        )
+
+    @classmethod
+    def app(self, index):
+        return SiteElement(
+            By.CSS_SELECTOR, ".app-text-block-header:nth-of-type({})".format(index)
+        )
+
+    @classmethod
+    def toggle_get_started(self, driver):
+        self.get_started_toggle.click(driver)
+
+    @classmethod
+    def is_get_started_showing(self, driver):
+        return self.get_started_toggle.get_text(driver) == "Hide Getting Started"
+
+    @classmethod
     def check_getting_started_link(self, driver, row, column):
-        DashboardPage.links_by_row_and_index(row, column).click(driver)
+        self.links_by_row_and_index(row, column).click(driver)
         time.sleep(EXTERNAL_PAGE_LOAD / 2)
-        HomePage.logo.click(driver)
+        Home.logo.click(driver)
         time.sleep(EXTERNAL_PAGE_LOAD / 2)
         TestSystem.back(driver)
         time.sleep(EXTERNAL_PAGE_LOAD / 2)
         TestSystem.back(driver)
 
+    @classmethod
     def get_recent_activity_length(self, driver):
-        return DashboardPage.recently_visited_list.get_immediate_child_count(driver)
+        return self.recently_visited_list.get_immediate_child_count(driver)
 
+    @classmethod
     def check_recent_activity_resource(self, driver, row):
-        link_title = DashboardPage.recent_activity_resource(row).get_text(driver)
-        DashboardPage.recent_activity_resource(row).click(driver)
-        resource_title = ResourcePage.title.get_text(driver)
+        link_title = self.recent_activity_resource(row).get_text(driver)
+        self.recent_activity_resource(row).click(driver)
+        resource_title = Resource.title.get_text(driver)
         TestSystem.back(driver)
         return link_title, resource_title
 
+    @classmethod
     def check_recent_activity_author(self, driver, row):
-        link_author = DashboardPage.recent_activity_author(row).get_text(driver)
-        DashboardPage.recent_activity_author(row).click(driver)
-        profile_author = ProfilePage.name.get_text(driver)
+        link_author = self.recent_activity_author(row).get_text(driver)
+        self.recent_activity_author(row).click(driver)
+        profile_author = Profile.name.get_text(driver)
         TestSystem.back(driver)
         return link_author, profile_author
 
+    @classmethod
+    def to_app(self, driver, index):
+        self.app(index).click(driver)
+
 
 class NewResource:
-    def configure(self, driver, title):
-        NewResourceModal.title.click(driver)
-        NewResourceModal.title.inject_text(driver, title)
+    title = SiteElement(By.ID, "input-title")
+    create_btn = SiteElement(By.ID, "btn-resource-create")
+    cancel_btn = SiteElement(
+        By.CSS_SELECTOR,
+        "#submit-title-dialog div.modal-dialog div.modal-content div.modal-footer "
+        + "button:nth-of-type(1)",
+    )
 
+    @classmethod
+    def configure(self, driver, title):
+        self.title.click(driver)
+        self.title.inject_text(driver, title)
+
+    @classmethod
     def cancel(self, driver):
-        NewResourceModal.cancel.click(driver)
+        self.cancel_btn.click(driver)
         time.sleep(RESOURCE_CREATION / 2)
 
+    @classmethod
     def create(self, driver):
-        NewResourceModal.create.click(driver)
+        self.create_btn.click(driver)
         time.sleep(RESOURCE_CREATION)
 
 
 class Registration:
+    first_name = SiteElement(By.ID, "id_first_name")
+    last_name = SiteElement(By.ID, "id_last_name")
+    email = SiteElement(By.ID, "id_email")
+    username = SiteElement(By.ID, "id_username")
+    organizations = SiteElement(By.CSS_SELECTOR, 'input[placeholder="Organization(s)"]')
+    password1 = SiteElement(By.ID, "id_password1")
+    password2 = SiteElement(By.ID, "id_password2")
+    signup = SiteElement(By.ID, "signup")
+    error = SiteElement(By.CSS_SELECTOR, "p.alert")
+
+    @classmethod
     def check_error(self, driver):
-        return RegistrationPage.error.get_text(driver)
+        return self.error.get_text(driver)
 
 
 class SiteMap:
+    @classmethod
+    def all_resource_links(self, driver):
+        return SiteElementsCollection(By.CSS_SELECTOR, 'a[href*="/resource"]').items(
+            driver
+        )
+
+    @classmethod
     def get_resource_list(self, driver):
-        return list(SiteMapPage.all_resource_links(driver))
+        return list(self.all_resource_links(driver))
 
 
 class JupyterHub:
-    def to_hs_login(self, driver):
-        JupyterHubPage.login.click(driver)
+    login = SiteElement(By.CSS_SELECTOR, "#login-main > div > a")
+    authorize = SiteElement(By.CSS_SELECTOR, 'input[value="Authorize"]')
+    scientific_spawner = SiteElement(By.ID, "profile-item-1")
+    spawn = SiteElement(By.CSS_SELECTOR, 'input[value="Spawn"]')
+    sort_name = SiteElement(By.ID, "sort-name")
 
-    def authorize(self, driver):
-        JupyterHubPage.authorize.javascript_click(driver)
+    def to_hs_login(self, driver):
+        self.login.click(driver)
+
+    def authorize_jupyterhub(self, driver):
+        self.authorize.javascript_click(driver)
 
     def select_scientific_spawner(self, driver):
-        JupyterHubPage.scientific_spawner.click(driver)
-        JupyterHubPage.spawn.click(driver)
+        self.scientific_spawner.click(driver)
+        self.spawn.click(driver)
 
     def sort_notebooks_by_name(self, driver):
         JupyterHubNotebooks.sort_name.click(driver)
-
-
-Home = Home()
-Login = Login()
-Apps = Apps()
-Discover = Discover()
-Resource = Resource()
-WebApp = WebApp()
-Help = Help()
-About = About()
-API = API()
-Profile = Profile()
-Groups = Groups()
-Group = Group()
-MyResources = MyResources()
-Dashboard = Dashboard()
-NewResource = NewResource()
-Registration = Registration()
-SiteMap = SiteMap()
-JupyterHub = JupyterHub()

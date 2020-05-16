@@ -23,7 +23,6 @@ class External:
         WebDriverWait(driver, NEW_PAGE_LOAD).until(
             EC.visibility_of_element_located(new_window_load_locator)
         )
-        TestSystem.check_language(driver)
 
     def switch_old_page(self, driver):
         win_handle = driver.window_handles[-2]
@@ -42,7 +41,6 @@ class External:
         driver.switch_to.window(new_handle)
         time.sleep(NEW_PAGE_LOAD)
         source = driver.page_source
-        TestSystem.check_language(driver)
         driver.switch_to.window(orig_handle)
         time.sleep(NEW_PAGE_LOAD)
         return source

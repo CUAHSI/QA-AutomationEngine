@@ -42,7 +42,8 @@ class HydroshareTestSuite(BaseTest):
     def test_B_000001(self):
         """ When creating a resource, ensure all resource types have a "Cancel"
         button available """
-        Home.login(self.driver, USERNAME, PASSWORD)
+        Home.to_login(self.driver)
+        Login.login(self.driver, USERNAME, PASSWORD)
         Home.to_my_resources(self.driver)
         resource_types = [
             "CompositeResource",
@@ -84,15 +85,18 @@ class HydroshareTestSuite(BaseTest):
 
     def test_B_000005(self):
         """ Confirms password reset works for users """
-        Home.login(self.driver, USERNAME, PASSWORD)
+        Home.to_login(self.driver)
+        Login.login(self.driver, USERNAME, PASSWORD)
         Home.to_profile(self.driver)
         Profile.to_editor(self.driver)
         Profile.reset_password(self.driver, PASSWORD, PASSWORD + "test")
-        Home.login(self.driver, USERNAME, PASSWORD + "test")
+        Home.to_login(self.driver)
+        Login.login(self.driver, USERNAME, PASSWORD + "test")
         Home.to_profile(self.driver)
         Profile.to_editor(self.driver)
         Profile.reset_password(self.driver, PASSWORD + "test", PASSWORD)
-        Home.login(self.driver, USERNAME, PASSWORD)
+        Home.to_login(self.driver)
+        Login.login(self.driver, USERNAME, PASSWORD)
 
     def test_B_000006(self):
         """
@@ -114,11 +118,11 @@ class HydroshareTestSuite(BaseTest):
         Home.to_discover(driver)
         orderings = ["Last Modified", "Title", "First Author", "Date Created"]
         for ordering in orderings:
-            Discover.sort_direction(driver, "Ascending")
-            Discover.sort_order(driver, ordering)
+            Discover.set_sort_direction(driver, "Ascending")
+            Discover.set_sort_order(driver, ordering)
             oracle(driver, ordering, "Ascending")
-            Discover.sort_direction(driver, "Descending")
-            Discover.sort_order(driver, ordering)
+            Discover.set_sort_direction(driver, "Descending")
+            Discover.set_sort_order(driver, ordering)
             oracle(driver, ordering, "Descending")
 
     def test_B_000007(self):
@@ -134,7 +138,7 @@ class HydroshareTestSuite(BaseTest):
 
         driver = self.driver
         Home.to_apps(driver)
-        apps_count = Apps.count(driver)
+        apps_count = Apps.get_count(driver)
         for i in range(1, apps_count + 1):  # xpath start at 1
             app_name = Apps.get_title(driver, i)
             Apps.show_info(driver, i)
@@ -208,7 +212,7 @@ class HydroshareTestSuite(BaseTest):
             API.toggle_endpoint(self.driver, endpoint["id"])
             API.try_endpoint(self.driver)
             API.set_parameter(self.driver, endpoint["resource_param_ind"], resource_id)
-            API.submit(self.driver)
+            API.execute_request(self.driver)
             response_code = API.get_response_code(self.driver)
             oracle(response_code)
             API.toggle_endpoint(self.driver, endpoint["id"])
@@ -233,7 +237,7 @@ class HydroshareTestSuite(BaseTest):
         for endpoint in endpoints:
             API.toggle_endpoint(self.driver, endpoint)
             API.try_endpoint(self.driver)
-            API.submit(self.driver)
+            API.execute_request(self.driver)
             response_code = API.get_response_code(self.driver)
             oracle(response_code)
             API.toggle_endpoint(self.driver, endpoint)
@@ -300,14 +304,15 @@ class HydroshareTestSuite(BaseTest):
                 TestSystem.page_source(self.driver),
             )
 
-        Home.login(self.driver, USERNAME, PASSWORD)
+        Home.to_login(self.driver)
+        Login.login(self.driver, USERNAME, PASSWORD)
         Home.to_profile(self.driver)
         Profile.to_editor(self.driver)
-        Profile.delete_org(self.driver, 2)
-        Profile.delete_org(self.driver, 1)
-        Profile.add_org(self.driver, "Freie Universität Berlin")
-        Profile.add_org(self.driver, "Agricultural University of Warsaw")
-        Profile.save(self.driver)
+        Profile.delete_organization(self.driver, 2)
+        Profile.delete_organization(self.driver, 1)
+        Profile.add_organization(self.driver, "Freie Universität Berlin")
+        Profile.add_organization(self.driver, "Agricultural University of Warsaw")
+        Profile.save_changes(self.driver)
         oracle()
 
     def test_B_000014(self):
@@ -320,7 +325,8 @@ class HydroshareTestSuite(BaseTest):
             """ Group name is visible in the new group page """
             self.assertEqual(Group.check_title(self.driver), group_name)
 
-        Home.login(self.driver, USERNAME, PASSWORD)
+        Home.to_login(self.driver)
+        Login.login(self.driver, USERNAME, PASSWORD)
         Home.to_groups(self.driver)
         group_name = "QA Test Group {}".format(random.randint(1, 1000000))
         Groups.create_group(
@@ -355,7 +361,8 @@ class HydroshareTestSuite(BaseTest):
             """ Test resource landing page shows the right resource name """
             self.assertEqual("Test Resource", resource_title)
 
-        Home.login(self.driver, USERNAME, PASSWORD)
+        Home.to_login(self.driver)
+        Login.login(self.driver, USERNAME, PASSWORD)
         Home.create_resource(self.driver, "CompositeResource")
         NewResource.configure(self.driver, "Test Resource")
         NewResource.create(self.driver)
@@ -387,7 +394,8 @@ class HydroshareTestSuite(BaseTest):
             "Time Series",
             "Web App",
         ]
-        Home.login(self.driver, USERNAME, PASSWORD)
+        Home.to_login(self.driver)
+        Login.login(self.driver, USERNAME, PASSWORD)
         Home.to_my_resources(self.driver)
         MyResources.search_resource_type(self.driver)
         for option in options:
@@ -421,7 +429,8 @@ class HydroshareTestSuite(BaseTest):
             else:
                 self.assertNotIn("[subject:", MyResources.read_searchbar(self.driver))
 
-        Home.login(self.driver, USERNAME, PASSWORD)
+        Home.to_login(self.driver)
+        Login.login(self.driver, USERNAME, PASSWORD)
         Home.to_my_resources(self.driver)
 
         MyResources.search_resource_type(self.driver)
@@ -474,7 +483,8 @@ class HydroshareTestSuite(BaseTest):
             """ The label is showing as deselected """
             self.assertFalse(MyResources.check_label_applied(self.driver))
 
-        Home.login(self.driver, USERNAME, PASSWORD)
+        Home.to_login(self.driver)
+        Login.login(self.driver, USERNAME, PASSWORD)
         Home.to_my_resources(self.driver)
         MyResources.create_label(self.driver, "Test")
         MyResources.toggle_label(self.driver, "Test")
@@ -490,13 +500,14 @@ class HydroshareTestSuite(BaseTest):
             """ "View CV" window page title contains the file name """
             self.assertTrue(cv_filename in TestSystem.title(self.driver))
 
-        Home.login(self.driver, USERNAME, PASSWORD)
+        Home.to_login(self.driver)
+        Login.login(self.driver, USERNAME, PASSWORD)
         Home.to_profile(self.driver)
         Profile.to_editor(self.driver)
         Profile.upload_cv(
             self.driver, "http://www.bu.edu/careers/files/2012/08/Resume-Guide-2012.pdf"
         )
-        Profile.save(self.driver)
+        Profile.save_changes(self.driver)
         num_windows_now = len(self.driver.window_handles)
         Profile.view_cv(self.driver)
         External.to_file(self.driver, num_windows_now, "cv-test")
@@ -523,7 +534,8 @@ class HydroshareTestSuite(BaseTest):
                     Profile.confirm_photo_uploaded(self.driver, img_filename)
                 )
 
-        Home.login(self.driver, USERNAME, PASSWORD)
+        Home.to_login(self.driver)
+        Login.login(self.driver, USERNAME, PASSWORD)
         Home.to_profile(self.driver)
         Profile.to_editor(self.driver)
         urlretrieve(
@@ -532,7 +544,7 @@ class HydroshareTestSuite(BaseTest):
         cwd = os.getcwd()
         profile_img_path = os.path.join(cwd, "profile.jpg")
         Profile.add_photo(self.driver, profile_img_path)
-        Profile.save(self.driver)
+        Profile.save_changes(self.driver)
         oracle("profile", True)
         os.remove(profile_img_path)
         Profile.to_editor(self.driver)
@@ -585,7 +597,8 @@ class HydroshareTestSuite(BaseTest):
             Resource.exists_name(self.driver, name)
             Resource.exists_value(self.driver, value)
 
-        Home.login(self.driver, USERNAME, PASSWORD)
+        Home.to_login(self.driver)
+        Login.login(self.driver, USERNAME, PASSWORD)
         Home.create_resource(self.driver, "CompositeResource")
         NewResource.configure(self.driver, "Test Metadata")
         NewResource.create(self.driver)
@@ -629,7 +642,8 @@ class HydroshareTestSuite(BaseTest):
             """ Text from the legends on MyResources and Discover match """
             self.assertEqual(legend_one, legend_two)
 
-        Home.login(self.driver, USERNAME, PASSWORD)
+        Home.to_login(self.driver)
+        Login.login(self.driver, USERNAME, PASSWORD)
         Home.to_my_resources(self.driver)
         my_resource_legend = MyResources.legend_text(self.driver)
         Home.to_discover(self.driver)
@@ -744,7 +758,8 @@ class HydroshareTestSuite(BaseTest):
             """ Expect get started to be showing """
             self.assertNotEqual(visibility[0], visibility[1])
 
-        Home.login(self.driver, USERNAME, PASSWORD)
+        Home.to_login(self.driver)
+        Login.login(self.driver, USERNAME, PASSWORD)
         Dashboard.toggle_get_started(self.driver)
         visibility = [Dashboard.is_get_started_showing(self.driver)]
         Dashboard.toggle_get_started(self.driver)
@@ -774,7 +789,8 @@ class HydroshareTestSuite(BaseTest):
         """Ensure Correct Web apps show in Open With"""
 
         # login
-        Home.login(self.driver, USERNAME, PASSWORD)
+        Home.to_login(self.driver)
+        Login.login(self.driver, USERNAME, PASSWORD)
         Home.create_resource(self.driver, "ToolResource")
 
         # create web app resource
@@ -803,9 +819,11 @@ class HydroshareTestSuite(BaseTest):
             self.assertIn("username", error_message)
             self.assertIn("password", error_message)
 
-        Home.login(self.driver, "Invalid", "Invalid")
+        Home.to_login(self.driver)
+        Login.login(self.driver, "Invalid", "Invalid")
         oracle(Login.get_login_error(self.driver))
-        Home.login(self.driver, USERNAME, PASSWORD)
+        Home.to_login(self.driver)
+        Login.login(self.driver, USERNAME, PASSWORD)
         Dashboard.toggle_get_started(self.driver)
         Dashboard.toggle_get_started(self.driver)
 
@@ -813,21 +831,23 @@ class HydroshareTestSuite(BaseTest):
         """ Ensure pre-login My Resources redirects to My Resources after login """
         Home.to_my_resources(self.driver)
         Login.login(self.driver, USERNAME, PASSWORD)
-        MyResources.search(self.driver, "Search bar text")
+        MyResources.enter_search(self.driver, "Search bar text")
 
     def test_B_000041(self):
         """ Update profile About information """
-        Home.login(self.driver, USERNAME, PASSWORD)
+        Home.to_login(self.driver)
+        Login.login(self.driver, USERNAME, PASSWORD)
         Home.to_profile(self.driver)
         Profile.to_editor(self.driver)
         Profile.update_about(
             self.driver, "// TODO My Profile Description", "United States", "New York"
         )
-        Profile.save(self.driver)
+        Profile.save_changes(self.driver)
 
     def test_B_000046(self):
         """ Ensure clicking the Hydroshare logo links back to the home page """
-        Home.login(self.driver, USERNAME, PASSWORD)
+        Home.to_login(self.driver)
+        Login.login(self.driver, USERNAME, PASSWORD)
         Home.to_profile(self.driver)
         Home.click_logo(self.driver)
         Home.slider_left(self.driver)
@@ -852,9 +872,11 @@ class HydroshareTestSuite(BaseTest):
 
     def test_B_000049(self):
         """ Ensure user can logout after logging in """
-        Home.login(self.driver, USERNAME, PASSWORD)
+        Home.to_login(self.driver)
+        Login.login(self.driver, USERNAME, PASSWORD)
         Home.logout(self.driver)
-        Home.login(self.driver, USERNAME, PASSWORD)
+        Home.to_login(self.driver)
+        Login.login(self.driver, USERNAME, PASSWORD)
         Home.logout(self.driver)
 
     def test_B_000050(self):
@@ -863,7 +885,8 @@ class HydroshareTestSuite(BaseTest):
 
     def test_B_000051(self):
         """ Ensure all Getting Started links open correctly, and in the same tab """
-        Home.login(self.driver, USERNAME, PASSWORD)
+        Home.to_login(self.driver)
+        Login.login(self.driver, USERNAME, PASSWORD)
         for row in [1, 2]:
             for column in [1, 2, 3]:
                 Dashboard.check_getting_started_link(self.driver, row, column)
@@ -879,7 +902,8 @@ class HydroshareTestSuite(BaseTest):
             for word in [profile_author.split(" ")[0], profile_author.split(" ")[-1]]:
                 self.assertIn(word, link_author)
 
-        Home.login(self.driver, USERNAME, PASSWORD)
+        Home.to_login(self.driver)
+        Login.login(self.driver, USERNAME, PASSWORD)
         recent_activity_len = Dashboard.get_recent_activity_length(self.driver)
         for i in range(
             1, recent_activity_len + 1
@@ -910,7 +934,7 @@ class JupyterhubTestSuite(BaseTest):
         JupyterHub.to_hs_login(self.driver)
         Login.login(self.driver, USERNAME, PASSWORD)
         TestSystem.wait(3)
-        JupyterHub.authorize(self.driver)
+        JupyterHub.authorize_jupyterhub(self.driver)
         JupyterHub.select_scientific_spawner(self.driver)
         JupyterHub.sort_notebooks_by_name(self.driver)
 
