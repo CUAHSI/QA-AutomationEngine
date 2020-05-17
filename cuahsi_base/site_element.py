@@ -209,7 +209,7 @@ class SiteElement:
         target_el = self.loc_it(el_driver)
         return target_el.get_attribute("value")
 
-    def get_href(self, el_driver, base_url):
+    def get_href(self, el_driver, base_url=None):
         """ Returns element href link, with relative links expanded
         into an absolute link
         """

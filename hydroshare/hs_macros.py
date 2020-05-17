@@ -24,139 +24,125 @@ from timing import (
 )
 
 
-class Home:
-    nav_home = SiteElement(By.ID, "dropdown-menu-home")
-    nav_my_resources = SiteElement(By.ID, "dropdown-menu-my-resources")
-    nav_discover = SiteElement(By.ID, "dropdown-menu-search")
-    nav_apps = SiteElement(By.ID, "dropdown-menu-https:--www.hydroshare.org-apps-")
-    nav_help = SiteElement(
+class Hydroshare:
+    navigation_landing_page = SiteElement(By.ID, "img-brand-logo")
+    navigation_home = SiteElement(By.ID, "dropdown-menu-home")
+    navigation_my_resources = SiteElement(By.ID, "dropdown-menu-my-resources")
+    navigation_discover = SiteElement(By.ID, "dropdown-menu-search")
+    navigation_collaborate = SiteElement(By.CSS_SELECTOR, "#dropdown-menu-collaborate a")
+    navigation_apps = SiteElement(By.ID, "dropdown-menu-https:--www.hydroshare.org-apps-")
+    navigation_help = SiteElement(
         By.CSS_SELECTOR, 'a[href="{}"]'.format("http://help.hydroshare.org")
     )
-    nav_login = SiteElement(By.CSS_SELECTOR, "#signin-menu a")
-    nav_collaborate = SiteElement(By.CSS_SELECTOR, "#dropdown-menu-collaborate a")
-    nav_groups = SiteElement(By.CSS_SELECTOR, 'a[href="/groups"]')
-    profile_image = SiteElement(By.ID, "profile-menu")
+    navigation_login = SiteElement(By.CSS_SELECTOR, "#signin-menu a")
     profile_button = SiteElement(
         By.CSS_SELECTOR, ".account div.dropdown-footer .btn.btn-primary"
     )
-    go_up = SiteElement(By.CSS_SELECTOR, ".scrolltotop")
-    body = SiteElement(By.XPATH, "//body[1]")
-    scroll_slider_right = SiteElement(By.CSS_SELECTOR, ".glyphicon-chevron-right")
-    scroll_slider_left = SiteElement(By.CSS_SELECTOR, ".glyphicon-chevron-left")
-    slider = SiteElement(By.CSS_SELECTOR, "div.item.parallax-window.active")
+    profile_menu = SiteElement(By.ID, "profile-menu")
+    sign_out = SiteElement(By.ID, "signout-menu")
+    creation_resource = SiteElement(By.ID, "select-resource-type")
+    footer = SiteElement(By.CSS_SELECTOR, "footer")
+    footer_terms = SiteElement(By.CSS_SELECTOR, "footer a[href='/terms-of-use']")
+    footer_privacy = SiteElement(By.CSS_SELECTOR, "footer a[href='/privacy']")
+    footer_sitemap = SiteElement(By.CSS_SELECTOR, "footer a[href='/sitemap/']")
     twitter = SiteElement(By.CSS_SELECTOR, ".content.social ul li:nth-child(1) > a")
     facebook = SiteElement(By.CSS_SELECTOR, ".content.social ul li:nth-child(2) > a")
     youtube = SiteElement(By.CSS_SELECTOR, ".content.social ul li:nth-child(3) > a")
     github = SiteElement(By.CSS_SELECTOR, ".content.social ul li:nth-child(4) > a")
     linkedin = SiteElement(By.CSS_SELECTOR, ".content.social ul li:nth-child(5) > a")
-    slider = SiteElement(By.CSS_SELECTOR, "div.item.parallax-window.active")
-    nav_site_map = SiteElement(By.LINK_TEXT, "Site Map")
     version = SiteElement(By.CSS_SELECTOR, ".content p b")
-    create = SiteElement(By.ID, "select-resource-type")
-    nav_signup = SiteElement(By.CSS_SELECTOR, "a.btn-signup")
-    footer = SiteElement(By.CSS_SELECTOR, "footer")
-    logo = SiteElement(By.ID, "img-brand-logo")
-    profile_menu = SiteElement(By.ID, "profile-menu")
-    sign_out = SiteElement(By.ID, "signout-menu")
     support_email = SiteElement(By.CSS_SELECTOR, 'a[href="mailto:help@cuahsi.org"]')
+    page_tip = SiteElement(By.CSS_SELECTOR, ".page-tip > .container > .row > div > p")
 
     @classmethod
-    def create_type(self, resource_type):
-        return SiteElement(By.CSS_SELECTOR, 'a[data-value="{}"]'.format(resource_type))
-
-    @classmethod
-    def resource_selection(self, resource):
-        return SiteElement(By.LINK_TEXT, "{}".format(resource))
+    def to_landing_page(self, driver):
+        self.navigation_landing_page.click(driver)
 
     @classmethod
     def to_home(self, driver):
-        self.nav_home.click(driver)
+        self.navigation_home.click(driver)
 
     @classmethod
     def to_my_resources(self, driver):
-        self.nav_my_resources.click(driver)
+        self.navigation_my_resources.click(driver)
 
     @classmethod
     def to_discover(self, driver):
-        self.nav_discover.click(driver)
+        self.navigation_discover.click(driver)
+
+    @classmethod
+    def to_collaborate(self, driver):
+        self.navigation_collaborate.click(driver)
 
     @classmethod
     def to_apps(self, driver):
         num_windows_now = len(driver.window_handles)
-        self.nav_apps.click(driver)
+        self.navigation_apps.click(driver)
         External.switch_new_page(driver, num_windows_now, Apps.apps_locator)
 
     @classmethod
     def to_help(self, driver):
-        self.nav_help.click(driver)
+        self.navigation_help.click(driver)
         time.sleep(EXTERNAL_PAGE_LOAD)
 
     @classmethod
     def to_about(self, driver):
-        self.nav_help.click(driver)
+        self.navigation_help.click(driver)
         time.sleep(EXTERNAL_PAGE_LOAD)
         Help.to_about.javascript_click(driver)
 
     @classmethod
-    def to_groups(self, driver):
-        self.nav_collaborate.click(driver)
-        self.nav_groups.click(driver)
-
-    @classmethod
     def to_login(self, driver):
-        self.nav_login.click(driver)
+        self.navigation_login.click(driver)
 
     @classmethod
     def to_profile(self, driver):
-        self.profile_image.click(driver)
+        self.profile_menu.click(driver)
         self.profile_button.click(driver)
 
     @classmethod
-    def scroll_to_top(self, driver):
-        self.go_up.click(driver)
+    def logout(self, driver):
+        self.profile_menu.click(driver)
+        self.sign_out.click(driver)
 
     @classmethod
-    def scroll_to_button(self, driver):
-        self.footer.scroll_to(driver)
-
-    @classmethod
-    def slider_right(self, driver):
-        self.scroll_slider_right.javascript_click(driver)
-        time.sleep(HOME_PAGE_SLIDER_ANIMATION)
-
-    @classmethod
-    def slider_left(self, driver):
-        self.scroll_slider_left.javascript_click(driver)
-        time.sleep(HOME_PAGE_SLIDER_ANIMATION)
-
-    @classmethod
-    def a_slider_is_active(self, driver):
-        return self.slider
-
-    @classmethod
-    def slider_has_valid_img(self, driver, images):
-        return self.slider.get_attribute(driver, "style") in images
-
-    @classmethod
-    def to_site_map(self, driver):
-        return self.nav_site_map.click(driver)
-
-    @classmethod
-    def select_resource(self, driver, res):
-        self.resource_selection(res).click(driver)
-        time.sleep(EXTERNAL_PAGE_LOAD)
-
-    @classmethod
-    def version(self, driver):
-        return self.version.get_text(driver).strip()
+    def resource_type(self, resource_type):
+        return SiteElement(By.CSS_SELECTOR, 'a[data-value="{}"]'.format(resource_type))
 
     @classmethod
     def create_resource(self, driver, type):
-        self.create.click(driver)
-        self.create_type(type).click(driver)
+        self.creation_resource.click(driver)
+        self.resource_type(type).click(driver)
 
     @classmethod
-    def get_hs_latest_release(self, org, repo):
+    def to_terms(self, driver):
+        self.footer_terms.click(driver)
+
+    @classmethod
+    def to_privacy(self, driver):
+        self.footer_privacy.click(driver)
+
+    @classmethod
+    def to_sitemap(self, driver):
+        self.footer_sitemap.click(driver)
+
+    @classmethod
+    def get_social_link(self, driver, social):
+        social_links = {
+            "facebook": self.facebook,
+            "twitter": self.twitter,
+            "youtube": self.youtube,
+            "github": self.github,
+            "linkedin": self.linkedin,
+        }
+        return social_links[social].get_attribute(driver, "href")
+
+    @classmethod
+    def get_version(self, driver):
+        return self.version.get_text(driver).strip()
+
+    @classmethod
+    def get_latest_release(self, org, repo):
         """
         Retrieves the version of the latest published release of 'hydroshare'
         repository.
@@ -169,79 +155,120 @@ class Home:
         return release_version
 
     @classmethod
-    def get_social_link_expected(self, social):
-        social_links = {
-            "facebook": "https://www.facebook.com/pages/CUAHSI-Consortium-"
-            "of-Universities-for-the-Advancement-of-Hydrologic-"
-            "Science-Inc/179921902590",
-            "twitter": "http://twitter.com/cuahsi",
-            "youtube": "http://youtube.hydroshare.org/",
-            "github": "http://github.com/hydroshare",
-            "linkedin": "https://www.linkedin.com/company/2632114",
-        }
-        return social_links[social]
+    def get_support_email(self, driver):
+        return self.support_email.get_href(driver)
+
+
+class LandingPage(Hydroshare):
+    hero = SiteElement(By.CSS_SELECTOR, "div.item.parallax-window.active")
+    hero_right = SiteElement(By.CSS_SELECTOR, ".glyphicon-chevron-right")
+    hero_left = SiteElement(By.CSS_SELECTOR, ".glyphicon-chevron-left")
+    navigation_top = SiteElement(By.CSS_SELECTOR, ".scrolltotop")
+    navigation_registration = SiteElement(By.CSS_SELECTOR, "a.btn-signup")
 
     @classmethod
-    def get_social_link_actual(self, driver, social):
-        social_links = {
-            "facebook": self.facebook,
-            "twitter": self.twitter,
-            "youtube": self.youtube,
-            "github": self.github,
-            "linkedin": self.linkedin,
-        }
-        return social_links[social].get_attribute(driver, "href")
+    def to_registration(self, driver):
+        self.navigation_registration.click(driver)
 
     @classmethod
-    def signup(
-        self,
-        driver,
-        first_name=None,
-        last_name=None,
-        email=None,
-        username=None,
-        organizations=[],
-        password=None,
-    ):
-        self.nav_signup.click(driver)
-        if first_name is not None:
-            Registration.first_name.click(driver)
-            Registration.first_name.inject_text(driver, first_name)
-        if last_name is not None:
-            Registration.last_name.click(driver)
-            Registration.last_name.inject_text(driver, last_name)
-        if email is not None:
-            Registration.email.click(driver)
-            Registration.email.inject_text(driver, email)
-        if username is not None:
-            Registration.username.click(driver)
-            Registration.username.inject_text(driver, username)
-        for organization in organizations:
-            Registration.organizations.click(driver)
-            Registration.organizations.inject_text(driver, organization)
-            Registration.organizations.inject_text(driver, Keys.ENTER)
-        if password is not None:
-            Registration.password1.click(driver)
-            Registration.password1.inject_text(driver, username)
-            Registration.password2.click(driver)
-            Registration.password2.inject_text(driver, username)
-        Registration.signup.click(driver)
+    def slide_hero_right(self, driver):
+        self.hero_right.javascript_click(driver)
+        time.sleep(HOME_PAGE_SLIDER_ANIMATION)
 
     @classmethod
-    def click_logo(self, driver):
-        self.logo.click(driver)
+    def slide_hero_left(self, driver):
+        self.hero_left.javascript_click(driver)
+        time.sleep(HOME_PAGE_SLIDER_ANIMATION)
 
     @classmethod
-    def logout(self, driver):
-        self.profile_menu.click(driver)
-        self.sign_out.click(driver)
+    def scroll_to_top(self, driver):
+        self.navigation_top.click(driver)
 
     @classmethod
-    def email_support(self, driver):
-        return self.support_email.get_text(driver)
+    def scroll_to_button(self, driver):
+        self.footer.scroll_to(driver)
+
+    @classmethod
+    def hero_has_valid_img(self, driver, images):
+        return self.hero.get_attribute(driver, "style") in images
 
 
-class Login:
+class Home(Hydroshare):
+    body = SiteElement(By.XPATH, "//body[1]")
+    get_started_toggle = SiteElement(By.ID, "id-getting-started-toggle")
+    recently_visited_list = SiteElement(
+        By.CSS_SELECTOR, "#recently-visited-resources > tbody"
+    )
+
+    @classmethod
+    def links_by_row_and_index(self, row, column):
+        return SiteElement(
+            By.CSS_SELECTOR, "#row-{} > div:nth-child({}) > a".format(row, column)
+        )
+
+    @classmethod
+    def recent_activity_resource(self, row):
+        return SiteElement(
+            By.CSS_SELECTOR,
+            "#recently-visited-resources > tbody > tr:nth-child({}) > td:nth-child(2) > strong > a".format(
+                row
+            ),
+        )
+
+    @classmethod
+    def recent_activity_author(self, row):
+        return SiteElement(
+            By.CSS_SELECTOR,
+            "#recently-visited-resources > tbody > tr:nth-child({}) > td:nth-child(3) > a".format(
+                row
+            ),
+        )
+
+    @classmethod
+    def app(self, index):
+        return SiteElement(
+            By.CSS_SELECTOR, ".app-text-block-header:nth-of-type({})".format(index)
+        )
+
+    @classmethod
+    def toggle_get_started(self, driver):
+        self.get_started_toggle.click(driver)
+
+    @classmethod
+    def is_get_started_showing(self, driver):
+        return self.get_started_toggle.get_text(driver) == "Hide Getting Started"
+
+    @classmethod
+    def check_getting_started_link(self, driver, row, column):
+        self.links_by_row_and_index(row, column).click(driver)
+        time.sleep(EXTERNAL_PAGE_LOAD / 2)
+
+    @classmethod
+    def get_recent_activity_length(self, driver):
+        return self.recently_visited_list.get_immediate_child_count(driver)
+
+    @classmethod
+    def check_recent_activity_resource(self, driver, row):
+        link_title = self.recent_activity_resource(row).get_text(driver)
+        self.recent_activity_resource(row).click(driver)
+        resource_title = Resource.title.get_text(driver)
+        TestSystem.back(driver)
+        return link_title, resource_title
+
+    @classmethod
+    def check_recent_activity_author(self, driver, row):
+        link_author = self.recent_activity_author(row).get_text(driver)
+        self.recent_activity_author(row).click(driver)
+        profile_author = Profile.name.get_text(driver)
+        TestSystem.back(driver)
+        return link_author, profile_author
+
+    @classmethod
+    def to_app(self, driver, index):
+        self.app(index).click(driver)
+
+
+class Login(Hydroshare):
     username = SiteElement(By.ID, "id_username")
     password = SiteElement(By.ID, "id_password")
     submit = SiteElement(By.CSS_SELECTOR, "input.btn.btn-primary[type='submit']")
@@ -265,7 +292,7 @@ class Login:
         self.submit.click(driver)
 
 
-class Apps:
+class Apps(Hydroshare):
     apps = SiteElementsCollection(By.CSS_SELECTOR, ".webapp")
     apps_locator = By.CSS_SELECTOR, ".webapp"
 
@@ -310,7 +337,7 @@ class Apps:
         return self.title(num).get_text(driver)
 
 
-class Discover:
+class Discover(Hydroshare):
     start_date = SiteElement(By.ID, "id_start_date")
     end_date = SiteElement(By.ID, "id_end_date")
     map_tab = SiteElement(By.CSS_SELECTOR, 'a[href="#map-view"]')
@@ -539,7 +566,7 @@ class Discover:
         self.show_all_btn.click(driver)
 
     @classmethod
-    def filters(
+    def add_filters(
         self,
         driver,
         author=None,
@@ -672,7 +699,7 @@ class Discover:
             return self.filter_availability(availability).is_selected(driver)
 
 
-class Resource:
+class Resource(Hydroshare):
     bagit = SiteElement(By.ID, "btn-download-all")
     open_with = SiteElement(By.ID, "apps-dropdown")
     open_jupyterhub = SiteElement(By.CSS_SELECTOR, 'li[title="CUAHSI JupyterHub"]')
@@ -704,7 +731,7 @@ class Resource:
         return SiteElement(By.XPATH, '//td[text()= "{}"]'.format(value))
 
     @classmethod
-    def size_download(self, driver, BASE_URL):
+    def get_bagit_size(self, driver, BASE_URL):
         """ Check the size of the BagIt download """
         download_href = self.bagit.get_href(driver, BASE_URL)
         r = requests.get(download_href)
@@ -798,14 +825,9 @@ class WebApp(Resource):
         self.add_open_with.click(driver)
 
 
-class Help:
-    core_root = SiteElement(By.CSS_SELECTOR, "#content div.row")
-    core_breadcrumb = SiteElement(By.ID, "breadcrumb-menu-home")
-    footer_terms = SiteElement(By.CSS_SELECTOR, "footer a[href='/terms-of-use']")
-    footer_privacy = SiteElement(By.CSS_SELECTOR, "footer a[href='/privacy']")
-    footer_sitemap = SiteElement(By.CSS_SELECTOR, "footer a[href='/sitemap/']")
-    title = SiteElement(By.CSS_SELECTOR, "h1.page-title")
+class Help(Hydroshare):
     to_about = SiteElement(By.CSS_SELECTOR, 'a[href="{}"]'.format("/about-hydroshare"))
+    core_root = SiteElement(By.CSS_SELECTOR, "#content div.row")
 
     @classmethod
     def core_item(self, index):
@@ -817,11 +839,7 @@ class Help:
         )
 
     @classmethod
-    def open_core(self, driver, index):
-        self.core_item(index).click(driver)
-
-    @classmethod
-    def count_core(self, driver):
+    def get_core_count(self, driver):
         return self.core_root.get_immediate_child_count(driver)
 
     @classmethod
@@ -829,27 +847,23 @@ class Help:
         return self.core_item(index).get_text(driver)
 
     @classmethod
-    def to_core_breadcrumb(self, driver):
+    def open_core(self, driver, index):
+        self.core_item(index).click(driver)
+
+class HelpArticle(Hydroshare):
+    core_breadcrumb = SiteElement(By.ID, "breadcrumb-menu-home")
+    title = SiteElement(By.CSS_SELECTOR, "h1.page-title")
+
+    @classmethod
+    def to_help_breadcrumb(self, driver):
         self.core_breadcrumb.click(driver)
-
-    @classmethod
-    def to_footer_terms(self, driver):
-        self.footer_terms.click(driver)
-
-    @classmethod
-    def to_footer_privacy(self, driver):
-        self.footer_privacy.click(driver)
-
-    @classmethod
-    def to_footer_sitemap(self, driver):
-        self.footer_sitemap.click(driver)
 
     @classmethod
     def get_title(self, driver):
         return self.title.get_text(driver)
 
 
-class About:
+class About(Hydroshare):
     tree_root = SiteElement(
         By.CSS_SELECTOR, "#tree-menu-about-hydroshare div.tree-menu-item i"
     )
@@ -893,7 +907,7 @@ class About:
         return self.article_title.get_text(driver)
 
 
-class API:
+class API(Hydroshare):
     hsapi = SiteElement(By.ID, "endpointListTogger_hsapi")
     endpoint_list = SiteElement(
         By.CSS_SELECTOR, "div.opblock-tag-section div:first-child"
@@ -937,7 +951,7 @@ class API:
         return self.response_code.get_text(driver)
 
 
-class Profile:
+class Profile(Hydroshare):
     edit = SiteElement(By.ID, "btn-edit-profile")
     organizations = SiteElement(By.CSS_SELECTOR, 'input[placeholder="Organization(s)"]')
     save = SiteElement(By.CSS_SELECTOR, "button.btn-save-profile:first-of-type")
@@ -1078,7 +1092,15 @@ class Profile:
         self.province.inject_text(driver, province)
 
 
-class Groups:
+class Collaborate(Hydroshare):
+    groups = SiteElement(By.CSS_SELECTOR, 'a[href="/groups"]')
+
+    @classmethod
+    def to_groups(self, driver):
+        self.groups.click(driver)
+
+
+class Groups(Hydroshare):
     group_creation = SiteElement(
         By.CSS_SELECTOR, 'a[data-target="#create-group-dialog"]'
     )
@@ -1115,7 +1137,7 @@ class Groups:
         self.submit.click(driver)
 
 
-class Group:
+class Group(Hydroshare):
     name = SiteElement(By.CSS_SELECTOR, ".group-title")
 
     @classmethod
@@ -1123,7 +1145,7 @@ class Group:
         return self.name.get_text(driver)
 
 
-class MyResources:
+class MyResources(Hydroshare):
     resource_type_selector = SiteElement(By.ID, "select-resource-type")
     cancel_resource = SiteElement(By.CSS_SELECTOR, ".btn-cancel-create-resource")
     resource_types = SiteElement(By.CSS_SELECTOR, "#input-resource-type")
@@ -1259,86 +1281,7 @@ class MyResources:
         return labels, resources
 
 
-class Dashboard:
-    get_started_toggle = SiteElement(By.ID, "id-getting-started-toggle")
-    recently_visited_list = SiteElement(
-        By.CSS_SELECTOR, "#recently-visited-resources > tbody"
-    )
-
-    @classmethod
-    def links_by_row_and_index(self, row, column):
-        return SiteElement(
-            By.CSS_SELECTOR, "#row-{} > div:nth-child({}) > a".format(row, column)
-        )
-
-    @classmethod
-    def recent_activity_resource(self, row):
-        return SiteElement(
-            By.CSS_SELECTOR,
-            "#recently-visited-resources > tbody > tr:nth-child({}) > td:nth-child(2) > strong > a".format(
-                row
-            ),
-        )
-
-    @classmethod
-    def recent_activity_author(self, row):
-        return SiteElement(
-            By.CSS_SELECTOR,
-            "#recently-visited-resources > tbody > tr:nth-child({}) > td:nth-child(3) > a".format(
-                row
-            ),
-        )
-
-    @classmethod
-    def app(self, index):
-        return SiteElement(
-            By.CSS_SELECTOR, ".app-text-block-header:nth-of-type({})".format(index)
-        )
-
-    @classmethod
-    def toggle_get_started(self, driver):
-        self.get_started_toggle.click(driver)
-
-    @classmethod
-    def is_get_started_showing(self, driver):
-        return self.get_started_toggle.get_text(driver) == "Hide Getting Started"
-
-    @classmethod
-    def check_getting_started_link(self, driver, row, column):
-        self.links_by_row_and_index(row, column).click(driver)
-        time.sleep(EXTERNAL_PAGE_LOAD / 2)
-        Home.logo.click(driver)
-        time.sleep(EXTERNAL_PAGE_LOAD / 2)
-        TestSystem.back(driver)
-        time.sleep(EXTERNAL_PAGE_LOAD / 2)
-        TestSystem.back(driver)
-
-    @classmethod
-    def get_recent_activity_length(self, driver):
-        return self.recently_visited_list.get_immediate_child_count(driver)
-
-    @classmethod
-    def check_recent_activity_resource(self, driver, row):
-        link_title = self.recent_activity_resource(row).get_text(driver)
-        self.recent_activity_resource(row).click(driver)
-        resource_title = Resource.title.get_text(driver)
-        TestSystem.back(driver)
-        return link_title, resource_title
-
-    @classmethod
-    def check_recent_activity_author(self, driver, row):
-        link_author = self.recent_activity_author(row).get_text(driver)
-        self.recent_activity_author(row).click(driver)
-        profile_author = Profile.name.get_text(driver)
-        TestSystem.back(driver)
-        return link_author, profile_author
-
-    @classmethod
-    def to_app(self, driver, index):
-        self.app(index).click(driver)
-
-
-class NewResource:
+class NewResource(Hydroshare):
     title = SiteElement(By.ID, "input-title")
     create_btn = SiteElement(By.ID, "btn-resource-create")
     cancel_btn = SiteElement(
@@ -1363,7 +1306,7 @@ class NewResource:
         time.sleep(RESOURCE_CREATION)
 
 
-class Registration:
+class Registration(Hydroshare):
     first_name = SiteElement(By.ID, "id_first_name")
     last_name = SiteElement(By.ID, "id_last_name")
     email = SiteElement(By.ID, "id_email")
@@ -1375,11 +1318,49 @@ class Registration:
     error = SiteElement(By.CSS_SELECTOR, "p.alert")
 
     @classmethod
+    def signup_user(
+        self,
+        driver,
+        first_name=None,
+        last_name=None,
+        email=None,
+        username=None,
+        organizations=[],
+        password=None,
+    ):
+        if first_name is not None:
+            self.first_name.click(driver)
+            self.first_name.inject_text(driver, first_name)
+        if last_name is not None:
+            self.last_name.click(driver)
+            self.last_name.inject_text(driver, last_name)
+        if email is not None:
+            self.email.click(driver)
+            self.email.inject_text(driver, email)
+        if username is not None:
+            self.username.click(driver)
+            self.username.inject_text(driver, username)
+        for organization in organizations:
+            self.organizations.click(driver)
+            self.organizations.inject_text(driver, organization)
+            self.organizations.inject_text(driver, Keys.ENTER)
+        if password is not None:
+            self.password1.click(driver)
+            self.password1.inject_text(driver, username)
+            self.password2.click(driver)
+            self.password2.inject_text(driver, username)
+        self.signup.click(driver)
+
+    @classmethod
     def check_error(self, driver):
         return self.error.get_text(driver)
 
 
-class SiteMap:
+class SiteMap(Hydroshare):
+    @classmethod
+    def resource_selection(self, resource):
+        return SiteElement(By.LINK_TEXT, "{}".format(resource))
+
     @classmethod
     def all_resource_links(self, driver):
         return SiteElementsCollection(By.CSS_SELECTOR, 'a[href*="/resource"]').items(
@@ -1389,6 +1370,11 @@ class SiteMap:
     @classmethod
     def get_resource_list(self, driver):
         return list(self.all_resource_links(driver))
+
+    @classmethod
+    def select_resource(self, driver, res):
+        self.resource_selection(res).click(driver)
+        time.sleep(EXTERNAL_PAGE_LOAD)
 
 
 class JupyterHub:

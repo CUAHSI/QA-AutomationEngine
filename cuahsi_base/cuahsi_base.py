@@ -8,7 +8,7 @@ from selenium import webdriver
 from .browser import USER_AGENT
 
 
-class BaseTest(unittest.TestCase):
+class BaseTestSuite(unittest.TestCase):
     grid_hub_ip = None
     browser = "firefox"
 
