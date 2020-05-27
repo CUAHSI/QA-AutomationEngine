@@ -24,7 +24,10 @@ from timing import (
 )
 
 
-class Hydroshare:
+class WebPage:
+    body_locator = By.CSS_SELECTOR, "body"
+
+class Hydroshare(WebPage):
     navigation_landing_page = SiteElement(By.ID, "img-brand-logo")
     navigation_home = SiteElement(By.ID, "dropdown-menu-home")
     navigation_my_resources = SiteElement(By.ID, "dropdown-menu-my-resources")
@@ -39,20 +42,24 @@ class Hydroshare:
         By.CSS_SELECTOR, ".account div.dropdown-footer .btn.btn-primary"
     )
     profile_menu = SiteElement(By.ID, "profile-menu")
-    sign_out = SiteElement(By.ID, "signout-menu")
-    creation_resource = SiteElement(By.ID, "select-resource-type")
+    signout_menu = SiteElement(By.ID, "signout-menu")
+    resource_creation = SiteElement(By.ID, "select-resource-type")
     footer = SiteElement(By.CSS_SELECTOR, "footer")
     footer_terms = SiteElement(By.CSS_SELECTOR, "footer a[href='/terms-of-use']")
     footer_privacy = SiteElement(By.CSS_SELECTOR, "footer a[href='/privacy']")
     footer_sitemap = SiteElement(By.CSS_SELECTOR, "footer a[href='/sitemap/']")
-    twitter = SiteElement(By.CSS_SELECTOR, ".content.social ul li:nth-child(1) > a")
-    facebook = SiteElement(By.CSS_SELECTOR, ".content.social ul li:nth-child(2) > a")
-    youtube = SiteElement(By.CSS_SELECTOR, ".content.social ul li:nth-child(3) > a")
-    github = SiteElement(By.CSS_SELECTOR, ".content.social ul li:nth-child(4) > a")
-    linkedin = SiteElement(By.CSS_SELECTOR, ".content.social ul li:nth-child(5) > a")
-    version = SiteElement(By.CSS_SELECTOR, ".content p b")
+    footer_twitter = SiteElement(By.CSS_SELECTOR, ".content.social ul li:nth-child(1) > a")
+    footer_facebook = SiteElement(By.CSS_SELECTOR, ".content.social ul li:nth-child(2) > a")
+    footer_youtube = SiteElement(By.CSS_SELECTOR, ".content.social ul li:nth-child(3) > a")
+    footer_github = SiteElement(By.CSS_SELECTOR, ".content.social ul li:nth-child(4) > a")
+    footer_linkedin = SiteElement(By.CSS_SELECTOR, ".content.social ul li:nth-child(5) > a")
+    footer_version = SiteElement(By.CSS_SELECTOR, ".content p b")
     support_email = SiteElement(By.CSS_SELECTOR, 'a[href="mailto:help@cuahsi.org"]')
     page_tip = SiteElement(By.CSS_SELECTOR, ".page-tip > .container > .row > div > p")
+
+    @classmethod
+    def resource_type(self, resource_type):
+        return SiteElement(By.CSS_SELECTOR, 'a[data-value="{}"]'.format(resource_type))
 
     @classmethod
     def to_landing_page(self, driver):
@@ -103,15 +110,11 @@ class Hydroshare:
     @classmethod
     def logout(self, driver):
         self.profile_menu.click(driver)
-        self.sign_out.click(driver)
-
-    @classmethod
-    def resource_type(self, resource_type):
-        return SiteElement(By.CSS_SELECTOR, 'a[data-value="{}"]'.format(resource_type))
+        self.signout_menu.click(driver)
 
     @classmethod
     def create_resource(self, driver, type):
-        self.creation_resource.click(driver)
+        self.resource_creation.click(driver)
         self.resource_type(type).click(driver)
 
     @classmethod
@@ -129,17 +132,17 @@ class Hydroshare:
     @classmethod
     def get_social_link(self, driver, social):
         social_links = {
-            "facebook": self.facebook,
-            "twitter": self.twitter,
-            "youtube": self.youtube,
-            "github": self.github,
-            "linkedin": self.linkedin,
+            "facebook": self.footer_facebook,
+            "twitter": self.footer_twitter,
+            "youtube": self.footer_youtube,
+            "github": self.footer_github,
+            "linkedin": self.footer_linkedin,
         }
         return social_links[social].get_attribute(driver, "href")
 
     @classmethod
     def get_version(self, driver):
-        return self.version.get_text(driver).strip()
+        return self.footer_version.get_text(driver).strip()
 
     @classmethod
     def get_latest_release(self, org, repo):
@@ -194,7 +197,6 @@ class LandingPage(Hydroshare):
 
 
 class Home(Hydroshare):
-    body = SiteElement(By.XPATH, "//body[1]")
     get_started_toggle = SiteElement(By.ID, "id-getting-started-toggle")
     recently_visited_list = SiteElement(
         By.CSS_SELECTOR, "#recently-visited-resources > tbody"
@@ -205,7 +207,7 @@ class Home(Hydroshare):
         return SiteElement(
             By.CSS_SELECTOR, "#row-{} > div:nth-child({}) > a".format(row, column)
         )
-
+ 
     @classmethod
     def recent_activity_resource(self, row):
         return SiteElement(
@@ -225,9 +227,15 @@ class Home(Hydroshare):
         )
 
     @classmethod
-    def app(self, index):
+    def featured_app(self, index):
         return SiteElement(
-            By.CSS_SELECTOR, ".app-text-block-header:nth-of-type({})".format(index)
+            By.CSS_SELECTOR, "div.main-container > div:nth-child(2) > div:nth-child(2) > div.row.big-app-row > div:nth-child({}) > div.app-text-block > div.app-text-block-header > strong > a".format(index)
+        )
+
+    @classmethod
+    def cuahsi_app(self, index):
+        return SiteElement(
+            By.CSS_SELECTOR, "div.main-container > div:nth-child(2) > div:nth-child(3) > div.row.big-app-row > div:nth-child({}) > div.app-text-block > div.app-text-block-header > strong > a".format(index)
         )
 
     @classmethod
@@ -264,9 +272,15 @@ class Home(Hydroshare):
         return link_author, profile_author
 
     @classmethod
-    def to_app(self, driver, index):
-        self.app(index).click(driver)
-
+    def to_app(self, driver, app_type, index):
+        if app_type == "Featured":
+            num_windows_now = len(driver.window_handles)
+            self.featured_app(index).click(driver)
+            External.switch_new_page(driver, num_windows_now, self.body_locator)
+        if app_type == "CUAHSI":
+            num_windows_now = len(driver.window_handles)
+            self.cuahsi_app(index).click(driver)
+            External.switch_new_page(driver, num_windows_now, self.body_locator)
 
 class Login(Hydroshare):
     username = SiteElement(By.ID, "id_username")
@@ -1196,6 +1210,38 @@ class MyResources(Hydroshare):
         )
 
     @classmethod
+    def resource_title(self, index):
+        return SiteElement(
+            By.CSS_SELECTOR,
+            "#item-selectors > tbody > tr:nth-child({}) > td:nth-child(3)".format(index)
+        )
+
+    @classmethod
+    def resource_link(self, index):
+        return SiteElement(
+            By.CSS_SELECTOR,
+            "#item-selectors > tbody > tr:nth-child({}) > td:nth-child(3) > strong > a".format(index)
+        )
+
+    @classmethod
+    def resource_author(self, index):
+        return SiteElement(
+            By.CSS_SELECTOR,
+            "#item-selectors > tbody > tr:nth-child({}) > td:nth-child(4)".format(index)
+        )
+
+    @classmethod
+    def resource_favorite(self, index):
+        return SiteElement(
+            By.CSS_SELECTOR,
+            "#item-selectors > tbody > tr:nth-child({}) > td:nth-child(1) > span.glyphicon-star".format(index)
+        )
+
+    @classmethod
+    def table_filter(self, data_facet):
+        return SiteElement(By.CSS_SELECTOR, 'input[data-facet="{}"]'.format(data_facet))
+
+    @classmethod
     def get_resource_type_indexes(self, driver):
         self.resource_type_selector.click(driver)
         resource_creation_list = self.resource_creation_list
@@ -1279,6 +1325,26 @@ class MyResources(Hydroshare):
         labels = str(self.legend_labels.get_text(driver))
         resources = str(self.legend_resources.get_text(driver))
         return labels, resources
+
+    @classmethod
+    def to_resource_from_table(self, driver, index):
+        self.resource_title(index).click(driver)
+
+    @classmethod
+    def get_resource_link(self, driver, index):
+        return self.resource_link(index).get_attribute(driver, "href")
+
+    @classmethod
+    def to_author_from_table(self, driver, index):
+        self.resource_author(index).click(driver)
+
+    @classmethod
+    def favorite_resource(self, driver, index):
+        self.resource_favorite(index).click(driver)
+
+    @classmethod
+    def filter_table(self, driver, data_facet):
+        self.table_filter(data_facet).click(driver)
 
 
 class NewResource(Hydroshare):
