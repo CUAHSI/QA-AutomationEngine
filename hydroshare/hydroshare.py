@@ -634,11 +634,6 @@ class HydroshareTestSuite(BaseTestSuite):
         Login.login(self.driver, "Invalid", "Invalid")
         self.assertIn("username", Login.get_login_error(self.driver))
         self.assertIn("password", Login.get_login_error(self.driver))
-        percySnapshot(
-            browser=self.driver,
-            name='Failed Login Screen',
-            enableJavaScript=True
-        )
         Login.to_login(self.driver)
         Login.login(self.driver, USERNAME, PASSWORD)
         Home.toggle_get_started(self.driver)
