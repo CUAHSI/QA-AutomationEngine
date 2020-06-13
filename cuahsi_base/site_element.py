@@ -5,6 +5,7 @@ parameters.  The class methods faciltate easy manipulation
 import platform
 import time
 
+from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.select import Select
@@ -242,6 +243,12 @@ class SiteElement:
         target_el = self.loc_it(el_driver)
         target_style = target_el.get_attribute("style")
         return target_style
+
+    def wait_on_visibility(self, el_driver, max_time):
+        locator = self.by, self.locator
+        WebDriverWait(el_driver, max_time).until(
+            EC.visibility_of_element_located(locator)
+        )
 
 
 class SiteElementsCollection:

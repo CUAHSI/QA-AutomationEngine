@@ -374,7 +374,7 @@ class Discover(Hydroshare):
     last_updated_by = SiteElement(
         By.XPATH, '//th[text() = "Last updated:"]/following-sibling::td/a'
     )
-    search = SiteElement(By.ID, "id_q")
+    search_field = SiteElement(By.ID, "id_q")
     show_all_btn = SiteElement(By.ID, "btn-show-all")
     user_modal_to_profile = SiteElement(
         By.CSS_SELECTOR,
@@ -680,8 +680,8 @@ class Discover(Hydroshare):
 
     @classmethod
     def search(self, driver, text):
-        self.search.inject_text(driver, text)
-        self.search.submit(driver)
+        self.search_field.inject_text(driver, text)
+        self.search_field.submit(driver)
         time.sleep(DISCOVER_TABLE_UPDATE)
 
     @classmethod
@@ -1446,19 +1446,69 @@ class SiteMap(Hydroshare):
 class JupyterHub:
     login = SiteElement(By.CSS_SELECTOR, "#login-main > div > a")
     authorize = SiteElement(By.CSS_SELECTOR, 'input[value="Authorize"]')
+    minimal_spawner = SiteElement(By.ID, "profile-item-0")
     scientific_spawner = SiteElement(By.ID, "profile-item-1")
-    spawn = SiteElement(By.CSS_SELECTOR, 'input[value="Spawn"]')
+    r_scientific_spawner = SiteElement(By.ID, "profile-item-2")
+    spawn = SiteElement(By.CSS_SELECTOR, 'input[value="Start"]')
     sort_name = SiteElement(By.ID, "sort-name")
+    terms_of_use = SiteElement(By.ID, "chk-tou")
 
+    @classmethod
     def to_hs_login(self, driver):
         self.login.click(driver)
 
+    @classmethod
     def authorize_jupyterhub(self, driver):
         self.authorize.javascript_click(driver)
 
+    @classmethod
+    def select_minimal_spawner(self, driver):
+        self.minimal_spawner.click(driver)
+        self.spawn.click(driver)
+
+    @classmethod
     def select_scientific_spawner(self, driver):
         self.scientific_spawner.click(driver)
         self.spawn.click(driver)
 
+    @classmethod
+    def select_r_scientific_spawner(self, driver):
+        self.r_scientific_spawner.click(driver)
+        self.spawn.click(driver)
+
+    @classmethod
+    def agree_to_terms_of_use(self, driver):
+        JupyterHub.terms_of_use.click(driver)
+
+class JupyterHubNotebooks:
+    sort_name = SiteElement(By.ID, 'sort-name')
+    top_panel = SiteElement(By.ID, 'jp-top-panel')
+    notebook_spawner = SiteElement(By.CSS_SELECTOR, 'div[data-category="Notebook"]')
+
+    @classmethod
+    def wait_on_server_creation(self, driver):
+        JupyterHubNotebooks.top_panel.wait_on_visibility(driver, 300)
+
+    @classmethod
     def sort_notebooks_by_name(self, driver):
         JupyterHubNotebooks.sort_name.click(driver)
+
+    @classmethod
+    def select_notebook_spawner(self, driver):
+        self.notebook_spawner.click(driver)
+
+    @classmethod
+    def is_spawner_set(self, driver):
+        try:
+            self.notebook_spawner.wait_on_visibility(driver, 30)
+        except TimeoutException:
+            return True
+        return False
+
+
+class JupyterHubNotebook:
+    save = SiteElement(By.CSS_SELECTOR, 'button[title="Save the notebook contents and create checkpoint"]')
+
+    @classmethod
+    def save_notebook(self, driver):
+        self.save.click(driver)

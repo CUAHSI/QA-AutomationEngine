@@ -4,6 +4,7 @@ import random
 import re
 
 from urllib.request import urlretrieve
+from percy import percySnapshot
 
 from hs_macros import (
     Hydroshare,
@@ -27,6 +28,8 @@ from hs_macros import (
     SiteMap,
     WebApp,
     JupyterHub,
+    JupyterHubNotebooks,
+    JupyterHubNotebook
 )
 
 from cuahsi_base.cuahsi_base import BaseTestSuite, parse_args_run_tests
@@ -154,7 +157,7 @@ class HydroshareTestSuite(BaseTestSuite):
         errors.  These basic get methods are accessible from the GUI and
         use just a resource id required parameter
         """
-        resource_id = "927094481da54af38ffb6f0c39ad8787"
+        resource_id = "54ae2ade31f646d097d78ef0695bb36c"
         endpoints = [
             {"id": "operations-hsapi-hsapi_resource_read", "resource_param_ind": 1},
             {
@@ -288,7 +291,7 @@ class HydroshareTestSuite(BaseTestSuite):
     def test_B_000015(self):
         """ Confirms Resource "Open With" successfully redirects to JupyterHub """
         LandingPage.to_discover(self.driver)
-        Discover.add_filters(self.driver, author="Castronova, Anthony")
+        Discover.add_filters(self.driver, owner="Castronova, Anthony")
         Discover.to_resource(self.driver, "Beaver Divide Air Temperature")
         Resource.open_with_jupyterhub(self.driver)
         webpage_title = TestSystem.title(self.driver)
@@ -525,8 +528,9 @@ class HydroshareTestSuite(BaseTestSuite):
     def test_B_000029(self):
         """ Commenting requires a login """
         LandingPage.to_discover(self.driver)
-        Discover.add_filters(self.driver, author="Castronova, Anthony")
-        Discover.to_resource(self.driver, "Beaver Divide Air Temperature")
+        Discover.search(self.driver, "Beaver Divide Air Temperature - Further Development")
+        Discover.add_filters(self.driver, owner="DeBuhr, Neal")
+        Discover.to_resource(self.driver, "Further Development")
         initial_comment_count = Resource.get_comment_count(self.driver)
         Resource.add_comment(self.driver, "Test Comment")
         self.assertIn("Please log in", Login.get_notification(self.driver))
@@ -630,6 +634,11 @@ class HydroshareTestSuite(BaseTestSuite):
         Login.login(self.driver, "Invalid", "Invalid")
         self.assertIn("username", Login.get_login_error(self.driver))
         self.assertIn("password", Login.get_login_error(self.driver))
+        percySnapshot(
+            browser=self.driver,
+            name='Failed Login Screen',
+            enableJavaScript=True
+        )
         Login.to_login(self.driver)
         Login.login(self.driver, USERNAME, PASSWORD)
         Home.toggle_get_started(self.driver)
@@ -791,7 +800,7 @@ class HydroshareTestSuite(BaseTestSuite):
         self.assertIn("Private Test Resource", TestSystem.title(self.driver))
 
 
-class JupyterhubTestSuite(BaseTestSuite):
+class JupyterhubTestSuite(HydroshareTestSuite):
     """ Python unittest setup for jupyterhub testing """
 
     def setUp(self):
@@ -800,13 +809,20 @@ class JupyterhubTestSuite(BaseTestSuite):
 
     def test_000001(self):
         """ Spawn and interact with a server """
-        TestSystem.to_url(self.driver, "https://whw.cuahsi.org/hub/login")
+        TestSystem.to_url(self.driver, "https://jupyterhub.cuahsi.org/hub/login")
+        JupyterHub.agree_to_terms_of_use(self.driver)
         JupyterHub.to_hs_login(self.driver)
-        Login.login(self.driver, USERNAME, PASSWORD)
+        Login.login(self.driver, "selenium-user9", "abc123")
         TestSystem.wait(3)
         JupyterHub.authorize_jupyterhub(self.driver)
-        JupyterHub.select_scientific_spawner(self.driver)
-        JupyterHub.sort_notebooks_by_name(self.driver)
+        # JupyterHub.select_minimal_spawner(self.driver)
+        # JupyterHub.select_scientific_spawner(self.driver)
+        JupyterHub.select_r_scientific_spawner(self.driver)
+        JupyterHubNotebooks.wait_on_server_creation(self.driver)
+        if not JupyterHubNotebooks.is_spawner_set(self.driver):
+            JupyterHubNotebooks.select_notebook_spawner(self.driver)
+        JupyterHubNotebook.save_notebook(self.driver)
+        TestSystem.wait(5)
 
 
 # Health cases definition
@@ -898,7 +914,7 @@ class HydroshareSpamSuite(HydroshareTestSuite):
             r"\bgoogle\b",
             "android",
             r"\bchrome\b",
-            "apple",
+            r"\bapple\b",
             "icloud",
             r"\bios\b",
             "iphone",
@@ -907,7 +923,6 @@ class HydroshareSpamSuite(HydroshareTestSuite):
             "macos",
             "facebook",
             "microsoft",
-            "windows",
             "internet explorer",
             "adult",
             "escort",
