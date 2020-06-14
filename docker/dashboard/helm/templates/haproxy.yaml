@@ -1,0 +1,81 @@
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: dashboards-haproxy
+spec:
+  type: LoadBalancer
+  selector:
+    app: dashboards-haproxy
+  ports:
+  - name: https
+    port: 443
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: dashboards-haproxy
+  name: dashboards-haproxy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dashboards-haproxy
+  template:
+    metadata:
+      labels:
+        app: dashboards-haproxy
+    spec:
+      containers:
+      - name: dashboards-haproxy
+        image: haproxytech/haproxy-debian:2.0
+        imagePullPolicy: Always
+        command: ["/usr/local/sbin/haproxy", "-f", "/etc/haproxy/haproxy.cfg"]
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+        volumeMounts:
+        - name: dashboards-haproxy-cfg
+          mountPath: /etc/haproxy/haproxy.cfg
+          subPath: haproxy.cfg
+        - name: dashboards-ssl-pem
+          mountPath: /etc/ssl/
+          readOnly: true
+      volumes:
+      - name: dashboards-haproxy-cfg
+        configMap:
+          name: dashboards-haproxy-cfg
+          defaultMode: 0644
+      - name: dashboards-ssl-pem
+        secret:
+          secretName: dashboards-ssl-pem
+          defaultMode: 0400
+      restartPolicy: Always
+status: {}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dashboards-haproxy-cfg
+data:
+  haproxy.cfg: |
+    defaults
+      mode http
+      timeout connect 5000ms
+      timeout client 50000ms
+      timeout server 50000ms
+
+    frontend components
+        mode http
+        bind *:443 ssl crt /etc/ssl/ssl.pem
+        default_backend dashboards
+
+    backend dashboards
+        mode http
+        http-request add-header X-Forwarded-Proto https
+        http-request add-header X-Forwarded-Host %[req.hdr(Host)]
+        http-request add-header X-Forwarded-Port %[dst_port]
+        http-request add-header X-Forwarded-For %[src]
+        server dashboards-ui dashboards-ui:80

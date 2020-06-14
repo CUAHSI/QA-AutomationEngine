@@ -1,0 +1,48 @@
+{{- $root := . }}
+{{- range .Values.endpoints }}
+---
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: runner-{{ .name }}
+spec:
+  schedule: "18 15 * * SUN"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: runner
+            image: python:3.8-buster
+            command: ["/bin/sh", "-c"]
+            args:
+            - |
+                git clone https://github.com/CUAHSI/QA-AutomationEngine && \
+                cd QA-AutomationEngine && \
+                pip3 install -r requirements.txt && \
+                ./hydrotest hydroshare HydroshareTestSuite --grid selenium --browser chrome > /var/results/stdout.log 2> /var/results/stderr.log && \
+                find /var/results/stderr.log -printf "%TY-%Tm-%Td %TH:%TM\n" > /var/results/timestamp.txt && \
+                cat /var/results/stderr.log | grep -e 'Ran [0-9]* tests in [0-9]*\.[0-9]*s' > /var/results/run.txt && \
+                tail -n 1 /var/results/stderr.log > /var/results/result.txt
+            volumeMounts:
+            - name: runner-{{ .name }}
+              mountPath: /var/results
+          volumes:
+          - name: runner-{{ .name }}
+            persistentVolumeClaim:
+              claimName: runner-{{ .name }}-pvc
+          restartPolicy: OnFailure
+      backoffLimit: 2
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: runner-{{ .name }}-pvc
+spec:
+  storageClassName: nfs-client
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 8Gi
+{{- end }}

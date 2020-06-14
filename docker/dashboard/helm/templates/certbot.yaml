@@ -1,0 +1,121 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: dashboards-certbot-init
+spec:
+  template:
+    spec:
+      serviceAccountName: dashboards-sa-ssl
+      initContainers:
+      - name: certbot
+        image: certbot/dns-google:v1.3.0
+        command: ["/bin/sh", "-c"]
+        args:
+        - |
+            certbot certonly --dns-google --dns-google-credentials /home/certbot/.secrets/certbot/google.json \
+              -d {{ .Values.certbot.domain }} --non-interactive --agree-tos -m {{ .Values.certbot.email }} && \
+            cat /etc/letsencrypt/live/{{ .Values.certbot.domain }}/cert.pem /etc/letsencrypt/live/{{ .Values.certbot.domain }}/privkey.pem > /etc/ssl/ssl.pem
+        volumeMounts:
+        - name: google-json
+          mountPath: /home/certbot/.secrets/certbot/
+          readOnly: true
+        - name: ssl
+          mountPath: /etc/ssl
+      containers:
+      - name: ssl-secret-creation
+        image: bitnami/kubectl:latest
+        command: ["/bin/sh", "-c"]
+        args:
+        - |
+            kubectl create secret generic dashboards-ssl-pem --from-file=/etc/ssl/ssl.pem \
+              --dry-run -o yaml | kubectl apply -f -
+        volumeMounts:
+        - name: ssl
+          mountPath: /etc/ssl
+      volumes:
+      - name: google-json
+        secret:
+          secretName: google-json
+          defaultMode: 0400
+      - name: ssl
+        emptyDir: {}
+      restartPolicy: OnFailure
+---
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: dashboards-certbot
+spec:
+  # generate a new ssl certificate every 60 days
+  schedule: "0 11 12 */2 *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: dashboards-sa-ssl
+          initContainers:
+          - name: certbot
+            image: certbot/dns-google:v1.3.0
+            command: ["/bin/sh", "-c"]
+            args:
+            - |
+                certbot certonly --dns-google --dns-google-credentials /home/certbot/.secrets/certbot/google.json \
+                  -d {{ .Values.certbot.domain }} --non-interactive --agree-tos -m {{ .Values.certbot.email }} && \
+                cat /etc/letsencrypt/live/{{ .Values.certbot.domain }}/cert.pem /etc/letsencrypt/live/{{ .Values.certbot.domain }}/privkey.pem > /etc/ssl/ssl.pem
+            volumeMounts:
+            - name: google-json
+              mountPath: /home/certbot/.secrets/certbot/
+              readOnly: true
+            - name: ssl
+              mountPath: /etc/ssl
+          containers:
+          - name: ssl-secret-creation
+            image: bitnami/kubectl:latest
+            command: ["/bin/sh", "-c"]
+            args:
+            - |
+                kubectl create secret generic dashboards-ssl-pem --from-file=/etc/ssl/ssl.pem \
+                  --dry-run -o yaml | kubectl apply -f -
+            volumeMounts:
+            - name: ssl
+              mountPath: /etc/ssl
+          volumes:
+          - name: google-json
+            secret:
+              secretName: google-json
+              defaultMode: 0400
+          - name: ssl
+            emptyDir: {}
+          restartPolicy: OnFailure
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: dashboards-sa-ssl
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: dashboards-ssl
+subjects:
+- kind: ServiceAccount
+  name: dashboards-sa-ssl
+roleRef:
+  kind: Role
+  name: dashboards-ssl
+  apiGroup: ""
+---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: dashboards-ssl
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  verbs:
+  - get
+  - create
+  - apply
+  - patch

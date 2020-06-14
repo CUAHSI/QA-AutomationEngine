@@ -1,0 +1,68 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: dashboards-ui
+  name: dashboards-ui
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dashboards-ui
+  template:
+    metadata:
+      labels:
+        app: dashboards-ui
+    spec:
+      containers:
+      - name: dashboards-ui
+        image: us.gcr.io/cuahsiqa/dashboards/ui:latest
+        imagePullPolicy: Always
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "500m"
+        volumeMounts:
+{{- $root := . }}
+{{- range .Values.endpoints }}
+        - name: runner-{{ .name }}
+          mountPath: /srv/{{ .name }}/
+{{- end }}
+        - name: dashboards-ui-caddyfile
+          mountPath: /etc/Caddyfile
+          subPath: Caddyfile
+      volumes:
+{{- $root := . }}
+{{- range .Values.endpoints }}
+      - name: runner-{{ .name }}
+        persistentVolumeClaim:
+          claimName: runner-{{ .name }}-pvc
+{{- end }}
+      - name: dashboards-ui-caddyfile
+        configMap:
+          name: dashboards-ui-caddyfile
+          defaultMode: 0555
+      restartPolicy: Always
+status: {}
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: dashboards-ui
+spec:
+  type: ClusterIP
+  selector:
+    app: dashboards-ui
+  ports:
+  - name: http
+    port: 80
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dashboards-ui-caddyfile
+data:
+  Caddyfile: |
+    0.0.0.0:80
+    tls off

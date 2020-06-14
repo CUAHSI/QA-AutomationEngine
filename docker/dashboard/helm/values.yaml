@@ -1,0 +1,6 @@
+endpoints:
+- name: beta
+  value: beta.hydroshare.org
+certbot:
+  domain: dashboards.cuahsi-qa.com
+  email: admin@cuahsi-qa.com
