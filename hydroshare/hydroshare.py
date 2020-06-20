@@ -4,7 +4,7 @@ import random
 import re
 
 from urllib.request import urlretrieve
-from percy import percySnapshot
+# from percy import percySnapshot
 
 from hs_macros import (
     Hydroshare,
@@ -50,7 +50,6 @@ class HydroshareTestSuite(BaseTestSuite):
         button available """
         LandingPage.to_login(self.driver)
         Login.login(self.driver, USERNAME, PASSWORD)
-        Home.to_my_resources(self.driver)
         resource_types = [
             "CompositeResource",
             "CollectionResource",
@@ -61,7 +60,7 @@ class HydroshareTestSuite(BaseTestSuite):
             "MODFLOWModelInstanceResource",
         ]
         for resource_type in resource_types:
-            MyResources.create_resource(self.driver, resource_type)
+            Home.create_resource(self.driver, resource_type)
             NewResource.configure(self.driver, "TEST TITLE")
             NewResource.cancel(self.driver)
 
@@ -528,7 +527,7 @@ class HydroshareTestSuite(BaseTestSuite):
     def test_B_000029(self):
         """ Commenting requires a login """
         LandingPage.to_discover(self.driver)
-        Discover.search(self.driver, "Beaver Divide Air Temperature - Further Development")
+        Discover.search(self.driver, "DeBuhr")
         Discover.add_filters(self.driver, owner="DeBuhr, Neal")
         Discover.to_resource(self.driver, "Further Development")
         initial_comment_count = Resource.get_comment_count(self.driver)
@@ -793,6 +792,49 @@ class HydroshareTestSuite(BaseTestSuite):
         TestSystem.to_url(self.driver, resource_href)
         Login.login(self.driver, USERNAME, PASSWORD)
         self.assertIn("Private Test Resource", TestSystem.title(self.driver))
+
+    def test_B_000064(self):
+        """ Ensure title renders properly for a sample of resources """
+        Home.to_sitemap(self.driver)
+        links = SiteMap.get_resource_list(self.driver)
+        print(len(links))
+        for i in range(0, len(links), 761):
+            SiteMap.select_resource_by_index(self.driver, i)
+            self.assertTrue(len(Resource.get_title(self.driver)) > 0)
+            print(Resource.get_title(self.driver))
+            TestSystem.back(self.driver)
+
+    def test_B_000073(self):
+        """ Adding and removing a resource reference works properly """
+        LandingPage.to_login(self.driver)
+        Login.login(self.driver, USERNAME, PASSWORD)
+        Home.create_resource(self.driver, "CompositeResource")
+        NewResource.configure(self.driver, "Resource Reference Test")
+        NewResource.create(self.driver)
+        Resource.view(self.driver)
+        Resource.edit(self.driver)
+        Resource.add_reference(self.driver, "First Principles")
+        Resource.delete_reference(self.driver)
+        Resource.add_reference(self.driver, "First Principles")
+        Resource.delete_reference(self.driver)
+
+    def test_B_000075(self):
+        """ Confirm making a resource public requires the prerequisite metadata to be filled out
+        and that the notice about this stays visible in view and edit modes """
+        LandingPage.to_login(self.driver)
+        Login.login(self.driver, USERNAME, PASSWORD)
+        Home.create_resource(self.driver, "CompositeResource")
+        NewResource.configure(self.driver, "Making Resource Public Test")
+        NewResource.create(self.driver)
+        Resource.view(self.driver)
+        Resource.edit(self.driver)
+        Resource.populate_abstract(self.driver, "// TODO Abstract")
+        Resource.view(self.driver)
+        Resource.edit(self.driver)
+        Resource.is_visible_public_resource_notice(self.driver)
+        Resource.add_subject_keyword(self.driver, "keyphrase multiple words")
+        Resource.view(self.driver)
+        Resource.is_visible_public_resource_notice(self.driver)
 
 
 class JupyterhubTestSuite(HydroshareTestSuite):

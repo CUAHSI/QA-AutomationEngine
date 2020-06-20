@@ -731,6 +731,17 @@ class Resource(Hydroshare):
     comment_text = SiteElement(By.CSS_SELECTOR, "#comment textarea")
     comment_submit = SiteElement(By.CSS_SELECTOR, 'input[value="Comment"]')
     comment_section = SiteElement(By.ID, "comments")
+    new_reference = SiteElement(By.CSS_SELECTOR, "a#add-source")
+    derived_from = SiteElement(By.ID, "id_derived_from")
+    save_reference = SiteElement(By.CSS_SELECTOR, "#add-source-dialog button.btn-primary")
+    trash_reference = SiteElement(By.CSS_SELECTOR, "span.glyphicon-trash.table-icon")
+    confirm_delete = SiteElement(By.CSS_SELECTOR, "a.btn-danger.btn-disable-after")
+    new_file = SiteElement(By.CSS_SELECTOR, "#fb-file-operations-controls > a.upload-toggle")
+    abstract = SiteElement(By.ID, "id_abstract")
+    abstract_save = SiteElement(By.CSS_SELECTOR, "#div_id_abstract button")
+    public_resource_notice = SiteElement(By.ID, "missing-metadata-or-file")
+    subject_keywords = SiteElement(By.ID, "txt-keyword")
+    subject_keyword_save = SiteElement(By.CSS_SELECTOR, "#cv-add-keyword-wrapper button")
 
     @classmethod
     def open_with_title(self, title):
@@ -806,6 +817,39 @@ class Resource(Hydroshare):
     @classmethod
     def get_comment_count(self, driver):
         return self.comment_section.get_immediate_child_count(driver) - 4
+
+    @classmethod
+    def is_downloadable(self, driver):
+        return self.bagit.exists(driver)
+
+    @classmethod
+    def add_reference(self, driver, reference_text):
+        self.new_reference.click(driver)
+        self.derived_from.inject_text(driver, reference_text)
+        self.save_reference.click(driver)
+
+    @classmethod
+    def delete_reference(self, driver):
+        self.trash_reference.click(driver)
+        self.confirm_delete.click(driver)
+
+    @classmethod
+    def upload_file(self, driver, path):
+        self.new_file.set_path(driver, path)
+
+    @classmethod
+    def populate_abstract(self, driver, text):
+        self.abstract.inject_text(driver, text)
+        self.abstract_save.click(driver)
+
+    @classmethod
+    def is_visible_public_resource_notice(self, driver):
+        self.public_resource_notice.is_visible(driver)
+
+    @classmethod
+    def add_subject_keyword(self, driver, keyword):
+        self.subject_keywords.inject_text(driver, keyword)
+        self.subject_keyword_save.click(driver)
 
 
 class WebApp(Resource):
@@ -1359,6 +1403,7 @@ class NewResource(Hydroshare):
     @classmethod
     def configure(self, driver, title):
         self.title.click(driver)
+        self.title.clear_all_text(driver)
         self.title.inject_text(driver, title)
 
     @classmethod
@@ -1424,6 +1469,10 @@ class Registration(Hydroshare):
 
 class SiteMap(Hydroshare):
     @classmethod
+    def resource_link(self, index):
+        return SiteElement(By.CSS_SELECTOR, 'h4:nth-of-type({}) a'.format(index+1))
+
+    @classmethod
     def resource_selection(self, resource):
         return SiteElement(By.LINK_TEXT, "{}".format(resource))
 
@@ -1441,6 +1490,10 @@ class SiteMap(Hydroshare):
     def select_resource(self, driver, res):
         self.resource_selection(res).click(driver)
         time.sleep(EXTERNAL_PAGE_LOAD)
+
+    @classmethod
+    def select_resource_by_index(self, driver, index):
+        self.resource_link(index).click(driver)
 
 
 class JupyterHub:
