@@ -21,19 +21,25 @@ from timing import (
     LABEL_CREATION,
     DISCOVER_TABLE_UPDATE,
     EXTERNAL_PAGE_LOAD,
+    KEYS_RESPONSE,
 )
 
 
 class WebPage:
     body_locator = By.CSS_SELECTOR, "body"
 
+
 class Hydroshare(WebPage):
     navigation_landing_page = SiteElement(By.ID, "img-brand-logo")
     navigation_home = SiteElement(By.ID, "dropdown-menu-home")
     navigation_my_resources = SiteElement(By.ID, "dropdown-menu-my-resources")
     navigation_discover = SiteElement(By.ID, "dropdown-menu-search")
-    navigation_collaborate = SiteElement(By.CSS_SELECTOR, "#dropdown-menu-collaborate a")
-    navigation_apps = SiteElement(By.ID, "dropdown-menu-https:--www.hydroshare.org-apps-")
+    navigation_collaborate = SiteElement(
+        By.CSS_SELECTOR, "#dropdown-menu-collaborate a"
+    )
+    navigation_apps = SiteElement(
+        By.ID, "dropdown-menu-https:--www.hydroshare.org-apps-"
+    )
     navigation_help = SiteElement(
         By.CSS_SELECTOR, 'a[href="{}"]'.format("http://help.hydroshare.org")
     )
@@ -48,11 +54,21 @@ class Hydroshare(WebPage):
     footer_terms = SiteElement(By.CSS_SELECTOR, "footer a[href='/terms-of-use']")
     footer_privacy = SiteElement(By.CSS_SELECTOR, "footer a[href='/privacy']")
     footer_sitemap = SiteElement(By.CSS_SELECTOR, "footer a[href='/sitemap/']")
-    footer_twitter = SiteElement(By.CSS_SELECTOR, ".content.social ul li:nth-child(1) > a")
-    footer_facebook = SiteElement(By.CSS_SELECTOR, ".content.social ul li:nth-child(2) > a")
-    footer_youtube = SiteElement(By.CSS_SELECTOR, ".content.social ul li:nth-child(3) > a")
-    footer_github = SiteElement(By.CSS_SELECTOR, ".content.social ul li:nth-child(4) > a")
-    footer_linkedin = SiteElement(By.CSS_SELECTOR, ".content.social ul li:nth-child(5) > a")
+    footer_twitter = SiteElement(
+        By.CSS_SELECTOR, ".content.social ul li:nth-child(1) > a"
+    )
+    footer_facebook = SiteElement(
+        By.CSS_SELECTOR, ".content.social ul li:nth-child(2) > a"
+    )
+    footer_youtube = SiteElement(
+        By.CSS_SELECTOR, ".content.social ul li:nth-child(3) > a"
+    )
+    footer_github = SiteElement(
+        By.CSS_SELECTOR, ".content.social ul li:nth-child(4) > a"
+    )
+    footer_linkedin = SiteElement(
+        By.CSS_SELECTOR, ".content.social ul li:nth-child(5) > a"
+    )
     footer_version = SiteElement(By.CSS_SELECTOR, ".content p b")
     support_email = SiteElement(By.CSS_SELECTOR, 'a[href="mailto:help@cuahsi.org"]')
     page_tip = SiteElement(By.CSS_SELECTOR, ".page-tip > .container > .row > div > p")
@@ -207,7 +223,7 @@ class Home(Hydroshare):
         return SiteElement(
             By.CSS_SELECTOR, "#row-{} > div:nth-child({}) > a".format(row, column)
         )
- 
+
     @classmethod
     def recent_activity_resource(self, row):
         return SiteElement(
@@ -229,13 +245,19 @@ class Home(Hydroshare):
     @classmethod
     def featured_app(self, index):
         return SiteElement(
-            By.CSS_SELECTOR, "div.main-container > div:nth-child(2) > div:nth-child(2) > div.row.big-app-row > div:nth-child({}) > div.app-text-block > div.app-text-block-header > strong > a".format(index)
+            By.CSS_SELECTOR,
+            "div.main-container > div:nth-child(2) > div:nth-child(2) > div.row.big-app-row > div:nth-child({}) > div.app-text-block > div.app-text-block-header > strong > a".format(
+                index
+            ),
         )
 
     @classmethod
     def cuahsi_app(self, index):
         return SiteElement(
-            By.CSS_SELECTOR, "div.main-container > div:nth-child(2) > div:nth-child(3) > div.row.big-app-row > div:nth-child({}) > div.app-text-block > div.app-text-block-header > strong > a".format(index)
+            By.CSS_SELECTOR,
+            "div.main-container > div:nth-child(2) > div:nth-child(3) > div.row.big-app-row > div:nth-child({}) > div.app-text-block > div.app-text-block-header > strong > a".format(
+                index
+            ),
         )
 
     @classmethod
@@ -281,6 +303,7 @@ class Home(Hydroshare):
             num_windows_now = len(driver.window_handles)
             self.cuahsi_app(index).click(driver)
             External.switch_new_page(driver, num_windows_now, self.body_locator)
+
 
 class Login(Hydroshare):
     username = SiteElement(By.ID, "id_username")
@@ -733,15 +756,45 @@ class Resource(Hydroshare):
     comment_section = SiteElement(By.ID, "comments")
     new_reference = SiteElement(By.CSS_SELECTOR, "a#add-source")
     derived_from = SiteElement(By.ID, "id_derived_from")
-    save_reference = SiteElement(By.CSS_SELECTOR, "#add-source-dialog button.btn-primary")
+    save_reference = SiteElement(
+        By.CSS_SELECTOR, "#add-source-dialog button.btn-primary"
+    )
     trash_reference = SiteElement(By.CSS_SELECTOR, "span.glyphicon-trash.table-icon")
     confirm_delete = SiteElement(By.CSS_SELECTOR, "a.btn-danger.btn-disable-after")
-    new_file = SiteElement(By.CSS_SELECTOR, "#fb-file-operations-controls > a.upload-toggle")
+    new_file = SiteElement(
+        By.CSS_SELECTOR, "#fb-file-operations-controls > a.upload-toggle"
+    )
     abstract = SiteElement(By.ID, "id_abstract")
     abstract_save = SiteElement(By.CSS_SELECTOR, "#div_id_abstract button")
     public_resource_notice = SiteElement(By.ID, "missing-metadata-or-file")
     subject_keywords = SiteElement(By.ID, "txt-keyword")
-    subject_keyword_save = SiteElement(By.CSS_SELECTOR, "#cv-add-keyword-wrapper button")
+    subject_keyword_save = SiteElement(
+        By.CSS_SELECTOR, "#cv-add-keyword-wrapper button"
+    )
+    access_management = SiteElement(By.CSS_SELECTOR, 'a[data-target="#manage-access"')
+    copy = SiteElement(By.ID, "copy-resource")
+    accept_terms = SiteElement(By.ID, "agree-chk-copy")
+    confirm_copy = SiteElement(By.ID, "copy-btn")
+    new_version = SiteElement(By.ID, "new-version")
+    new_version_confirm = SiteElement(
+        By.CSS_SELECTOR,
+        "#new-version-resource-dialog > div > div > div.modal-footer > a",
+    )
+    delete = SiteElement(By.ID, "delete")
+    delete_confirmation = SiteElement(
+        By.CSS_SELECTOR, "#delete-resource-dialog > div > div > div.modal-footer > a"
+    )
+    title_input = SiteElement(By.ID, "txt-title")
+    title_save = SiteElement(By.ID, "title-save-button")
+    grant_input = SiteElement(By.ID, "user-autocomplete")
+    access_add = SiteElement(By.ID, "btn-confirm-add-access")
+    access_close = SiteElement(
+        By.CSS_SELECTOR, "#manage-access > div > div > div.modal-footer > a"
+    )
+    access_table = SiteElement(By.CSS_SELECTOR, ".access-table > tbody")
+    access_type = SiteElement(By.ID, "roles_list")
+    access_type_editor = SiteElement(By.CSS_SELECTOR, 'a[data-role="edit"]')
+    access_type_owner = SiteElement(By.CSS_SELECTOR, 'a[data-role="owner"]')
 
     @classmethod
     def open_with_title(self, title):
@@ -851,6 +904,80 @@ class Resource(Hydroshare):
         self.subject_keywords.inject_text(driver, keyword)
         self.subject_keyword_save.click(driver)
 
+    @classmethod
+    def make_public(self, driver):
+        self.access_management.click(driver)
+
+    @classmethod
+    def copy_resource(self, driver):
+        self.copy.click(driver)
+        self.accept_terms.click(driver)
+        self.confirm_copy.click(driver)
+
+    @classmethod
+    def create_version(self, driver):
+        self.new_version.click(driver)
+        self.new_version_confirm.click(driver)
+
+    @classmethod
+    def delete_resource(self, driver):
+        self.delete.click(driver)
+        self.delete_confirmation.click(driver)
+
+    @classmethod
+    def set_title(self, driver, title):
+        self.title_input.click(driver)
+        self.title_input.clear_all_text(driver)
+        self.title_input.inject_text(driver, title)
+        self.title_save.click(driver)
+
+    @classmethod
+    def grant_viewer(self, driver, username):
+        self.access_management.click(driver)
+        self.grant_input.inject_text(driver, username)
+        time.sleep(KEYS_RESPONSE)
+        self.grant_input.inject_text(driver, Keys.ARROW_DOWN)
+        time.sleep(KEYS_RESPONSE)
+        self.grant_input.inject_text(driver, Keys.ENTER)
+        time.sleep(KEYS_RESPONSE)
+        self.access_add.click(driver)
+        self.access_close.click(driver)
+
+    @classmethod
+    def grant_editor(self, driver, username):
+        self.access_management.click(driver)
+        self.access_type.click(driver)
+        self.access_type_editor.click(driver)
+        self.grant_input.inject_text(driver, username)
+        time.sleep(KEYS_RESPONSE)
+        self.grant_input.inject_text(driver, Keys.ARROW_DOWN)
+        time.sleep(KEYS_RESPONSE)
+        self.grant_input.inject_text(driver, Keys.ENTER)
+        time.sleep(KEYS_RESPONSE)
+        self.access_add.click(driver)
+        self.access_close.click(driver)
+
+    @classmethod
+    def grant_owner(self, driver, username):
+        self.access_management.click(driver)
+        self.access_type.click(driver)
+        self.access_type_owner.click(driver)
+        self.grant_input.inject_text(driver, username)
+        time.sleep(KEYS_RESPONSE)
+        self.grant_input.inject_text(driver, Keys.ARROW_DOWN)
+        time.sleep(KEYS_RESPONSE)
+        self.grant_input.inject_text(driver, Keys.ENTER)
+        time.sleep(KEYS_RESPONSE)
+        self.access_add.click(driver)
+        self.access_close.click(driver)
+
+    @classmethod
+    def get_user_access_count(self, driver):
+        self.access_management.click(driver)
+        count = self.access_table.get_immediate_child_count(driver)
+        self.access_close.click(driver)
+        return count
+
 
 class WebApp(Resource):
     save_supported_resource_types = SiteElement(
@@ -907,6 +1034,7 @@ class Help(Hydroshare):
     @classmethod
     def open_core(self, driver, index):
         self.core_item(index).click(driver)
+
 
 class HelpArticle(Hydroshare):
     core_breadcrumb = SiteElement(By.ID, "breadcrumb-menu-home")
@@ -1257,28 +1385,36 @@ class MyResources(Hydroshare):
     def resource_title(self, index):
         return SiteElement(
             By.CSS_SELECTOR,
-            "#item-selectors > tbody > tr:nth-child({}) > td:nth-child(3)".format(index)
+            "#item-selectors > tbody > tr:nth-child({}) > td:nth-child(3)".format(
+                index
+            ),
         )
 
     @classmethod
     def resource_link(self, index):
         return SiteElement(
             By.CSS_SELECTOR,
-            "#item-selectors > tbody > tr:nth-child({}) > td:nth-child(3) > strong > a".format(index)
+            "#item-selectors > tbody > tr:nth-child({}) > td:nth-child(3) > strong > a".format(
+                index
+            ),
         )
 
     @classmethod
     def resource_author(self, index):
         return SiteElement(
             By.CSS_SELECTOR,
-            "#item-selectors > tbody > tr:nth-child({}) > td:nth-child(4)".format(index)
+            "#item-selectors > tbody > tr:nth-child({}) > td:nth-child(4)".format(
+                index
+            ),
         )
 
     @classmethod
     def resource_favorite(self, index):
         return SiteElement(
             By.CSS_SELECTOR,
-            "#item-selectors > tbody > tr:nth-child({}) > td:nth-child(1) > span.glyphicon-star".format(index)
+            "#item-selectors > tbody > tr:nth-child({}) > td:nth-child(1) > span.glyphicon-star".format(
+                index
+            ),
         )
 
     @classmethod
@@ -1470,7 +1606,7 @@ class Registration(Hydroshare):
 class SiteMap(Hydroshare):
     @classmethod
     def resource_link(self, index):
-        return SiteElement(By.CSS_SELECTOR, 'h4:nth-of-type({}) a'.format(index+1))
+        return SiteElement(By.CSS_SELECTOR, "h4:nth-of-type({}) a".format(index + 1))
 
     @classmethod
     def resource_selection(self, resource):
@@ -1533,9 +1669,10 @@ class JupyterHub:
     def agree_to_terms_of_use(self, driver):
         JupyterHub.terms_of_use.click(driver)
 
+
 class JupyterHubNotebooks:
-    sort_name = SiteElement(By.ID, 'sort-name')
-    top_panel = SiteElement(By.ID, 'jp-top-panel')
+    sort_name = SiteElement(By.ID, "sort-name")
+    top_panel = SiteElement(By.ID, "jp-top-panel")
     notebook_spawner = SiteElement(By.CSS_SELECTOR, 'div[data-category="Notebook"]')
 
     @classmethod
@@ -1560,7 +1697,10 @@ class JupyterHubNotebooks:
 
 
 class JupyterHubNotebook:
-    save = SiteElement(By.CSS_SELECTOR, 'button[title="Save the notebook contents and create checkpoint"]')
+    save = SiteElement(
+        By.CSS_SELECTOR,
+        'button[title="Save the notebook contents and create checkpoint"]',
+    )
 
     @classmethod
     def save_notebook(self, driver):

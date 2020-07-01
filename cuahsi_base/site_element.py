@@ -258,9 +258,7 @@ class SiteElement:
 
     def wait_on_visibility(self, driver, max_time):
         locator = self.by, self.locator
-        WebDriverWait(driver, max_time).until(
-            EC.visibility_of_element_located(locator)
-        )
+        WebDriverWait(driver, max_time).until(EC.visibility_of_element_located(locator))
 
 
 class SiteElementsCollection:

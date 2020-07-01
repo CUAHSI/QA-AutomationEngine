@@ -4,6 +4,7 @@ import random
 import re
 
 from urllib.request import urlretrieve
+
 # from percy import percySnapshot
 
 from hs_macros import (
@@ -29,7 +30,7 @@ from hs_macros import (
     WebApp,
     JupyterHub,
     JupyterHubNotebooks,
-    JupyterHubNotebook
+    JupyterHubNotebook,
 )
 
 from cuahsi_base.cuahsi_base import BaseTestSuite, parse_args_run_tests
@@ -145,7 +146,8 @@ class HydroshareTestSuite(BaseTestSuite):
             Help.open_core(self.driver, ind)
             words_string = re.sub("[^A-Za-z]", " ", core_topic)
             matches = [
-                word in HelpArticle.get_title(self.driver) for word in words_string.split(" ")
+                word in HelpArticle.get_title(self.driver)
+                for word in words_string.split(" ")
             ]
             self.assertTrue(True in matches)
             HelpArticle.to_help_breadcrumb(self.driver)
@@ -243,9 +245,7 @@ class HydroshareTestSuite(BaseTestSuite):
         privacy_title = HelpArticle.get_title(self.driver)
         self.assertIn("statement of privacy", privacy_title.lower())
         HelpArticle.to_sitemap(self.driver)
-        self.assertNotIn(
-            "Page not found", TestSystem.title(self.driver)
-        )
+        self.assertNotIn("Page not found", TestSystem.title(self.driver))
 
     def test_B_000013(self):
         """
@@ -263,8 +263,7 @@ class HydroshareTestSuite(BaseTestSuite):
         Profile.save_changes(self.driver)
         page_tip = Profile.page_tip.get_text(self.driver)
         self.assertEqual(
-            "Your profile has been successfully updated.",
-            page_tip,
+            "Your profile has been successfully updated.", page_tip,
         )
 
     def test_B_000014(self):
@@ -427,15 +426,11 @@ class HydroshareTestSuite(BaseTestSuite):
         profile_img_path = os.path.join(cwd, "profile.jpg")
         Profile.add_photo(self.driver, profile_img_path)
         Profile.save_changes(self.driver)
-        self.assertTrue(
-            Profile.confirm_photo_uploaded(self.driver, "profile")
-        )
+        self.assertTrue(Profile.confirm_photo_uploaded(self.driver, "profile"))
         os.remove(profile_img_path)
         Profile.to_editor(self.driver)
         Profile.remove_photo(self.driver)
-        self.assertFalse(
-            Profile.confirm_photo_uploaded(self.driver, "profile")
-        )
+        self.assertFalse(Profile.confirm_photo_uploaded(self.driver, "profile"))
 
     def test_B_000023(self):
         """
@@ -552,7 +547,9 @@ class HydroshareTestSuite(BaseTestSuite):
         """ Confirm that the hydroshare footer version number matches up with the
         latest version number in GitHub """
         displayed_release_version = LandingPage.get_version(self.driver)
-        expected_release_version = LandingPage.get_latest_release(GITHUB_ORG, GITHUB_REPO)
+        expected_release_version = LandingPage.get_latest_release(
+            GITHUB_ORG, GITHUB_REPO
+        )
         self.assertEqual(expected_release_version, displayed_release_version)
 
     def test_B_000033(self):
@@ -569,12 +566,8 @@ class HydroshareTestSuite(BaseTestSuite):
         )
         Discover.show_all(self.driver)
         self.assertFalse(Discover.is_selected(self.driver, author="Myers, Jessie"))
-        self.assertFalse(
-            Discover.is_selected(self.driver, contributor="Cox, Chris")
-        )
-        self.assertFalse(
-            Discover.is_selected(self.driver, owner="Christopher, Adrian")
-        )
+        self.assertFalse(Discover.is_selected(self.driver, contributor="Cox, Chris"))
+        self.assertFalse(Discover.is_selected(self.driver, owner="Christopher, Adrian"))
         self.assertFalse(
             Discover.is_selected(self.driver, content_type="Model Instance")
         )
@@ -689,7 +682,9 @@ class HydroshareTestSuite(BaseTestSuite):
 
     def test_B_000050(self):
         """ Ensure the support email mailto is in the site footer """
-        self.assertEqual("mailto:help@cuahsi.org", LandingPage.get_support_email(self.driver))
+        self.assertEqual(
+            "mailto:help@cuahsi.org", LandingPage.get_support_email(self.driver)
+        )
 
     def test_B_000051(self):
         """ Ensure all Getting Started links open correctly, and in the same tab """
@@ -725,12 +720,9 @@ class HydroshareTestSuite(BaseTestSuite):
         """ Verify featured apps featured on the dashboard link correctly """
         LandingPage.to_login(self.driver)
         Login.login(self.driver, USERNAME, PASSWORD)
-        featured_apps = [
-            "JupyterHub",
-            "Tethys"
-        ]
+        featured_apps = ["JupyterHub", "Tethys"]
         for i in range(0, 2):
-            Home.to_app(self.driver, "Featured", i+1)
+            Home.to_app(self.driver, "Featured", i + 1)
             self.assertIn(featured_apps[i], TestSystem.title(self.driver))
             External.switch_old_page(self.driver)
             External.close_new_page(self.driver)
@@ -739,12 +731,9 @@ class HydroshareTestSuite(BaseTestSuite):
         """ Verify CUAHSI apps mentioned on the dashboard link correctly """
         LandingPage.to_login(self.driver)
         Login.login(self.driver, USERNAME, PASSWORD)
-        cuahsi_apps = [
-            "HydroClient",
-            "HydroServerTools"
-        ]
+        cuahsi_apps = ["HydroClient", "HydroServerTools"]
         for i in range(0, 2):
-            Home.to_app(self.driver, "CUAHSI", i+1)
+            Home.to_app(self.driver, "CUAHSI", i + 1)
             self.assertIn(cuahsi_apps[i], TestSystem.title(self.driver))
             External.switch_old_page(self.driver)
             External.close_new_page(self.driver)
@@ -836,6 +825,166 @@ class HydroshareTestSuite(BaseTestSuite):
         Resource.view(self.driver)
         Resource.is_visible_public_resource_notice(self.driver)
 
+    def test_B_000085(self):
+        """ Copy a resource """
+        LandingPage.to_login(self.driver)
+        Login.login(self.driver, USERNAME, PASSWORD)
+        Home.to_discover(self.driver)
+        Discover.add_filters(
+            self.driver,
+            subject="iUTAH",
+            resource_type="Composite",
+            availability=["discoverable", "public"],
+        )
+        Discover.to_resource(self.driver, "Beaver Divide Air Temperature")
+        Resource.copy_resource(self.driver)
+        Resource.view(self.driver)
+        self.assertEqual(
+            Resource.get_title(self.driver), "Beaver Divide Air Temperature"
+        )
+
+    def test_B_000086(self):
+        """ Confirm basic resource versioning """
+        LandingPage.to_login(self.driver)
+        Login.login(self.driver, USERNAME, PASSWORD)
+        Home.to_discover(self.driver)
+        Discover.add_filters(
+            self.driver,
+            subject="iUTAH",
+            resource_type="Composite",
+            availability=["discoverable", "public"],
+        )
+        Discover.to_resource(self.driver, "Beaver Divide Air Temperature")
+        Resource.copy_resource(self.driver)
+        Resource.view(self.driver)
+        Resource.create_version(self.driver)
+        Resource.view(self.driver)
+        Resource.edit(self.driver)
+        Resource.view(self.driver)
+        TestSystem.back(self.driver)
+        try:
+            Resource.edit(self.driver)
+            # Old resource should no longer be editable
+            self.assertTrue(False)
+        except:
+            TestSystem.wait(1)
+
+    def test_B_000087(self):
+        """ Validate version rollback, through resource deletion """
+        LandingPage.to_login(self.driver)
+        Login.login(self.driver, USERNAME, PASSWORD)
+        Home.to_discover(self.driver)
+        Discover.add_filters(
+            self.driver,
+            subject="iUTAH",
+            resource_type="Composite",
+            availability=["discoverable", "public"],
+        )
+        Discover.to_resource(self.driver, "Beaver Divide Air Temperature")
+        Resource.copy_resource(self.driver)
+        Resource.view(self.driver)
+        Resource.create_version(self.driver)
+        Resource.view(self.driver)
+        Resource.delete_resource(self.driver)
+        TestSystem.back(self.driver)
+        TestSystem.refresh(self.driver)
+        self.assertIn("Page not found", TestSystem.title(self.driver))
+        TestSystem.back(self.driver)
+        try:
+            Resource.edit(self.driver)
+        except:
+            # Old resource version should be editable, after the newer one is deleted
+            self.assertTrue(False)
+
+    def test_B_000088(self):
+        """ Confirm My Resources lists the latest resource version """
+        LandingPage.to_login(self.driver)
+        Login.login(self.driver, USERNAME, PASSWORD)
+        Home.to_discover(self.driver)
+        Discover.add_filters(
+            self.driver,
+            subject="iUTAH",
+            resource_type="Composite",
+            availability=["discoverable", "public"],
+        )
+        Discover.to_resource(self.driver, "Beaver Divide Air Temperature")
+        Resource.copy_resource(self.driver)
+        Resource.set_title(self.driver, "Old Version - Test")
+        Resource.view(self.driver)
+        Resource.create_version(self.driver)
+        Resource.set_title(self.driver, "New Version - Test")
+        Resource.view(self.driver)
+        Resource.to_my_resources(self.driver)
+        MyResources.to_resource_from_table(self.driver, 1)
+        self.assertEqual(Resource.get_title(self.driver), "New Version - Test")
+        Resource.delete_resource(self.driver)
+        MyResources.to_resource_from_table(self.driver, 1)
+        self.assertEqual(Resource.get_title(self.driver), "Old Version - Test")
+        try:
+            Resource.edit(self.driver)
+        except:
+            # Old resource version should be editable, after the newer one is deleted
+            self.assertTrue(False)
+
+    def test_B_000089(self):
+        """ Confirm core resource sharing (viewer) functionality """
+        LandingPage.to_login(self.driver)
+        Login.login(self.driver, USERNAME, PASSWORD)
+        Home.create_resource(self.driver, "CompositeResource")
+        NewResource.configure(self.driver, "Sharing Resource Test")
+        NewResource.create(self.driver)
+        Resource.view(self.driver)
+        Resource.grant_viewer(self.driver, "selenium-user2")
+        users_with_access = Resource.get_user_access_count(self.driver)
+        resource_url = TestSystem.current_url(self.driver)
+        self.assertEqual(users_with_access, 2)
+        Resource.logout(self.driver)
+        LandingPage.to_login(self.driver)
+        Login.login(self.driver, "selenium-user2", "abc123")
+        self.driver.get(resource_url)
+        self.assertEqual(Resource.get_title(self.driver), "Sharing Resource Test")
+
+    def test_B_000091(self):
+        """ Confirm editor sharing """
+        LandingPage.to_login(self.driver)
+        Login.login(self.driver, USERNAME, PASSWORD)
+        Home.create_resource(self.driver, "CompositeResource")
+        NewResource.configure(self.driver, "Editor Resource Test")
+        NewResource.create(self.driver)
+        Resource.view(self.driver)
+        Resource.grant_editor(self.driver, "selenium-user3")
+        users_with_access = Resource.get_user_access_count(self.driver)
+        resource_url = TestSystem.current_url(self.driver)
+        self.assertEqual(users_with_access, 2)
+        Resource.logout(self.driver)
+        LandingPage.to_login(self.driver)
+        Login.login(self.driver, "selenium-user3", "abc123")
+        self.driver.get(resource_url)
+        Resource.edit(self.driver)
+        Resource.view(self.driver)
+        self.assertEqual(Resource.get_title(self.driver), "Editor Resource Test")
+
+    def test_B_000092(self):
+        """ Confirm owner sharing """
+        LandingPage.to_login(self.driver)
+        Login.login(self.driver, USERNAME, PASSWORD)
+        Home.create_resource(self.driver, "CompositeResource")
+        NewResource.configure(self.driver, "Owner Resource Test")
+        NewResource.create(self.driver)
+        Resource.view(self.driver)
+        Resource.grant_owner(self.driver, "selenium-user4")
+        users_with_access = Resource.get_user_access_count(self.driver)
+        resource_url = TestSystem.current_url(self.driver)
+        self.assertEqual(users_with_access, 2)
+        Resource.logout(self.driver)
+        LandingPage.to_login(self.driver)
+        Login.login(self.driver, "selenium-user4", "abc123")
+        self.driver.get(resource_url)
+        Resource.delete_resource(self.driver)
+        TestSystem.back(self.driver)
+        TestSystem.refresh(self.driver)
+        self.assertIn("Page not found", TestSystem.title(self.driver))
+
 
 class JupyterhubTestSuite(HydroshareTestSuite):
     """ Python unittest setup for jupyterhub testing """
@@ -849,7 +998,7 @@ class JupyterhubTestSuite(HydroshareTestSuite):
         TestSystem.to_url(self.driver, "https://jupyterhub.cuahsi.org/hub/login")
         JupyterHub.agree_to_terms_of_use(self.driver)
         JupyterHub.to_hs_login(self.driver)
-        Login.login(self.driver, "selenium-user9", "abc123")
+        Login.login(self.driver, "selenium-user1", "abc123")
         TestSystem.wait(3)
         JupyterHub.authorize_jupyterhub(self.driver)
         # JupyterHub.select_minimal_spawner(self.driver)

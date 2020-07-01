@@ -104,6 +104,12 @@ class TestSystem:
     def execute_javascript(self, driver, script):
         driver.execute_script(script)
 
+    def current_url(self, driver):
+        return driver.current_url
+
+    def refresh(self, driver):
+        driver.refresh()
+
 
 External = External()
 TestSystem = TestSystem()

@@ -301,13 +301,8 @@ class ZendeskWidget:
     def __init__(self):
         self.helping = SiteElement(By.ID, "Embed")
         self.results = SiteElement(By.ID, "webWidget")
-        self.search = SiteElement(
-            By.CSS_SELECTOR, "input"
-        )
-        self.more = SiteElement(
-            By.CSS_SELECTOR,
-            "svg",
-        )
+        self.search = SiteElement(By.CSS_SELECTOR, "input")
+        self.more = SiteElement(By.CSS_SELECTOR, "svg",)
 
     def pull(self, text):
         return SiteElement(By.XPATH, '//a[contains(text(), "{}")]'.format(text))
