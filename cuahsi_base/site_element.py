@@ -232,6 +232,16 @@ class SiteElement:
             target_href = base_url + target_href
         return target_href
 
+    def get_bag_url(self, driver, base_url=None):
+        """ Returns element href link, with relative links expanded
+        into an absolute link
+        """
+        target_el = self.loc_it(driver)
+        target_href = target_el.get_attribute("data-bag-url")
+        if target_href[0] == "/":
+            target_href = base_url + target_href
+        return target_href
+
     def get_child_count(self, driver):
         """ Returns the number of child elements, given a parent
         element specification

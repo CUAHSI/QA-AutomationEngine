@@ -8,6 +8,7 @@ from urllib.request import urlretrieve
 # from percy import percySnapshot
 
 from hs_macros import (
+    Downloads,
     Hydroshare,
     LandingPage,
     Home,
@@ -31,6 +32,7 @@ from hs_macros import (
     JupyterHub,
     JupyterHubNotebooks,
     JupyterHubNotebook,
+    Utilities
 )
 
 from cuahsi_base.cuahsi_base import BaseTestSuite, parse_args_run_tests
@@ -524,7 +526,9 @@ class HydroshareTestSuite(BaseTestSuite):
         LandingPage.to_discover(self.driver)
         Discover.search(self.driver, "DeBuhr")
         Discover.add_filters(self.driver, owner="DeBuhr, Neal")
-        Discover.to_resource(self.driver, "Further Development")
+        Discover.to_resource(
+            self.driver, "Beaver Divide Air Temperature - Further Development"
+        )
         initial_comment_count = Resource.get_comment_count(self.driver)
         Resource.add_comment(self.driver, "Test Comment")
         self.assertIn("Please log in", Login.get_notification(self.driver))
@@ -837,10 +841,15 @@ class HydroshareTestSuite(BaseTestSuite):
             availability=["discoverable", "public"],
         )
         Discover.to_resource(self.driver, "Beaver Divide Air Temperature")
+        Discover.clear_notifications(self.driver)
         Resource.copy_resource(self.driver)
+        Resource.use_notification_link(self.driver, 1)
+        Resource.edit(self.driver)
         Resource.view(self.driver)
-        self.assertEqual(
-            Resource.get_title(self.driver), "Beaver Divide Air Temperature"
+        self.assertTrue(
+            Resource.get_title(self.driver) == "Beaver Divide Air Temperature"
+            or Resource.get_title(self.driver)
+            == "Beaver Divide Air Temperature - Further Development"
         )
 
     def test_B_000086(self):
@@ -855,8 +864,9 @@ class HydroshareTestSuite(BaseTestSuite):
             availability=["discoverable", "public"],
         )
         Discover.to_resource(self.driver, "Beaver Divide Air Temperature")
+        Discover.clear_notifications(self.driver)
         Resource.copy_resource(self.driver)
-        Resource.view(self.driver)
+        Resource.use_notification_link(self.driver, 1)
         Resource.create_version(self.driver)
         Resource.view(self.driver)
         Resource.edit(self.driver)
@@ -881,8 +891,9 @@ class HydroshareTestSuite(BaseTestSuite):
             availability=["discoverable", "public"],
         )
         Discover.to_resource(self.driver, "Beaver Divide Air Temperature")
+        Discover.clear_notifications(self.driver)
         Resource.copy_resource(self.driver)
-        Resource.view(self.driver)
+        Resource.use_notification_link(self.driver, 1)
         Resource.create_version(self.driver)
         Resource.view(self.driver)
         Resource.delete_resource(self.driver)
@@ -908,7 +919,10 @@ class HydroshareTestSuite(BaseTestSuite):
             availability=["discoverable", "public"],
         )
         Discover.to_resource(self.driver, "Beaver Divide Air Temperature")
+        Discover.clear_notifications(self.driver)
         Resource.copy_resource(self.driver)
+        Resource.use_notification_link(self.driver, 1)
+        Resource.edit(self.driver)
         Resource.set_title(self.driver, "Old Version - Test")
         Resource.view(self.driver)
         Resource.create_version(self.driver)
@@ -985,6 +999,191 @@ class HydroshareTestSuite(BaseTestSuite):
         TestSystem.refresh(self.driver)
         self.assertIn("Page not found", TestSystem.title(self.driver))
 
+    def test_B_000094(self):
+        """ Confirm sharable functionality with a share chain """
+        LandingPage.to_login(self.driver)
+        Login.login(self.driver, USERNAME, PASSWORD)
+        Home.create_resource(self.driver, "CompositeResource")
+        NewResource.configure(self.driver, "Sharable Chain Resource Test")
+        NewResource.create(self.driver)
+        Resource.view(self.driver)
+        Resource.grant_editor(self.driver, "selenium-user5")
+        users_with_access = Resource.get_user_access_count(self.driver)
+        resource_url = TestSystem.current_url(self.driver)
+        self.assertEqual(users_with_access, 2)
+        Resource.logout(self.driver)
+        LandingPage.to_login(self.driver)
+        Login.login(self.driver, "selenium-user5", "abc123")
+        self.driver.get(resource_url)
+        Resource.edit(self.driver)
+        Resource.view(self.driver)
+        Resource.grant_editor(self.driver, "selenium-user6")
+        users_with_access = Resource.get_user_access_count(self.driver)
+        resource_url = TestSystem.current_url(self.driver)
+        self.assertEqual(users_with_access, 3)
+        Resource.logout(self.driver)
+        LandingPage.to_login(self.driver)
+        Login.login(self.driver, "selenium-user6", "abc123")
+        self.driver.get(resource_url)
+        Resource.edit(self.driver)
+        Resource.view(self.driver)
+        self.assertEqual(
+            Resource.get_title(self.driver), "Sharable Chain Resource Test"
+        )
+
+    def test_B_000095(self):
+        """ Confirm the ability to block sharable functionality with the sharable setting """
+        LandingPage.to_login(self.driver)
+        Login.login(self.driver, USERNAME, PASSWORD)
+        Home.create_resource(self.driver, "CompositeResource")
+        NewResource.configure(self.driver, "Sharable Chain Resource Test")
+        NewResource.create(self.driver)
+        Resource.view(self.driver)
+        Resource.grant_editor(self.driver, "selenium-user5")
+        Resource.toggle_sharable(self.driver)
+        users_with_access = Resource.get_user_access_count(self.driver)
+        resource_url = TestSystem.current_url(self.driver)
+        self.assertEqual(users_with_access, 2)
+        Resource.logout(self.driver)
+        LandingPage.to_login(self.driver)
+        Login.login(self.driver, "selenium-user5", "abc123")
+        self.driver.get(resource_url)
+        Resource.edit(self.driver)
+        Resource.view(self.driver)
+        try:
+            Resource.grant_editor(self.driver, "selenium-user6")
+            self.assertTrue(False)  # Selenium-User5 should not be able to share
+        except:
+            TestSystem.wait(1)
+
+    def test_B_000096(self):
+        """ Update profile contact information """
+        LandingPage.to_login(self.driver)
+        Login.login(self.driver, USERNAME, PASSWORD)
+        Home.to_profile(self.driver)
+        Profile.to_editor(self.driver)
+        Profile.update_contact(
+            self.driver,
+            phone1="555-555-5555",
+            phone2="555-555-5555",
+            email="jim@example.com",
+            website="example.com",
+        )
+        Profile.save_changes(self.driver)
+
+    def test_B_000097(self):
+        """ Update profile name matches logout interface name """
+        LandingPage.to_login(self.driver)
+        Login.login(self.driver, USERNAME, PASSWORD)
+        Home.to_profile(self.driver)
+        self.assertEqual(
+            Profile.get_logged_in_name(self.driver), Profile.get_name(self.driver)
+        )
+
+    def test_B_000099(self):
+        """ Ensure the total for each author matches the total when the author filter is applied in Discover """
+        LandingPage.to_discover(self.driver)
+        for i in range(1, 50, 7):
+            Discover.toggle_author_filter_by_index(self.driver, i)
+            filter_count = Discover.get_author_resource_count_by_index(self.driver, i)
+            table_count = Discover.count_results_in_table(self.driver)
+            Discover.toggle_author_filter_by_index(self.driver, i)
+            self.assertEqual(filter_count, table_count)
+
+    def test_B_000100(self):
+        """ Ensure the total for each contributor matches the total when the contributor filter is applied in Discover """
+        LandingPage.to_discover(self.driver)
+        for i in range(2, 50, 7):
+            Discover.toggle_contributor_filter_by_index(self.driver, i)
+            filter_count = Discover.get_contributor_resource_count_by_index(
+                self.driver, i
+            )
+            table_count = Discover.count_results_in_table(self.driver)
+            Discover.toggle_contributor_filter_by_index(self.driver, i)
+            self.assertEqual(filter_count, table_count)
+
+    def test_B_000101(self):
+        """ Ensure the total for each owner matches the total when the owner filter is applied in Discover """
+        LandingPage.to_discover(self.driver)
+        for i in range(3, 50, 7):
+            Discover.toggle_owner_filter_by_index(self.driver, i)
+            filter_count = Discover.get_owner_resource_count_by_index(self.driver, i)
+            table_count = Discover.count_results_in_table(self.driver)
+            Discover.toggle_owner_filter_by_index(self.driver, i)
+            self.assertEqual(filter_count, table_count)
+
+    def test_B_000102(self):
+        """ Confirm dates are formatted consistently across resources in the results table """
+        LandingPage.to_discover(self.driver)
+        Discover.uses_consistent_date_formatting(self.driver)
+
+    def test_B_000103(self):
+        """ Ensure resource logos are consistent within each resource type """
+        LandingPage.to_discover(self.driver)
+        self.assertTrue(Discover.uses_consistent_icon(self.driver))
+
+    def test_B_000105(self):
+        """ Ensure the total for each resource type matches the total when the resource type filter is applied in Discover """
+        LandingPage.to_discover(self.driver)
+        for i in range(4, Discover.get_count_of_types(self.driver), 3):
+            Discover.toggle_type_filter_by_index(self.driver, i)
+            filter_count = Discover.get_type_resource_count_by_index(self.driver, i)
+            table_count = Discover.count_results_in_table(self.driver)
+            Discover.toggle_type_filter_by_index(self.driver, i)
+            self.assertEqual(filter_count, table_count)
+
+    def test_B_000106(self):
+        """ Ensure the listed first author in the Discover page is listed as an author on the resource page """
+        LandingPage.to_discover(self.driver)
+        # Get a pseudo-random sample by taking the first result of a few random string searches
+        search_strings = [
+            "Berlin",
+            "CUAHSI",
+            "99",
+            "Estuary",
+            "New York",
+            "Precipitation",
+            "Ice",
+            "Antarctica",
+            "Phosphorus",
+            "Leak",
+            "Database",
+        ]
+        for search_string in search_strings:
+            Discover.search(self.driver, search_string)
+            first_author = Discover.get_first_author_by_resource_index(self.driver, 1)
+            Discover.to_resource_by_index(self.driver, 1)  # first row, second column
+            authors_csv = ", ".join(Resource.get_authors(self.driver))
+            for name_part in first_author.replace(",", "").split(" "):
+                self.assertIn(name_part, authors_csv)
+            TestSystem.back(self.driver)
+
+    def test_B_000109(self):
+        """
+        Confirms Beaver Divide Air Temperature resource landing page is
+        online via navigation and title check, then downloads the BagIt
+        archive and confirms the BagIt file size matches expectation
+        """
+        LandingPage.to_discover(self.driver)
+        Discover.search(self.driver, "Waterhackweek 2019 Cyberseminar: Jupyter notebooks and workflows on Hydroshare")
+        Discover.to_resource(self.driver, "Waterhackweek 2019 Cyberseminar: Jupyter notebooks and workflows on Hydroshare")
+        Resource.download_bagit(self.driver)
+        TestSystem.wait()
+        TestSystem.to_url(self.driver, "chrome://downloads")
+        Downloads.check_successful_download(self.driver)
+
+
+class Utils(HydroshareTestSuite):
+
+    def setUp(self):
+        super(Utils, self).setUp()
+        self.driver.get(BASE_URL)
+
+    def test_000001(self):
+        TestSystem.to_url(self.driver, "http://toxiproxy-test/")
+        Utilities.run_speed_test(self.driver)
+        TestSystem.wait(20)
+
 
 class JupyterhubTestSuite(HydroshareTestSuite):
     """ Python unittest setup for jupyterhub testing """
@@ -995,15 +1194,15 @@ class JupyterhubTestSuite(HydroshareTestSuite):
 
     def test_000001(self):
         """ Spawn and interact with a server """
-        TestSystem.to_url(self.driver, "https://jupyterhub.cuahsi.org/hub/login")
-        JupyterHub.agree_to_terms_of_use(self.driver)
+        TestSystem.to_url(self.driver, "https://jupyter-edu.cuahsi.org/hub/login")
+        # JupyterHub.agree_to_terms_of_use(self.driver)
         JupyterHub.to_hs_login(self.driver)
         Login.login(self.driver, "selenium-user1", "abc123")
         TestSystem.wait(3)
         JupyterHub.authorize_jupyterhub(self.driver)
         # JupyterHub.select_minimal_spawner(self.driver)
         # JupyterHub.select_scientific_spawner(self.driver)
-        JupyterHub.select_r_scientific_spawner(self.driver)
+        # JupyterHub.select_r_scientific_spawner(self.driver)
         JupyterHubNotebooks.wait_on_server_creation(self.driver)
         if not JupyterHubNotebooks.is_spawner_set(self.driver):
             JupyterHubNotebooks.select_notebook_spawner(self.driver)

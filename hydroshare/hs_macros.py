@@ -8,6 +8,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import TimeoutException
 from dateutil import parser
 from urllib.request import urlretrieve, urlopen
+from datetime import datetime
 
 from cuahsi_base.site_element import SiteElement, SiteElementsCollection
 from cuahsi_base.utils import External, TestSystem
@@ -27,6 +28,25 @@ from timing import (
 
 class WebPage:
     body_locator = By.CSS_SELECTOR, "body"
+
+
+class Downloads:
+    latest_link = SiteElement(By.CSS_SELECTOR, "#show")
+
+    @classmethod
+    def check_successful_download(self, driver):
+        download_time = 0
+        while download_time < 300:
+            successful_downloads = TestSystem.return_from_javascript(
+                driver,
+                "return document.querySelector('downloads-manager').shadowRoot.querySelector('#downloadsList').items.filter(e => e.state === 'COMPLETE').length"
+            )
+            if successful_downloads > 0:
+                return True
+            else:
+                TestSystem.wait(5)
+                download_time += 5
+        return False
 
 
 class Hydroshare(WebPage):
@@ -72,6 +92,9 @@ class Hydroshare(WebPage):
     footer_version = SiteElement(By.CSS_SELECTOR, ".content p b")
     support_email = SiteElement(By.CSS_SELECTOR, 'a[href="mailto:help@cuahsi.org"]')
     page_tip = SiteElement(By.CSS_SELECTOR, ".page-tip > .container > .row > div > p")
+    logged_in_full_name = SiteElement(By.ID, "profile-menu-fullname")
+    notifications = SiteElement(By.CSS_SELECTOR, "#notifications-dropdown > a")
+    notifications_clear = SiteElement(By.CSS_SELECTOR, "#btn-notifications-clear")
 
     @classmethod
     def resource_type(self, resource_type):
@@ -176,6 +199,19 @@ class Hydroshare(WebPage):
     @classmethod
     def get_support_email(self, driver):
         return self.support_email.get_href(driver)
+
+    @classmethod
+    def get_logged_in_name(self, driver):
+        self.profile_menu.click(driver)
+        name = self.logged_in_full_name.get_text(driver)
+        self.profile_menu.click(driver)
+        return name
+
+    @classmethod
+    def clear_notifications(self, driver):
+        self.notifications.click(driver)
+        self.notifications_clear.click(driver)
+        self.notifications.click(driver)
 
 
 class LandingPage(Hydroshare):
@@ -404,6 +440,9 @@ class Discover(Hydroshare):
         ".open > ul:nth-child(2) > li:nth-child(1) > div:nth-child(1) "
         "> div:nth-child(2) > h4:nth-child(1) > a:nth-child(1)",
     )
+    author_list = SiteElement(By.ID, "list-group-creator")
+    result_rows = SiteElement(By.CSS_SELECTOR, "#items-discovered > tbody")
+    type_list = SiteElement(By.ID, "list-group-content_type")
 
     @classmethod
     def resource_link(self, title):
@@ -493,6 +532,71 @@ class Discover(Hydroshare):
         return SiteElement(By.ID, "availability-{}".format(availability))
 
     @classmethod
+    def author_by_index(self, index):
+        return SiteElement(
+            By.CSS_SELECTOR,
+            "#list-group-creator > li:nth-of-type({}) input".format(index),
+        )
+
+    @classmethod
+    def author_resource_count_by_index(self, index):
+        return SiteElement(
+            By.CSS_SELECTOR,
+            "#list-group-creator > li:nth-of-type({}) > span".format(index),
+        )
+
+    @classmethod
+    def contributor_by_index(self, index):
+        return SiteElement(
+            By.CSS_SELECTOR,
+            "#list-group-contributor > li:nth-of-type({}) input".format(index),
+        )
+
+    @classmethod
+    def contributor_resource_count_by_index(self, index):
+        return SiteElement(
+            By.CSS_SELECTOR,
+            "#list-group-contributor > li:nth-of-type({}) > span".format(index),
+        )
+
+    @classmethod
+    def owner_by_index(self, index):
+        return SiteElement(
+            By.CSS_SELECTOR,
+            "#list-group-owner > li:nth-of-type({}) input".format(index),
+        )
+
+    @classmethod
+    def owner_resource_count_by_index(self, index):
+        return SiteElement(
+            By.CSS_SELECTOR,
+            "#list-group-owner > li:nth-of-type({}) > span".format(index),
+        )
+
+    @classmethod
+    def type_by_index(self, index):
+        return SiteElement(
+            By.CSS_SELECTOR,
+            "#list-group-content_type > li:nth-of-type({}) input".format(index),
+        )
+
+    @classmethod
+    def type_resource_count_by_index(self, index):
+        return SiteElement(
+            By.CSS_SELECTOR,
+            "#list-group-content_type > li:nth-of-type({}) > span".format(index),
+        )
+
+    @classmethod
+    def resource_icon_by_index(self, index):
+        return SiteElement(
+            By.CSS_SELECTOR,
+            "#items-discovered > tbody > tr:nth-child({}) > td:nth-child(1) > img".format(
+                index
+            ),
+        )
+
+    @classmethod
     def set_sort_order(self, driver, option):
         """ Set the sort order to {{option}} """
         self.sort_order.select_option_text(driver, option)
@@ -513,7 +617,6 @@ class Discover(Hydroshare):
         resource_found = False
         while not resource_found:
             try:
-                self.next_page.scroll_to(driver)
                 self.resource_link(title).click(driver)
                 resource_found = True
             except TimeoutException:
@@ -703,6 +806,8 @@ class Discover(Hydroshare):
 
     @classmethod
     def search(self, driver, text):
+        self.search_field.click(driver)
+        self.search_field.clear_all_text(driver)
         self.search_field.inject_text(driver, text)
         self.search_field.submit(driver)
         time.sleep(DISCOVER_TABLE_UPDATE)
@@ -710,6 +815,10 @@ class Discover(Hydroshare):
     @classmethod
     def to_search_result_item(self, driver, col_ind, row_one):
         self.cell_href(col_ind, row_one).click(driver)
+
+    @classmethod
+    def to_resource_by_index(self, driver, index):
+        self.cell_strong_href(2, index).click(driver)
 
     @classmethod
     def is_selected(
@@ -734,6 +843,109 @@ class Discover(Hydroshare):
             return self.filter_subject(subject).is_selected(driver)
         elif availability is not None:
             return self.filter_availability(availability).is_selected(driver)
+
+    @classmethod
+    def toggle_author_filter_by_index(self, driver, index):
+        self.author_by_index(index).javascript_click(driver)
+        time.sleep(DISCOVER_TABLE_UPDATE)
+
+    @classmethod
+    def get_author_resource_count_by_index(self, driver, index):
+        return int(self.author_resource_count_by_index(index).get_text(driver))
+
+    @classmethod
+    def toggle_contributor_filter_by_index(self, driver, index):
+        self.contributor_by_index(index).javascript_click(driver)
+        time.sleep(DISCOVER_TABLE_UPDATE)
+
+    @classmethod
+    def get_contributor_resource_count_by_index(self, driver, index):
+        return int(self.contributor_resource_count_by_index(index).get_text(driver))
+
+    @classmethod
+    def toggle_owner_filter_by_index(self, driver, index):
+        self.owner_by_index(index).javascript_click(driver)
+        time.sleep(DISCOVER_TABLE_UPDATE)
+
+    @classmethod
+    def get_owner_resource_count_by_index(self, driver, index):
+        return int(self.owner_resource_count_by_index(index).get_text(driver))
+
+    @classmethod
+    def toggle_type_filter_by_index(self, driver, index):
+        self.type_by_index(index).javascript_click(driver)
+        time.sleep(DISCOVER_TABLE_UPDATE)
+
+    @classmethod
+    def get_type_resource_count_by_index(self, driver, index):
+        return int(self.type_resource_count_by_index(index).get_text(driver))
+
+    @classmethod
+    def get_count_of_types(self, driver):
+        time.sleep(DISCOVER_TABLE_UPDATE)
+        return int(self.type_list.get_immediate_child_count(driver))
+
+    @classmethod
+    def count_results_in_table(self, driver):
+        last_page = False
+        count = 0
+        while not last_page:
+            time.sleep(DISCOVER_TABLE_UPDATE / 3)
+            try:
+                self.next_page.scroll_to(driver)
+                self.next_page.javascript_click(driver)
+                count += self.result_rows.get_immediate_child_count(driver)
+            except TimeoutException:
+                last_page = True
+                count += self.result_rows.get_immediate_child_count(driver)
+        return count
+
+    @classmethod
+    def uses_consistent_date_formatting(self, driver):
+        last_page = False
+        page = 1
+        while not last_page:
+            time.sleep(DISCOVER_TABLE_UPDATE / 3)
+            try:
+                for i in range(
+                    1, self.result_rows.get_immediate_child_count(driver) + 1
+                ):
+                    date_created = " ".join(
+                        self.cell(4, i).get_text(driver).split(" ")[0:-1]
+                    )  # Date created, without the trailing a.m./p.m.
+                    last_modified = " ".join(
+                        self.cell(5, i).get_text(driver).split(" ")[0:-1]
+                    )  # Last modified, without the trailing a.m./p.m.
+                    datetime.strptime(date_created, "%b %d, %Y at %I:%M")
+                    datetime.strptime(last_modified, "%b %d, %Y at %I:%M")
+                self.next_page.scroll_to(driver)
+                self.next_page.javascript_click(driver)
+                page += 1
+                print(page)
+            except TimeoutException:
+                last_page = True
+            except ValueError as e:
+                raise Exception(e)
+        return True
+
+    @classmethod
+    def get_first_author_by_resource_index(self, driver, index):
+        try:
+            first_author = self.cell_href(3, index).get_text(driver)
+        except TimeoutException:
+            first_author = self.cell(3, index).get_text(driver)
+        return first_author
+
+    @classmethod
+    def uses_consistent_icon(self, driver):
+        reference_src = self.resource_icon_by_index(1).get_attribute(driver, "src")
+        for i in range(2, self.result_rows.get_immediate_child_count(driver) + 1):
+            if (
+                self.resource_icon_by_index(i).get_attribute(driver, "src")
+                != reference_src
+            ):
+                return False
+        return True
 
 
 class Resource(Hydroshare):
@@ -795,6 +1007,10 @@ class Resource(Hydroshare):
     access_type = SiteElement(By.ID, "roles_list")
     access_type_editor = SiteElement(By.CSS_SELECTOR, 'a[data-role="edit"]')
     access_type_owner = SiteElement(By.CSS_SELECTOR, 'a[data-role="owner"]')
+    access_sharable = SiteElement(
+        By.CSS_SELECTOR, "#sharing-status input[type=checkbox]"
+    )
+    authors = SiteElement(By.CSS_SELECTOR, ".authors-wrapper")
 
     @classmethod
     def open_with_title(self, title):
@@ -809,11 +1025,24 @@ class Resource(Hydroshare):
         return SiteElement(By.XPATH, '//td[text()= "{}"]'.format(value))
 
     @classmethod
-    def get_bagit_size(self, driver, BASE_URL):
+    def author(self, index):
+        return SiteElement(
+            By.CSS_SELECTOR, ".authors-wrapper > a:nth-of-type({})".format(index)
+        )
+
+    @classmethod
+    def notification_link(self, index):
+        return SiteElement(
+            By.CSS_SELECTOR,
+            "#app-notifications .task:nth-of-type({}) .notification--name a".format(
+                index
+            ),
+        )
+
+    @classmethod
+    def download_bagit(self, driver):
         """ Check the size of the BagIt download """
-        download_href = self.bagit.get_href(driver, BASE_URL)
-        r = requests.get(download_href)
-        return len(r.content)
+        self.bagit.click(driver)
 
     @classmethod
     def open_with_jupyterhub(self, driver):
@@ -977,6 +1206,22 @@ class Resource(Hydroshare):
         count = self.access_table.get_immediate_child_count(driver)
         self.access_close.click(driver)
         return count
+
+    @classmethod
+    def toggle_sharable(self, driver):
+        self.access_management.click(driver)
+        self.access_sharable.click(driver)
+        self.access_close.click(driver)
+
+    @classmethod
+    def get_authors(self, driver):
+        authors_count = self.authors.get_immediate_child_count(driver)
+        authors = [self.author(i).get_text(driver) for i in range(1, authors_count + 1)]
+        return authors
+
+    @classmethod
+    def use_notification_link(self, driver, index):
+        self.notification_link(index).click(driver)
 
 
 class WebApp(Resource):
@@ -1165,6 +1410,10 @@ class Profile(Hydroshare):
     country = SiteElement(By.CSS_SELECTOR, 'select[name="country"]')
     province = SiteElement(By.CSS_SELECTOR, 'input[name="state"]')
     name = SiteElement(By.CSS_SELECTOR, "h2")
+    phone1 = SiteElement(By.ID, "phone1")
+    phone2 = SiteElement(By.ID, "phone2")
+    email = SiteElement(By.ID, "id_email")
+    website = SiteElement(By.CSS_SELECTOR, 'input[name="website"]')
 
     @classmethod
     def contribution_type(self, index):
@@ -1276,6 +1525,31 @@ class Profile(Hydroshare):
         self.province.click(driver)
         self.province.clear_all_text(driver)
         self.province.inject_text(driver, province)
+
+    @classmethod
+    def update_contact(
+        self, driver, phone1=None, phone2=None, email=None, website=None
+    ):
+        if phone1 is not None:
+            self.phone1.click(driver)
+            self.phone1.clear_all_text(driver)
+            self.phone1.inject_text(driver, phone1)
+        if phone2 is not None:
+            self.phone2.click(driver)
+            self.phone2.clear_all_text(driver)
+            self.phone2.inject_text(driver, phone2)
+        if email is not None:
+            self.email.click(driver)
+            self.email.clear_all_text(driver)
+            self.email.inject_text(driver, email)
+        if website is not None:
+            self.website.click(driver)
+            self.website.clear_all_text(driver)
+            self.website.inject_text(driver, website)
+
+    @classmethod
+    def get_name(self, driver):
+        return self.name.get_text(driver)
 
 
 class Collaborate(Hydroshare):
@@ -1677,7 +1951,7 @@ class JupyterHubNotebooks:
 
     @classmethod
     def wait_on_server_creation(self, driver):
-        JupyterHubNotebooks.top_panel.wait_on_visibility(driver, 300)
+        JupyterHubNotebooks.top_panel.wait_on_visibility(driver, 600)
 
     @classmethod
     def sort_notebooks_by_name(self, driver):
@@ -1705,3 +1979,13 @@ class JupyterHubNotebook:
     @classmethod
     def save_notebook(self, driver):
         self.save.click(driver)
+
+
+class Utilities:
+    run_test = SiteElement(By.ID, "run-test")
+    confirm_test = SiteElement(By.ID, "view39")
+
+    @classmethod
+    def run_speed_test(self, driver):
+        self.run_test.click(driver)
+        self.confirm_test.click(driver)

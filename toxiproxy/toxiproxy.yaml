@@ -1,0 +1,201 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: toxiproxy-www
+  name: toxiproxy-www
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: toxiproxy-www
+  template:
+    metadata:
+      labels:
+        app: toxiproxy-www
+    spec:
+      containers:
+      - name: toxiproxy-www
+        image: shopify/toxiproxy:2.1.4
+        args:
+        - "-config"
+        - "/etc/toxiproxy.json"
+        ports:
+        - name: http
+          containerPort: 443
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "500m"
+        volumeMounts:
+        - name: toxiproxy-www-json
+          mountPath: /etc/toxiproxy.json
+          subPath: toxiproxy.json
+      volumes:
+      - name: toxiproxy-www-json
+        configMap:
+          name: toxiproxy-www-json
+      restartPolicy: Always
+status: {}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: toxiproxy-beta
+  name: toxiproxy-beta
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: toxiproxy-beta
+  template:
+    metadata:
+      labels:
+        app: toxiproxy-beta
+    spec:
+      containers:
+      - name: toxiproxy-beta
+        image: shopify/toxiproxy:2.1.4
+        args:
+        - "-config"
+        - "/etc/toxiproxy.json"
+        ports:
+        - name: http
+          containerPort: 443
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "500m"
+        volumeMounts:
+        - name: toxiproxy-beta-json
+          mountPath: /etc/toxiproxy.json
+          subPath: toxiproxy.json
+      volumes:
+      - name: toxiproxy-beta-json
+        configMap:
+          name: toxiproxy-beta-json
+      restartPolicy: Always
+status: {}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: toxiproxy-test
+  name: toxiproxy-test
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: toxiproxy-test
+  template:
+    metadata:
+      labels:
+        app: toxiproxy-test
+    spec:
+      containers:
+      - name: toxiproxy-test
+        image: shopify/toxiproxy:2.1.4
+        args:
+        - "-config"
+        - "/etc/toxiproxy.json"
+        ports:
+        - name: http
+          containerPort: 80
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "500m"
+        volumeMounts:
+        - name: toxiproxy-test-json
+          mountPath: /etc/toxiproxy.json
+          subPath: toxiproxy.json
+      volumes:
+      - name: toxiproxy-test-json
+        configMap:
+          name: toxiproxy-test-json
+      restartPolicy: Always
+status: {}
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: toxiproxy-www
+spec:
+  type: ClusterIP
+  selector:
+    app: toxiproxy
+  ports:
+  - name: http
+    port: 443
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: toxiproxy-beta
+spec:
+  type: ClusterIP
+  selector:
+    app: toxiproxy-beta
+  ports:
+  - name: http
+    port: 443
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: toxiproxy-test
+spec:
+  type: ClusterIP
+  selector:
+    app: toxiproxy-test
+  ports:
+  - name: http
+    port: 80
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: toxiproxy-www-json
+data:
+  toxiproxy.json: |
+    [
+      {
+        "name": "www",
+        "listen": "[::]:443",
+        "upstream": "hydroshare.org:443",
+        "enabled": true
+      }
+    ]
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: toxiproxy-beta-json
+data:
+  toxiproxy.json: |
+    [
+      {
+        "name": "beta",
+        "listen": "[::]:443",
+        "upstream": "beta.hydroshare.org:443",
+        "enabled": true
+      }
+    ]
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: toxiproxy-test-json
+data:
+  toxiproxy.json: |
+    [
+      {
+        "name": "test",
+        "listen": "[::]:80",
+        "upstream": "speedtest.googlefiber.net:80",
+        "enabled": true
+      }
+    ]

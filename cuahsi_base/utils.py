@@ -104,6 +104,9 @@ class TestSystem:
     def execute_javascript(self, driver, script):
         driver.execute_script(script)
 
+    def return_from_javascript(self, driver, script):
+        return driver.execute_script(script)
+
     def current_url(self, driver):
         return driver.current_url
 
