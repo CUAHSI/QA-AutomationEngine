@@ -10,6 +10,7 @@ from .browser import USER_AGENT
 
 class BaseTestSuite(unittest.TestCase):
     grid_hub_ip = None
+    resource = None
     browser = "firefox"
 
     def setUp(self):
@@ -44,6 +45,9 @@ class BaseTestSuite(unittest.TestCase):
 
         self.driver = driver
 
+    def getResourceId(self):
+        return self.resource
+
     @staticmethod
     def _firefox_profile():
         profile = webdriver.FirefoxProfile()
@@ -64,6 +68,7 @@ def basecli():
     parser = argparse.ArgumentParser()
     parser.add_argument("--grid")
     parser.add_argument("--browser")
+    parser.add_argument("--resource")
     parser.add_argument("unittest_args", nargs="*")
 
     return parser
@@ -72,6 +77,7 @@ def basecli():
 def parse_args_run_tests(test_class):
     args = basecli().parse_args()
     test_class.grid_hub_ip = args.grid
+    test_class.resource = args.resource
     if args.browser is not None:
         test_class.browser = args.browser
 

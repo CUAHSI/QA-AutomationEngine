@@ -1172,6 +1172,38 @@ class HydroshareTestSuite(BaseTestSuite):
         TestSystem.to_url(self.driver, "chrome://downloads")
         Downloads.check_successful_download(self.driver)
 
+class PerformanceTestSuite(BaseTestSuite):
+    """ Python unittest setup for smoke tests """
+
+    def setUp(self):
+        super(PerformanceTestSuite, self).setUp()
+
+    def test_D_000001(self):
+        """
+        Download a BagIt, straight from the resource landing page
+        """
+        resource = super(PerformanceTestSuite, self).getResourceId()
+        TestSystem.to_url(self.driver, BASE_URL + "/resource/{}/".format(resource))
+        Resource.download_bagit(self.driver)
+        TestSystem.wait()
+        TestSystem.to_url(self.driver, "chrome://downloads")
+        self.assertTrue(Downloads.check_successful_download(self.driver))
+
+    def test_D_000002(self):
+        """
+        Make a set of test resources public
+        """
+        TestSystem.to_url(self.driver, BASE_URL)
+        LandingPage.to_login(self.driver)
+        Login.login(self.driver, USERNAME, PASSWORD)
+        resource_ids = [
+            # Copy resource IDs here
+        ]
+        for resource_id in resource_ids:
+            TestSystem.to_url(self.driver, BASE_URL + "/resource/{}/".format(resource_id))
+            Resource.edit(self.driver)
+            Resource.make_public(self.driver)
+
 
 class Utils(HydroshareTestSuite):
 

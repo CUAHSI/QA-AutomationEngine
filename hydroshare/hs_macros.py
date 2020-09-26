@@ -1010,6 +1010,7 @@ class Resource(Hydroshare):
     access_sharable = SiteElement(
         By.CSS_SELECTOR, "#sharing-status input[type=checkbox]"
     )
+    access_public = SiteElement(By.ID, "btn-public")
     authors = SiteElement(By.CSS_SELECTOR, ".authors-wrapper")
 
     @classmethod
@@ -1136,6 +1137,8 @@ class Resource(Hydroshare):
     @classmethod
     def make_public(self, driver):
         self.access_management.click(driver)
+        self.access_public.click(driver)
+        self.access_close.click(driver)
 
     @classmethod
     def copy_resource(self, driver):
