@@ -1,5 +1,5 @@
 #!/bin/bash
-for i in {1..150}
+for i in {1..190}
 do
     RESOURCE_ID=$(cat resources.txt | head -n $i | tail -n 1 | xargs -i echo -n {})
     # Get a CSRF Token from Swagger API Delete Call

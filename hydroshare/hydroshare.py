@@ -9,6 +9,7 @@ from urllib.request import urlretrieve
 
 from hs_macros import (
     Downloads,
+    MatlabOnline,
     Hydroshare,
     LandingPage,
     Home,
@@ -71,17 +72,18 @@ class HydroshareTestSuite(BaseTestSuite):
         """
         Confirms Beaver Divide Air Temperature resource landing page is
         online via navigation and title check, then downloads the BagIt
-        archive and confirms the BagIt file size matches expectation
+        archive to make sure it downloads successfully
         """
         LandingPage.to_discover(self.driver)
         Discover.add_filters(
             self.driver,
             subject="iUTAH",
-            resource_type="Composite",
+            resource_type="Composite Resource",
             availability=["discoverable", "public"],
         )
         Discover.to_resource(self.driver, "Beaver Divide Air Temperature")
-        self.assertEqual(Resource.get_bagit_size(self.driver, BASE_URL), 512000)
+        Resource.download_bagit(self.driver)
+        self.assertTrue(Downloads.check_successful_download_new_tab(self.driver))
 
     def test_B_000005(self):
         """ Confirms password reset works for users """
@@ -105,17 +107,21 @@ class HydroshareTestSuite(BaseTestSuite):
         of the first rows being ordered correctly
         """
         LandingPage.to_discover(self.driver)
-        orderings = ["Last Modified", "Title", "First Author", "Date Created"]
-        for ordering in orderings:
-            Discover.set_sort_direction(self.driver, "Ascending")
-            Discover.set_sort_order(self.driver, ordering)
+        Discover.add_filters(
+            self.driver,
+            availability=["published"],
+        )  # remove once long delay issue is fixed
+        orderings = ["First Author", "Date Created", "Last Modified"]
+        for i in range(3, 6):
+            Discover.set_sort(self.driver, i)
+            TestSystem.wait()  # remove once long delay issue is fixed
             self.assertTrue(
-                Discover.check_sorting_multi(self.driver, ordering, "Ascending")
+                Discover.check_sorting_multi(self.driver, orderings[i-3], "Ascending")
             )
-            Discover.set_sort_direction(self.driver, "Descending")
-            Discover.set_sort_order(self.driver, ordering)
+            Discover.set_sort(self.driver, i)
+            TestSystem.wait()  # remove once long delay issue is fixed
             self.assertTrue(
-                Discover.check_sorting_multi(self.driver, ordering, "Descending")
+                Discover.check_sorting_multi(self.driver, orderings[i-3], "Descending")
             )
 
     def test_B_000007(self):
@@ -540,11 +546,11 @@ class HydroshareTestSuite(BaseTestSuite):
     def test_B_000031(self):
         """ Confirm that resources can be accessed from the sitemap links """
         LandingPage.to_sitemap(self.driver)
-        SiteMap.select_resource(self.driver, "Beaver Divide Air Temperature")
-        self.assertIn("Beaver Divide Air Temperature", TestSystem.title(self.driver))
+        SiteMap.select_resource(self.driver, "Beaver Divide Air Temperature - Demo")
+        self.assertIn("Beaver Divide Air Temperature - Demo", TestSystem.title(self.driver))
         TestSystem.back(self.driver)
-        SiteMap.select_resource(self.driver, "Beaver Divide Air Temperature")
-        self.assertIn("Beaver Divide Air Temperature", TestSystem.title(self.driver))
+        SiteMap.select_resource(self.driver, "Beaver Divide Air Temperature - Demo")
+        self.assertIn("Beaver Divide Air Temperature - Demo", TestSystem.title(self.driver))
         TestSystem.back(self.driver)
 
     def test_B_000032(self):
@@ -557,24 +563,20 @@ class HydroshareTestSuite(BaseTestSuite):
         self.assertEqual(expected_release_version, displayed_release_version)
 
     def test_B_000033(self):
-        """ Ensure Discover page "show all" clears all filter types """
+        """ Ensure Discover page refresh clears all filters """
         LandingPage.to_discover(self.driver)
         Discover.add_filters(
             self.driver,
             author="Myers, Jessie",
             contributor="Cox, Chris",
             owner="Christopher, Adrian",
-            content_type="Model Instance",
             subject="USACE Corps Water Management System (CWMS)",
             availability="public",
         )
-        Discover.show_all(self.driver)
+        TestSystem.refresh(self.driver)
         self.assertFalse(Discover.is_selected(self.driver, author="Myers, Jessie"))
         self.assertFalse(Discover.is_selected(self.driver, contributor="Cox, Chris"))
         self.assertFalse(Discover.is_selected(self.driver, owner="Christopher, Adrian"))
-        self.assertFalse(
-            Discover.is_selected(self.driver, content_type="Model Instance")
-        )
         self.assertFalse(
             Discover.is_selected(
                 self.driver, subject="USACE Corps Water Management System (CWMS)"
@@ -724,12 +726,19 @@ class HydroshareTestSuite(BaseTestSuite):
         """ Verify featured apps featured on the dashboard link correctly """
         LandingPage.to_login(self.driver)
         Login.login(self.driver, USERNAME, PASSWORD)
-        featured_apps = ["JupyterHub", "Tethys"]
-        for i in range(0, 2):
-            Home.to_app(self.driver, "Featured", i + 1)
-            self.assertIn(featured_apps[i], TestSystem.title(self.driver))
-            External.switch_old_page(self.driver)
-            External.close_new_page(self.driver)
+        # JupyterHub
+        Home.to_app(self.driver, "Featured", 1)
+        self.assertIn("JupyterHub", TestSystem.title(self.driver))
+        External.switch_old_page(self.driver)
+        External.close_new_page(self.driver)
+        # MATLAB Online
+        Home.to_app(self.driver, "Featured", 2)
+        Login.login(self.driver, USERNAME, PASSWORD)
+        MatlabOnline.authorize(self.driver)
+        TestSystem.wait(30)
+        self.assertIn("MATLAB Online", TestSystem.title(self.driver))
+        External.switch_old_page(self.driver)
+        External.close_new_page(self.driver)
 
     def test_B_000057(self):
         """ Verify CUAHSI apps mentioned on the dashboard link correctly """
@@ -837,19 +846,18 @@ class HydroshareTestSuite(BaseTestSuite):
         Discover.add_filters(
             self.driver,
             subject="iUTAH",
-            resource_type="Composite",
+            resource_type="Composite Resource",
             availability=["discoverable", "public"],
         )
         Discover.to_resource(self.driver, "Beaver Divide Air Temperature")
         Discover.clear_notifications(self.driver)
         Resource.copy_resource(self.driver)
+        TestSystem.wait(20)
         Resource.use_notification_link(self.driver, 1)
         Resource.edit(self.driver)
         Resource.view(self.driver)
         self.assertTrue(
-            Resource.get_title(self.driver) == "Beaver Divide Air Temperature"
-            or Resource.get_title(self.driver)
-            == "Beaver Divide Air Temperature - Further Development"
+            "Beaver Divide Air Temperature" in Resource.get_title(self.driver)
         )
 
     def test_B_000086(self):
@@ -860,12 +868,13 @@ class HydroshareTestSuite(BaseTestSuite):
         Discover.add_filters(
             self.driver,
             subject="iUTAH",
-            resource_type="Composite",
+            resource_type="Composite Resource",
             availability=["discoverable", "public"],
         )
         Discover.to_resource(self.driver, "Beaver Divide Air Temperature")
         Discover.clear_notifications(self.driver)
         Resource.copy_resource(self.driver)
+        TestSystem.wait(20)
         Resource.use_notification_link(self.driver, 1)
         Resource.create_version(self.driver)
         Resource.view(self.driver)
@@ -887,12 +896,13 @@ class HydroshareTestSuite(BaseTestSuite):
         Discover.add_filters(
             self.driver,
             subject="iUTAH",
-            resource_type="Composite",
+            resource_type="Composite Resource",
             availability=["discoverable", "public"],
         )
         Discover.to_resource(self.driver, "Beaver Divide Air Temperature")
         Discover.clear_notifications(self.driver)
         Resource.copy_resource(self.driver)
+        TestSystem.wait(20)
         Resource.use_notification_link(self.driver, 1)
         Resource.create_version(self.driver)
         Resource.view(self.driver)
@@ -915,17 +925,19 @@ class HydroshareTestSuite(BaseTestSuite):
         Discover.add_filters(
             self.driver,
             subject="iUTAH",
-            resource_type="Composite",
+            resource_type="Composite Resource",
             availability=["discoverable", "public"],
         )
         Discover.to_resource(self.driver, "Beaver Divide Air Temperature")
         Discover.clear_notifications(self.driver)
         Resource.copy_resource(self.driver)
+        TestSystem.wait(20)
         Resource.use_notification_link(self.driver, 1)
         Resource.edit(self.driver)
         Resource.set_title(self.driver, "Old Version - Test")
         Resource.view(self.driver)
         Resource.create_version(self.driver)
+        TestSystem.wait(20)
         Resource.set_title(self.driver, "New Version - Test")
         Resource.view(self.driver)
         Resource.to_my_resources(self.driver)
@@ -1083,7 +1095,7 @@ class HydroshareTestSuite(BaseTestSuite):
     def test_B_000099(self):
         """ Ensure the total for each author matches the total when the author filter is applied in Discover """
         LandingPage.to_discover(self.driver)
-        for i in range(1, 50, 7):
+        for i in range(1, 20, 4):
             Discover.toggle_author_filter_by_index(self.driver, i)
             filter_count = Discover.get_author_resource_count_by_index(self.driver, i)
             table_count = Discover.count_results_in_table(self.driver)
@@ -1093,7 +1105,7 @@ class HydroshareTestSuite(BaseTestSuite):
     def test_B_000100(self):
         """ Ensure the total for each contributor matches the total when the contributor filter is applied in Discover """
         LandingPage.to_discover(self.driver)
-        for i in range(2, 50, 7):
+        for i in range(2, 20, 4):
             Discover.toggle_contributor_filter_by_index(self.driver, i)
             filter_count = Discover.get_contributor_resource_count_by_index(
                 self.driver, i
@@ -1105,7 +1117,7 @@ class HydroshareTestSuite(BaseTestSuite):
     def test_B_000101(self):
         """ Ensure the total for each owner matches the total when the owner filter is applied in Discover """
         LandingPage.to_discover(self.driver)
-        for i in range(3, 50, 7):
+        for i in range(3, 20, 4):
             Discover.toggle_owner_filter_by_index(self.driver, i)
             filter_count = Discover.get_owner_resource_count_by_index(self.driver, i)
             table_count = Discover.count_results_in_table(self.driver)
@@ -1156,7 +1168,8 @@ class HydroshareTestSuite(BaseTestSuite):
             authors_csv = ", ".join(Resource.get_authors(self.driver))
             for name_part in first_author.replace(",", "").split(" "):
                 self.assertIn(name_part, authors_csv)
-            TestSystem.back(self.driver)
+            External.switch_old_page(self.driver)
+            External.close_new_page(self.driver)
 
     def test_B_000109(self):
         """
@@ -1178,7 +1191,7 @@ class PerformanceTestSuite(BaseTestSuite):
     def setUp(self):
         super(PerformanceTestSuite, self).setUp()
 
-    def test_D_000001(self):
+    def test_D_000000(self):
         """
         Download a BagIt, straight from the resource landing page
         """
@@ -1186,8 +1199,25 @@ class PerformanceTestSuite(BaseTestSuite):
         TestSystem.to_url(self.driver, BASE_URL + "/resource/{}/".format(resource))
         Resource.download_bagit(self.driver)
         TestSystem.wait()
+        Resource.wait_on_task_completion(self.driver, 1, 300)
+        Resource.use_notification_link(self.driver, 1)
         TestSystem.to_url(self.driver, "chrome://downloads")
         self.assertTrue(Downloads.check_successful_download(self.driver))
+
+    def test_D_000001(self):
+        """
+        Download a BagIt, straight from the resource landing page
+        """
+        resource = super(PerformanceTestSuite, self).getResourceId()
+        # TestSystem.to_url(self.driver, BASE_URL)
+        # LandingPage.to_login(self.driver)
+        # Login.login(self.driver, USERNAME, PASSWORD)
+        TestSystem.to_url(self.driver, BASE_URL + "/resource/{}/".format(resource))
+        Resource.download_bagit(self.driver)
+        TestSystem.wait(10)
+        # Resource.wait_on_download_notification(self.driver)
+        # TestSystem.to_url(self.driver, "chrome://downloads")
+        self.assertTrue(Downloads.check_successful_download_new_tab(self.driver))
 
     def test_D_000002(self):
         """

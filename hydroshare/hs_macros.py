@@ -30,13 +30,23 @@ class WebPage:
     body_locator = By.CSS_SELECTOR, "body"
 
 
-class Downloads:
+class MatlabOnline:
+    authorize_btn = SiteElement(By.CSS_SELECTOR, 'input[value="Authorize"]')
+    accept_terms = SiteElement(By.ID, 'btn_submit')
+
+    @classmethod
+    def authorize(self, driver):
+        self.authorize_btn.click(driver)
+        self.accept_terms.click(driver)
+
+
+class Downloads(WebPage):
     latest_link = SiteElement(By.CSS_SELECTOR, "#show")
 
     @classmethod
     def check_successful_download(self, driver):
         download_time = 0
-        while download_time < 300:
+        while download_time < 1800:
             successful_downloads = TestSystem.return_from_javascript(
                 driver,
                 "return document.querySelector('downloads-manager').shadowRoot.querySelector('#downloadsList').items.filter(e => e.state === 'COMPLETE').length"
@@ -47,6 +57,16 @@ class Downloads:
                 TestSystem.wait(5)
                 download_time += 5
         return False
+
+    @classmethod
+    def check_successful_download_new_tab(self, driver):
+        num_windows_now = len(driver.window_handles)
+        TestSystem.execute_javascript(
+            driver, '''window.open("https://google.com","_blank");'''
+        )
+        External.switch_new_page(driver, num_windows_now, self.body_locator)
+        TestSystem.to_url(driver, "chrome://downloads")
+        return self.check_successful_download(driver)
 
 
 class Hydroshare(WebPage):
@@ -430,10 +450,11 @@ class Discover(Hydroshare):
         "#legend-collapse div:first-child div:first-child div.col-xs-12.col-sm-7",
     )
     next_page = SiteElement(By.XPATH, '//a[contains(text(), "Next")][1]')
+    page = SiteElement(By.ID, 'page-number')
     last_updated_by = SiteElement(
         By.XPATH, '//th[text() = "Last updated:"]/following-sibling::td/a'
     )
-    search_field = SiteElement(By.ID, "id_q")
+    search_field = SiteElement(By.ID, "search-input")
     show_all_btn = SiteElement(By.ID, "btn-show-all")
     user_modal_to_profile = SiteElement(
         By.CSS_SELECTOR,
@@ -442,7 +463,14 @@ class Discover(Hydroshare):
     )
     author_list = SiteElement(By.ID, "list-group-creator")
     result_rows = SiteElement(By.CSS_SELECTOR, "#items-discovered > tbody")
-    type_list = SiteElement(By.ID, "list-group-content_type")
+    type_list = SiteElement(By.ID, "list-group-type")
+    map_mode = SiteElement(By.ID, "map-mode-button")
+    page_left = SiteElement(By.ID, "page-left")
+    page_right = SiteElement(By.ID, "page-right")
+
+    @classmethod
+    def column_header(index):
+        return SiteElement(By.CSS_SELECTOR, "thead > tr:nth-child(1) > th:nth-child({})".format(index))
 
     @classmethod
     def resource_link(self, title):
@@ -464,7 +492,7 @@ class Discover(Hydroshare):
         return SiteElement(
             By.CSS_SELECTOR,
             "#items-discovered tbody tr:nth-of-type({}) "
-            "td:nth-of-type({})".format(row, col),
+            "td:nth-of-type({}) span".format(row, col),
         )
 
     @classmethod
@@ -493,11 +521,11 @@ class Discover(Hydroshare):
 
     @classmethod
     def filter_author(self, author):
-        return SiteElement(By.ID, "creator-{}".format(author))
+        return SiteElement(By.ID, "author-{}".format(author))
 
     @classmethod
     def filter_contributor(self, author):
-        return SiteElement(By.ID, "contributor-{}".format(author))
+        return SiteElement(By.ID, "contrib-{}".format(author))
 
     @classmethod
     def filter_content_type(self, content_type):
@@ -505,11 +533,11 @@ class Discover(Hydroshare):
 
     @classmethod
     def filter_subject(self, subject):
-        return SiteElement(By.ID, "subject-{}".format(subject))
+        return SiteElement(By.ID, "subj-{}".format(subject))
 
     @classmethod
     def filter_resource_type(self, resource_type):
-        return SiteElement(By.ID, "content_type-{}".format(resource_type))
+        return SiteElement(By.ID, "type-{}".format(resource_type))
 
     @classmethod
     def filter_owner(self, owner):
@@ -529,7 +557,7 @@ class Discover(Hydroshare):
 
     @classmethod
     def filter_availability(self, availability):
-        return SiteElement(By.ID, "availability-{}".format(availability))
+        return SiteElement(By.ID, "avail-{}".format(availability))
 
     @classmethod
     def author_by_index(self, index):
@@ -577,21 +605,21 @@ class Discover(Hydroshare):
     def type_by_index(self, index):
         return SiteElement(
             By.CSS_SELECTOR,
-            "#list-group-content_type > li:nth-of-type({}) input".format(index),
+            "#list-group-type > li:nth-of-type({}) input".format(index),
         )
 
     @classmethod
     def type_resource_count_by_index(self, index):
         return SiteElement(
             By.CSS_SELECTOR,
-            "#list-group-content_type > li:nth-of-type({}) > span".format(index),
+            "#list-group-type > li:nth-of-type({}) > span".format(index),
         )
 
     @classmethod
     def resource_icon_by_index(self, index):
         return SiteElement(
             By.CSS_SELECTOR,
-            "#items-discovered > tbody > tr:nth-child({}) > td:nth-child(1) > img".format(
+            "#items-discovered > tbody > tr:nth-child({}) > td:nth-child(1) > span > img:nth-child(1)".format(
                 index
             ),
         )
@@ -609,19 +637,25 @@ class Discover(Hydroshare):
         time.sleep(DISCOVER_TABLE_UPDATE)
 
     @classmethod
+    def set_sort(self, driver, col_index):
+        self.col_header(col_index).click(driver)
+
+    @classmethod
     def to_resource(self, driver, title):
         """ Navigate to the {{title}} resource landing page by clicking
         on it within the table.  If the resource is not visible will switch to
         the next result page
         """
+        num_windows_now = len(driver.window_handles)
         resource_found = False
         while not resource_found:
             try:
                 self.resource_link(title).click(driver)
                 resource_found = True
             except TimeoutException:
-                self.next_page.scroll_to(driver)
-                self.next_page.javascript_click(driver)
+                self.page_right.click(driver)
+        # Switch to new resource page
+        External.switch_new_page(driver, num_windows_now, Resource.authors_locator)
 
     @classmethod
     def to_last_updated_profile(self, driver):
@@ -667,8 +701,8 @@ class Discover(Hydroshare):
         """
         col_ind = self.col_index(driver, column_name)
         if column_name == "Title":
-            first_element = self.cell_strong_href(col_ind, row_one)
-            second_element = self.cell_strong_href(col_ind, row_two)
+            first_element = self.cell_href(col_ind, row_one)
+            second_element = self.cell_href(col_ind, row_two)
             first_two_vals = [
                 first_element.get_text(driver),
                 second_element.get_text(driver),
@@ -806,6 +840,8 @@ class Discover(Hydroshare):
 
     @classmethod
     def search(self, driver, text):
+        self.map_mode.click(driver)
+        self.map_mode.click(driver)
         self.search_field.click(driver)
         self.search_field.clear_all_text(driver)
         self.search_field.inject_text(driver, text)
@@ -818,7 +854,9 @@ class Discover(Hydroshare):
 
     @classmethod
     def to_resource_by_index(self, driver, index):
-        self.cell_strong_href(2, index).click(driver)
+        num_windows_now = len(driver.window_handles)
+        self.cell_href(2, index).click(driver)
+        External.switch_new_page(driver, num_windows_now, Resource.authors_locator)
 
     @classmethod
     def is_selected(
@@ -887,45 +925,41 @@ class Discover(Hydroshare):
 
     @classmethod
     def count_results_in_table(self, driver):
-        last_page = False
+        last_page = 0
         count = 0
-        while not last_page:
-            time.sleep(DISCOVER_TABLE_UPDATE / 3)
-            try:
-                self.next_page.scroll_to(driver)
-                self.next_page.javascript_click(driver)
-                count += self.result_rows.get_immediate_child_count(driver)
-            except TimeoutException:
-                last_page = True
-                count += self.result_rows.get_immediate_child_count(driver)
+        while True:
+            time.sleep(DISCOVER_TABLE_UPDATE)
+            current_page = self.page.get_value(driver)
+            if current_page == last_page:
+                break
+            TestSystem.wait()
+            self.page_right.click(driver)
+            last_page = current_page
+            time.sleep(DISCOVER_TABLE_UPDATE)
+            count += self.result_rows.get_immediate_child_count(driver)
         return count
 
     @classmethod
     def uses_consistent_date_formatting(self, driver):
-        last_page = False
-        page = 1
-        while not last_page:
-            time.sleep(DISCOVER_TABLE_UPDATE / 3)
-            try:
-                for i in range(
-                    1, self.result_rows.get_immediate_child_count(driver) + 1
-                ):
-                    date_created = " ".join(
-                        self.cell(4, i).get_text(driver).split(" ")[0:-1]
-                    )  # Date created, without the trailing a.m./p.m.
-                    last_modified = " ".join(
-                        self.cell(5, i).get_text(driver).split(" ")[0:-1]
-                    )  # Last modified, without the trailing a.m./p.m.
-                    datetime.strptime(date_created, "%b %d, %Y at %I:%M")
-                    datetime.strptime(last_modified, "%b %d, %Y at %I:%M")
-                self.next_page.scroll_to(driver)
-                self.next_page.javascript_click(driver)
-                page += 1
-                print(page)
-            except TimeoutException:
-                last_page = True
-            except ValueError as e:
-                raise Exception(e)
+        last_page = 0
+        while True:
+            time.sleep(DISCOVER_TABLE_UPDATE)
+            for i in range(
+                1, self.result_rows.get_immediate_child_count(driver) + 1
+            ):
+                # date_created = "/".join([number.zfill(2) for number in self.cell(4, i).get_text(driver).split("/")])
+                date_created = self.cell(4, i).get_text(driver)
+                last_modified = self.cell(5, i).get_text(driver)
+                datetime.strptime(date_created, "%m/%d/%Y")
+                datetime.strptime(last_modified, "%m/%d/%Y")
+            current_page = self.page.get_value(driver)
+            if current_page == last_page:
+                break
+            self.page.click(driver)
+            self.page.clear_all_text(driver)
+            self.page.inject_text(driver, "{}".format(int(current_page) + 1))
+            self.page.inject_text(driver, Keys.ENTER)
+            last_page = current_page
         return True
 
     @classmethod
@@ -1012,6 +1046,9 @@ class Resource(Hydroshare):
     )
     access_public = SiteElement(By.ID, "btn-public")
     authors = SiteElement(By.CSS_SELECTOR, ".authors-wrapper")
+    authors_locator = By.CSS_SELECTOR, ".authors-wrapper"
+    download_status = SiteElement(By.ID, "download-status-info")
+    # If your download does not start automatically
 
     @classmethod
     def open_with_title(self, title):
@@ -1042,7 +1079,6 @@ class Resource(Hydroshare):
 
     @classmethod
     def download_bagit(self, driver):
-        """ Check the size of the BagIt download """
         self.bagit.click(driver)
 
     @classmethod
@@ -1226,6 +1262,21 @@ class Resource(Hydroshare):
     def use_notification_link(self, driver, index):
         self.notification_link(index).click(driver)
 
+    @classmethod
+    def wait_on_task_completion(self, driver, index, timeout):
+        elapsed = 0
+        while elapsed < timeout:
+            try:
+                self.notification_link(index).click(driver)
+                break
+            except TimeoutException:
+                time.sleep(1)
+                elapsed += 1
+
+    @classmethod
+    def wait_on_download_notification(self, driver):
+        while "Please wait" in self.download_status.get_text(driver):
+            time.sleep(1)
 
 class WebApp(Resource):
     save_supported_resource_types = SiteElement(
