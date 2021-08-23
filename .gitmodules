@@ -1,0 +1,3 @@
+[submodule "hsclient"]
+	path = hsclient
+	url = https://github.com/hydroshare/hsclient
