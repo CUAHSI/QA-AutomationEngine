@@ -1,20 +1,41 @@
 import argparse
 import sys
+import time
 import unittest
 import warnings
 
+from botocore.config import Config
 from selenium import webdriver
 
 from .browser import USER_AGENT
+from .utils import kinesis_record
+
+SPAM_DATA_STREAM_NAME = "cuahsi-quality-spam-data-stream"
+SPAM_DATA_STREAM_CONFIG = Config(
+    region_name="us-east-2",
+)
+TEST_DURATION_DATA_STREAM_NAME = "cuahsi-quality-test-duration-data-stream"
+TEST_DURATION_DATA_STREAM_CONFIG = Config(
+    region_name="us-east-2",
+)
+USER_COUNT = 1
 
 
 class BaseTestSuite(unittest.TestCase):
     grid_hub_ip = None
     resource = None
     browser = "firefox"
+    records = None
+    data = {}
+    past_errors = 0
+    past_failures = 0
 
     def setUp(self):
-        """ Setup driver for use in automation tests """
+        """Setup driver for use in automation tests"""
+
+        if self.records == "aws":
+            self.data["test"] = self._testMethodName
+            self.data["start_time"] = time.time()
 
         if self.grid_hub_ip is not None:
             warnings.simplefilter("ignore", ResourceWarning)
@@ -60,8 +81,35 @@ class BaseTestSuite(unittest.TestCase):
         options.add_argument("--user-agent={}".format(USER_AGENT))
         return options
 
+    def list2reason(self, exc_list):
+        if exc_list and exc_list[-1][0] is self:
+            return exc_list[-1][1]
+
     def tearDown(self):
         self.driver.quit()
+
+        # https://gist.github.com/hynekcer/1b0a260ef72dae05fe9611904d7b9675
+        if hasattr(self, "_outcome"):  # Python 3.4+
+            result = self.defaultTestResult()  # these 2 methods have no side effects
+            self._feedErrorsToResult(result, self._outcome.errors)
+        else:  # Python 3.2 - 3.3 or 2.7
+            result = getattr(self, "_outcomeForDoCleanups", self._resultForDoCleanups)
+        ok = self.past_errors == len(result.errors) and self.past_failures == len(
+            result.failures
+        )
+        self.past_errors = len(result.errors)
+        self.past_failures = len(result.failures)
+
+        if self.records == "aws":
+            self.data["end_time"] = time.time()
+            self.data["passed"] = ok
+            self.data["parallel_users"] = USER_COUNT
+            kinesis_record(
+                TEST_DURATION_DATA_STREAM_CONFIG,
+                TEST_DURATION_DATA_STREAM_NAME,
+                "test-duration",
+                self.data,
+            )
 
 
 def basecli():
@@ -69,6 +117,7 @@ def basecli():
     parser.add_argument("--grid")
     parser.add_argument("--browser")
     parser.add_argument("--resource")
+    parser.add_argument("--records")
     parser.add_argument("unittest_args", nargs="*")
 
     return parser
@@ -80,6 +129,8 @@ def parse_args_run_tests(test_class):
     test_class.resource = args.resource
     if args.browser is not None:
         test_class.browser = args.browser
+    if args.records is not None:
+        test_class.records = args.records
 
     sys.argv[1:] = args.unittest_args
     unittest.main(verbosity=2)

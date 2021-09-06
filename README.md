@@ -72,6 +72,12 @@ $ ./hydrotest hydroclient --browser chrome
 $ ./hydrotest hydroclient --browser safari HydroclientTestSuite.test_A_000002
 ```
 
+For loading test data into AWS, first export AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY environment variables, and then set AWS as the records target:
+```
+$ ./hydrotest hydroclient --records aws
+$ ./hydrotest hydroclient --records aws HydroclientTestSuite.test_A_000002
+```
+
 ### Jenkins Deployments
 After following the README in [docker/continuous-integration/](https://github.com/CUAHSI/QA-AutomationEngine/blob/master/docker/continuous-integration/) to setup a QA automation server, the tests to run can be configured using the following configuration files:
 1) [hydroclient.conf](hydroclient/hydroclient.conf)

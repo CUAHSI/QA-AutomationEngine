@@ -1,5 +1,6 @@
 import json
 import os
+import re
 import requests
 import time
 
@@ -23,6 +24,7 @@ from timing import (
     DISCOVER_TABLE_UPDATE,
     EXTERNAL_PAGE_LOAD,
     KEYS_RESPONSE,
+    RESOURCE_LANDING_PAGE_LOAD,
 )
 
 
@@ -32,7 +34,7 @@ class WebPage:
 
 class MatlabOnline:
     authorize_btn = SiteElement(By.CSS_SELECTOR, 'input[value="Authorize"]')
-    accept_terms = SiteElement(By.ID, 'btn_submit')
+    accept_terms = SiteElement(By.ID, "btn_submit")
 
     @classmethod
     def authorize(self, driver):
@@ -46,10 +48,10 @@ class Downloads(WebPage):
     @classmethod
     def check_successful_download(self, driver):
         download_time = 0
-        while download_time < 1800:
+        while download_time < 3600:
             successful_downloads = TestSystem.return_from_javascript(
                 driver,
-                "return document.querySelector('downloads-manager').shadowRoot.querySelector('#downloadsList').items.filter(e => e.state === 'COMPLETE').length"
+                "return document.querySelector('downloads-manager').shadowRoot.querySelector('#downloadsList').items.filter(e => e.state === 'COMPLETE').length",
             )
             if successful_downloads > 0:
                 return True
@@ -62,7 +64,7 @@ class Downloads(WebPage):
     def check_successful_download_new_tab(self, driver):
         num_windows_now = len(driver.window_handles)
         TestSystem.execute_javascript(
-            driver, '''window.open("https://google.com","_blank");'''
+            driver, """window.open("https://google.com","_blank");"""
         )
         External.switch_new_page(driver, num_windows_now, self.body_locator)
         TestSystem.to_url(driver, "chrome://downloads")
@@ -113,6 +115,7 @@ class Hydroshare(WebPage):
     support_email = SiteElement(By.CSS_SELECTOR, 'a[href="mailto:help@cuahsi.org"]')
     page_tip = SiteElement(By.CSS_SELECTOR, ".page-tip > .container > .row > div > p")
     logged_in_full_name = SiteElement(By.ID, "profile-menu-fullname")
+    logged_in_email = SiteElement(By.ID, "profile-menu-email")
     notifications = SiteElement(By.CSS_SELECTOR, "#notifications-dropdown > a")
     notifications_clear = SiteElement(By.CSS_SELECTOR, "#btn-notifications-clear")
 
@@ -228,6 +231,13 @@ class Hydroshare(WebPage):
         return name
 
     @classmethod
+    def get_logged_in_email(self, driver):
+        self.profile_menu.click(driver)
+        name = self.logged_in_email.get_text(driver)
+        self.profile_menu.click(driver)
+        return name
+
+    @classmethod
     def clear_notifications(self, driver):
         self.notifications.click(driver)
         self.notifications_clear.click(driver)
@@ -243,6 +253,7 @@ class LandingPage(Hydroshare):
 
     @classmethod
     def to_registration(self, driver):
+        time.sleep(EXTERNAL_PAGE_LOAD)
         self.navigation_registration.click(driver)
 
     @classmethod
@@ -367,7 +378,7 @@ class Login(Hydroshare):
     submit = SiteElement(By.CSS_SELECTOR, "input.btn.btn-primary[type='submit']")
     error = SiteElement(By.CSS_SELECTOR, ".alert-danger")
     notification = SiteElement(
-        By.CSS_SELECTOR, 'div[class="page-tip animated slideInDown"] p'
+        By.CSS_SELECTOR, "div.page-tip-error.animated.slideInDown > div > div > div > p"
     )
 
     @classmethod
@@ -450,7 +461,7 @@ class Discover(Hydroshare):
         "#legend-collapse div:first-child div:first-child div.col-xs-12.col-sm-7",
     )
     next_page = SiteElement(By.XPATH, '//a[contains(text(), "Next")][1]')
-    page = SiteElement(By.ID, 'page-number')
+    page = SiteElement(By.ID, "page-number-upper")
     last_updated_by = SiteElement(
         By.XPATH, '//th[text() = "Last updated:"]/following-sibling::td/a'
     )
@@ -465,12 +476,14 @@ class Discover(Hydroshare):
     result_rows = SiteElement(By.CSS_SELECTOR, "#items-discovered > tbody")
     type_list = SiteElement(By.ID, "list-group-type")
     map_mode = SiteElement(By.ID, "map-mode-button")
-    page_left = SiteElement(By.ID, "page-left")
-    page_right = SiteElement(By.ID, "page-right")
+    page_left = SiteElement(By.ID, "page-left-upper")
+    page_right = SiteElement(By.ID, "page-right-upper")
 
     @classmethod
     def column_header(index):
-        return SiteElement(By.CSS_SELECTOR, "thead > tr:nth-child(1) > th:nth-child({})".format(index))
+        return SiteElement(
+            By.CSS_SELECTOR, "thead > tr:nth-child(1) > th:nth-child({})".format(index)
+        )
 
     @classmethod
     def resource_link(self, title):
@@ -478,7 +491,7 @@ class Discover(Hydroshare):
 
     @classmethod
     def col_header(self, col_index):
-        """ Return the column header element, given the index """
+        """Return the column header element, given the index"""
         return SiteElement(
             By.CSS_SELECTOR,
             "#items-discovered thead tr " "th:nth-of-type({})".format(col_index),
@@ -626,13 +639,13 @@ class Discover(Hydroshare):
 
     @classmethod
     def set_sort_order(self, driver, option):
-        """ Set the sort order to {{option}} """
+        """Set the sort order to {{option}}"""
         self.sort_order.select_option_text(driver, option)
         time.sleep(DISCOVER_TABLE_UPDATE)
 
     @classmethod
     def set_sort_direction(self, driver, option):
-        """ Set the sort direction to {{option}} """
+        """Set the sort direction to {{option}}"""
         self.sort_direction.select_option_text(driver, option)
         time.sleep(DISCOVER_TABLE_UPDATE)
 
@@ -642,12 +655,13 @@ class Discover(Hydroshare):
 
     @classmethod
     def to_resource(self, driver, title):
-        """ Navigate to the {{title}} resource landing page by clicking
+        """Navigate to the {{title}} resource landing page by clicking
         on it within the table.  If the resource is not visible will switch to
         the next result page
         """
         num_windows_now = len(driver.window_handles)
         resource_found = False
+        time.sleep(DISCOVER_TABLE_UPDATE)
         while not resource_found:
             try:
                 self.resource_link(title).click(driver)
@@ -664,20 +678,20 @@ class Discover(Hydroshare):
 
     @classmethod
     def col_index(self, driver, col_name):
-        """ Indentify the index for a discover page column, given the
+        """Indentify the index for a discover page column, given the
         column name.  Indexes here start at one since the
         end application here is xpath, and those indexes are 1 based
         """
-        num_cols = self.col_headers.get_child_count(driver)
+        num_cols = self.col_headers.get_immediate_child_count(driver)
         for i in range(1, num_cols + 1):
-            name_to_check = self.col_header(i).get_text(driver)
+            name_to_check = self.col_header(i).get_text(driver).replace("\n", " ")
             if name_to_check == col_name:
                 return i
         return 0
 
     @classmethod
     def check_sorting_multi(self, driver, column_name, ascend_or_descend):
-        """ Check discover page rows are sorted correctly.  The automated
+        """Check discover page rows are sorted correctly.  The automated
         testing system checks the first eight rows against the rows that
         are 1, 2, and 3 positions down, relative to the base row (a total
         of 24 checks)
@@ -696,7 +710,7 @@ class Discover(Hydroshare):
     def check_sorting_single(
         self, driver, column_name, ascend_or_descend, row_one, row_two
     ):
-        """ Confirm that two rows are sorted correctly relative to
+        """Confirm that two rows are sorted correctly relative to
         eachother
         """
         col_ind = self.col_index(driver, column_name)
@@ -754,7 +768,7 @@ class Discover(Hydroshare):
         contributor=None,
         content_type=None,
     ):
-        """ Use the filters on the left side of the Discover interface.
+        """Use the filters on the left side of the Discover interface.
         Filters should include author(s) {{author}}, subject(s) {{subject}},
         resource type(s) {{resource_type}}, owner(s) {{owner}}, variables
         {{variable}}, sample medium(s) {{sample_medium}}, unit(s) {{unit}},
@@ -840,8 +854,6 @@ class Discover(Hydroshare):
 
     @classmethod
     def search(self, driver, text):
-        self.map_mode.click(driver)
-        self.map_mode.click(driver)
         self.search_field.click(driver)
         self.search_field.clear_all_text(driver)
         self.search_field.inject_text(driver, text)
@@ -944,9 +956,7 @@ class Discover(Hydroshare):
         last_page = 0
         while True:
             time.sleep(DISCOVER_TABLE_UPDATE)
-            for i in range(
-                1, self.result_rows.get_immediate_child_count(driver) + 1
-            ):
+            for i in range(1, self.result_rows.get_immediate_child_count(driver) + 1):
                 # date_created = "/".join([number.zfill(2) for number in self.cell(4, i).get_text(driver).split("/")])
                 date_created = self.cell(4, i).get_text(driver)
                 last_modified = self.cell(5, i).get_text(driver)
@@ -1022,14 +1032,10 @@ class Resource(Hydroshare):
     accept_terms = SiteElement(By.ID, "agree-chk-copy")
     confirm_copy = SiteElement(By.ID, "copy-btn")
     new_version = SiteElement(By.ID, "new-version")
-    new_version_confirm = SiteElement(
-        By.CSS_SELECTOR,
-        "#new-version-resource-dialog > div > div > div.modal-footer > a",
-    )
+    new_version_confirm = SiteElement(By.ID, "new-version-btn")
     delete = SiteElement(By.ID, "delete")
-    delete_confirmation = SiteElement(
-        By.CSS_SELECTOR, "#delete-resource-dialog > div > div > div.modal-footer > a"
-    )
+    delete_text = SiteElement(By.ID, "confirm-res-id-text")
+    delete_confirmation = SiteElement(By.ID, "btn-delete-resource")
     title_input = SiteElement(By.ID, "txt-title")
     title_save = SiteElement(By.ID, "title-save-button")
     grant_input = SiteElement(By.ID, "user-autocomplete")
@@ -1045,10 +1051,38 @@ class Resource(Hydroshare):
         By.CSS_SELECTOR, "#sharing-status input[type=checkbox]"
     )
     access_public = SiteElement(By.ID, "btn-public")
+    access_discoverable = SiteElement(By.ID, "btn-discoverable")
     authors = SiteElement(By.CSS_SELECTOR, ".authors-wrapper")
     authors_locator = By.CSS_SELECTOR, ".authors-wrapper"
     download_status = SiteElement(By.ID, "download-status-info")
     # If your download does not start automatically
+    file_download = SiteElement(
+        By.CSS_SELECTOR, '#right-click-menu > li[data-fb-action="download"]'
+    )
+    file_download_zip = SiteElement(
+        By.CSS_SELECTOR, '#right-click-menu > li[data-fb-action="downloadZipped"]'
+    )
+    file_link = SiteElement(
+        By.CSS_SELECTOR, '#right-click-menu > li[data-fb-action="getLink"]'
+    )
+    file_delete = SiteElement(
+        By.CSS_SELECTOR, '#right-click-menu > li[data-fb-action="delete"]'
+    )
+    file_link_field = SiteElement(By.ID, "txtFileURL")
+    spatial_north_limit = SiteElement(By.ID, "id_northlimit")
+    spatial_east_limit = SiteElement(By.ID, "id_eastlimit")
+    spatial_south_limit = SiteElement(By.ID, "id_southlimit")
+    spatial_west_limit = SiteElement(By.ID, "id_westlimit")
+    spatial_latitude = SiteElement(By.ID, "id_north")
+    spatial_longitude = SiteElement(By.ID, "id_east")
+    spatial_save = SiteElement(By.CSS_SELECTOR, "#coverage-header > button")
+    spatial_delete = SiteElement(By.ID, "id-delete-spatial-resource")
+    spatial_set_box = SiteElement(By.ID, "id_type_1")
+    spatial_set_point = SiteElement(By.ID, "id_type_2")
+    file_delete_confirm = SiteElement(By.ID, "btn-confirm-delete")
+    sharing_status = SiteElement(By.ID, "hl-sharing-status")
+    file_browser_alerts = SiteElement(By.ID, "fb-alerts")
+    file_browser = SiteElement(By.ID, "hs-file-browser")
 
     @classmethod
     def open_with_title(self, title):
@@ -1075,6 +1109,12 @@ class Resource(Hydroshare):
             "#app-notifications .task:nth-of-type({}) .notification--name a".format(
                 index
             ),
+        )
+
+    @classmethod
+    def resource_file(self, index):
+        return SiteElement(
+            By.CSS_SELECTOR, "#fb-files-container > li:nth-of-type({})".format(index)
         )
 
     @classmethod
@@ -1159,7 +1199,7 @@ class Resource(Hydroshare):
     @classmethod
     def populate_abstract(self, driver, text):
         self.abstract.inject_text(driver, text)
-        self.abstract_save.click(driver)
+        self.abstract_save.javascript_click(driver)
 
     @classmethod
     def is_visible_public_resource_notice(self, driver):
@@ -1177,6 +1217,12 @@ class Resource(Hydroshare):
         self.access_close.click(driver)
 
     @classmethod
+    def make_discoverable(self, driver):
+        self.access_management.click(driver)
+        self.access_discoverable.click(driver)
+        self.access_close.click(driver)
+
+    @classmethod
     def copy_resource(self, driver):
         self.copy.click(driver)
         self.accept_terms.click(driver)
@@ -1190,6 +1236,8 @@ class Resource(Hydroshare):
     @classmethod
     def delete_resource(self, driver):
         self.delete.click(driver)
+        self.delete_text.click(driver)
+        self.delete_text.inject_text(driver, "DELETE")
         self.delete_confirmation.click(driver)
 
     @classmethod
@@ -1277,6 +1325,62 @@ class Resource(Hydroshare):
     def wait_on_download_notification(self, driver):
         while "Please wait" in self.download_status.get_text(driver):
             time.sleep(1)
+
+    @classmethod
+    def download_file_by_index(self, driver, index):
+        self.file_browser.scroll_to(driver)
+        time.sleep(RESOURCE_LANDING_PAGE_LOAD)
+        self.resource_file(index).right_click(driver)
+        self.file_download.javascript_click(driver)
+
+    @classmethod
+    def download_file_zip_by_index(self, driver, index):
+        self.file_browser.scroll_to(driver)
+        time.sleep(RESOURCE_LANDING_PAGE_LOAD)
+        self.resource_file(index).right_click(driver)
+        self.file_download_zip.javascript_click(driver)
+
+    @classmethod
+    def get_file_download_link_by_index(self, driver, index):
+        self.file_browser.scroll_to(driver)
+        time.sleep(RESOURCE_LANDING_PAGE_LOAD)
+        self.resource_file(index).right_click(driver)
+        self.file_link.javascript_click(driver)
+        return self.file_link_field.get_value(driver)
+
+    @classmethod
+    def set_spatial_coverage_box(self, driver, north, east, south, west):
+        self.spatial_set_box.click(driver)
+        self.spatial_north_limit.inject_text(driver, str(north))
+        self.spatial_east_limit.inject_text(driver, str(east))
+        self.spatial_south_limit.inject_text(driver, str(south))
+        self.spatial_west_limit.inject_text(driver, str(west))
+        self.spatial_save.click(driver)
+
+    @classmethod
+    def set_spatial_coverage_point(self, driver, latitude, longitude):
+        self.spatial_set_point.click(driver)
+        self.spatial_latitude.inject_text(driver, str(latitude))
+        self.spatial_longitude.inject_text(driver, str(longitude))
+        self.spatial_save.click(driver)
+
+    @classmethod
+    def delete_spatial_coverage(self, driver):
+        self.spatial_delete.click(driver)
+
+    @classmethod
+    def delete_file_by_index(self, driver, index):
+        self.file_browser.scroll_to(driver)
+        time.sleep(RESOURCE_LANDING_PAGE_LOAD)
+        self.resource_file(index).right_click(driver)
+        self.file_delete.javascript_click(driver)
+        self.file_delete_confirm.click(driver)
+
+    @classmethod
+    def get_sharing_status(self, driver):
+        time.sleep(RESOURCE_LANDING_PAGE_LOAD)
+        return self.sharing_status.get_text(driver)
+
 
 class WebApp(Resource):
     save_supported_resource_types = SiteElement(
@@ -1468,6 +1572,23 @@ class Profile(Hydroshare):
     phone2 = SiteElement(By.ID, "phone2")
     email = SiteElement(By.ID, "id_email")
     website = SiteElement(By.CSS_SELECTOR, 'input[name="website"]')
+    user_type = SiteElement(By.ID, "db-user-type")
+    user_overview_0 = SiteElement(
+        By.CSS_SELECTOR,
+        "#body > div.main-container > div.container > div.row > div > div > div.col-xs-12.col-sm-6 > div > table",
+    )
+    user_overview_1 = SiteElement(
+        By.CSS_SELECTOR, "#overview div.panel:nth-of-type(1) table.overview"
+    )
+    user_overview_2 = SiteElement(
+        By.CSS_SELECTOR, "#overview div.panel:nth-of-type(2) table.overview"
+    )
+    headline = SiteElement(
+        By.CSS_SELECTOR,
+        "#body > div.main-container > div.container > div.row > div > div > div.col-xs-12.col-sm-6 > div > h4",
+    )
+    view_description = SiteElement(By.ID, "profile-description")
+    profile_picture = SiteElement(By.CSS_SELECTOR, "#profile-pic-container > div")
 
     @classmethod
     def contribution_type(self, index):
@@ -1571,6 +1692,13 @@ class Profile(Hydroshare):
         self.password_confirm.click(driver)
 
     @classmethod
+    def queue_password_change(self, driver, old_password, new_password):
+        self.password_change.click(driver)
+        self.current_password.inject_text(driver, old_password)
+        self.new_password.inject_text(driver, new_password)
+        self.confirm_password.inject_text(driver, new_password)
+
+    @classmethod
     def update_about(self, driver, description, country, province):
         self.description.click(driver)
         self.description.clear_all_text(driver)
@@ -1604,6 +1732,71 @@ class Profile(Hydroshare):
     @classmethod
     def get_name(self, driver):
         return self.name.get_text(driver)
+
+    @classmethod
+    def get_email(self, driver):
+        return self.email.get_value(driver)
+
+    @classmethod
+    def get_data(self, driver):
+        html_strip = re.compile("<.*?>")
+        email_strip = re.compile("send email to")
+        email = re.search('mailto:(.+?)"', TestSystem.page_source(driver)).group(1)
+        name = self.name.get_text(driver) if self.name.exists(driver) else ""
+        headline = (
+            self.headline.get_text(driver) if self.headline.exists(driver) else ""
+        )
+        description = (
+            self.view_description.get_text(driver)
+            if self.view_description.exists(driver)
+            else ""
+        )
+        profile_picture = (
+            self.profile_picture.get_style(driver)
+            .replace('background-image: url("', "")
+            .replace('");', "")
+        )
+        if profile_picture in [None, ""]:
+            profile_picture = "/static/media/profile/NoProfileImage.png"
+        overview0 = (
+            re.sub(
+                html_strip, "", self.user_overview_0.get_attribute(driver, "innerHTML")
+            )
+            if self.user_overview_0.exists(driver)
+            else ""
+        )
+        overview1 = (
+            re.sub(
+                html_strip, "", self.user_overview_1.get_attribute(driver, "innerHTML")
+            )
+            if self.user_overview_1.exists(driver)
+            else ""
+        )
+        overview2 = (
+            re.sub(
+                email_strip, "", self.user_overview_2.get_attribute(driver, "innerHTML")
+            )
+            if self.user_overview_2.exists(driver)
+            else ""
+        )
+        overview2 = re.sub(html_strip, "", overview2)
+        overview2 = overview2.replace("Email\n", "\n")
+        return {
+            "name": name,
+            "headline": headline,
+            "email": email,
+            "profile_picture": profile_picture,
+            "description": description,
+            "overview_0": "\n".join(
+                [ll.lstrip() for ll in overview0.splitlines() if ll.strip()]
+            ),
+            "overview_1": "\n".join(
+                [ll.lstrip() for ll in overview1.splitlines() if ll.strip()]
+            ),
+            "overview_2": "\n".join(
+                [ll.lstrip() for ll in overview2.splitlines() if ll.strip()]
+            ),
+        }
 
 
 class Collaborate(Hydroshare):
@@ -1836,7 +2029,7 @@ class MyResources(Hydroshare):
 
     @classmethod
     def to_resource_from_table(self, driver, index):
-        self.resource_title(index).click(driver)
+        self.resource_link(index).click(driver)
 
     @classmethod
     def get_resource_link(self, driver, index):

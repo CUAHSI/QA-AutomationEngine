@@ -2,12 +2,12 @@
 wget https://hydroshare.org/resource/f87be11d9ff54a0489d8f1b12588b453/data/contents/Jupyter-notebooks-and-workflows-on-Hydroshare.pdf
 wget https://hydroshare.org/resource/f87be11d9ff54a0489d8f1b12588b453/data/contents/Waterhackweek_-_January_24_2019_-_Tony_Castronova_CUAHSI.mp4
 wget https://hydroshare.org/resource/f87be11d9ff54a0489d8f1b12588b453/data/contents/taudem.ipynb
-for i in {1..15}
+for i in {1..150}
 do
-    for j in {9..20}
+    for j in {0..0}
     do
         cp resource.json resource-$i-$j.json
-        sed -i "s/XXXX/A-$i-$j/g" resource-$i-$j.json
+        sed -i "s/XXXX/Z-$i-$j/g" resource-$i-$j.json
         RESOURCE_ID=$(curl -u "$HS_USERNAME:$HS_PASSWORD" -H 'Accept: application/json' -H 'Content-Type: application/json' -X POST --data-binary @resource-$i-$j.json https://beta.hydroshare.org/hsapi/resource/ | jq .resource_id | sed 's/"//g')
         echo $RESOURCE_ID >> resources.txt
         sleep 1

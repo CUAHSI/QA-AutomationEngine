@@ -7,7 +7,7 @@ import time
 
 
 def validate_arguments(depths, experiments_count, factors):
-    """ Confirm number of experiments is theoretically possible.  Confirm
+    """Confirm number of experiments is theoretically possible.  Confirm
     length of specification is long enough, given number of factors.
     """
     assert factors > 1, '"factors" should be > 1'
@@ -24,7 +24,7 @@ def validate_arguments(depths, experiments_count, factors):
 
 
 def create_random_experiments(depths, experiments_count, seed=None):
-    """ Create random set of experiments """
+    """Create random set of experiments"""
     experiments = []
     if seed is None:
         seed = random.randrange(int(time.time()))

@@ -2,6 +2,8 @@
  execution.  Unlike hc_macros or hs_macros, these methods interact
 directly with the Selenium driver
 """
+import boto3
+import json
 import re
 import time
 
@@ -11,8 +13,15 @@ from selenium.webdriver.support.ui import WebDriverWait
 from .delays import NEW_PAGE_LOAD
 
 
+def kinesis_record(config, stream_name, partition_key, data):
+    kinesis_client = boto3.client("kinesis", config=config)
+    kinesis_client.put_record(
+        StreamName=stream_name, Data=json.dumps(data), PartitionKey=partition_key
+    )
+
+
 class External:
-    """ Utilities for handling new tabs/windows """
+    """Utilities for handling new tabs/windows"""
 
     def switch_new_page(self, driver, num_windows_before, new_window_load_locator):
         WebDriverWait(driver, NEW_PAGE_LOAD).until(
@@ -55,7 +64,7 @@ class External:
 
 
 class TestSystem:
-    """ General utilities for Hydroclient test case creation """
+    """General utilities for Hydroclient test case creation"""
 
     def scroll_to_top(self, driver):
         driver.execute_script("window.scrollTo(0, 0)")
@@ -85,7 +94,7 @@ class TestSystem:
         return words
 
     def check_language(self, driver):
-        """ Confirms that language is consistent with CUAHSI standards for
+        """Confirms that language is consistent with CUAHSI standards for
         terminology, capitalization, etc.
         """
         lang_dict = {}

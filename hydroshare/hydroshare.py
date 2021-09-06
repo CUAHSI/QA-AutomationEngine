@@ -1,8 +1,13 @@
 """ Runs various smoke tests for the hydroshare.org """
+import boto3
+import inspect
 import os
 import random
 import re
+import requests
+import time
 
+from botocore.config import Config
 from urllib.request import urlretrieve
 
 # from percy import percySnapshot
@@ -33,35 +38,41 @@ from hs_macros import (
     JupyterHub,
     JupyterHubNotebooks,
     JupyterHubNotebook,
-    Utilities
+    Utilities,
 )
 
 from cuahsi_base.cuahsi_base import BaseTestSuite, parse_args_run_tests
-from cuahsi_base.utils import External, TestSystem
-from config import BASE_URL, USERNAME, PASSWORD, GITHUB_ORG, GITHUB_REPO
+from cuahsi_base.utils import kinesis_record, External, TestSystem
+from config import (
+    BASE_URL,
+    USERNAME,
+    PASSWORD,
+    GITHUB_ORG,
+    GITHUB_REPO,
+)
 
+SPAM_DATA_STREAM_NAME = "cuahsi-quality-spam-data-stream"
+SPAM_DATA_STREAM_CONFIG = Config(
+    region_name="us-east-2",
+)
 
 # Test cases definition
 class HydroshareTestSuite(BaseTestSuite):
-    """ Python unittest setup for smoke tests """
+    """Python unittest setup for smoke tests"""
 
     def setUp(self):
         super(HydroshareTestSuite, self).setUp()
         self.driver.get(BASE_URL)
 
     def test_B_000001(self):
-        """ When creating a resource, ensure all resource types have a "Cancel"
-        button available """
+        """When creating a resource, ensure all resource types have a "Cancel"
+        button available"""
         LandingPage.to_login(self.driver)
         Login.login(self.driver, USERNAME, PASSWORD)
         resource_types = [
             "CompositeResource",
             "CollectionResource",
             "ToolResource",
-            "ModelProgramResource",
-            "ModelInstanceResource",
-            "SWATModelInstanceResource",
-            "MODFLOWModelInstanceResource",
         ]
         for resource_type in resource_types:
             Home.create_resource(self.driver, resource_type)
@@ -77,8 +88,8 @@ class HydroshareTestSuite(BaseTestSuite):
         LandingPage.to_discover(self.driver)
         Discover.add_filters(
             self.driver,
-            subject="iUTAH",
-            resource_type="Composite Resource",
+            author="Castronova, Anthony",
+            resource_type="Composite",
             availability=["discoverable", "public"],
         )
         Discover.to_resource(self.driver, "Beaver Divide Air Temperature")
@@ -86,7 +97,7 @@ class HydroshareTestSuite(BaseTestSuite):
         self.assertTrue(Downloads.check_successful_download_new_tab(self.driver))
 
     def test_B_000005(self):
-        """ Confirms password reset works for users """
+        """Confirms password reset works for users"""
         LandingPage.to_login(self.driver)
         Login.login(self.driver, USERNAME, PASSWORD)
         Home.to_profile(self.driver)
@@ -111,17 +122,32 @@ class HydroshareTestSuite(BaseTestSuite):
             self.driver,
             availability=["published"],
         )  # remove once long delay issue is fixed
-        orderings = ["First Author", "Date Created", "Last Modified"]
-        for i in range(3, 6):
-            Discover.set_sort(self.driver, i)
+        orderings = [
+            {
+                "name": "First Author",
+                "column": 3,
+            },
+            {
+                "name": "Date Created",
+                "column": 4,
+            },
+            {
+                "name": "Last Modified",
+                "column": 5,
+            },
+        ]
+        for ordering in orderings:
+            Discover.set_sort(self.driver, ordering["column"])
             TestSystem.wait()  # remove once long delay issue is fixed
             self.assertTrue(
-                Discover.check_sorting_multi(self.driver, orderings[i-3], "Ascending")
+                Discover.check_sorting_multi(self.driver, ordering["name"], "Ascending")
             )
-            Discover.set_sort(self.driver, i)
+            Discover.set_sort(self.driver, ordering["column"])
             TestSystem.wait()  # remove once long delay issue is fixed
             self.assertTrue(
-                Discover.check_sorting_multi(self.driver, orderings[i-3], "Descending")
+                Discover.check_sorting_multi(
+                    self.driver, ordering["name"], "Descending"
+                )
             )
 
     def test_B_000007(self):
@@ -223,7 +249,7 @@ class HydroshareTestSuite(BaseTestSuite):
             API.toggle_endpoint(self.driver, endpoint)
 
     def test_B_000011(self):
-        """ Check Hydroshare About policy pages to confirm links and content """
+        """Check Hydroshare About policy pages to confirm links and content"""
         LandingPage.to_about(self.driver)
         About.toggle_tree(self.driver)
         About.toggle_tree(self.driver)
@@ -271,7 +297,8 @@ class HydroshareTestSuite(BaseTestSuite):
         Profile.save_changes(self.driver)
         page_tip = Profile.page_tip.get_text(self.driver)
         self.assertEqual(
-            "Your profile has been successfully updated.", page_tip,
+            "Your profile has been successfully updated.",
+            page_tip,
         )
 
     def test_B_000014(self):
@@ -295,7 +322,7 @@ class HydroshareTestSuite(BaseTestSuite):
         self.assertEqual(group_name, new_group_name)
 
     def test_B_000015(self):
-        """ Confirms Resource "Open With" successfully redirects to JupyterHub """
+        """Confirms Resource "Open With" successfully redirects to JupyterHub"""
         LandingPage.to_discover(self.driver)
         Discover.add_filters(self.driver, owner="Castronova, Anthony")
         Discover.to_resource(self.driver, "Beaver Divide Air Temperature")
@@ -304,8 +331,8 @@ class HydroshareTestSuite(BaseTestSuite):
         self.assertNotIn("Page not found", webpage_title)
 
     def test_B_000016(self):
-        """ Create basic resource without any files and confirm that the resulting
-        resource landing page is OK """
+        """Create basic resource without any files and confirm that the resulting
+        resource landing page is OK"""
         LandingPage.to_login(self.driver)
         Login.login(self.driver, USERNAME, PASSWORD)
         Home.create_resource(self.driver, "CompositeResource")
@@ -316,7 +343,7 @@ class HydroshareTestSuite(BaseTestSuite):
         self.assertEqual("Test Resource", resource_title)
 
     def test_B_000017(self):
-        """ Confirm resource type filters can be applied in My Resources """
+        """Confirm resource type filters can be applied in My Resources"""
         options = [
             "Collection",
             "Composite Resource",
@@ -350,7 +377,6 @@ class HydroshareTestSuite(BaseTestSuite):
         LandingPage.to_login(self.driver)
         Login.login(self.driver, USERNAME, PASSWORD)
         Home.to_my_resources(self.driver)
-
         MyResources.search_resource_type(self.driver)
 
         self.assertNotIn("[type:", MyResources.read_searchbar(self.driver))
@@ -403,7 +429,7 @@ class HydroshareTestSuite(BaseTestSuite):
         MyResources.delete_label(self.driver)
 
     def hold_test_B_000021(self):  # BROKEN DUE TO HYDROSHARE JS FRAMEWORK USE
-        """ Confirm ability to upload CV file to users profile """
+        """Confirm ability to upload CV file to users profile"""
         LandingPage.to_login(self.driver)
         Login.login(self.driver, USERNAME, PASSWORD)
         Home.to_profile(self.driver)
@@ -422,7 +448,7 @@ class HydroshareTestSuite(BaseTestSuite):
         Profile.delete_cv(self.driver)
 
     def hold_test_B_000022(self):  # BROKEN DUE TO HYDROSHARE JS FRAMEWORK USE
-        """ Confirm profile image upload, within the profile page """
+        """Confirm profile image upload, within the profile page"""
         LandingPage.to_login(self.driver)
         Login.login(self.driver, USERNAME, PASSWORD)
         Home.to_profile(self.driver)
@@ -466,7 +492,7 @@ class HydroshareTestSuite(BaseTestSuite):
         )
 
     def test_B_000024(self):
-        """ Verify the ability to extend metadata on resource landing pages """
+        """Verify the ability to extend metadata on resource landing pages"""
         name_ex = "name_ex"
         value_ex = "value_ex"
         LandingPage.to_login(self.driver)
@@ -481,7 +507,7 @@ class HydroshareTestSuite(BaseTestSuite):
         Resource.exists_value(self.driver, value_ex)
 
     def test_B_000026(self):
-        """ Confirm that the home page slider is functional """
+        """Confirm that the home page slider is functional"""
         images = [
             'background-image: url("/static/img/home-page/carousel/bg1.jpg");',
             'background-image: url("/static/img/home-page/carousel/bg2.JPG");',
@@ -528,7 +554,7 @@ class HydroshareTestSuite(BaseTestSuite):
             )
 
     def test_B_000029(self):
-        """ Commenting requires a login """
+        """Commenting requires a login, and redirect works as expected"""
         LandingPage.to_discover(self.driver)
         Discover.search(self.driver, "DeBuhr")
         Discover.add_filters(self.driver, owner="DeBuhr, Neal")
@@ -544,18 +570,22 @@ class HydroshareTestSuite(BaseTestSuite):
         self.assertTrue(initial_comment_count < final_comment_count)
 
     def test_B_000031(self):
-        """ Confirm that resources can be accessed from the sitemap links """
+        """Confirm that resources can be accessed from the sitemap links"""
         LandingPage.to_sitemap(self.driver)
         SiteMap.select_resource(self.driver, "Beaver Divide Air Temperature - Demo")
-        self.assertIn("Beaver Divide Air Temperature - Demo", TestSystem.title(self.driver))
+        self.assertIn(
+            "Beaver Divide Air Temperature - Demo", TestSystem.title(self.driver)
+        )
         TestSystem.back(self.driver)
         SiteMap.select_resource(self.driver, "Beaver Divide Air Temperature - Demo")
-        self.assertIn("Beaver Divide Air Temperature - Demo", TestSystem.title(self.driver))
+        self.assertIn(
+            "Beaver Divide Air Temperature - Demo", TestSystem.title(self.driver)
+        )
         TestSystem.back(self.driver)
 
     def test_B_000032(self):
-        """ Confirm that the hydroshare footer version number matches up with the
-        latest version number in GitHub """
+        """Confirm that the hydroshare footer version number matches up with the
+        latest version number in GitHub"""
         displayed_release_version = LandingPage.get_version(self.driver)
         expected_release_version = LandingPage.get_latest_release(
             GITHUB_ORG, GITHUB_REPO
@@ -563,7 +593,7 @@ class HydroshareTestSuite(BaseTestSuite):
         self.assertEqual(expected_release_version, displayed_release_version)
 
     def test_B_000033(self):
-        """ Ensure Discover page refresh clears all filters """
+        """Ensure Discover page refresh clears all filters"""
         LandingPage.to_discover(self.driver)
         Discover.add_filters(
             self.driver,
@@ -574,6 +604,7 @@ class HydroshareTestSuite(BaseTestSuite):
             availability="public",
         )
         TestSystem.refresh(self.driver)
+        TestSystem.wait(3)
         self.assertFalse(Discover.is_selected(self.driver, author="Myers, Jessie"))
         self.assertFalse(Discover.is_selected(self.driver, contributor="Cox, Chris"))
         self.assertFalse(Discover.is_selected(self.driver, owner="Christopher, Adrian"))
@@ -585,7 +616,7 @@ class HydroshareTestSuite(BaseTestSuite):
         self.assertFalse(Discover.is_selected(self.driver, availability="public"))
 
     def test_B_000034(self):
-        """ Basic navigation to home/dashboard """
+        """Basic navigation to home/dashboard"""
         LandingPage.to_login(self.driver)
         Login.login(self.driver, USERNAME, PASSWORD)
         Home.toggle_get_started(self.driver)
@@ -596,7 +627,7 @@ class HydroshareTestSuite(BaseTestSuite):
         self.assertNotEqual(visibility[0], visibility[1])
 
     def test_B_000035(self):
-        """ Ensure registration prompts for Organization entry """
+        """Ensure registration prompts for Organization entry"""
         LandingPage.to_registration(self.driver)
         Registration.signup_user(
             self.driver,
@@ -627,7 +658,7 @@ class HydroshareTestSuite(BaseTestSuite):
         Resource.open_with_by_title(self.driver, "TEST Web App")
 
     def test_B_000038(self):
-        """ Ensure invalid logins generate a helpful error message """
+        """Ensure invalid logins generate a helpful error message"""
         LandingPage.to_login(self.driver)
         Login.login(self.driver, "Invalid", "Invalid")
         self.assertIn("username", Login.get_login_error(self.driver))
@@ -638,13 +669,32 @@ class HydroshareTestSuite(BaseTestSuite):
         Home.toggle_get_started(self.driver)
 
     def test_B_000039(self):
-        """ Ensure pre-login My Resources redirects to My Resources after login """
+        """Ensure pre-login My Resources redirects to My Resources after login"""
         LandingPage.to_my_resources(self.driver)
         Login.login(self.driver, USERNAME, PASSWORD)
         MyResources.enter_search(self.driver, "Search bar text")
 
+    def test_B_000040(self):
+        """Ensure invalid login messages are identical"""
+        LandingPage.to_login(self.driver)
+        Login.login(self.driver, USERNAME, "Invalid")
+        self.assertIn(
+            "Invalid username/email and password", Login.get_login_error(self.driver)
+        )
+        Login.to_login(self.driver)
+        Login.login(self.driver, "Invalid", PASSWORD)
+        self.assertIn(
+            "Invalid username/email and password", Login.get_login_error(self.driver)
+        )
+        Login.to_login(self.driver)
+        Login.login(self.driver, "Invalid", "Invalid")
+        self.assertIn(
+            "Invalid username/email and password", Login.get_login_error(self.driver)
+        )
+        Login.to_login(self.driver)
+
     def test_B_000041(self):
-        """ Update profile About information """
+        """Update profile About information"""
         LandingPage.to_login(self.driver)
         Login.login(self.driver, USERNAME, PASSWORD)
         Home.to_profile(self.driver)
@@ -655,7 +705,7 @@ class HydroshareTestSuite(BaseTestSuite):
         Profile.save_changes(self.driver)
 
     def test_B_000046(self):
-        """ Ensure clicking the Hydroshare logo links back to the home page """
+        """Ensure clicking the Hydroshare logo links back to the home page"""
         LandingPage.to_login(self.driver)
         Login.login(self.driver, USERNAME, PASSWORD)
         Home.to_profile(self.driver)
@@ -663,14 +713,14 @@ class HydroshareTestSuite(BaseTestSuite):
         LandingPage.slide_hero_right(self.driver)
 
     def test_B_000047(self):
-        """ Ensure DEBUG=false for production hydroshare.org """
+        """Ensure DEBUG=false for production hydroshare.org"""
         TestSystem.to_url(
             self.driver, "https://www.hydroshare.org/landingPageDoesNotExist/"
         )
         LandingPage.to_landing_page(self.driver)
 
     def test_B_000048(self):
-        """ Ensure pre-login My Groups redirects to My Groups after login """
+        """Ensure pre-login My Groups redirects to My Groups after login"""
         LandingPage.to_collaborate(self.driver)
         Collaborate.to_groups(self.driver)
         Groups.to_my_groups(self.driver)
@@ -678,7 +728,7 @@ class HydroshareTestSuite(BaseTestSuite):
         self.assertEqual("My Groups", Groups.get_title(self.driver))
 
     def test_B_000049(self):
-        """ Ensure user can logout after logging in """
+        """Ensure user can logout after logging in"""
         LandingPage.to_login(self.driver)
         Login.login(self.driver, USERNAME, PASSWORD)
         Home.logout(self.driver)
@@ -687,13 +737,13 @@ class HydroshareTestSuite(BaseTestSuite):
         Home.logout(self.driver)
 
     def test_B_000050(self):
-        """ Ensure the support email mailto is in the site footer """
+        """Ensure the support email mailto is in the site footer"""
         self.assertEqual(
             "mailto:help@cuahsi.org", LandingPage.get_support_email(self.driver)
         )
 
     def test_B_000051(self):
-        """ Ensure all Getting Started links open correctly, and in the same tab """
+        """Ensure all Getting Started links open correctly, and in the same tab"""
         LandingPage.to_login(self.driver)
         Login.login(self.driver, USERNAME, PASSWORD)
         for row in [1, 2]:
@@ -706,7 +756,7 @@ class HydroshareTestSuite(BaseTestSuite):
                 TestSystem.back(self.driver)
 
     def test_B_000052(self):
-        """ Verify Recently Visited resources and authors link to valid pages """
+        """Verify Recently Visited resources and authors link to valid pages"""
         LandingPage.to_login(self.driver)
         Login.login(self.driver, USERNAME, PASSWORD)
         recent_activity_len = Home.get_recent_activity_length(self.driver)
@@ -722,9 +772,49 @@ class HydroshareTestSuite(BaseTestSuite):
             for word in [profile_author.split(" ")[0], profile_author.split(" ")[-1]]:
                 self.assertIn(word, link_author)
 
-    def test_B_000056(self):
-        """ Verify featured apps featured on the dashboard link correctly """
+    def test_B_000053(self):
+        """Ensure private resources are not shown for anonymous viewers on the contributions profile page"""
         LandingPage.to_login(self.driver)
+        Login.login(self.driver, USERNAME, PASSWORD)
+        Home.to_profile(self.driver)
+        Profile.view_contributions(self.driver)
+        initial_count = Profile.get_contribution_type_count(self.driver, 0)
+        Profile.to_home(self.driver)
+        Home.create_resource(self.driver, "CompositeResource")
+        NewResource.configure(self.driver, "Private Contributions Test Resource")
+        NewResource.create(self.driver)
+        NewResource.to_profile(self.driver)
+        Profile.view_contributions(self.driver)
+        incremented_count = Profile.get_contribution_type_count(self.driver, 0)
+        self.assertTrue(initial_count + 1 == incremented_count)
+        Resource.logout(self.driver)
+        TestSystem.to_url(self.driver, BASE_URL + "/user/3887/")
+        Profile.view_contributions(self.driver)
+        public_count = Profile.get_contribution_type_count(self.driver, 0)
+        self.assertTrue(public_count < initial_count)
+
+    def test_B_000055(self):
+        """Verify featured apps featured on the dashboard link correctly"""
+        LandingPage.to_login(self.driver)
+        Login.login(self.driver, USERNAME, PASSWORD)
+        # JupyterHub
+        Home.to_app(self.driver, "Featured", 1)
+        self.assertIn("JupyterHub", TestSystem.title(self.driver))
+        External.switch_old_page(self.driver)
+        External.close_new_page(self.driver)
+        # MATLAB Online
+        TestSystem.to_url(self.driver, "http://matlab-launcher.cuahsi.org")
+        # Login.login(self.driver, USERNAME, PASSWORD)
+        TestSystem.wait(30)
+        MatlabOnline.authorize(self.driver)
+        TestSystem.wait(120)
+        self.assertIn("MATLAB Online", TestSystem.title(self.driver))
+        # External.switch_old_page(self.driver)
+        # External.close_new_page(self.driver)
+
+    def test_B_000056(self):
+        """Verify featured apps featured on the dashboard link correctly"""
+        # LandingPage.to_login(self.driver)
         Login.login(self.driver, USERNAME, PASSWORD)
         # JupyterHub
         Home.to_app(self.driver, "Featured", 1)
@@ -734,6 +824,7 @@ class HydroshareTestSuite(BaseTestSuite):
         # MATLAB Online
         Home.to_app(self.driver, "Featured", 2)
         Login.login(self.driver, USERNAME, PASSWORD)
+        TestSystem.wait(30)
         MatlabOnline.authorize(self.driver)
         TestSystem.wait(30)
         self.assertIn("MATLAB Online", TestSystem.title(self.driver))
@@ -741,7 +832,7 @@ class HydroshareTestSuite(BaseTestSuite):
         External.close_new_page(self.driver)
 
     def test_B_000057(self):
-        """ Verify CUAHSI apps mentioned on the dashboard link correctly """
+        """Verify CUAHSI apps mentioned on the dashboard link correctly"""
         LandingPage.to_login(self.driver)
         Login.login(self.driver, USERNAME, PASSWORD)
         cuahsi_apps = ["HydroClient", "HydroServerTools"]
@@ -752,7 +843,7 @@ class HydroshareTestSuite(BaseTestSuite):
             External.close_new_page(self.driver)
 
     def test_B_000058(self):
-        """ Confirm My Resources table title and author links redirect to reasonable pages """
+        """Confirm My Resources table title and author links redirect to reasonable pages"""
         LandingPage.to_login(self.driver)
         Login.login(self.driver, USERNAME, PASSWORD)
         Home.create_resource(self.driver, "CompositeResource")
@@ -767,7 +858,7 @@ class HydroshareTestSuite(BaseTestSuite):
         TestSystem.back(self.driver)
 
     def test_B_000059(self):
-        """ Confirm favorite star/unstar/filter works on MyResources """
+        """Confirm favorite star/unstar/filter works on MyResources"""
         LandingPage.to_login(self.driver)
         Login.login(self.driver, USERNAME, PASSWORD)
         Home.create_resource(self.driver, "CompositeResource")
@@ -782,7 +873,7 @@ class HydroshareTestSuite(BaseTestSuite):
         MyResources.filter_table(self.driver, "owned")
 
     def test_B_000060(self):
-        """ Ensure new resources are default private """
+        """Ensure new resources are default private"""
         LandingPage.to_login(self.driver)
         Login.login(self.driver, USERNAME, PASSWORD)
         Home.create_resource(self.driver, "CompositeResource")
@@ -796,7 +887,7 @@ class HydroshareTestSuite(BaseTestSuite):
         self.assertIn("Private Test Resource", TestSystem.title(self.driver))
 
     def test_B_000064(self):
-        """ Ensure title renders properly for a sample of resources """
+        """Ensure title renders properly for a sample of resources"""
         Home.to_sitemap(self.driver)
         links = SiteMap.get_resource_list(self.driver)
         print(len(links))
@@ -807,7 +898,7 @@ class HydroshareTestSuite(BaseTestSuite):
             TestSystem.back(self.driver)
 
     def test_B_000073(self):
-        """ Adding and removing a resource reference works properly """
+        """Adding and removing a resource reference works properly"""
         LandingPage.to_login(self.driver)
         Login.login(self.driver, USERNAME, PASSWORD)
         Home.create_resource(self.driver, "CompositeResource")
@@ -821,8 +912,8 @@ class HydroshareTestSuite(BaseTestSuite):
         Resource.delete_reference(self.driver)
 
     def test_B_000075(self):
-        """ Confirm making a resource public requires the prerequisite metadata to be filled out
-        and that the notice about this stays visible in view and edit modes """
+        """Confirm making a resource public requires the prerequisite metadata to be filled out
+        and that the notice about this stays visible in view and edit modes"""
         LandingPage.to_login(self.driver)
         Login.login(self.driver, USERNAME, PASSWORD)
         Home.create_resource(self.driver, "CompositeResource")
@@ -839,14 +930,14 @@ class HydroshareTestSuite(BaseTestSuite):
         Resource.is_visible_public_resource_notice(self.driver)
 
     def test_B_000085(self):
-        """ Copy a resource """
+        """Copy a resource"""
         LandingPage.to_login(self.driver)
         Login.login(self.driver, USERNAME, PASSWORD)
         Home.to_discover(self.driver)
         Discover.add_filters(
             self.driver,
-            subject="iUTAH",
-            resource_type="Composite Resource",
+            author="Castronova, Anthony",
+            resource_type="Composite",
             availability=["discoverable", "public"],
         )
         Discover.to_resource(self.driver, "Beaver Divide Air Temperature")
@@ -861,14 +952,14 @@ class HydroshareTestSuite(BaseTestSuite):
         )
 
     def test_B_000086(self):
-        """ Confirm basic resource versioning """
+        """Confirm basic resource versioning"""
         LandingPage.to_login(self.driver)
         Login.login(self.driver, USERNAME, PASSWORD)
         Home.to_discover(self.driver)
         Discover.add_filters(
             self.driver,
-            subject="iUTAH",
-            resource_type="Composite Resource",
+            author="Castronova, Anthony",
+            resource_type="Composite",
             availability=["discoverable", "public"],
         )
         Discover.to_resource(self.driver, "Beaver Divide Air Temperature")
@@ -877,7 +968,8 @@ class HydroshareTestSuite(BaseTestSuite):
         TestSystem.wait(20)
         Resource.use_notification_link(self.driver, 1)
         Resource.create_version(self.driver)
-        Resource.view(self.driver)
+        TestSystem.wait(20)
+        Resource.use_notification_link(self.driver, 1)
         Resource.edit(self.driver)
         Resource.view(self.driver)
         TestSystem.back(self.driver)
@@ -889,14 +981,14 @@ class HydroshareTestSuite(BaseTestSuite):
             TestSystem.wait(1)
 
     def test_B_000087(self):
-        """ Validate version rollback, through resource deletion """
+        """Validate version rollback, through resource deletion"""
         LandingPage.to_login(self.driver)
         Login.login(self.driver, USERNAME, PASSWORD)
         Home.to_discover(self.driver)
         Discover.add_filters(
             self.driver,
-            subject="iUTAH",
-            resource_type="Composite Resource",
+            author="Castronova, Anthony",
+            resource_type="Composite",
             availability=["discoverable", "public"],
         )
         Discover.to_resource(self.driver, "Beaver Divide Air Temperature")
@@ -905,9 +997,10 @@ class HydroshareTestSuite(BaseTestSuite):
         TestSystem.wait(20)
         Resource.use_notification_link(self.driver, 1)
         Resource.create_version(self.driver)
-        Resource.view(self.driver)
+        TestSystem.wait(20)
+        Resource.use_notification_link(self.driver, 1)
         Resource.delete_resource(self.driver)
-        TestSystem.back(self.driver)
+        TestSystem.wait(20)
         TestSystem.refresh(self.driver)
         self.assertIn("Page not found", TestSystem.title(self.driver))
         TestSystem.back(self.driver)
@@ -918,14 +1011,14 @@ class HydroshareTestSuite(BaseTestSuite):
             self.assertTrue(False)
 
     def test_B_000088(self):
-        """ Confirm My Resources lists the latest resource version """
+        """Confirm My Resources lists the latest resource version"""
         LandingPage.to_login(self.driver)
         Login.login(self.driver, USERNAME, PASSWORD)
         Home.to_discover(self.driver)
         Discover.add_filters(
             self.driver,
-            subject="iUTAH",
-            resource_type="Composite Resource",
+            author="Castronova, Anthony",
+            resource_type="Composite",
             availability=["discoverable", "public"],
         )
         Discover.to_resource(self.driver, "Beaver Divide Air Temperature")
@@ -938,13 +1031,19 @@ class HydroshareTestSuite(BaseTestSuite):
         Resource.view(self.driver)
         Resource.create_version(self.driver)
         TestSystem.wait(20)
+        Resource.use_notification_link(self.driver, 1)
+        Resource.edit(self.driver)
         Resource.set_title(self.driver, "New Version - Test")
         Resource.view(self.driver)
         Resource.to_my_resources(self.driver)
         MyResources.to_resource_from_table(self.driver, 1)
+        TestSystem.wait()
         self.assertEqual(Resource.get_title(self.driver), "New Version - Test")
         Resource.delete_resource(self.driver)
+        TestSystem.wait(20)
+        Resource.to_my_resources(self.driver)
         MyResources.to_resource_from_table(self.driver, 1)
+        TestSystem.wait()
         self.assertEqual(Resource.get_title(self.driver), "Old Version - Test")
         try:
             Resource.edit(self.driver)
@@ -953,7 +1052,7 @@ class HydroshareTestSuite(BaseTestSuite):
             self.assertTrue(False)
 
     def test_B_000089(self):
-        """ Confirm core resource sharing (viewer) functionality """
+        """Confirm core resource sharing (viewer) functionality"""
         LandingPage.to_login(self.driver)
         Login.login(self.driver, USERNAME, PASSWORD)
         Home.create_resource(self.driver, "CompositeResource")
@@ -971,7 +1070,7 @@ class HydroshareTestSuite(BaseTestSuite):
         self.assertEqual(Resource.get_title(self.driver), "Sharing Resource Test")
 
     def test_B_000091(self):
-        """ Confirm editor sharing """
+        """Confirm editor sharing"""
         LandingPage.to_login(self.driver)
         Login.login(self.driver, USERNAME, PASSWORD)
         Home.create_resource(self.driver, "CompositeResource")
@@ -991,7 +1090,7 @@ class HydroshareTestSuite(BaseTestSuite):
         self.assertEqual(Resource.get_title(self.driver), "Editor Resource Test")
 
     def test_B_000092(self):
-        """ Confirm owner sharing """
+        """Confirm owner sharing"""
         LandingPage.to_login(self.driver)
         Login.login(self.driver, USERNAME, PASSWORD)
         Home.create_resource(self.driver, "CompositeResource")
@@ -1007,12 +1106,12 @@ class HydroshareTestSuite(BaseTestSuite):
         Login.login(self.driver, "selenium-user4", "abc123")
         self.driver.get(resource_url)
         Resource.delete_resource(self.driver)
-        TestSystem.back(self.driver)
+        TestSystem.wait(20)
         TestSystem.refresh(self.driver)
         self.assertIn("Page not found", TestSystem.title(self.driver))
 
     def test_B_000094(self):
-        """ Confirm sharable functionality with a share chain """
+        """Confirm sharable functionality with a share chain"""
         LandingPage.to_login(self.driver)
         Login.login(self.driver, USERNAME, PASSWORD)
         Home.create_resource(self.driver, "CompositeResource")
@@ -1044,7 +1143,7 @@ class HydroshareTestSuite(BaseTestSuite):
         )
 
     def test_B_000095(self):
-        """ Confirm the ability to block sharable functionality with the sharable setting """
+        """Confirm the ability to block sharable functionality with the sharable setting"""
         LandingPage.to_login(self.driver)
         Login.login(self.driver, USERNAME, PASSWORD)
         Home.create_resource(self.driver, "CompositeResource")
@@ -1069,7 +1168,7 @@ class HydroshareTestSuite(BaseTestSuite):
             TestSystem.wait(1)
 
     def test_B_000096(self):
-        """ Update profile contact information """
+        """Update profile contact information"""
         LandingPage.to_login(self.driver)
         Login.login(self.driver, USERNAME, PASSWORD)
         Home.to_profile(self.driver)
@@ -1084,7 +1183,7 @@ class HydroshareTestSuite(BaseTestSuite):
         Profile.save_changes(self.driver)
 
     def test_B_000097(self):
-        """ Update profile name matches logout interface name """
+        """Update profile name matches logout interface name"""
         LandingPage.to_login(self.driver)
         Login.login(self.driver, USERNAME, PASSWORD)
         Home.to_profile(self.driver)
@@ -1092,8 +1191,21 @@ class HydroshareTestSuite(BaseTestSuite):
             Profile.get_logged_in_name(self.driver), Profile.get_name(self.driver)
         )
 
+    def test_B_000098(self):
+        """Update profile email matches logout interface name"""
+        LandingPage.to_login(self.driver)
+        Login.login(self.driver, USERNAME, PASSWORD)
+        Home.to_profile(self.driver)
+        self.assertEqual(
+            Profile.get_logged_in_name(self.driver), Profile.get_name(self.driver)
+        )
+        Profile.to_editor(self.driver)
+        self.assertEqual(
+            Profile.get_logged_in_email(self.driver), Profile.get_email(self.driver)
+        )
+
     def test_B_000099(self):
-        """ Ensure the total for each author matches the total when the author filter is applied in Discover """
+        """Ensure the total for each author matches the total when the author filter is applied in Discover"""
         LandingPage.to_discover(self.driver)
         for i in range(1, 20, 4):
             Discover.toggle_author_filter_by_index(self.driver, i)
@@ -1103,7 +1215,7 @@ class HydroshareTestSuite(BaseTestSuite):
             self.assertEqual(filter_count, table_count)
 
     def test_B_000100(self):
-        """ Ensure the total for each contributor matches the total when the contributor filter is applied in Discover """
+        """Ensure the total for each contributor matches the total when the contributor filter is applied in Discover"""
         LandingPage.to_discover(self.driver)
         for i in range(2, 20, 4):
             Discover.toggle_contributor_filter_by_index(self.driver, i)
@@ -1115,7 +1227,7 @@ class HydroshareTestSuite(BaseTestSuite):
             self.assertEqual(filter_count, table_count)
 
     def test_B_000101(self):
-        """ Ensure the total for each owner matches the total when the owner filter is applied in Discover """
+        """Ensure the total for each owner matches the total when the owner filter is applied in Discover"""
         LandingPage.to_discover(self.driver)
         for i in range(3, 20, 4):
             Discover.toggle_owner_filter_by_index(self.driver, i)
@@ -1125,17 +1237,17 @@ class HydroshareTestSuite(BaseTestSuite):
             self.assertEqual(filter_count, table_count)
 
     def test_B_000102(self):
-        """ Confirm dates are formatted consistently across resources in the results table """
+        """Confirm dates are formatted consistently across resources in the results table"""
         LandingPage.to_discover(self.driver)
         Discover.uses_consistent_date_formatting(self.driver)
 
     def test_B_000103(self):
-        """ Ensure resource logos are consistent within each resource type """
+        """Ensure resource logos are consistent within each resource type"""
         LandingPage.to_discover(self.driver)
         self.assertTrue(Discover.uses_consistent_icon(self.driver))
 
     def test_B_000105(self):
-        """ Ensure the total for each resource type matches the total when the resource type filter is applied in Discover """
+        """Ensure the total for each resource type matches the total when the resource type filter is applied in Discover"""
         LandingPage.to_discover(self.driver)
         for i in range(4, Discover.get_count_of_types(self.driver), 3):
             Discover.toggle_type_filter_by_index(self.driver, i)
@@ -1145,7 +1257,7 @@ class HydroshareTestSuite(BaseTestSuite):
             self.assertEqual(filter_count, table_count)
 
     def test_B_000106(self):
-        """ Ensure the listed first author in the Discover page is listed as an author on the resource page """
+        """Ensure the listed first author in the Discover page is listed as an author on the resource page"""
         LandingPage.to_discover(self.driver)
         # Get a pseudo-random sample by taking the first result of a few random string searches
         search_strings = [
@@ -1178,22 +1290,216 @@ class HydroshareTestSuite(BaseTestSuite):
         archive and confirms the BagIt file size matches expectation
         """
         LandingPage.to_discover(self.driver)
-        Discover.search(self.driver, "Waterhackweek 2019 Cyberseminar: Jupyter notebooks and workflows on Hydroshare")
-        Discover.to_resource(self.driver, "Waterhackweek 2019 Cyberseminar: Jupyter notebooks and workflows on Hydroshare")
+        Discover.search(
+            self.driver,
+            "Waterhackweek 2019 Cyberseminar: Jupyter notebooks and workflows on Hydroshare",
+        )
+        Discover.to_resource(
+            self.driver,
+            "Waterhackweek 2019 Cyberseminar: Jupyter notebooks and workflows on Hydroshare",
+        )
         Resource.download_bagit(self.driver)
         TestSystem.wait()
         TestSystem.to_url(self.driver, "chrome://downloads")
         Downloads.check_successful_download(self.driver)
 
+    def test_B_000110(self):
+        """
+        Confirms file downloads within a resource are successful
+        """
+        LandingPage.to_discover(self.driver)
+        Discover.search(
+            self.driver,
+            "Waterhackweek 2019 Cyberseminar: Jupyter notebooks and workflows on Hydroshare",
+        )
+        Discover.to_resource(
+            self.driver,
+            "Waterhackweek 2019 Cyberseminar: Jupyter notebooks and workflows on Hydroshare",
+        )
+        Resource.download_file_by_index(self.driver, 2)
+        TestSystem.wait(10)
+        TestSystem.to_url(self.driver, "chrome://downloads")
+        Downloads.check_successful_download(self.driver)
+
+    def test_B_000111(self):
+        """
+        Confirms file zip downloads within a resource are successful
+        """
+        LandingPage.to_discover(self.driver)
+        Discover.search(
+            self.driver,
+            "Waterhackweek 2019 Cyberseminar: Jupyter notebooks and workflows on Hydroshare",
+        )
+        Discover.to_resource(
+            self.driver,
+            "Waterhackweek 2019 Cyberseminar: Jupyter notebooks and workflows on Hydroshare",
+        )
+        Resource.download_file_zip_by_index(self.driver, 3)
+        TestSystem.wait(10)
+        TestSystem.to_url(self.driver, "chrome://downloads")
+        Downloads.check_successful_download(self.driver)
+
+    def test_B_000112(self):
+        """
+        Confirms the resource file download links are valid
+        """
+        LandingPage.to_discover(self.driver)
+        Discover.search(
+            self.driver,
+            "Waterhackweek 2019 Cyberseminar: Jupyter notebooks and workflows on Hydroshare",
+        )
+        Discover.to_resource(
+            self.driver,
+            "Waterhackweek 2019 Cyberseminar: Jupyter notebooks and workflows on Hydroshare",
+        )
+        file_download_link = Resource.get_file_download_link_by_index(self.driver, 1)
+        TestSystem.to_url(self.driver, file_download_link)
+        TestSystem.wait(10)
+        TestSystem.to_url(self.driver, "chrome://downloads")
+        Downloads.check_successful_download(self.driver)
+
+    def test_B_000113(self):
+        """
+        Download and upload a 541 MB file from the API, then download it from the GUI
+        """
+        urlretrieve(
+            BASE_URL
+            + "/resource/a7b99c31adfe4f56899bef1a6700f9cf/data/contents/1m_snowOff_filter_SHD.zip",
+            "1m_snowOff_filter_SHD.zip",
+        )
+        r = requests.post(
+            BASE_URL + "/hsapi/resource/",
+            auth=(USERNAME, PASSWORD),
+            data={
+                "title": "Automated Test Resource CUAHSI QA",
+                "abstract": "This is a test resource for QA purposes.",
+                "keywords": ["test", "QA", "CUAHSI"],
+            },
+        )
+        resource_id = r.json()["resource_id"]
+        files = {"file": open("1m_snowOff_filter_SHD.zip", "rb")}
+        r = requests.post(
+            BASE_URL + "/hsapi/resource/{}/files/".format(resource_id),
+            auth=(USERNAME, PASSWORD),
+            files=files,
+        )
+        LandingPage.to_login(self.driver)
+        Login.login(self.driver, USERNAME, PASSWORD)
+        TestSystem.to_url(self.driver, BASE_URL + "/resource/{}/".format(resource_id))
+        Resource.download_bagit(self.driver)
+        TestSystem.wait(10)
+        self.assertTrue(Downloads.check_successful_download_new_tab(self.driver))
+
+    def test_B_000115(self):
+        """Confirms password reset is not confirmed unless submit is clicked"""
+        LandingPage.to_login(self.driver)
+        Login.login(self.driver, USERNAME, PASSWORD)
+        Home.to_profile(self.driver)
+        Profile.to_editor(self.driver)
+        Profile.queue_password_change(self.driver, PASSWORD, PASSWORD + "test")
+        Home.logout(self.driver)
+        LandingPage.to_login(self.driver)
+        Login.login(self.driver, USERNAME, PASSWORD + "test")
+        self.assertIn(
+            "Invalid username/email and password", Login.get_login_error(self.driver)
+        )
+
+    def test_B_000117(self):
+        """Create a discoverable resource"""
+        urlretrieve(
+            BASE_URL
+            + "/resource/a7b99c31adfe4f56899bef1a6700f9cf/data/contents/1m_snowOff_filter_SHD.zip",
+            "1m_snowOff_filter_SHD.zip",
+        )
+        r = requests.post(
+            BASE_URL + "/hsapi/resource/",
+            auth=(USERNAME, PASSWORD),
+            data={
+                "title": "Discoverable Resource CUAHSI QA",
+                "abstract": "This is a test resource for QA purposes.",
+                "keywords": ["test", "QA", "CUAHSI"],
+            },
+        )
+        resource_id = r.json()["resource_id"]
+        files = {"file": open("1m_snowOff_filter_SHD.zip", "rb")}
+        r = requests.post(
+            BASE_URL + "/hsapi/resource/{}/files/".format(resource_id),
+            auth=(USERNAME, PASSWORD),
+            files=files,
+        )
+        LandingPage.to_login(self.driver)
+        Login.login(self.driver, USERNAME, PASSWORD)
+        TestSystem.to_url(self.driver, BASE_URL + "/resource/{}/".format(resource_id))
+        Resource.edit(self.driver)
+        Resource.make_discoverable(self.driver)
+        Resource.logout(self.driver)
+        LandingPage.to_discover(self.driver)
+        Discover.add_filters(
+            self.driver,
+            availability=["discoverable"],
+        )
+        Discover.to_resource(self.driver, "Discoverable Resource CUAHSI QA")
+
+    def test_B_000118(self):
+        """Confirm the addition and deletion of metadata works for both point and box coverage"""
+        LandingPage.to_login(self.driver)
+        Login.login(self.driver, USERNAME, PASSWORD)
+        Home.create_resource(self.driver, "CompositeResource")
+        NewResource.configure(self.driver, "Spatial Coverage Test")
+        NewResource.create(self.driver)
+        Resource.set_spatial_coverage_box(self.driver, 44, 43, 42, 41)
+        Resource.delete_spatial_coverage(self.driver)
+        TestSystem.wait()
+        Resource.set_spatial_coverage_point(self.driver, 42, 42)
+        Resource.delete_spatial_coverage(self.driver)
+
+    def test_B_000119(self):
+        """Comfirm a warning message when making a resource no longer public-compatible"""
+        urlretrieve(
+            BASE_URL
+            + "/resource/a7b99c31adfe4f56899bef1a6700f9cf/data/contents/1m_snowOff_filter_SHD.zip",
+            "1m_snowOff_filter_SHD.zip",
+        )
+        r = requests.post(
+            BASE_URL + "/hsapi/resource/",
+            auth=(USERNAME, PASSWORD),
+            data={
+                "title": "Discoverable Resource CUAHSI QA",
+                "abstract": "This is a test resource for QA purposes.",
+                "keywords": ["test", "QA", "CUAHSI"],
+            },
+        )
+        resource_id = r.json()["resource_id"]
+        files = {"file": open("1m_snowOff_filter_SHD.zip", "rb")}
+        r = requests.post(
+            BASE_URL + "/hsapi/resource/{}/files/".format(resource_id),
+            auth=(USERNAME, PASSWORD),
+            files=files,
+        )
+        LandingPage.to_login(self.driver)
+        Login.login(self.driver, USERNAME, PASSWORD)
+        TestSystem.to_url(self.driver, BASE_URL + "/resource/{}/".format(resource_id))
+        Resource.edit(self.driver)
+        Resource.populate_abstract(self.driver, "// TODO Abstract")
+        Resource.add_subject_keyword(self.driver, "keyphrase multiple words")
+        Resource.make_public(self.driver)
+        Resource.view(self.driver)
+        self.assertEqual(Resource.get_sharing_status(self.driver), "Public")
+        Resource.edit(self.driver)
+        Resource.delete_file_by_index(self.driver, 1)
+        Resource.view(self.driver)
+        self.assertEqual(Resource.get_sharing_status(self.driver), "Private")
+
+
 class PerformanceTestSuite(BaseTestSuite):
-    """ Python unittest setup for smoke tests """
+    """Python unittest setup for smoke tests"""
 
     def setUp(self):
         super(PerformanceTestSuite, self).setUp()
 
     def test_D_000000(self):
         """
-        Download a BagIt, straight from the resource landing page
+        Anonymously download a BagIt, straight from the resource landing page
         """
         resource = super(PerformanceTestSuite, self).getResourceId()
         TestSystem.to_url(self.driver, BASE_URL + "/resource/{}/".format(resource))
@@ -1206,17 +1512,18 @@ class PerformanceTestSuite(BaseTestSuite):
 
     def test_D_000001(self):
         """
-        Download a BagIt, straight from the resource landing page
+        Login, then download a BagIt, straight from the resource landing page
         """
         resource = super(PerformanceTestSuite, self).getResourceId()
-        # TestSystem.to_url(self.driver, BASE_URL)
-        # LandingPage.to_login(self.driver)
-        # Login.login(self.driver, USERNAME, PASSWORD)
+        TestSystem.to_url(self.driver, BASE_URL)
+        LandingPage.to_login(self.driver)
+        Login.login(self.driver, USERNAME, PASSWORD)
         TestSystem.to_url(self.driver, BASE_URL + "/resource/{}/".format(resource))
         Resource.download_bagit(self.driver)
-        TestSystem.wait(10)
-        # Resource.wait_on_download_notification(self.driver)
-        # TestSystem.to_url(self.driver, "chrome://downloads")
+        TestSystem.wait()
+        Resource.wait_on_task_completion(self.driver, 1, 300)
+        Resource.use_notification_link(self.driver, 1)
+        TestSystem.to_url(self.driver, "chrome://downloads")
         self.assertTrue(Downloads.check_successful_download_new_tab(self.driver))
 
     def test_D_000002(self):
@@ -1230,13 +1537,14 @@ class PerformanceTestSuite(BaseTestSuite):
             # Copy resource IDs here
         ]
         for resource_id in resource_ids:
-            TestSystem.to_url(self.driver, BASE_URL + "/resource/{}/".format(resource_id))
+            TestSystem.to_url(
+                self.driver, BASE_URL + "/resource/{}/".format(resource_id)
+            )
             Resource.edit(self.driver)
             Resource.make_public(self.driver)
 
 
 class Utils(HydroshareTestSuite):
-
     def setUp(self):
         super(Utils, self).setUp()
         self.driver.get(BASE_URL)
@@ -1248,14 +1556,14 @@ class Utils(HydroshareTestSuite):
 
 
 class JupyterhubTestSuite(HydroshareTestSuite):
-    """ Python unittest setup for jupyterhub testing """
+    """Python unittest setup for jupyterhub testing"""
 
     def setUp(self):
         super(JupyterhubTestSuite, self).setUp()
         self.driver.get(BASE_URL)
 
     def test_000001(self):
-        """ Spawn and interact with a server """
+        """Spawn and interact with a server"""
         TestSystem.to_url(self.driver, "https://jupyter-edu.cuahsi.org/hub/login")
         # JupyterHub.agree_to_terms_of_use(self.driver)
         JupyterHub.to_hs_login(self.driver)
@@ -1274,7 +1582,7 @@ class JupyterhubTestSuite(HydroshareTestSuite):
 
 # Health cases definition
 class HydroshareSpamSuite(HydroshareTestSuite):
-    """ Python unittest setup for health checks """
+    """Python unittest setup for health checks"""
 
     def setUp(self):
         super(HydroshareSpamSuite, self).setUp()
@@ -1330,7 +1638,7 @@ class HydroshareSpamSuite(HydroshareTestSuite):
             "cheap[est]?",
             "credit[s]?",
             "customer[s]?",
-            "deal[s]?",
+            r"\bdeal[s]?\b",
             "phone number",
             "price",
             "4free",
@@ -1390,6 +1698,87 @@ class HydroshareSpamSuite(HydroshareTestSuite):
         ]
         # verifyme_resources = check_links_against_patterns(links, verifyme_patterns)
         # print_formatted_result(verifyme_resources, classification="potentially useless")
+
+    def test_C_000002(self):
+        """
+        Tries to identify potential spam users, via user ID sweep.
+        The test will simply print all suspicious resources to stdout, there are
+        no assertions in it.
+        """
+
+        patterns = [
+            "amazing",
+            "business",
+            "cheap[est]?",
+            "credit[s]?",
+            "customer[s]?",
+            "deal[s]?",
+            "phone number",
+            "price",
+            "4free",
+            "airline[s]?",
+            "baggage",
+            "booking",
+            "flight[s]?",
+            r"\breservation\b",
+            "vacation[al]?",
+            "ticket[s]?",
+            # r"\baccount\b",
+            "antivirus",
+            "cleaner",
+            "cookies",
+            # r"\b[e]?mail\b",
+            "laptop",
+            "password",
+            "mail7d.com",
+            "inbox-me.top",
+            "smart-email.me",
+            "best service",
+            "SEO services",
+            "sign up",
+            "sign in",
+            "wi[-]?fi",
+            # r'' is a 'raw' string (backslash symbol is treated as a literal
+            # backslash).
+            # '\b' stands for 'word boundary'.
+            # r"\bgoogle\b",
+            "android",
+            r"\bchrome\b",
+            r"\bapple\b",
+            " icloud ",
+            r"\bios\b",
+            "iphone",
+            r" mac ",
+            "macbook",
+            "macos",
+            # "facebook",
+            "microsoft",
+            "internet explorer",
+            "adult",
+            "escort",
+            "porn",
+            "xxx",
+        ]
+        full_pattern = re.compile("|".join(patterns), re.IGNORECASE)
+
+        LandingPage.to_login(self.driver)
+        Login.login(self.driver, USERNAME, PASSWORD)
+
+        for i in range(1000, 10000):
+            TestSystem.to_url(self.driver, BASE_URL + "/user/{}/".format(i))
+            if "User profile" in TestSystem.title(self.driver):
+                data = Profile.get_data(self.driver)
+                match = re.search(
+                    full_pattern, json.dumps(Profile.get_data(self.driver))
+                )
+                # Link text matches one of the patterns.
+                if match is not None:
+                    kinesis_record(
+                        SPAM_DATA_STREAM_CONFIG,
+                        SPAM_DATA_STREAM_NAME,
+                        "spam-user",
+                        data,
+                    )
 
 
 if __name__ == "__main__":

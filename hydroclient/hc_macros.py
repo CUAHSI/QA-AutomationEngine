@@ -32,7 +32,7 @@ from timing import (
 
 class Search:
     def scroll_map(self, driver, count=1):
-        """ Make a large scroll with the map {{count}} times to the
+        """Make a large scroll with the map {{count}} times to the
         right
         """
         SearchPage.map_area.click(driver)
@@ -40,37 +40,37 @@ class Search:
             SearchPage.map_area.scroll_right(driver)
 
     def to_workspace(self, driver):
-        """ Navigate to the Workspace using the button at the top of
+        """Navigate to the Workspace using the button at the top of
         the search interface
         """
         SearchPage.workspace.click(driver)
 
     def to_quickstart(self, driver):
-        """ Open the Quick Start modal using the button at the top of
+        """Open the Quick Start modal using the button at the top of
         the search interface
         """
         SearchPage.quickstart.click(driver)
 
     def is_legend_visible(self, driver):
-        """ Click on the legend tab, within the search interface sidebar """
+        """Click on the legend tab, within the search interface sidebar"""
         SearchPage.legend_tab.click(driver)
         return SearchPage.legend_img.is_visible(driver)
 
     def search(self, driver, count=1):
-        """ Press the Search Now button {{count}} time(s) """
+        """Press the Search Now button {{count}} time(s)"""
         for i in range(0, count):
             SearchPage.search.click(driver)
             time.sleep(SEARCH_IN_PROGRESS)
 
     def toggle_layer(self, driver, layer_name):
-        """ Turn on the {{layer_name}} layer using the map search interface
+        """Turn on the {{layer_name}} layer using the map search interface
         dropdown
         """
         SearchPage.layers.click(driver)
         SearchPage.layer(layer_name).click(driver)
 
     def to_random_map_marker(self, driver):
-        """ Click on a map marker """
+        """Click on a map marker"""
         marker_sizes = [22, 24, 28, 32]
         for marker_size in marker_sizes:
             try:
@@ -80,7 +80,7 @@ class Search:
                 continue
 
     def search_location(self, driver, location):
-        """ Use the search field to search for {{location}}, then click
+        """Use the search field to search for {{location}}, then click
         the first item in the dropdown of suggestions
         """
         SearchPage.map_search.click(driver)
@@ -92,7 +92,7 @@ class Search:
         time.sleep(SEARCH_IN_PROGRESS)
 
     def count_results(self, driver):
-        """ Check the number of results using the "Time Series Found"
+        """Check the number of results using the "Time Series Found"
         area of the sidebar
         """
         results_count = SearchPage.results_count.get_text(driver)
@@ -103,7 +103,7 @@ class Search:
         return int(results_count)
 
     def filter_dates(self, driver, start_date, end_date):
-        """ Use the "Date Range" option when doing a map search to filter
+        """Use the "Date Range" option when doing a map search to filter
         results.  Use the start date of {{start_date}} and the end date
         of {{end_date}}
         """
@@ -121,17 +121,16 @@ class Search:
         Search.search(driver)
 
     def clear_date_filter(self, driver):
-        """ Clears any date filters with an "All Dates" selection """
+        """Clears any date filters with an "All Dates" selection"""
         SearchPage.all_dates.click(driver)
 
     def reset(self, driver):
-        """ Press the reset button in the sidebar """
+        """Press the reset button in the sidebar"""
         SearchPage.reset.click(driver)
         time.sleep(SEARCH_IN_PROGRESS)
 
     def zoom_in(self, driver, count=1):
-        """ Use the + button on the map interface to zoom in {{count}} times
-        """
+        """Use the + button on the map interface to zoom in {{count}} times"""
         for i in range(0, count):
             SearchPage.zoom_in.click(driver)
 
@@ -151,7 +150,7 @@ class Search:
 
 class Marker:
     def to_workspace_all(self, driver):
-        """ Export all these results to the workspace by selecting all
+        """Export all these results to the workspace by selecting all
         results, clicking "Select Action", and then selecting the workspace
         export option
         """
@@ -173,7 +172,7 @@ class Marker:
 
 class Services:
     def filters(self, driver, orgs=None, titles=None, non_gridded_only=False):
-        """ Click on the "Data Services" button to open the service filtering
+        """Click on the "Data Services" button to open the service filtering
         capabilities.  Next, filter the search results by multi-selecting
         the {{org}} organization(s) and the {{titles}} titles
         """
@@ -201,7 +200,7 @@ class Services:
         Search.search(driver)
 
     def search(self, driver, search_text, result_num):
-        """ Click on the "Data Services" button to open the service filtering
+        """Click on the "Data Services" button to open the service filtering
         capabilities.  Next, use the searchbar and select a result from the list
         using result_num as the desired row index
         """
@@ -222,7 +221,7 @@ class Services:
 
 class Keywords:
     def filter_root(self, driver, keywords):
-        """ Filter the search results using the keywords filter.  Navigate
+        """Filter the search results using the keywords filter.  Navigate
         to the "full list" tab, then click the checkboxes for the
         {{keywords}} keywords, which are at the "root" keywords level.
         Click the "Search" button at the bottom of the modal to confirm
@@ -243,7 +242,7 @@ class Keywords:
 
 class Advanced:
     def filter_all_value_types(self, driver):
-        """ Navigate to the advanced search modal, then select all the
+        """Navigate to the advanced search modal, then select all the
         "value type" rows on the associated tab.  Click the "Search"
         button at the bottom of the modal to confirm the filtering
         """
@@ -282,7 +281,7 @@ class Filter:
         time.sleep(MODAL_FADE)
 
     def to_workspace_cell(self, driver, row, col):
-        """ Click on the "Filter Results" button.  Then, click on the
+        """Click on the "Filter Results" button.  Then, click on the
         cell in the {{row}} row and {{col}} column, then
         click "Select Action" and choose the workspace option
         """
@@ -294,7 +293,7 @@ class Filter:
         FilterModal.workspace.click(driver)
 
     def to_workspace_cell_range(self, driver, first_row, last_row):
-        """ Select a range of rows from the Filter Results modal """
+        """Select a range of rows from the Filter Results modal"""
         FilterModal.count.select_option(driver, "100")
         FilterModal.cell(first_row, 3).scroll_to(driver)
         FilterModal.cell(first_row, 3).click(driver)
@@ -306,7 +305,7 @@ class Filter:
         FilterModal.workspace.click(driver)
 
     def to_workspace_cell_multi(self, driver, rows):
-        """ Select multiple rows within Filter Results modal """
+        """Select multiple rows within Filter Results modal"""
         FilterModal.count.select_option(driver, "100")
         FilterModal.cell(rows[0], 3).scroll_to(driver)
         FilterModal.cell(rows[0], 3).click(driver)
@@ -319,7 +318,7 @@ class Filter:
         FilterModal.workspace.click(driver)
 
     def to_workspace_texts_range(self, driver, texts):
-        """ Click on the "Filter Results" button.  Find a cell which
+        """Click on the "Filter Results" button.  Find a cell which
         contains the text in the first item of this list: {{texts}}.
         Next, find a cell which contains the text in the
         second imem of this list: {{texts}}.  Click the first cell, then
@@ -336,7 +335,7 @@ class Filter:
         FilterModal.workspace.click(driver)
 
     def to_workspace_text(self, driver, text):
-        """ Click on the "Filter Results" button.  Then, find a cell
+        """Click on the "Filter Results" button.  Then, find a cell
         which contains the text {{text}} and click on it.  Next, click
         on "Select Tool" and choose the workspace option
         """
@@ -347,7 +346,7 @@ class Filter:
         FilterModal.workspace.click(driver)
 
     def search_field(self, driver, search_string):
-        """ Click on the "Filter Results" button.  Then, use the table
+        """Click on the "Filter Results" button.  Then, use the table
         search field to search for {{search_string}}.  Then, close the
         modal window
         """
@@ -357,8 +356,8 @@ class Filter:
         FilterModal.count.select_option(driver, "100")
 
     def to_workspace_all(self, driver):
-        """ Select all the results in the Filter Results dialog, then
-        export them to the workspace """
+        """Select all the results in the Filter Results dialog, then
+        export them to the workspace"""
         FilterModal.selections.click(driver)
         FilterModal.select_all.click(driver)
         FilterModal.action.click(driver)
@@ -366,7 +365,7 @@ class Filter:
         FilterModal.workspace.click(driver)
 
     def complex_selection_to_workspace(self, driver, double=False, to_workspace=False):
-        """ Use double click for workspace selections,
+        """Use double click for workspace selections,
         instead of single click selections,
         due to issues with single-click selection of large result sets
         """
@@ -454,14 +453,14 @@ class Filter:
 
 class About:
     def to_helpcenter(self, driver):
-        """ Navigate to the Help Center, by using the About button
+        """Navigate to the Help Center, by using the About button
         at the top of the page
         """
         SearchPage.about.click(driver)
         AboutModal.helpcenter.click(driver)
 
     def to_license_repo_top(self, driver):
-        """ Open the License Agreement using the About button at the top of
+        """Open the License Agreement using the About button at the top of
         the page, then click on the GitHub repository link near the top
         of the modal
         """
@@ -470,7 +469,7 @@ class About:
         AboutModal.license_repo_top.click(driver)
 
     def to_license_repo_inline(self, driver):
-        """ Open the License Agreement using the About button at the top of
+        """Open the License Agreement using the About button at the top of
         the page, then click on the GitHub repository link that is inline
         with the paragraph content of the modal
         """
@@ -485,7 +484,7 @@ class About:
         )
 
     def to_contact(self, driver):
-        """ Open the contact modal using the About button at the top of
+        """Open the contact modal using the About button at the top of
         the page, then click on the need additional help button and
         close the modal
         """
@@ -502,11 +501,11 @@ class About:
 
 class QuickStart:
     def section(self, driver, help_item):
-        """ Open the Quick Start section labeled {{help_item}} """
+        """Open the Quick Start section labeled {{help_item}}"""
         QuickStartModal.section(help_item).click(driver)
 
     def more(self, driver, link_text):
-        """ Use the Quick Start link {{link_text}} to open up a
+        """Use the Quick Start link {{link_text}} to open up a
         page with more information on the topic
         """
         QuickStartModal.more(link_text).click(driver)
@@ -514,7 +513,7 @@ class QuickStart:
 
 class Zendesk:
     def to_help(self, driver, search_text, article_text):
-        """ Use the ZenDesk widget to search for {{search_text}}.  Click
+        """Use the ZenDesk widget to search for {{search_text}}.  Click
         on the {{article_text}} option and click on the link to open the
         page in a new window
         """
@@ -529,26 +528,26 @@ class Zendesk:
 
 class Workspace:
     def select_all(self, driver):
-        """ Select all the items in the workspace using the selection
+        """Select all the items in the workspace using the selection
         dropdown
         """
         WorkspacePage.select_dropdown.passive_click(driver)
         WorkspacePage.select_all.click(driver)
 
     def clear_select(self, driver):
-        """ Clear all workspace selections using the selection dropdown """
+        """Clear all workspace selections using the selection dropdown"""
         WorkspacePage.select_dropdown.passive_click(driver)
         WorkspacePage.select_clear.click(driver)
 
     def remove_select(self, driver):
-        """ Remove all the selected workspace rows by using the selection
+        """Remove all the selected workspace rows by using the selection
         dropdown
         """
         WorkspacePage.select_dropdown.passive_click(driver)
         WorkspacePage.select_delete.click(driver)
 
     def to_csv(self, driver):
-        """ Open the tools dropdown and choose the option to generate
+        """Open the tools dropdown and choose the option to generate
         a CSV file
         """
         WorkspacePage.tools.passive_click(driver)
@@ -558,35 +557,35 @@ class Workspace:
         WorkspacePage.to_csv.click(driver)
 
     def to_viewer(self, driver):
-        """ Open the tools dropdown and choose the option to explore
-        the data using the Data Viewer """
+        """Open the tools dropdown and choose the option to explore
+        the data using the Data Viewer"""
         WorkspacePage.tools.passive_click(driver)
         WorkspacePage.to_viewer.click(driver)
 
     def to_hydroshare(self, driver):
-        """ Open the tools dropdown and choose the option to
-        Export to HydroShare """
+        """Open the tools dropdown and choose the option to
+        Export to HydroShare"""
         WorkspacePage.tools.passive_click(driver)
         WorkspacePage.to_hydroshare.click(driver)
 
     def launch_tool(self, driver):
-        """ Click on the Launch Tool button """
+        """Click on the Launch Tool button"""
         WorkspacePage.launch_tool.passive_click(driver)
 
     def to_none(self, driver):
-        """ Open the tools dropdown and choose the "None" option """
+        """Open the tools dropdown and choose the "None" option"""
         WorkspacePage.tools.passive_click(driver)
         WorkspacePage.to_none.click(driver)
 
     def count_complete(self, driver, wait_multiplier=1):
-        """ Check the number of rows in the workspace which are processed
+        """Check the number of rows in the workspace which are processed
         and show a status of "Completed"
         """
         time.sleep(WORKSPACE_CREATE_ARCHIVE * wait_multiplier)
         return driver.page_source.count("<em> Completed</em>")
 
     def is_in_results(self, driver, strings, time_mult):
-        """ Check the table to see if the text(s) {{strings}} are present
+        """Check the table to see if the text(s) {{strings}} are present
         somewhere in the cells
         """
         if type(strings) is list:
@@ -604,7 +603,7 @@ class Workspace:
 
 class ResourceCreator:
     def create_resource(self, driver):
-        """ Clicks on the Create Time Series Resource button """
+        """Clicks on the Create Time Series Resource button"""
         time.sleep(APP_INITIALIZATION)
         ResourceCreatorPage.create_time_resource.click(driver)
 

@@ -21,7 +21,7 @@ from config import BASE_URL
 
 # Test cases definition
 class HydroclientTestSuite(BaseTest):
-    """ Test suite for the HydroClient software system """
+    """Test suite for the HydroClient software system"""
 
     def setUp(self):
         super(HydroclientTestSuite, self).setUp()
@@ -29,12 +29,12 @@ class HydroclientTestSuite(BaseTest):
         self.driver.get(BASE_URL)
 
     def test_A_000002(self):
-        """ Confirms Archbold service metadata is available through
+        """Confirms Archbold service metadata is available through
         HydroClient and that a sample of the data downloads successfully
         """
 
         def oracle():
-            """ The Lake Annie Florida data can be successfully sent to the
+            """The Lake Annie Florida data can be successfully sent to the
             workspace, and then is processed successfully in the
             workspace ("completed" status)
             """
@@ -47,12 +47,12 @@ class HydroclientTestSuite(BaseTest):
         oracle()
 
     def test_A_000003(self):
-        """ Confirms repeated search for Lake Annie data does not result
+        """Confirms repeated search for Lake Annie data does not result
         in problematic behavior
         """
 
         def oracle():
-            """ 51 results are returned for a Lake Annie Florida data search,
+            """51 results are returned for a Lake Annie Florida data search,
             when the search is filtered to only include "Archbold Biological
             Center" service
             """
@@ -64,13 +64,13 @@ class HydroclientTestSuite(BaseTest):
         oracle()
 
     def test_A_000004(self):
-        """ Confirms the start and end date in a NWIS Unit Values
+        """Confirms the start and end date in a NWIS Unit Values
         data search are applied throughout search and workspace export
         workflow
         """
 
         def oracle():
-            """ Start date and end date in workspace match the initial
+            """Start date and end date in workspace match the initial
             date filtering values established in the Search interface
             """
             self.assertTrue(
@@ -85,14 +85,14 @@ class HydroclientTestSuite(BaseTest):
         oracle()
 
     def test_A_000005(self):
-        """ Confirms metadata and data availability for the NASA Goddard
+        """Confirms metadata and data availability for the NASA Goddard
         Earth Sciences services, using the New Haven CT Site X416-Y130.
         The two associated services are NLDAS Hourly NOAH Data and NLDAS
         Hourly Primary Forcing Data
         """
 
         def oracle():
-            """ The time series are sent to the workspace and processed,
+            """The time series are sent to the workspace and processed,
             resulting in a "completed" status for all time series
             """
             self.assertEqual(Workspace.count_complete(self.driver, 6), 3)
@@ -109,12 +109,12 @@ class HydroclientTestSuite(BaseTest):
         oracle()
 
     def test_A_000006(self):
-        """ Confirms metadata availability and the capability to download data
+        """Confirms metadata availability and the capability to download data
         near Köln Germany
         """
 
         def oracle():
-            """ Results are exported to workspace and number of successfully
+            """Results are exported to workspace and number of successfully
             processed time series is above 0
             """
             self.assertNotEqual(Workspace.count_complete(self.driver), 0)
@@ -126,13 +126,13 @@ class HydroclientTestSuite(BaseTest):
         oracle()
 
     def test_A_000008(self):
-        """ Confirms that map layer naming, as defined in the HydroClient
+        """Confirms that map layer naming, as defined in the HydroClient
         user interface, is consistent with the Quick Start and help pages
         documentation
         """
 
         def oracle_1():
-            """ Map layer naming in the Quick Start modal matches the
+            """Map layer naming in the Quick Start modal matches the
             naming within the HydroClient map search interface
             """
             for layer in layers:
@@ -141,7 +141,7 @@ class HydroclientTestSuite(BaseTest):
                 )
 
         def oracle_2():
-            """ Map layer naming in the help documentation page matches the
+            """Map layer naming in the help documentation page matches the
             naming within the HydroClient search interface
             """
             for layer in layers:
@@ -164,12 +164,12 @@ class HydroclientTestSuite(BaseTest):
         oracle_2()
 
     def test_A_000009(self):
-        """ Confirms that additional help on layer control can be
+        """Confirms that additional help on layer control can be
         accessed using the Zendesk widget
         """
 
         def oracle():
-            """ A valid help center page is opened from the Zendesk
+            """A valid help center page is opened from the Zendesk
             widget, and the page contains the word "Layers"
             """
             self.assertIn("Help Center", TestSystem.title(driver))
@@ -186,14 +186,14 @@ class HydroclientTestSuite(BaseTest):
         oracle()
 
     def test_A_000010(self):
-        """ Confirms that filtering by all keywords and all data types
+        """Confirms that filtering by all keywords and all data types
         returns the same number of results as if no search parameters
         were applied.  This test is applied near both the Dallas Texas
         and Rio De Janeiro Brazil areas
         """
 
         def oracle():
-            """ A search which filters for all keywords and all data types
+            """A search which filters for all keywords and all data types
             returns the same number of results as a search without any
             filters
             """
@@ -224,12 +224,12 @@ class HydroclientTestSuite(BaseTest):
         oracle()
 
     def test_A_000011(self):
-        """ Confirms "About" modal dropdown links successfully open up
+        """Confirms "About" modal dropdown links successfully open up
         the associated resource in a new tab and do not show a 404 Error
         """
 
         def oracle():
-            """ None of the resource pages contain the text "404 Error" """
+            """None of the resource pages contain the text "404 Error" """
             self.assertNotIn(
                 "404 Error",
                 external_sources,
@@ -261,7 +261,7 @@ class HydroclientTestSuite(BaseTest):
         oracle()
 
     def test_A_000012(self):
-        """ Confirms repeated map scrolls, followed by a location search,
+        """Confirms repeated map scrolls, followed by a location search,
         returns nonzero results for an area which normally has nonzero
         search results.  Effectively, this test confirms that viewing
         duplicate map instances to the left and right of the main (starting)
@@ -269,7 +269,7 @@ class HydroclientTestSuite(BaseTest):
         """
 
         def oracle():
-            """ Results count is nonzero after map navigations and a map
+            """Results count is nonzero after map navigations and a map
             location search (in that order)
             """
             self.assertNotEqual(Search.count_results(self.driver), 0)
@@ -280,12 +280,12 @@ class HydroclientTestSuite(BaseTest):
         oracle()
 
     def test_A_000013(self):
-        """ Confirms operations within the Workspace user interface
+        """Confirms operations within the Workspace user interface
         do not result in errors when the workspace is empty
         """
 
         def oracle():
-            """ The browser is still on using the HydroClient system
+            """The browser is still on using the HydroClient system
             after Workspace operations are used on an empty Workspace
             """
             self.assertIn("HydroClient", TestSystem.title(driver))
@@ -306,11 +306,11 @@ class HydroclientTestSuite(BaseTest):
         oracle()
 
     def test_A_000014(self):
-        """ Confirms NLDAS data is not available over the ocean (from
-        either of the two services) """
+        """Confirms NLDAS data is not available over the ocean (from
+        either of the two services)"""
 
         def oracle():
-            """ The results count over Cape Cod Bay (no land in view)
+            """The results count over Cape Cod Bay (no land in view)
             is 0 after filtering for only NLDAS services
             """
             self.assertEqual(Search.count_results(self.driver), 0)
@@ -324,8 +324,8 @@ class HydroclientTestSuite(BaseTest):
         oracle()
 
     def test_A_000015(self):
-        """ Confirms no date filters returns the same number of results as
-        applying a date filter from 01/01/0100 to 01/01/9000 """
+        """Confirms no date filters returns the same number of results as
+        applying a date filter from 01/01/0100 to 01/01/9000"""
 
         def oracle(init_count, final_count):
             self.assertEqual(init_count, final_count)
@@ -340,12 +340,12 @@ class HydroclientTestSuite(BaseTest):
         oracle(init_count, final_count)
 
     def test_A_000016(self):
-        """ Austin, TX search successfully pulls metadata, which is then viewable
+        """Austin, TX search successfully pulls metadata, which is then viewable
         within the Filter Results dialog.
         """
 
         def oracle(result_nums):
-            """ Results count is between 1k and 10k, as seen from Filter Results
+            """Results count is between 1k and 10k, as seen from Filter Results
             dialog reporting
             """
             self.assertEqual(result_nums[0], 1)  # first results page is active
@@ -361,8 +361,8 @@ class HydroclientTestSuite(BaseTest):
         oracle(result_nums)
 
     def test_A_000017(self):
-        """ Confirm Reset button clears Filter Results text and categorical
-        filters """
+        """Confirm Reset button clears Filter Results text and categorical
+        filters"""
 
         def oracle_results_count(expected_results, should_match):
             if should_match:
@@ -371,7 +371,7 @@ class HydroclientTestSuite(BaseTest):
                 self.assertNotEqual(Search.count_results(self.driver), expected_results)
 
         def oracle_data_prop_selection(data_props, should_be_selected):
-            """ Checks that filter options not selected """
+            """Checks that filter options not selected"""
             for data_prop in data_props:
                 if should_be_selected:
                     self.assertTrue(
@@ -383,7 +383,7 @@ class HydroclientTestSuite(BaseTest):
                     )
 
         def oracle_data_service_selection(data_services, should_be_selected):
-            """ Checks that filter options not selected """
+            """Checks that filter options not selected"""
             for data_service in data_services:
                 if should_be_selected:
                     self.assertTrue(
@@ -429,10 +429,10 @@ class HydroclientTestSuite(BaseTest):
         oracle_data_service_selection(data_services, should_be_selected=False)
 
     def test_A_000018(self):
-        """ Search results for Antarctica is greater than 0 """
+        """Search results for Antarctica is greater than 0"""
 
         def oracle():
-            """ Search result is greater than zero """
+            """Search result is greater than zero"""
             self.assertGreater(Search.count_results(self.driver), 0)
 
         Search.search_location(self.driver, "Antarctica")
@@ -440,15 +440,15 @@ class HydroclientTestSuite(BaseTest):
         oracle()
 
     def test_A_000019(self):
-        """ Confirm empty operations on the filter modals don't affect the
-        results set or the persistance of the searchbox entry """
+        """Confirm empty operations on the filter modals don't affect the
+        results set or the persistance of the searchbox entry"""
 
         def oracle_search_text_is_same(text):
-            """ Check if the text is the same in the search field """
+            """Check if the text is the same in the search field"""
             self.assertEqual(Search.get_searchbox_text(self.driver), text)
 
         def oracle_result(init_result):
-            """ Compare search results count to the initial level """
+            """Compare search results count to the initial level"""
             self.assertEqual(init_result, Search.count_results(self.driver))
 
         location = "NUIO üł. 54343nt, 342sf 234sdf, 12..."  # deliberately random
@@ -467,16 +467,16 @@ class HydroclientTestSuite(BaseTest):
         oracle_search_text_is_same(location)
 
     def test_A_000020(self):
-        """ Confirms sample Buffalo NY data exports successfully to the Data
-        Series Viewer """
+        """Confirms sample Buffalo NY data exports successfully to the Data
+        Series Viewer"""
 
         def oracle_processed_count():
-            """ The Buffalo NY three time series process successfully """
+            """The Buffalo NY three time series process successfully"""
             self.assertEqual(Workspace.count_complete(self.driver), 3)
 
         def oracle_viewer_opened():
-            """ The Data Series viewer application initializes and the data table
-            near the bottom of the application is loaded """
+            """The Data Series viewer application initializes and the data table
+            near the bottom of the application is loaded"""
             self.assertIn('id="stat_div"', External.source_new_page(self.driver))
 
         Search.search_location(self.driver, "Buffalo")
@@ -491,11 +491,11 @@ class HydroclientTestSuite(BaseTest):
         oracle_viewer_opened()
 
     def test_A_000021(self):
-        """" Confirm the Data Series Viewer application can't be sent more
-        than 10 time series records """
+        """ " Confirm the Data Series Viewer application can't be sent more
+        than 10 time series records"""
 
         def oracle():
-            """ Checks that the Launch Tool is disabled """
+            """Checks that the Launch Tool is disabled"""
             self.assertTrue(Workspace.launch_is_disabled(self.driver))
 
         Search.search_location(self.driver, "Panama City, Pana")
@@ -511,15 +511,15 @@ class HydroclientTestSuite(BaseTest):
         oracle()
 
     def test_A_000022(self):
-        """ Confirm data series export to the Resource Creator app can be executed
-        successfully """
+        """Confirm data series export to the Resource Creator app can be executed
+        successfully"""
 
         def oracle_completion_count():
-            """ Returned results set from Trinidad is not too large """
+            """Returned results set from Trinidad is not too large"""
             self.assertLess(Workspace.count_complete(self.driver), 5)
 
         def oracle_resource_creator_up():
-            """ Resource creator seems to be functioning """
+            """Resource creator seems to be functioning"""
             self.assertTrue(ResourceCreator.is_initialized(self.driver))
 
         Search.search_location(self.driver, "Trinidad, Trinidad and Tobago")
@@ -542,7 +542,7 @@ class HydroclientTestSuite(BaseTest):
         """
 
         def oracle():
-            """ Checks that Ok button of warning window is displayed """
+            """Checks that Ok button of warning window is displayed"""
             # self.assertTrue(FilterModal.ok.is_visible(self.driver))
             self.assertTrue(Filter.ok_is_visible(self.driver))
 
@@ -566,7 +566,7 @@ class HydroclientTestSuite(BaseTest):
         """
 
         def oracle():
-            """ Checks that search result is greater than 0 """
+            """Checks that search result is greater than 0"""
             self.assertGreater(Search.count_results(self.driver), 0)
 
         Search.show_hide_panel(self.driver)
@@ -579,14 +579,14 @@ class HydroclientTestSuite(BaseTest):
         oracle()
 
     def test_A_000025(self):
-        """ Verifies availability of University of New Hampshire data """
+        """Verifies availability of University of New Hampshire data"""
 
         def oracle_search():
-            """ Checks search result is greater than 8000 """
+            """Checks search result is greater than 8000"""
             self.assertGreater(Search.count_results(self.driver), 8000)
 
         def oracle_filters():
-            """ Checks search results with applied filters is greater than 97 """
+            """Checks search results with applied filters is greater than 97"""
             self.assertGreater(Search.count_results(self.driver), 97)
 
         Search.hybrid(self.driver)
