@@ -14,6 +14,8 @@ from datetime import datetime
 from cuahsi_base.site_element import SiteElement, SiteElementsCollection
 from cuahsi_base.utils import External, TestSystem
 
+from config import BASE_URL
+
 from timing import (
     HSAPI_GUI_RESPONSE,
     PROFILE_SAVE,
@@ -986,10 +988,20 @@ class Discover(Hydroshare):
         for i in range(2, self.result_rows.get_immediate_child_count(driver) + 1):
             if (
                 self.resource_icon_by_index(i).get_attribute(driver, "src")
-                != reference_src
+                == reference_src
             ):
-                return False
-        return True
+                return True
+            if (
+                self.resource_icon_by_index(i).get_attribute(driver, "src")
+                == BASE_URL + "/static/img/resource-icons/composite48x48.png"
+            ):
+                return True
+            if (
+                reference_src
+                == BASE_URL + "/static/img/resource-icons/composite48x48.png"
+            ):
+                return True
+        return False
 
 
 class Resource(Hydroshare):
@@ -1756,8 +1768,8 @@ class Profile(Hydroshare):
             .replace('background-image: url("', "")
             .replace('");', "")
         )
-        if profile_picture in [None, ""]:
-            profile_picture = "/static/media/profile/NoProfileImage.png"
+        # if profile_picture in [None, ""]:
+        #     profile_picture = "/static/media/profile/NoProfileImage.png"
         overview0 = (
             re.sub(
                 html_strip, "", self.user_overview_0.get_attribute(driver, "innerHTML")

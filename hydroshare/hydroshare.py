@@ -1,6 +1,7 @@
 """ Runs various smoke tests for the hydroshare.org """
 import boto3
 import inspect
+import json
 import os
 import random
 import re
@@ -8,6 +9,7 @@ import requests
 import time
 
 from botocore.config import Config
+from google.cloud import vision
 from urllib.request import urlretrieve
 
 # from percy import percySnapshot
@@ -58,15 +60,18 @@ SPAM_DATA_STREAM_CONFIG = Config(
 
 # Test cases definition
 class HydroshareTestSuite(BaseTestSuite):
-    """Python unittest setup for smoke tests"""
+    """Python unittest setup for functional tests"""
 
     def setUp(self):
         super(HydroshareTestSuite, self).setUp()
         self.driver.get(BASE_URL)
 
     def test_B_000001(self):
-        """When creating a resource, ensure all resource types have a "Cancel"
-        button available"""
+        """
+        When creating a resource, ensure all resource types have a "Cancel"
+        button available, so that they are not forced to finish creating a resource
+        if they don't actually want one or if they made a mistake
+        """
         LandingPage.to_login(self.driver)
         Login.login(self.driver, USERNAME, PASSWORD)
         resource_types = [
@@ -81,7 +86,7 @@ class HydroshareTestSuite(BaseTestSuite):
 
     def test_B_000003(self):
         """
-        Confirms Beaver Divide Air Temperature resource landing page is
+        Confirms the Beaver Divide Air Temperature example resource landing page is
         online via navigation and title check, then downloads the BagIt
         archive to make sure it downloads successfully
         """
@@ -97,7 +102,10 @@ class HydroshareTestSuite(BaseTestSuite):
         self.assertTrue(Downloads.check_successful_download_new_tab(self.driver))
 
     def test_B_000005(self):
-        """Confirms password reset works for users"""
+        """
+        Confirms user passwords can be changed, and then changed back
+        to the original value, using the Profile interface
+        """
         LandingPage.to_login(self.driver)
         Login.login(self.driver, USERNAME, PASSWORD)
         Home.to_profile(self.driver)
@@ -168,7 +176,7 @@ class HydroshareTestSuite(BaseTestSuite):
 
     def test_B_000008(self):
         """
-        Checks all HydroShare Help links to confirm links are intact
+        Checks all HydroShare Help links lead to valid pages
         and that the topic title words come up in the associated help page
         """
         LandingPage.to_help(self.driver)
@@ -189,7 +197,7 @@ class HydroshareTestSuite(BaseTestSuite):
     def test_B_000009(self):
         """
         Confirms the basic get methods within hydroshare api do not return
-        errors.  These basic get methods are accessible from the GUI and
+        errors.  These basic get methods are accessible from the Swagger UI and
         use just a resource id required parameter
         """
         resource_id = "54ae2ade31f646d097d78ef0695bb36c"
@@ -231,7 +239,7 @@ class HydroshareTestSuite(BaseTestSuite):
     def test_B_000010(self):
         """
         Confirms the basic get methods within hydroshare api, which require
-        no parameters, can be ran through the GUI
+        no parameters, can be ran through the Swagger UI
         """
         endpoints = [
             "operations-hsapi-hsapi_resource_content_types_list",
@@ -249,7 +257,9 @@ class HydroshareTestSuite(BaseTestSuite):
             API.toggle_endpoint(self.driver, endpoint)
 
     def test_B_000011(self):
-        """Check Hydroshare About policy pages to confirm links and content"""
+        """
+        Check Hydroshare About policy pages to confirm link titles, content titles, and page titles all align
+        """
         LandingPage.to_about(self.driver)
         About.toggle_tree(self.driver)
         About.toggle_tree(self.driver)
@@ -303,8 +313,8 @@ class HydroshareTestSuite(BaseTestSuite):
 
     def test_B_000014(self):
         """
-        Confirms ability to create HydroShare groups through standard
-        graphical interface and workflow
+        Confirms ability to create HydroShare groups through the standard
+        GUI workflow
         """
         LandingPage.to_login(self.driver)
         Login.login(self.driver, USERNAME, PASSWORD)
@@ -322,7 +332,9 @@ class HydroshareTestSuite(BaseTestSuite):
         self.assertEqual(group_name, new_group_name)
 
     def test_B_000015(self):
-        """Confirms Resource "Open With" successfully redirects to JupyterHub"""
+        """
+        Confirms the resource landing page "Open With" works, in the case of JupyterHub
+        """
         LandingPage.to_discover(self.driver)
         Discover.add_filters(self.driver, owner="Castronova, Anthony")
         Discover.to_resource(self.driver, "Beaver Divide Air Temperature")
@@ -331,8 +343,10 @@ class HydroshareTestSuite(BaseTestSuite):
         self.assertNotIn("Page not found", webpage_title)
 
     def test_B_000016(self):
-        """Create basic resource without any files and confirm that the resulting
-        resource landing page is OK"""
+        """
+        Create a basic resource without any files and confirm that the resulting
+        resource landing page is OK
+        """
         LandingPage.to_login(self.driver)
         Login.login(self.driver, USERNAME, PASSWORD)
         Home.create_resource(self.driver, "CompositeResource")
@@ -343,7 +357,9 @@ class HydroshareTestSuite(BaseTestSuite):
         self.assertEqual("Test Resource", resource_title)
 
     def test_B_000017(self):
-        """Confirm resource type filters can be applied in My Resources"""
+        """
+        Confirm resource type filters can be applied in My Resources
+        """
         options = [
             "Collection",
             "Composite Resource",
@@ -416,7 +432,7 @@ class HydroshareTestSuite(BaseTestSuite):
     def test_B_000019(self):
         """
         Create a new resources label and verify it can be added to existing
-        resources in the My Resources page
+        resources on the My Resources page
         """
         LandingPage.to_login(self.driver)
         Login.login(self.driver, USERNAME, PASSWORD)
@@ -429,13 +445,16 @@ class HydroshareTestSuite(BaseTestSuite):
         MyResources.delete_label(self.driver)
 
     def hold_test_B_000021(self):  # BROKEN DUE TO HYDROSHARE JS FRAMEWORK USE
-        """Confirm ability to upload CV file to users profile"""
+        """
+        Confirm the ability to upload a CV file within the profile interface
+        """
         LandingPage.to_login(self.driver)
         Login.login(self.driver, USERNAME, PASSWORD)
         Home.to_profile(self.driver)
         Profile.to_editor(self.driver)
         Profile.upload_cv(
-            self.driver, "http://www.bu.edu/careers/files/2012/08/Resume-Guide-2012.pdf"
+            self.driver,
+            "https://www.bu.edu/careers/files/2012/08/Resume-Guide-2012.pdf",
         )
         Profile.save_changes(self.driver)
         num_windows_now = len(self.driver.window_handles)
@@ -448,7 +467,9 @@ class HydroshareTestSuite(BaseTestSuite):
         Profile.delete_cv(self.driver)
 
     def hold_test_B_000022(self):  # BROKEN DUE TO HYDROSHARE JS FRAMEWORK USE
-        """Confirm profile image upload, within the profile page"""
+        """
+        Confirm profile image upload and removal works, within the profile page
+        """
         LandingPage.to_login(self.driver)
         Login.login(self.driver, USERNAME, PASSWORD)
         Home.to_profile(self.driver)
@@ -996,18 +1017,22 @@ class HydroshareTestSuite(BaseTestSuite):
         Resource.copy_resource(self.driver)
         TestSystem.wait(20)
         Resource.use_notification_link(self.driver, 1)
+        resource_copy = TestSystem.current_url(self.driver)
         Resource.create_version(self.driver)
         TestSystem.wait(20)
         Resource.use_notification_link(self.driver, 1)
         Resource.delete_resource(self.driver)
         TestSystem.wait(20)
         TestSystem.refresh(self.driver)
-        self.assertIn("Page not found", TestSystem.title(self.driver))
+        self.assertIn("My Resources", TestSystem.title(self.driver))
         TestSystem.back(self.driver)
+        # Deleted new version
+        self.assertIn("Page not found", TestSystem.title(self.driver))
+        # Now editable old version
+        TestSystem.to_url(self.driver, resource_copy)
         try:
             Resource.edit(self.driver)
         except:
-            # Old resource version should be editable, after the newer one is deleted
             self.assertTrue(False)
 
     def test_B_000088(self):
@@ -1107,7 +1132,7 @@ class HydroshareTestSuite(BaseTestSuite):
         self.driver.get(resource_url)
         Resource.delete_resource(self.driver)
         TestSystem.wait(20)
-        TestSystem.refresh(self.driver)
+        TestSystem.back(self.driver)
         self.assertIn("Page not found", TestSystem.title(self.driver))
 
     def test_B_000094(self):
@@ -1244,7 +1269,10 @@ class HydroshareTestSuite(BaseTestSuite):
     def test_B_000103(self):
         """Ensure resource logos are consistent within each resource type"""
         LandingPage.to_discover(self.driver)
-        self.assertTrue(Discover.uses_consistent_icon(self.driver))
+        for i in range(3, Discover.get_count_of_types(self.driver), 7):
+            Discover.toggle_type_filter_by_index(self.driver, i)
+            self.assertTrue(Discover.uses_consistent_icon(self.driver))
+            Discover.toggle_type_filter_by_index(self.driver, i)
 
     def test_B_000105(self):
         """Ensure the total for each resource type matches the total when the resource type filter is applied in Discover"""
@@ -1544,17 +1572,6 @@ class PerformanceTestSuite(BaseTestSuite):
             Resource.make_public(self.driver)
 
 
-class Utils(HydroshareTestSuite):
-    def setUp(self):
-        super(Utils, self).setUp()
-        self.driver.get(BASE_URL)
-
-    def test_000001(self):
-        TestSystem.to_url(self.driver, "http://toxiproxy-test/")
-        Utilities.run_speed_test(self.driver)
-        TestSystem.wait(20)
-
-
 class JupyterhubTestSuite(HydroshareTestSuite):
     """Python unittest setup for jupyterhub testing"""
 
@@ -1581,12 +1598,30 @@ class JupyterhubTestSuite(HydroshareTestSuite):
 
 
 # Health cases definition
-class HydroshareSpamSuite(HydroshareTestSuite):
+class HydroshareSpamSuite(BaseTestSuite):
     """Python unittest setup for health checks"""
+
+    vision_client = None
 
     def setUp(self):
         super(HydroshareSpamSuite, self).setUp()
         self.driver.get(BASE_URL)
+        self.vision_client = vision.ImageAnnotatorClient()
+
+    def send_record(self, data):
+        if self.records == "aws":
+            kinesis_record(
+                SPAM_DATA_STREAM_CONFIG,
+                SPAM_DATA_STREAM_NAME,
+                "spam-user",
+                data,
+            )
+        if self.records == "gcp":
+            future = self.publisher.publish(
+                self.publisher.topic_path("cuahsiqa", "spam-users"),
+                json.dumps(data, ensure_ascii=False).encode("utf8"),
+            )
+            future.result()
 
     def test_C_000001(self):
         """
@@ -1759,26 +1794,62 @@ class HydroshareSpamSuite(HydroshareTestSuite):
             "porn",
             "xxx",
         ]
+        profile_picture_flags = [
+            "Lingerie top",
+            "Brassiere",
+            "Lingerie",
+            "Undergarment",
+            "Gun barrel",
+            "Gun",
+            "Food",
+            "Trigger",
+            "Drugs",
+            "Drug",
+            "Prescription",
+            "Pills",
+            "Pill bottle",
+            "Pill",
+        ]
         full_pattern = re.compile("|".join(patterns), re.IGNORECASE)
 
         LandingPage.to_login(self.driver)
         Login.login(self.driver, USERNAME, PASSWORD)
 
-        for i in range(1000, 10000):
+        for i in range(1708, 7746):
             TestSystem.to_url(self.driver, BASE_URL + "/user/{}/".format(i))
             if "User profile" in TestSystem.title(self.driver):
                 data = Profile.get_data(self.driver)
                 match = re.search(
                     full_pattern, json.dumps(Profile.get_data(self.driver))
                 )
-                # Link text matches one of the patterns.
-                if match is not None:
-                    kinesis_record(
-                        SPAM_DATA_STREAM_CONFIG,
-                        SPAM_DATA_STREAM_NAME,
-                        "spam-user",
-                        data,
+                profile_picture_match = False
+                if data["profile_picture"] not in [None, ""]:
+                    response = self.vision_client.label_detection(
+                        image={
+                            "source": {"image_uri": BASE_URL + data["profile_picture"]}
+                        }
                     )
+                    print(
+                        i, [label.description for label in response.label_annotations]
+                    )
+                    if any(
+                        [
+                            label.description in profile_picture_flags
+                            for label in response.label_annotations
+                        ]
+                    ):
+                        profile_picture_match = True
+                # Link text matches one of the patterns.
+                if match is not None or profile_picture_match:
+                    data["id"] = i
+                    data["matches"] = str(match)
+                    if data["profile_picture"] not in [None, ""]:
+                        data["profile_picture_labels"] = ",".join(
+                            [label.description for label in response.label_annotations]
+                        )
+                    else:
+                        data["profile_picture_labels"] = ""
+                    self.send_record(data)
 
 
 if __name__ == "__main__":

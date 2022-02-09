@@ -1,10 +1,13 @@
 import argparse
+import datetime
+import json
 import sys
 import time
 import unittest
 import warnings
 
 from botocore.config import Config
+from google.cloud import pubsub_v1
 from selenium import webdriver
 
 from .browser import USER_AGENT
@@ -18,6 +21,10 @@ TEST_DURATION_DATA_STREAM_NAME = "cuahsi-quality-test-duration-data-stream"
 TEST_DURATION_DATA_STREAM_CONFIG = Config(
     region_name="us-east-2",
 )
+
+GCP_PROJECT_ID = "cuahsiqa"
+GCP_TOPIC_ID = "test-runs"
+
 USER_COUNT = 1
 
 
@@ -29,13 +36,18 @@ class BaseTestSuite(unittest.TestCase):
     data = {}
     past_errors = 0
     past_failures = 0
+    publisher = None
+    topic_path = None
 
     def setUp(self):
         """Setup driver for use in automation tests"""
 
-        if self.records == "aws":
+        if self.records is not None:
             self.data["test"] = self._testMethodName
+        if self.records == "aws":
             self.data["start_time"] = time.time()
+        elif self.records == "gcp":
+            self.data["start_time"] = datetime.datetime.now().isoformat()
 
         if self.grid_hub_ip is not None:
             warnings.simplefilter("ignore", ResourceWarning)
@@ -110,6 +122,15 @@ class BaseTestSuite(unittest.TestCase):
                 "test-duration",
                 self.data,
             )
+        elif self.records == "gcp":
+            self.data["end_time"] = datetime.datetime.now().isoformat()
+            self.data["passed"] = ok
+            self.data["parallel_users"] = USER_COUNT
+            future = self.publisher.publish(
+                self.topic_path,
+                json.dumps(self.data, ensure_ascii=False).encode("utf8"),
+            )
+            future.result()
 
 
 def basecli():
@@ -131,6 +152,11 @@ def parse_args_run_tests(test_class):
         test_class.browser = args.browser
     if args.records is not None:
         test_class.records = args.records
+    if args.records == "gcp":
+        test_class.publisher = pubsub_v1.PublisherClient()
+        test_class.topic_path = test_class.publisher.topic_path(
+            GCP_PROJECT_ID, GCP_TOPIC_ID
+        )
 
     sys.argv[1:] = args.unittest_args
     unittest.main(verbosity=2)
