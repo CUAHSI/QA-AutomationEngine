@@ -1022,7 +1022,13 @@ class Resource(Hydroshare):
     comment_text = SiteElement(By.CSS_SELECTOR, "#comment textarea")
     comment_submit = SiteElement(By.CSS_SELECTOR, 'input[value="Comment"]')
     comment_section = SiteElement(By.ID, "comments")
-    new_reference = SiteElement(By.CSS_SELECTOR, "a#add-source")
+    new_relation = SiteElement(By.CSS_SELECTOR, "a#add-relation")
+    relation_type = SiteElement(By.ID, "id_type")
+    relation_value = SiteElement(By.ID, "id_related_to_input")
+    relation_submit = SiteElement(
+        By.CSS_SELECTOR,
+        "#add-relation-dialog button.btn.btn-primary.btn-disable-after-valid",
+    )
     derived_from = SiteElement(By.ID, "id_derived_from")
     save_reference = SiteElement(
         By.CSS_SELECTOR, "#add-source-dialog button.btn-primary"
@@ -1195,9 +1201,10 @@ class Resource(Hydroshare):
 
     @classmethod
     def add_reference(self, driver, reference_text):
-        self.new_reference.click(driver)
-        self.derived_from.inject_text(driver, reference_text)
-        self.save_reference.click(driver)
+        self.new_relation.click(driver)
+        self.relation_type.select_option_text(driver, "This resource is referenced by")
+        self.relation_value.inject_text(driver, "https://google.com")
+        self.relation_submit.click(driver)
 
     @classmethod
     def delete_reference(self, driver):
@@ -1427,15 +1434,15 @@ class WebApp(Resource):
 
 class Help(Hydroshare):
     to_about = SiteElement(By.CSS_SELECTOR, 'a[href="{}"]'.format("/about-hydroshare"))
-    core_root = SiteElement(By.CSS_SELECTOR, "#content div.row")
+    core_root = SiteElement(By.CSS_SELECTOR, "#help-topics-grid")
 
     @classmethod
     def core_item(self, index):
         return SiteElement(
             By.CSS_SELECTOR,
-            "#content "
-            "div.row div:nth-of-type({}) "
-            "div.topic-name div".format(index),
+            "#help-topics-grid > a:nth-of-type({}) > div.topic-body > div".format(
+                index
+            ),
         )
 
     @classmethod

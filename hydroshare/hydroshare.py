@@ -183,7 +183,9 @@ class HydroshareTestSuite(BaseTestSuite):
         core_count = Help.get_core_count(self.driver)
         core_topics = [
             Help.get_core_topic(self.driver, i + 1) for i in range(0, core_count)
-        ]
+        ][
+            :-3
+        ]  # Last three topics include mailto: contact emails
         for ind, core_topic in enumerate(core_topics, 1):  # xpath ind start at 1
             Help.open_core(self.driver, ind)
             words_string = re.sub("[^A-Za-z]", " ", core_topic)
@@ -202,26 +204,26 @@ class HydroshareTestSuite(BaseTestSuite):
         """
         resource_id = "54ae2ade31f646d097d78ef0695bb36c"
         endpoints = [
-            {"id": "operations-hsapi-hsapi_resource_read", "resource_param_ind": 1},
+            {"id": "operations-resource-resource_read", "resource_param_ind": 1},
             {
-                "id": "operations-hsapi-hsapi_resource_file_list_list",
+                "id": "operations-resource-resource_file_list_list",
                 "resource_param_ind": 3,
             },
             {
-                "id": "operations-hsapi-hsapi_resource_files_list",
+                "id": "operations-resource-resource_files_list",
                 "resource_param_ind": 3,
             },
-            {"id": "operations-hsapi-hsapi_resource_map_list", "resource_param_ind": 1},
+            {"id": "operations-resource-resource_map_list", "resource_param_ind": 1},
             {
-                "id": "operations-hsapi-hsapi_resource_scimeta_list",
+                "id": "operations-resource-resource_scimeta_list",
                 "resource_param_ind": 1,
             },
             {
-                "id": "operations-hsapi-hsapi_resource_scimeta_elements_read",
+                "id": "operations-resource-resource_scimeta_elements_read",
                 "resource_param_ind": 1,
             },
             {
-                "id": "operations-hsapi-hsapi_resource_sysmeta_list",
+                "id": "operations-resource-resource_sysmeta_list",
                 "resource_param_ind": 1,
             },
         ]
@@ -242,10 +244,10 @@ class HydroshareTestSuite(BaseTestSuite):
         no parameters, can be ran through the Swagger UI
         """
         endpoints = [
-            "operations-hsapi-hsapi_resource_content_types_list",
-            "operations-hsapi-hsapi_resource_types_list",
-            "operations-hsapi-hsapi_user_list",
-            "operations-hsapi-hsapi_userInfo_list",
+            "operations-resource-resource_content_types_list",
+            "operations-resource-resource_types_list",
+            "operations-user-user_list",
+            "operations-userInfo-userInfo_list",
         ]
         TestSystem.to_url(self.driver, "{}/hsapi/".format(BASE_URL))
         for endpoint in endpoints:
@@ -833,9 +835,9 @@ class HydroshareTestSuite(BaseTestSuite):
         # External.switch_old_page(self.driver)
         # External.close_new_page(self.driver)
 
-    def test_B_000056(self):
+    def hold_test_B_000056(self):
         """Verify featured apps featured on the dashboard link correctly"""
-        # LandingPage.to_login(self.driver)
+        LandingPage.to_login(self.driver)
         Login.login(self.driver, USERNAME, PASSWORD)
         # JupyterHub
         Home.to_app(self.driver, "Featured", 1)
@@ -1133,6 +1135,7 @@ class HydroshareTestSuite(BaseTestSuite):
         Resource.delete_resource(self.driver)
         TestSystem.wait(20)
         TestSystem.back(self.driver)
+        TestSystem.refresh(self.driver)
         self.assertIn("Page not found", TestSystem.title(self.driver))
 
     def test_B_000094(self):
