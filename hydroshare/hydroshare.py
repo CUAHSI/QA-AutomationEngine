@@ -1520,7 +1520,39 @@ class HydroshareTestSuite(BaseTestSuite):
         Resource.delete_file_by_index(self.driver, 1)
         Resource.view(self.driver)
         self.assertEqual(Resource.get_sharing_status(self.driver), "Private")
+    
+    def test_B_000120(self):
+        """
+        Confirm profile image upload for .svg files
+        """
+        LandingPage.to_login(self.driver)
+        Login.login(self.driver, USERNAME, PASSWORD)
+        Home.create_resource(self.driver, "ToolResource")
+        NewResource.configure(self.driver, "TEST Web App")
+        NewResource.create(self.driver)
+        WebApp.support_resource_type(self.driver, "CompositeResource")
+        WebApp.set_app_launching_url(self.driver, "https://www.hydroshare.org")
+        WebApp.view(self.driver)
+        WebApp.add_to_open_with(self.driver)
+        WebApp.create_resource(self.driver, "CompositeResource")
+        NewResource.configure(self.driver, "TEST Web App Composite")
+        NewResource.create(self.driver)
+        Resource.view(self.driver)
+        Resource.open_with_by_title(self.driver, "TEST Web App")
 
+        Profile.to_editor(self.driver)
+        urlretrieve(
+            "https://upload.wikimedia.org/wikipedia/commons/0/02/SVG_logo.svg", "profile.svg"
+        )
+        cwd = os.getcwd()
+        img_path = os.path.join(cwd, "profile.svg")
+        Profile.add_photo(self.driver, profile_img_path)
+        Profile.save_changes(self.driver)
+        self.assertTrue(Profile.confirm_photo_uploaded(self.driver, "profile"))
+        os.remove(profile_img_path)
+        Profile.to_editor(self.driver)
+        Profile.remove_photo(self.driver)
+        self.assertFalse(Profile.confirm_photo_uploaded(self.driver, "profile"))
 
 class PerformanceTestSuite(BaseTestSuite):
     """Python unittest setup for smoke tests"""

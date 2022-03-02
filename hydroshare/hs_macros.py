@@ -441,6 +441,19 @@ class Apps(Hydroshare):
     @classmethod
     def get_title(self, driver, num):
         return self.title(num).get_text(driver)
+    
+    @classmethod
+    def add_photo(self, driver, link):
+        self.image_upload.set_path(driver, link)
+
+    @classmethod
+    def remove_photo(self, driver):
+        self.delete_image.click(driver)
+        self.submit_delete_image.click(driver)
+
+    @classmethod
+    def confirm_photo_uploaded(self, driver, contains):
+        return contains in self.image.get_style(driver)
 
 
 class Discover(Hydroshare):
