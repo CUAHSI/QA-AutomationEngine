@@ -1523,36 +1523,53 @@ class HydroshareTestSuite(BaseTestSuite):
     
     def test_B_000120(self):
         """
-        Confirm profile image upload for .svg files
+        Confirm app tool image by URL for .svg file
         """
         LandingPage.to_login(self.driver)
         Login.login(self.driver, USERNAME, PASSWORD)
         Home.create_resource(self.driver, "ToolResource")
-        NewResource.configure(self.driver, "TEST Web App")
+        NewResource.configure(self.driver, "TEST120 Web App")
         NewResource.create(self.driver)
-        WebApp.support_resource_type(self.driver, "CompositeResource")
-        WebApp.set_app_launching_url(self.driver, "https://www.hydroshare.org")
-        WebApp.view(self.driver)
-        WebApp.add_to_open_with(self.driver)
-        WebApp.create_resource(self.driver, "CompositeResource")
-        NewResource.configure(self.driver, "TEST Web App Composite")
-        NewResource.create(self.driver)
-        Resource.view(self.driver)
-        Resource.open_with_by_title(self.driver, "TEST Web App")
+        
+        img_url = "https://upload.wikimedia.org/wikipedia/commons/0/02/SVG_logo.svg"
+        WebApp.add_photo_by_url(self.driver, img_url)
+        self.assertTrue(WebApp.confirm_photo_uploaded(self.driver))
 
-        Profile.to_editor(self.driver)
+    def test_B_000121(self):
+        """
+        Confirm remove app tool image for .ico
+        """
+        LandingPage.to_login(self.driver)
+        Login.login(self.driver, USERNAME, PASSWORD)
+        Home.create_resource(self.driver, "ToolResource")
+        NewResource.configure(self.driver, "TEST120 Web App")
+        NewResource.create(self.driver)
+        img_url = "https://duckduckgo.com/favicon.ico"
+        WebApp.add_photo_by_url(self.driver, img_url)
+        TestSystem.wait()
+        self.assertTrue(WebApp.confirm_photo_uploaded(self.driver))
+        WebApp.remove_photo(self.driver)
+        TestSystem.wait()
+        self.assertFalse(WebApp.confirm_photo_uploaded(self.driver))
+
+    def test_B_000122(self):
+        # TODO: implement
+        return
+        """
+        Confirm app tool image by by FILE for .svg files
+        """
+        LandingPage.to_login(self.driver)
+        Login.login(self.driver, USERNAME, PASSWORD)
+        Home.create_resource(self.driver, "ToolResource")
+        NewResource.configure(self.driver, "TEST121 Web App")
+        NewResource.create(self.driver)
         urlretrieve(
             "https://upload.wikimedia.org/wikipedia/commons/0/02/SVG_logo.svg", "profile.svg"
         )
         cwd = os.getcwd()
         img_path = os.path.join(cwd, "profile.svg")
-        Profile.add_photo(self.driver, profile_img_path)
-        Profile.save_changes(self.driver)
-        self.assertTrue(Profile.confirm_photo_uploaded(self.driver, "profile"))
-        os.remove(profile_img_path)
-        Profile.to_editor(self.driver)
-        Profile.remove_photo(self.driver)
-        self.assertFalse(Profile.confirm_photo_uploaded(self.driver, "profile"))
+        WebApp.add_photo_by_file(self.driver, img_path)
+        # self.assertTrue(WebApp.confirm_photo_uploaded(self.driver))
 
 class PerformanceTestSuite(BaseTestSuite):
     """Python unittest setup for smoke tests"""

@@ -441,19 +441,6 @@ class Apps(Hydroshare):
     @classmethod
     def get_title(self, driver, num):
         return self.title(num).get_text(driver)
-    
-    @classmethod
-    def add_photo(self, driver, link):
-        self.image_upload.set_path(driver, link)
-
-    @classmethod
-    def remove_photo(self, driver):
-        self.delete_image.click(driver)
-        self.submit_delete_image.click(driver)
-
-    @classmethod
-    def confirm_photo_uploaded(self, driver, contains):
-        return contains in self.image.get_style(driver)
 
 
 class Discover(Hydroshare):
@@ -1426,6 +1413,14 @@ class WebApp(Resource):
         By.CSS_SELECTOR, "#id-requesturlbase button.btn-form-submit"
     )
 
+    image_container = SiteElement(By.CSS_SELECTOR, "#tool_icon")
+    save_image = SiteElement(By.CSS_SELECTOR, "#id-toolicon .btn-form-submit")
+    image_url_input = SiteElement(By.CSS_SELECTOR, "#id-toolicon #id_value")
+    image = SiteElement(By.CSS_SELECTOR, "#tool-icon-preview")
+    image_file_button = SiteElement(By.CSS_SELECTOR, "#id-toolicon #icon-select-btn")
+    image_file_input = SiteElement(By.CSS_SELECTOR, "#icon-select")
+    delete_image = SiteElement(By.CSS_SELECTOR, "#icon-delete-btn")
+
     @classmethod
     def supported_resource_type(self, resource_type):
         return SiteElement(By.CSS_SELECTOR, 'input[value="{}"]'.format(resource_type))
@@ -1443,6 +1438,31 @@ class WebApp(Resource):
     @classmethod
     def add_to_open_with(self, driver):
         self.add_open_with.click(driver)
+    
+    @classmethod
+    def add_photo_by_url(self, driver, link):
+        self.image_container.scroll_to(driver)
+        # self.image_url_input.scroll_to(driver)
+        self.image_url_input.inject_text(driver, link)
+        self.save_image.click(driver)
+
+    @classmethod
+    def add_photo_by_file(self, driver, link):
+        self.image_file_button.scroll_to(driver)
+        # self.image_file_button.click(driver)
+        self.image_file_input.set_path(driver, link)
+        self.save_image.click(driver)
+
+    @classmethod
+    def remove_photo(self, driver):
+        self.image_container.scroll_to(driver)
+        self.delete_image.click(driver)
+        self.image_file_button.scroll_to(driver)
+        self.save_image.click(driver)
+
+    @classmethod
+    def confirm_photo_uploaded(self, driver):
+        return self.image.get_attribute(driver, "src") != ""
 
 
 class Help(Hydroshare):
