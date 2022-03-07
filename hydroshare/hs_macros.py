@@ -1418,7 +1418,6 @@ class WebApp(Resource):
     image_url_input = SiteElement(By.CSS_SELECTOR, "#id-toolicon #id_value")
     image = SiteElement(By.CSS_SELECTOR, "#tool-icon-preview")
     image_file_button = SiteElement(By.CSS_SELECTOR, "#id-toolicon #icon-select-btn")
-    image_file_input = SiteElement(By.CSS_SELECTOR, "#icon-select")
     delete_image = SiteElement(By.CSS_SELECTOR, "#icon-delete-btn")
 
     @classmethod
@@ -1444,13 +1443,6 @@ class WebApp(Resource):
         self.image_container.scroll_to(driver)
         # self.image_url_input.scroll_to(driver)
         self.image_url_input.inject_text(driver, link)
-        self.save_image.click(driver)
-
-    @classmethod
-    def add_photo_by_file(self, driver, link):
-        self.image_file_button.scroll_to(driver)
-        # self.image_file_button.click(driver)
-        self.image_file_input.set_path(driver, link)
         self.save_image.click(driver)
 
     @classmethod

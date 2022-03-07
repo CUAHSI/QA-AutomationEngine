@@ -1552,25 +1552,6 @@ class HydroshareTestSuite(BaseTestSuite):
         TestSystem.wait()
         self.assertFalse(WebApp.confirm_photo_uploaded(self.driver))
 
-    def test_B_000122(self):
-        # TODO: implement
-        return
-        """
-        Confirm app tool image by by FILE for .svg files
-        """
-        LandingPage.to_login(self.driver)
-        Login.login(self.driver, USERNAME, PASSWORD)
-        Home.create_resource(self.driver, "ToolResource")
-        NewResource.configure(self.driver, "TEST121 Web App")
-        NewResource.create(self.driver)
-        urlretrieve(
-            "https://upload.wikimedia.org/wikipedia/commons/0/02/SVG_logo.svg", "profile.svg"
-        )
-        cwd = os.getcwd()
-        img_path = os.path.join(cwd, "profile.svg")
-        WebApp.add_photo_by_file(self.driver, img_path)
-        # self.assertTrue(WebApp.confirm_photo_uploaded(self.driver))
-
 class PerformanceTestSuite(BaseTestSuite):
     """Python unittest setup for smoke tests"""
 
