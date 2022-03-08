@@ -1575,12 +1575,6 @@ class HydroshareTestSuite(BaseTestSuite):
     def test_B_000123(self):
         """Create a resource and unzip a large file in the dropzone"""
         folder_name = "1m_snowOff_filter_SHD.zip"
-        if not os.path.exists(folder_name):
-            urlretrieve(
-                BASE_URL
-                + "/resource/a7b99c31adfe4f56899bef1a6700f9cf/data/contents/" + folder_name,
-            folder_name,
-            )
         r = requests.post(
             BASE_URL + "/hsapi/resource/",
             auth=(USERNAME, PASSWORD),
@@ -1592,6 +1586,19 @@ class HydroshareTestSuite(BaseTestSuite):
         )
         resource_id = r.json()["resource_id"]
         files = {"file": open(folder_name, "rb")}
+
+        if not os.path.exists(folder_name):
+            if "localhost" in BASE_URL:
+                # local instance might not have the Beaver Divide so get it from Beta
+                urlretrieve("https://beta.hydroshare.org/resource/a7b99c31adfe4f56899bef1a6700f9cf/data/contents/" + folder_name,
+                folder_name)
+            else:
+                urlretrieve(
+                    BASE_URL
+                    + "/resource/a7b99c31adfe4f56899bef1a6700f9cf/data/contents/" + folder_name,
+                    folder_name,
+                )
+
         r = requests.post(
             BASE_URL + "/hsapi/resource/{}/files/".format(resource_id),
             auth=(USERNAME, PASSWORD),
@@ -1606,6 +1613,7 @@ class HydroshareTestSuite(BaseTestSuite):
         TestSystem.wait()
         unzip_index = Resource.get_file_index_by_name(self.driver, folder_name)
         self.assertGreaterEqual(unzip_index, 1)
+
 
 
 class PerformanceTestSuite(BaseTestSuite):

@@ -1,6 +1,8 @@
 import json
 import os
 import re
+import resource
+from isort import file
 import requests
 import time
 
@@ -1402,6 +1404,7 @@ class Resource(Hydroshare):
     @classmethod
     def get_file_index_by_name(self, driver, filename):
         self.file_browser.scroll_to(driver)
+        time.sleep(RESOURCE_LANDING_PAGE_LOAD)
         filenames = self.get_resource_filenames(driver)
         # other index functions in this class are not zero-based
         return filenames.index(filename) + 1
