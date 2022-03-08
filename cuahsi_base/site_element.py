@@ -189,6 +189,15 @@ class SiteElement:
         for i in range(0, len(field_text)):
             target_el.send_keys(field_text[i])
 
+    def send_caps(self, driver, field_text):
+        """Enters text into a field or other input-capable html
+        element using send_keys_to_element
+        """
+        actionchains = ActionChains(driver)
+        target_el = self.loc_it(driver)
+        actionchains.key_down(Keys.SHIFT).send_keys_to_element(target_el, field_text).key_up(Keys.SHIFT).perform()
+            
+
     def set_path(self, driver, field_text):
         """Enters text into a field or other input-capable html
         element using send keys, best for setting path to files for upload

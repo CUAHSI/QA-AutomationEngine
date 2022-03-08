@@ -1551,6 +1551,61 @@ class HydroshareTestSuite(BaseTestSuite):
         WebApp.remove_photo(self.driver)
         TestSystem.wait()
         self.assertFalse(WebApp.confirm_photo_uploaded(self.driver))
+    
+    def test_B_000122(self):
+        """
+        Confirms zip and unzip folder within a resource is successful
+        """
+        folder_name = "test_folder"
+        LandingPage.to_login(self.driver)
+        Login.login(self.driver, USERNAME, PASSWORD)
+        Home.create_resource(self.driver, "CompositeResource")
+        NewResource.configure(self.driver, "Zip folder test")
+        NewResource.create(self.driver)
+        Resource.create_folder(self.driver, folder_name)
+        folder_index = Resource.get_file_index_by_name(self.driver, folder_name)
+        Resource.zip_folder_by_index(self.driver, folder_index)
+        TestSystem.wait()
+        zip_index = Resource.get_file_index_by_name(self.driver, folder_name + ".zip")
+        Resource.unzip_folder_by_index(self.driver, zip_index)
+        TestSystem.wait()
+        unzip_index = Resource.get_file_index_by_name(self.driver, folder_name + "-1")
+        self.assertGreaterEqual(unzip_index, 1)
+    
+    def test_B_000123(self):
+        """Create a resource and unzip a large file in the dropzone"""
+        folder_name = "1m_snowOff_filter_SHD.zip"
+        urlretrieve(
+            BASE_URL
+            + "/resource/a7b99c31adfe4f56899bef1a6700f9cf/data/contents/" + folder_name,
+           folder_name,
+        )
+        r = requests.post(
+            BASE_URL + "/hsapi/resource/",
+            auth=(USERNAME, PASSWORD),
+            data={
+                "title": "Large Zip folder test QA",
+                "abstract": "This is a test resource for QA purposes.",
+                "keywords": ["test", "QA", "CUAHSI"],
+            },
+        )
+        resource_id = r.json()["resource_id"]
+        files = {"file": open(folder_name, "rb")}
+        r = requests.post(
+            BASE_URL + "/hsapi/resource/{}/files/".format(resource_id),
+            auth=(USERNAME, PASSWORD),
+            files=files,
+        )
+        LandingPage.to_login(self.driver)
+        Login.login(self.driver, USERNAME, PASSWORD)
+        TestSystem.to_url(self.driver, BASE_URL + "/resource/{}/".format(resource_id))
+        Resource.edit(self.driver)
+        zip_index = Resource.get_file_index_by_name(self.driver, folder_name + ".zip")
+        Resource.unzip_folder_by_index(self.driver, zip_index)
+        TestSystem.wait()
+        unzip_index = Resource.get_file_index_by_name(self.driver, folder_name)
+        self.assertGreaterEqual(unzip_index, 1)
+
 
 class PerformanceTestSuite(BaseTestSuite):
     """Python unittest setup for smoke tests"""

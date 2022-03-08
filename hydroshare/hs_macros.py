@@ -1038,6 +1038,14 @@ class Resource(Hydroshare):
     new_file = SiteElement(
         By.CSS_SELECTOR, "#fb-file-operations-controls > a.upload-toggle"
     )
+    resource_file_container = SiteElement(By.CSS_SELECTOR,"#fb-files-container")
+    new_folder_button = SiteElement(By.ID, "fb-create-folder")
+    new_folder = SiteElement(
+        By.CSS_SELECTOR, "#fb-file-operations-controls > span.fa-folder"
+    )
+    # folder_name_input = SiteElement(By.ID, "txtFolderNamer")
+    folder_name_input = SiteElement(By.CSS_SELECTOR, "#create-folder-dialog input")
+    save_folder = SiteElement(By.ID, "btn-create-folder")
     abstract = SiteElement(By.ID, "id_abstract")
     abstract_save = SiteElement(By.CSS_SELECTOR, "#div_id_abstract button")
     public_resource_notice = SiteElement(By.ID, "missing-metadata-or-file")
@@ -1080,6 +1088,11 @@ class Resource(Hydroshare):
     file_download_zip = SiteElement(
         By.CSS_SELECTOR, '#right-click-menu > li[data-fb-action="downloadZipped"]'
     )
+    folder_zip = SiteElement(
+        By.CSS_SELECTOR, '#right-click-menu > li[data-fb-action="zip"]'
+    )
+    folder_zip_confirm = SiteElement(By.ID, "btn-confirm-zip")
+    unzip_here = SiteElement(By.ID, "btn-unzip")
     file_link = SiteElement(
         By.CSS_SELECTOR, '#right-click-menu > li[data-fb-action="getLink"]'
     )
@@ -1134,6 +1147,12 @@ class Resource(Hydroshare):
         return SiteElement(
             By.CSS_SELECTOR, "#fb-files-container > li:nth-of-type({})".format(index)
         )
+    
+    @classmethod
+    def get_resource_filenames(self, driver):
+        file_count = self.resource_file_container.get_immediate_child_count(driver)
+        resource_files = [self.resource_file(i).get_text(driver) for i in range(1, file_count + 1)]
+        return resource_files
 
     @classmethod
     def download_bagit(self, driver):
@@ -1214,6 +1233,14 @@ class Resource(Hydroshare):
     @classmethod
     def upload_file(self, driver, path):
         self.new_file.set_path(driver, path)
+    
+    @classmethod
+    def create_folder(self, driver, foldername):
+        self.file_browser.scroll_to(driver)
+        time.sleep(RESOURCE_LANDING_PAGE_LOAD)
+        self.new_folder_button.click(driver)
+        self.folder_name_input.inject_text(driver, foldername)
+        self.save_folder.click(driver)
 
     @classmethod
     def populate_abstract(self, driver, text):
@@ -1358,6 +1385,26 @@ class Resource(Hydroshare):
         time.sleep(RESOURCE_LANDING_PAGE_LOAD)
         self.resource_file(index).right_click(driver)
         self.file_download_zip.javascript_click(driver)
+    
+    @classmethod
+    def unzip_folder_by_index(self, driver, index):
+        self.file_browser.scroll_to(driver)
+        self.resource_file(index).right_click(driver)
+        self.unzip_here.javascript_click(driver)
+    
+    @classmethod
+    def zip_folder_by_index(self, driver, index):
+        self.file_browser.scroll_to(driver)
+        self.resource_file(index).right_click(driver)
+        self.folder_zip.javascript_click(driver)
+        self.folder_zip_confirm.click(driver)
+    
+    @classmethod
+    def get_file_index_by_name(self, driver, filename):
+        self.file_browser.scroll_to(driver)
+        filenames = self.get_resource_filenames(driver)
+        # other index functions in this class are not zero-based
+        return filenames.index(filename) + 1
 
     @classmethod
     def get_file_download_link_by_index(self, driver, index):
