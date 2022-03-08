@@ -1600,7 +1600,7 @@ class HydroshareTestSuite(BaseTestSuite):
         Login.login(self.driver, USERNAME, PASSWORD)
         TestSystem.to_url(self.driver, BASE_URL + "/resource/{}/".format(resource_id))
         Resource.edit(self.driver)
-        zip_index = Resource.get_file_index_by_name(self.driver, folder_name + ".zip")
+        zip_index = Resource.get_file_index_by_name(self.driver, folder_name)
         Resource.unzip_folder_by_index(self.driver, zip_index)
         TestSystem.wait()
         unzip_index = Resource.get_file_index_by_name(self.driver, folder_name)
