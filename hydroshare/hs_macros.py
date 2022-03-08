@@ -1,8 +1,6 @@
 import json
 import os
 import re
-import resource
-from isort import file
 import requests
 import time
 
