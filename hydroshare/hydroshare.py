@@ -1575,11 +1575,12 @@ class HydroshareTestSuite(BaseTestSuite):
     def test_B_000123(self):
         """Create a resource and unzip a large file in the dropzone"""
         folder_name = "1m_snowOff_filter_SHD.zip"
-        urlretrieve(
-            BASE_URL
-            + "/resource/a7b99c31adfe4f56899bef1a6700f9cf/data/contents/" + folder_name,
-           folder_name,
-        )
+        if not os.path.exists(folder_name):
+            urlretrieve(
+                BASE_URL
+                + "/resource/a7b99c31adfe4f56899bef1a6700f9cf/data/contents/" + folder_name,
+            folder_name,
+            )
         r = requests.post(
             BASE_URL + "/hsapi/resource/",
             auth=(USERNAME, PASSWORD),
