@@ -1520,7 +1520,7 @@ class HydroshareTestSuite(BaseTestSuite):
         Resource.delete_file_by_index(self.driver, 1)
         Resource.view(self.driver)
         self.assertEqual(Resource.get_sharing_status(self.driver), "Private")
-    
+
     def test_B_000120(self):
         """
         Confirm app tool image by URL for .svg file
@@ -1530,7 +1530,7 @@ class HydroshareTestSuite(BaseTestSuite):
         Home.create_resource(self.driver, "ToolResource")
         NewResource.configure(self.driver, "TEST120 Web App")
         NewResource.create(self.driver)
-        
+
         img_url = "https://upload.wikimedia.org/wikipedia/commons/0/02/SVG_logo.svg"
         WebApp.add_photo_by_url(self.driver, img_url)
         self.assertTrue(WebApp.confirm_photo_uploaded(self.driver))
@@ -1551,7 +1551,7 @@ class HydroshareTestSuite(BaseTestSuite):
         WebApp.remove_photo(self.driver)
         TestSystem.wait()
         self.assertFalse(WebApp.confirm_photo_uploaded(self.driver))
-    
+
     def test_B_000122(self):
         """
         Confirms zip and unzip folder within a resource is successful
@@ -1571,7 +1571,7 @@ class HydroshareTestSuite(BaseTestSuite):
         Resource.wait_on_task_completion(self.driver, 1, 30)
         unzip_index = Resource.get_file_index_by_name(self.driver, folder_name + "-1")
         self.assertGreaterEqual(unzip_index, 1)
-    
+
     def test_B_000123(self):
         """Create a resource and unzip a large file in the dropzone"""
         folder_name = "1m_snowOff_filter_SHD.zip"
@@ -1590,12 +1590,16 @@ class HydroshareTestSuite(BaseTestSuite):
         if not os.path.exists(folder_name):
             if "localhost" in BASE_URL:
                 # local instance might not have the Beaver Divide so get it from Beta
-                urlretrieve("https://beta.hydroshare.org/resource/a7b99c31adfe4f56899bef1a6700f9cf/data/contents/" + folder_name,
-                folder_name)
+                urlretrieve(
+                    "https://beta.hydroshare.org/resource/a7b99c31adfe4f56899bef1a6700f9cf/data/contents/"
+                    + folder_name,
+                    folder_name,
+                )
             else:
                 urlretrieve(
                     BASE_URL
-                    + "/resource/a7b99c31adfe4f56899bef1a6700f9cf/data/contents/" + folder_name,
+                    + "/resource/a7b99c31adfe4f56899bef1a6700f9cf/data/contents/"
+                    + folder_name,
                     folder_name,
                 )
 
@@ -1613,7 +1617,6 @@ class HydroshareTestSuite(BaseTestSuite):
         Resource.wait_on_task_completion(self.driver, 1, 30)
         unzip_index = Resource.get_file_index_by_name(self.driver, folder_name)
         self.assertGreaterEqual(unzip_index, 1)
-
 
 
 class PerformanceTestSuite(BaseTestSuite):
