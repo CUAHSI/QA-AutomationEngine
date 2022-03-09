@@ -1521,6 +1521,103 @@ class HydroshareTestSuite(BaseTestSuite):
         Resource.view(self.driver)
         self.assertEqual(Resource.get_sharing_status(self.driver), "Private")
 
+    def test_B_000120(self):
+        """
+        Confirm app tool image by URL for .svg file
+        """
+        LandingPage.to_login(self.driver)
+        Login.login(self.driver, USERNAME, PASSWORD)
+        Home.create_resource(self.driver, "ToolResource")
+        NewResource.configure(self.driver, "TEST120 Web App")
+        NewResource.create(self.driver)
+
+        img_url = "https://upload.wikimedia.org/wikipedia/commons/0/02/SVG_logo.svg"
+        WebApp.add_photo_by_url(self.driver, img_url)
+        self.assertTrue(WebApp.confirm_photo_uploaded(self.driver))
+
+    def test_B_000121(self):
+        """
+        Confirm remove app tool image for .ico
+        """
+        LandingPage.to_login(self.driver)
+        Login.login(self.driver, USERNAME, PASSWORD)
+        Home.create_resource(self.driver, "ToolResource")
+        NewResource.configure(self.driver, "TEST121 Web App")
+        NewResource.create(self.driver)
+        img_url = "https://duckduckgo.com/favicon.ico"
+        WebApp.add_photo_by_url(self.driver, img_url)
+        TestSystem.wait()
+        self.assertTrue(WebApp.confirm_photo_uploaded(self.driver))
+        WebApp.remove_photo(self.driver)
+        TestSystem.wait()
+        self.assertFalse(WebApp.confirm_photo_uploaded(self.driver))
+
+    def test_B_000122(self):
+        """
+        Confirms zip and unzip folder within a resource is successful
+        """
+        folder_name = "test_folder"
+        LandingPage.to_login(self.driver)
+        Login.login(self.driver, USERNAME, PASSWORD)
+        Home.create_resource(self.driver, "CompositeResource")
+        NewResource.configure(self.driver, "Zip folder test")
+        NewResource.create(self.driver)
+        Resource.create_folder(self.driver, folder_name)
+        folder_index = Resource.get_file_index_by_name(self.driver, folder_name)
+        Resource.zip_folder_by_index(self.driver, folder_index)
+        TestSystem.wait()
+        zip_index = Resource.get_file_index_by_name(self.driver, folder_name + ".zip")
+        Resource.unzip_folder_by_index(self.driver, zip_index)
+        Resource.wait_on_task_completion(self.driver, 1, 30)
+        unzip_index = Resource.get_file_index_by_name(self.driver, folder_name + "-1")
+        self.assertGreaterEqual(unzip_index, 1)
+
+    def test_B_000123(self):
+        """Create a resource and unzip a large file in the dropzone"""
+        folder_name = "1m_snowOff_filter_SHD.zip"
+        r = requests.post(
+            BASE_URL + "/hsapi/resource/",
+            auth=(USERNAME, PASSWORD),
+            data={
+                "title": "Large Zip folder test QA",
+                "abstract": "This is a test resource for QA purposes.",
+                "keywords": ["test", "QA", "CUAHSI"],
+            },
+        )
+        resource_id = r.json()["resource_id"]
+        files = {"file": open(folder_name, "rb")}
+
+        if not os.path.exists(folder_name):
+            if "localhost" in BASE_URL:
+                # local instance might not have the Beaver Divide so get it from Beta
+                urlretrieve(
+                    "https://beta.hydroshare.org/resource/a7b99c31adfe4f56899bef1a6700f9cf/data/contents/"
+                    + folder_name,
+                    folder_name,
+                )
+            else:
+                urlretrieve(
+                    BASE_URL
+                    + "/resource/a7b99c31adfe4f56899bef1a6700f9cf/data/contents/"
+                    + folder_name,
+                    folder_name,
+                )
+
+        r = requests.post(
+            BASE_URL + "/hsapi/resource/{}/files/".format(resource_id),
+            auth=(USERNAME, PASSWORD),
+            files=files,
+        )
+        LandingPage.to_login(self.driver)
+        Login.login(self.driver, USERNAME, PASSWORD)
+        TestSystem.to_url(self.driver, BASE_URL + "/resource/{}/".format(resource_id))
+        Resource.edit(self.driver)
+        zip_index = Resource.get_file_index_by_name(self.driver, folder_name)
+        Resource.unzip_folder_by_index(self.driver, zip_index)
+        Resource.wait_on_task_completion(self.driver, 1, 30)
+        unzip_index = Resource.get_file_index_by_name(self.driver, folder_name)
+        self.assertGreaterEqual(unzip_index, 1)
+
 
 class PerformanceTestSuite(BaseTestSuite):
     """Python unittest setup for smoke tests"""
