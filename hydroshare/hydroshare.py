@@ -1542,7 +1542,7 @@ class HydroshareTestSuite(BaseTestSuite):
         LandingPage.to_login(self.driver)
         Login.login(self.driver, USERNAME, PASSWORD)
         Home.create_resource(self.driver, "ToolResource")
-        NewResource.configure(self.driver, "TEST120 Web App")
+        NewResource.configure(self.driver, "TEST121 Web App")
         NewResource.create(self.driver)
         img_url = "https://duckduckgo.com/favicon.ico"
         WebApp.add_photo_by_url(self.driver, img_url)
