@@ -1584,9 +1584,8 @@ class HydroshareTestSuite(BaseTestSuite):
                 "keywords": ["test", "QA", "CUAHSI"],
             },
         )
-        resource_id = r.json()["resource_id"]
-        files = {"file": open(folder_name, "rb")}
 
+        # get a large zip that we can test with
         if not os.path.exists(folder_name):
             if "localhost" in BASE_URL:
                 # local instance might not have the Beaver Divide so get it from Beta
@@ -1603,6 +1602,8 @@ class HydroshareTestSuite(BaseTestSuite):
                     folder_name,
                 )
 
+        resource_id = r.json()["resource_id"]
+        files = {"file": open(folder_name, "rb")}
         r = requests.post(
             BASE_URL + "/hsapi/resource/{}/files/".format(resource_id),
             auth=(USERNAME, PASSWORD),
