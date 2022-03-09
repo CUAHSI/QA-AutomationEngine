@@ -1080,6 +1080,13 @@ class Resource(Hydroshare):
     access_discoverable = SiteElement(By.ID, "btn-discoverable")
     authors = SiteElement(By.CSS_SELECTOR, ".authors-wrapper")
     authors_locator = By.CSS_SELECTOR, ".authors-wrapper"
+    add_author_button = SiteElement(By.CSS_SELECTOR, '#btn-add-new-author')
+    # TODO: HS fix duplicate id in user-autocomplete
+    add_author_input = SiteElement(By.CSS_SELECTOR, '#add-author-modal input[placeholder="Search by name or username"]')
+    add_author_select = SiteElement(By.CSS_SELECTOR, '#add-author-modal .yourlabs-autocomplete span:nth-child(1)')
+    author_remove = SiteElement(By.CSS_SELECTOR, '#add-author-modal span.remove')
+    add_author_save = SiteElement(By.CSS_SELECTOR, '#add-author-modal .modal-footer button.btn-primary')
+    author_warning = SiteElement(By.CSS_SELECTOR, "#add-author-modal .alert-danger")
     download_status = SiteElement(By.ID, "download-status-info")
     # If your download does not start automatically
     file_download = SiteElement(
@@ -1451,6 +1458,21 @@ class Resource(Hydroshare):
         time.sleep(RESOURCE_LANDING_PAGE_LOAD)
         return self.sharing_status.get_text(driver)
 
+    @classmethod
+    def add_dup_authors(self, driver, username):
+        for _ in range(2):
+            self.add_author_button.click(driver)
+            # if self.author_remove.is_visible(driver):
+            if self.author_remove.exists(driver):
+                self.author_remove.click(driver)
+            self.add_author_input.click(driver)
+            self.add_author_input.inject_text(driver, username)
+            self.add_author_select.click(driver)
+            self.add_author_save.click(driver)
+    
+    @classmethod
+    def check_author_warning(self, driver):
+        return self.author_warning.get_text(driver)
 
 class WebApp(Resource):
     save_supported_resource_types = SiteElement(
