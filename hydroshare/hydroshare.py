@@ -1568,7 +1568,7 @@ class HydroshareTestSuite(BaseTestSuite):
         TestSystem.wait()
         zip_index = Resource.get_file_index_by_name(self.driver, folder_name + ".zip")
         Resource.unzip_folder_by_index(self.driver, zip_index)
-        TestSystem.wait()
+        Resource.wait_on_task_completion(self.driver, 1, 30)
         unzip_index = Resource.get_file_index_by_name(self.driver, folder_name + "-1")
         self.assertGreaterEqual(unzip_index, 1)
     
@@ -1610,7 +1610,7 @@ class HydroshareTestSuite(BaseTestSuite):
         Resource.edit(self.driver)
         zip_index = Resource.get_file_index_by_name(self.driver, folder_name)
         Resource.unzip_folder_by_index(self.driver, zip_index)
-        TestSystem.wait()
+        Resource.wait_on_task_completion(self.driver, 1, 30)
         unzip_index = Resource.get_file_index_by_name(self.driver, folder_name)
         self.assertGreaterEqual(unzip_index, 1)
 

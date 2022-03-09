@@ -1239,6 +1239,7 @@ class Resource(Hydroshare):
         self.file_browser.scroll_to(driver)
         time.sleep(RESOURCE_LANDING_PAGE_LOAD)
         self.new_folder_button.click(driver)
+        self.folder_name_input.click(driver)
         self.folder_name_input.inject_text(driver, foldername)
         self.save_folder.click(driver)
 
