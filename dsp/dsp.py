@@ -15,31 +15,16 @@ from urllib.request import urlretrieve
 # from percy import percySnapshot
 
 from dsp_macros import (
-    Downloads,
-    MatlabOnline,
     Hydroshare,
     LandingPage,
     Home,
     Login,
-    Apps,
-    Discover,
     Resource,
-    Help,
-    HelpArticle,
     API,
-    About,
     Profile,
-    Collaborate,
-    Groups,
-    Group,
-    MyResources,
     NewResource,
     Registration,
     SiteMap,
-    WebApp,
-    JupyterHub,
-    JupyterHubNotebooks,
-    JupyterHubNotebook,
     Utilities,
 )
 
