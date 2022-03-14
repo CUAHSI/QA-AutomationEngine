@@ -1,6 +1,6 @@
-BASE_URL = "https://beta.hydroshare.org/"
+BASE_URL = "http://localhost:8000"
 USERNAME = "jim"
 PASSWORD = "62meister"
 
-GITHUB_ORG = "hydroshare"
-GITHUB_REPO = "hydroshare"
+GITHUB_ORG = "cznethub"
+GITHUB_REPO = "dspfront"

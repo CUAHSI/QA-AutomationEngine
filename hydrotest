@@ -3,6 +3,7 @@
 # hydrotest
 # HydroTest Control Script
 # Author: Neal DeBuhr
+# Modified by: Devin Cowan
 
 display_usage() {
     echo "*** HydroTest Control Script ***"
