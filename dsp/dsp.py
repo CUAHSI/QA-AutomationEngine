@@ -1,4 +1,4 @@
-""" Runs various smoke tests for the hydroshare.org """
+""" Runs various smoke tests for the data submission portal """
 import boto3
 import inspect
 import json
