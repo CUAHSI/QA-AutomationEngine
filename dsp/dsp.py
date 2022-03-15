@@ -16,6 +16,7 @@ from urllib.request import urlretrieve
 
 from dsp_macros import (
     Dsp,
+    SubmitLandingPage,
     MySubmissions,
 )
 
@@ -46,8 +47,17 @@ class DspTestSuite(BaseTestSuite):
         """Ensure anonymous navigation to my submissions shows orcid login modal"""
         Dsp.show_mobile_nav(self.driver)
         Dsp.drawer_to_my_submissions(self.driver)
-        login_visible = MySubmissions.is_visible_orcid_login(self.driver)
+        login_visible = MySubmissions.is_visible_orcid_modal(self.driver)
         self.assertTrue(login_visible)
+    
+    def test_A_000002(self):
+        """Authenticate with orcid"""
+        Dsp.show_mobile_nav(self.driver)
+        Dsp.drawer_to_submit(self.driver)
+        SubmitLandingPage.to_hydroshare_repo(self.driver)
+        # TODO: how do we switch to the new window?
+        SubmitLandingPage.to_orcid_window(self.driver)
+        TestSystem.wait(10)
 
 
 if __name__ == "__main__":

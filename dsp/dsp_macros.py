@@ -46,6 +46,10 @@ class Dsp(WebPage):
     drawer_nav_about = SiteElement(By.CSS_SELECTOR, '.v-navigation-drawer__content a[href="/about"]')
     drawer_nav_contact = SiteElement(By.CSS_SELECTOR, '.v-navigation-drawer__content a[href="/contact"]')
 
+    # login
+    orcid_login_modal = SiteElement(By.CSS_SELECTOR, ".v-dialog .cz-login")
+    orcid_login_continue = SiteElement(By.CSS_SELECTOR, ".v-dialog .cz-login button.primary")
+
     # navigation_login = SiteElement(By.CSS_SELECTOR, "#signin-menu a")
     # signout_menu = SiteElement(By.ID, "signout-menu")
     # footer = SiteElement(By.CSS_SELECTOR, "footer")
@@ -128,14 +132,35 @@ class Dsp(WebPage):
     #     self.notifications.click(driver)
     #     self.notifications_clear.click(driver)
     #     self.notifications.click(driver)
-    
 
-class MySubmissions(Dsp):
-    orcid_login = SiteElement(By.CSS_SELECTOR, ".v-dialog .cz-login")
+    @classmethod
+    def is_visible_orcid_modal(self, driver):
+        return self.orcid_login_modal.is_visible(driver)
     
     @classmethod
-    def is_visible_orcid_login(self, driver):
-        return self.orcid_login.is_visible(driver)
+    def to_orcid_window(self, driver):
+        num_windows_now = len(driver.window_handles)
+        self.orcid_login_continue.click(driver)
+        External.switch_new_page(driver, num_windows_now, OrcidWindow.username)
+
+class OrcidWindow(WebPage):
+    username = SiteElement(By.ID, "username")
+
+class MySubmissions(Dsp):
+    # TODO: tests for my_submissions
+    pass
+
+
+class SubmitLandingPage(Dsp):
+    hydroshare_repo = SiteElement(By.CSS_SELECTOR, 'div.repositories img[alt="HydroShare"]')
+
+    @classmethod
+    def to_hydroshare_repo(self, driver):
+        self.hydroshare_repo.click(driver)
+
+
+class SubmitHydroshare(Dsp):
+    pass
 
 
 class Utilities:
