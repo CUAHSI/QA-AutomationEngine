@@ -19,6 +19,7 @@ from config import BASE_URL
 from timing import (
     EXTERNAL_PAGE_LOAD,
     KEYS_RESPONSE,
+    MY_SUBMISSIONS_LOAD
 )
 
 
@@ -26,215 +27,120 @@ class WebPage:
     body_locator = By.CSS_SELECTOR, "body"
 
 
-class Hydroshare(WebPage):
-    navigation_landing_page = SiteElement(By.ID, "img-brand-logo")
-    navigation_home = SiteElement(By.ID, "dropdown-menu-home")
-    navigation_my_resources = SiteElement(By.ID, "dropdown-menu-my-resources")
-    navigation_discover = SiteElement(By.ID, "dropdown-menu-search")
-    navigation_collaborate = SiteElement(
-        By.CSS_SELECTOR, "#dropdown-menu-collaborate a"
-    )
-    navigation_apps = SiteElement(
-        By.ID, "dropdown-menu-https:--www.hydroshare.org-apps-"
-    )
-    navigation_help = SiteElement(
-        By.CSS_SELECTOR, 'a[href="{}"]'.format("http://help.hydroshare.org")
-    )
-    navigation_login = SiteElement(By.CSS_SELECTOR, "#signin-menu a")
-    profile_button = SiteElement(
-        By.CSS_SELECTOR, ".account div.dropdown-footer .btn.btn-primary"
-    )
-    profile_menu = SiteElement(By.ID, "profile-menu")
-    signout_menu = SiteElement(By.ID, "signout-menu")
-    resource_creation = SiteElement(By.ID, "select-resource-type")
-    footer = SiteElement(By.CSS_SELECTOR, "footer")
-    footer_terms = SiteElement(By.CSS_SELECTOR, "footer a[href='/terms-of-use']")
-    footer_privacy = SiteElement(By.CSS_SELECTOR, "footer a[href='/privacy']")
-    footer_sitemap = SiteElement(By.CSS_SELECTOR, "footer a[href='/sitemap/']")
-    footer_twitter = SiteElement(
-        By.CSS_SELECTOR, ".content.social ul li:nth-child(1) > a"
-    )
-    footer_facebook = SiteElement(
-        By.CSS_SELECTOR, ".content.social ul li:nth-child(2) > a"
-    )
-    footer_youtube = SiteElement(
-        By.CSS_SELECTOR, ".content.social ul li:nth-child(3) > a"
-    )
-    footer_github = SiteElement(
-        By.CSS_SELECTOR, ".content.social ul li:nth-child(4) > a"
-    )
-    footer_linkedin = SiteElement(
-        By.CSS_SELECTOR, ".content.social ul li:nth-child(5) > a"
-    )
-    footer_version = SiteElement(By.CSS_SELECTOR, ".content p b")
-    support_email = SiteElement(By.CSS_SELECTOR, 'a[href="mailto:help@cuahsi.org"]')
-    page_tip = SiteElement(By.CSS_SELECTOR, ".page-tip > .container > .row > div > p")
-    logged_in_full_name = SiteElement(By.ID, "profile-menu-fullname")
-    logged_in_email = SiteElement(By.ID, "profile-menu-email")
-    notifications = SiteElement(By.CSS_SELECTOR, "#notifications-dropdown > a")
-    notifications_clear = SiteElement(By.CSS_SELECTOR, "#btn-notifications-clear")
+class Dsp(WebPage):
+    navigation_logo = SiteElement(By.CSS_SELECTOR, "#app-bar .logo")
+    navigation_home = SiteElement(By.CSS_SELECTOR, '.nav-items a[href="/"]')
+    navigation_my_submissions = SiteElement(By.CSS_SELECTOR, '.nav-items a[href="/submissions"]')
+    navigation_resources = SiteElement(By.CSS_SELECTOR, '.nav-items a[href="/resources"]')
+    navigation_submit = SiteElement(By.CSS_SELECTOR, '.nav-items a[href="/submit"]')
+    navigation_about = SiteElement(By.CSS_SELECTOR, '.nav-items a[href="/about"]')
+    navigation_contact = SiteElement(By.CSS_SELECTOR, '.nav-items a[href="/contact"]')
+    
+    # responsive
+    navigation_hamburger = SiteElement(By.CSS_SELECTOR, "#app-bar .v-app-bar__nav-icon")
+    navigation_drawer = SiteElement(By.CSS_SELECTOR, ".v-navigation-drawer")
+    drawer_nav_home = SiteElement(By.CSS_SELECTOR, '.v-navigation-drawer__content a[href="/"]')
+    drawer_nav_my_submissions = SiteElement(By.CSS_SELECTOR, '.v-navigation-drawer__content a[href="/submissions"]')
+    drawer_nav_resources = SiteElement(By.CSS_SELECTOR, '.v-navigation-drawer__content a[href="/resources"]')
+    drawer_nav_submit = SiteElement(By.CSS_SELECTOR, '.v-navigation-drawer__content a[href="/submit"]')
+    drawer_nav_about = SiteElement(By.CSS_SELECTOR, '.v-navigation-drawer__content a[href="/about"]')
+    drawer_nav_contact = SiteElement(By.CSS_SELECTOR, '.v-navigation-drawer__content a[href="/contact"]')
+
+    # navigation_login = SiteElement(By.CSS_SELECTOR, "#signin-menu a")
+    # signout_menu = SiteElement(By.ID, "signout-menu")
+    # footer = SiteElement(By.CSS_SELECTOR, "footer")
+    # footer_terms = SiteElement(By.CSS_SELECTOR, "footer a[href='/terms-of-use']")
+    # footer_privacy = SiteElement(By.CSS_SELECTOR, "footer a[href='/privacy']")
+    # footer_sitemap = SiteElement(By.CSS_SELECTOR, "footer a[href='/sitemap/']")
+    # footer_twitter = SiteElement(
+    #     By.CSS_SELECTOR, ".content.social ul li:nth-child(1) > a"
+    # )
+    # footer_facebook = SiteElement(
+    #     By.CSS_SELECTOR, ".content.social ul li:nth-child(2) > a"
+    # )
+    # footer_youtube = SiteElement(
+    #     By.CSS_SELECTOR, ".content.social ul li:nth-child(3) > a"
+    # )
+    # footer_github = SiteElement(
+    #     By.CSS_SELECTOR, ".content.social ul li:nth-child(4) > a"
+    # )
+    # footer_linkedin = SiteElement(
+    #     By.CSS_SELECTOR, ".content.social ul li:nth-child(5) > a"
+    # )
+    # footer_version = SiteElement(By.CSS_SELECTOR, ".content p b")
+    # page_tip = SiteElement(By.CSS_SELECTOR, ".page-tip > .container > .row > div > p")
+    # notifications = SiteElement(By.CSS_SELECTOR, "#notifications-dropdown > a")
+    # notifications_clear = SiteElement(By.CSS_SELECTOR, "#btn-notifications-clear")
 
     @classmethod
-    def resource_type(self, resource_type):
-        return SiteElement(By.CSS_SELECTOR, 'a[data-value="{}"]'.format(resource_type))
-
-    @classmethod
-    def to_landing_page(self, driver):
-        self.navigation_landing_page.click(driver)
+    def logo_to_home(self, driver):
+        self.navigation_logo.click(driver)
 
     @classmethod
     def to_home(self, driver):
         self.navigation_home.click(driver)
+    
+    @classmethod
+    def show_mobile_nav(self, driver):
+        self.navigation_hamburger.click(driver)
 
     @classmethod
-    def to_my_resources(self, driver):
-        self.navigation_my_resources.click(driver)
+    def to_my_submissions(self, driver):
+        self.navigation_my_submissions.click(driver)
+        TestSystem.wait(MY_SUBMISSIONS_LOAD)
+    
+    @classmethod
+    def drawer_to_my_submissions(self, driver):
+        self.drawer_nav_my_submissions.click(driver)
+        TestSystem.wait(MY_SUBMISSIONS_LOAD)
+    
+    @classmethod
+    def drawer_to_submit(self, driver):
+        self.drawer_nav_submit.click(driver)
 
     @classmethod
-    def to_discover(self, driver):
-        self.navigation_discover.click(driver)
+    def to_resources(self, driver):
+        self.navigation_resources.click(driver)
 
     @classmethod
-    def to_collaborate(self, driver):
-        self.navigation_collaborate.click(driver)
-
-    @classmethod
-    def to_apps(self, driver):
-        num_windows_now = len(driver.window_handles)
-        self.navigation_apps.click(driver)
-        External.switch_new_page(driver, num_windows_now, Apps.apps_locator)
-
-    @classmethod
-    def to_help(self, driver):
-        self.navigation_help.click(driver)
-        time.sleep(EXTERNAL_PAGE_LOAD)
+    def to_submit(self, driver):
+        self.navigation_submit.click(driver)
 
     @classmethod
     def to_about(self, driver):
-        self.navigation_help.click(driver)
-        time.sleep(EXTERNAL_PAGE_LOAD)
-        Help.to_about.javascript_click(driver)
+        self.navigation_about.click(driver)
 
     @classmethod
-    def to_login(self, driver):
-        self.navigation_login.click(driver)
+    def to_contact(self, driver):
+        self.navigation_contact.click(driver)
 
+    # @classmethod
+    # def to_login(self, driver):
+    #     self.navigation_login.click(driver)
+
+    # @classmethod
+    # def logout(self, driver):
+    #     self.profile_menu.click(driver)
+    #     self.signout_menu.click(driver)
+
+    # @classmethod
+    # def clear_notifications(self, driver):
+    #     self.notifications.click(driver)
+    #     self.notifications_clear.click(driver)
+    #     self.notifications.click(driver)
+    
+
+class MySubmissions(Dsp):
+    orcid_login = SiteElement(By.CSS_SELECTOR, ".v-dialog .cz-login")
+    
     @classmethod
-    def to_profile(self, driver):
-        self.profile_menu.click(driver)
-        self.profile_button.click(driver)
+    def is_visible_orcid_login(self, driver):
+        return self.orcid_login.is_visible(driver)
 
-    @classmethod
-    def logout(self, driver):
-        self.profile_menu.click(driver)
-        self.signout_menu.click(driver)
-
-    @classmethod
-    def create_resource(self, driver, type):
-        self.resource_creation.click(driver)
-        self.resource_type(type).click(driver)
-
-    @classmethod
-    def to_terms(self, driver):
-        self.footer_terms.click(driver)
-
-    @classmethod
-    def to_privacy(self, driver):
-        self.footer_privacy.click(driver)
-
-    @classmethod
-    def to_sitemap(self, driver):
-        self.footer_sitemap.click(driver)
-
-    @classmethod
-    def get_social_link(self, driver, social):
-        social_links = {
-            "facebook": self.footer_facebook,
-            "twitter": self.footer_twitter,
-            "youtube": self.footer_youtube,
-            "github": self.footer_github,
-            "linkedin": self.footer_linkedin,
-        }
-        return social_links[social].get_attribute(driver, "href")
-
-    @classmethod
-    def get_version(self, driver):
-        return self.footer_version.get_text(driver).strip()
-
-    @classmethod
-    def get_latest_release(self, org, repo):
-        """
-        Retrieves the version of the latest published release of 'hydroshare'
-        repository.
-        """
-        # See https://developer.github.com/v3/repos/
-        # releases/#get-the-latest-release
-        request_url = f"https://api.github.com/repos/{org}/" f"{repo}/releases/latest"
-        response_data = urlopen(request_url).read()
-        release_version = json.loads(response_data)["tag_name"]
-        return release_version
-
-    @classmethod
-    def get_support_email(self, driver):
-        return self.support_email.get_href(driver)
-
-    @classmethod
-    def get_logged_in_name(self, driver):
-        self.profile_menu.click(driver)
-        name = self.logged_in_full_name.get_text(driver)
-        self.profile_menu.click(driver)
-        return name
-
-    @classmethod
-    def get_logged_in_email(self, driver):
-        self.profile_menu.click(driver)
-        name = self.logged_in_email.get_text(driver)
-        self.profile_menu.click(driver)
-        return name
-
-    @classmethod
-    def clear_notifications(self, driver):
-        self.notifications.click(driver)
-        self.notifications_clear.click(driver)
-        self.notifications.click(driver)
-
-
-class LandingPage(Hydroshare):
-    hero = SiteElement(By.CSS_SELECTOR, "div.item.parallax-window.active")
-    hero_right = SiteElement(By.CSS_SELECTOR, ".glyphicon-chevron-right")
-    hero_left = SiteElement(By.CSS_SELECTOR, ".glyphicon-chevron-left")
-    navigation_top = SiteElement(By.CSS_SELECTOR, ".scrolltotop")
-    navigation_registration = SiteElement(By.CSS_SELECTOR, "a.btn-signup")
-
-    @classmethod
-    def to_registration(self, driver):
-        time.sleep(EXTERNAL_PAGE_LOAD)
-        self.navigation_registration.click(driver)
-
-    @classmethod
-    def slide_hero_right(self, driver):
-        self.hero_right.javascript_click(driver)
-        time.sleep(HOME_PAGE_SLIDER_ANIMATION)
-
-    @classmethod
-    def slide_hero_left(self, driver):
-        self.hero_left.javascript_click(driver)
-        time.sleep(HOME_PAGE_SLIDER_ANIMATION)
-
-    @classmethod
-    def scroll_to_top(self, driver):
-        self.navigation_top.click(driver)
-
-    @classmethod
-    def scroll_to_button(self, driver):
-        self.footer.scroll_to(driver)
-
-    @classmethod
-    def hero_has_valid_img(self, driver, images):
-        return self.hero.get_attribute(driver, "style") in images
-
-
-class Home(Hydroshare):
+"""
+THE CLASSES BELOW ARE FROM HYDROSHARE AND ARE HERE AS EXAMPLES WHILE WRITING DSP MACROS
+"""
+class Home(Dsp):
     get_started_toggle = SiteElement(By.ID, "id-getting-started-toggle")
     recently_visited_list = SiteElement(
         By.CSS_SELECTOR, "#recently-visited-resources > tbody"
@@ -326,8 +232,7 @@ class Home(Hydroshare):
             self.cuahsi_app(index).click(driver)
             External.switch_new_page(driver, num_windows_now, self.body_locator)
 
-
-class Login(Hydroshare):
+class Login(Dsp):
     username = SiteElement(By.ID, "id_username")
     password = SiteElement(By.ID, "id_password")
     submit = SiteElement(By.CSS_SELECTOR, "input.btn.btn-primary[type='submit']")
@@ -351,7 +256,7 @@ class Login(Hydroshare):
         self.submit.click(driver)
 
 
-class Resource(Hydroshare):
+class Resource(Dsp):
     bagit = SiteElement(By.ID, "btn-download-all")
     open_with = SiteElement(By.ID, "apps-dropdown")
     open_jupyterhub = SiteElement(By.CSS_SELECTOR, 'li[title="CUAHSI JupyterHub"]')
@@ -799,7 +704,7 @@ class Resource(Hydroshare):
         return self.sharing_status.get_text(driver)
 
 
-class API(Hydroshare):
+class API(Dsp):
     hsapi = SiteElement(By.ID, "endpointListTogger_hsapi")
     endpoint_list = SiteElement(
         By.CSS_SELECTOR, "div.opblock-tag-section div:first-child"
@@ -843,7 +748,7 @@ class API(Hydroshare):
         return self.response_code.get_text(driver)
 
 
-class Profile(Hydroshare):
+class Profile(Dsp):
     edit = SiteElement(By.ID, "btn-edit-profile")
     organizations = SiteElement(By.CSS_SELECTOR, 'input[placeholder="Organization(s)"]')
     save = SiteElement(By.CSS_SELECTOR, "button.btn-save-profile:first-of-type")
@@ -1102,7 +1007,7 @@ class Profile(Hydroshare):
         }
 
 
-class NewResource(Hydroshare):
+class NewResource(Dsp):
     title = SiteElement(By.ID, "input-title")
     create_btn = SiteElement(By.ID, "btn-resource-create")
     cancel_btn = SiteElement(
@@ -1128,7 +1033,7 @@ class NewResource(Hydroshare):
         time.sleep(RESOURCE_CREATION)
 
 
-class Registration(Hydroshare):
+class Registration(Dsp):
     first_name = SiteElement(By.ID, "id_first_name")
     last_name = SiteElement(By.ID, "id_last_name")
     email = SiteElement(By.ID, "id_email")
@@ -1178,7 +1083,7 @@ class Registration(Hydroshare):
         return self.error.get_text(driver)
 
 
-class SiteMap(Hydroshare):
+class SiteMap(Dsp):
     @classmethod
     def resource_link(self, index):
         return SiteElement(By.CSS_SELECTOR, "h4:nth-of-type({}) a".format(index + 1))

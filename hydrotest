@@ -49,7 +49,7 @@ case "$1" in
         ;;
     hydroclient) run_hydroclient "$@"
         ;;
-    dps) run_dsp "$@"
+    dsp) run_dsp "$@"
         ;;
     check) run_check "$@"
         ;;

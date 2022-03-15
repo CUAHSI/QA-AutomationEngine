@@ -84,12 +84,14 @@ class BaseTestSuite(unittest.TestCase):
     @staticmethod
     def _firefox_profile():
         profile = webdriver.FirefoxProfile()
+        profile.accept_untrusted_certs = True
         profile.set_preference("general.useragent.override", USER_AGENT)
         return profile
 
     @staticmethod
     def _chrome_options():
         options = webdriver.ChromeOptions()
+        options.add_argument('ignore-certificate-errors')
         options.add_argument("--user-agent={}".format(USER_AGENT))
         return options
 

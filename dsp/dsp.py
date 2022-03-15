@@ -15,17 +15,8 @@ from urllib.request import urlretrieve
 # from percy import percySnapshot
 
 from dsp_macros import (
-    Hydroshare,
-    LandingPage,
-    Home,
-    Login,
-    Resource,
-    API,
-    Profile,
-    NewResource,
-    Registration,
-    SiteMap,
-    Utilities,
+    Dsp,
+    MySubmissions,
 )
 
 from cuahsi_base.cuahsi_base import BaseTestSuite, parse_args_run_tests
@@ -52,20 +43,11 @@ class DspTestSuite(BaseTestSuite):
         self.driver.get(BASE_URL)
 
     def test_A_000001(self):
-        """
-        TODO: This will be the first DSP test...
-        """
-        LandingPage.to_login(self.driver)
-        Login.login(self.driver, USERNAME, PASSWORD)
-        resource_types = [
-            "CompositeResource",
-            "CollectionResource",
-            "ToolResource",
-        ]
-        for resource_type in resource_types:
-            Home.create_resource(self.driver, resource_type)
-            NewResource.configure(self.driver, "TEST TITLE")
-            NewResource.cancel(self.driver)
+        """Ensure anonymous navigation to my submissions shows orcid login modal"""
+        Dsp.show_mobile_nav(self.driver)
+        Dsp.drawer_to_my_submissions(self.driver)
+        login_visible = MySubmissions.is_visible_orcid_login(self.driver)
+        self.assertTrue(login_visible)
 
 
 if __name__ == "__main__":

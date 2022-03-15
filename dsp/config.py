@@ -1,5 +1,5 @@
-BASE_URL = "http://localhost:8000"
-USERNAME = "jim"
+BASE_URL = "https://localhost"
+USERNAME = "jmcuahsi@gmail.com"
 PASSWORD = "62meister"
 
 GITHUB_ORG = "cznethub"
