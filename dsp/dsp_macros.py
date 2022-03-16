@@ -117,6 +117,7 @@ class Dsp(WebPage):
         External.switch_new_page(driver, num_windows_now, self.body_locator)
 
 class OrcidWindow(WebPage):
+    """ Orcid window"""
     username = SiteElement(By.ID, "username")
     password = SiteElement(By.ID, "password")
     submit = SiteElement(By.ID, "signin-button")
@@ -128,6 +129,7 @@ class OrcidWindow(WebPage):
         self.submit.click(driver)
 
 class HydroshareWindow(WebPage):
+    """ Authentication window to use Hydroshare as Backend """
     username = SiteElement(By.ID, "id_username")
     password = SiteElement(By.ID, "id_password")
     submit = SiteElement(By.CSS_SELECTOR, ".account-form .btn-primary")
@@ -141,11 +143,13 @@ class HydroshareWindow(WebPage):
         self.authorize.click(driver)
 
 class MySubmissions(Dsp):
+    """ Page displaying users submissions """
     # TODO: tests for my_submissions
     pass
 
 
 class SubmitLandingPage(Dsp):
+    """ Page containing options for submitting data """
     hydroshare_repo = SiteElement(By.CSS_SELECTOR, 'div.repositories img[alt="HydroShare"]')
     submit_to_hs_modal = SiteElement(By.CSS_SELECTOR, ".v-dialog div.cz-authorize")
     submit_to_hs_authorize = SiteElement(By.CSS_SELECTOR, ".cz-authorize button.primary")
@@ -172,12 +176,15 @@ class SubmitLandingPage(Dsp):
         self.hydroshare_repo_select(driver)
 
 class SubmitHydroshare(Dsp):
+    """ Page containing forms for submitting data with HS backend"""
+
     header = SiteElement(By.CSS_SELECTOR, ".cz-new-submission h1")
     alert = SiteElement(By.CSS_SELECTOR,  ".v-alert .v-alert__content")
-    save = SiteElement(By.CSS_SELECTOR, ".cz-new-submission-actions button:nth-of-type(1)")
+    top_save = SiteElement(By.CSS_SELECTOR, "div.cz-new-submission-actions:nth-of-type(1) button:nth-of-type(1)")
     title =  SiteElement(By.ID, "#/properties/title-input")
     abstract = SiteElement(By.ID, "#/properties/abstract-input")
     subjects_input = SiteElement(By.ID, "#/properties/subjects-input")
+    bottom_save = SiteElement(By.CSS_SELECTOR, ".cz-new-submission-actions:nth-of-type(2) button:nth-of-type(1)")
 
     @classmethod
     def get_header_text(self, driver):
@@ -189,7 +196,7 @@ class SubmitHydroshare(Dsp):
 
     @classmethod
     def is_form_saveable(self, driver):
-        return self.save.get_attribute(driver, "disabled") != "disabled"
+        return self.top_save.get_attribute(driver, "disabled") != "disabled"
 
 
 
