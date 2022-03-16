@@ -18,6 +18,9 @@ from dsp_macros import (
     Dsp,
     SubmitLandingPage,
     MySubmissions,
+    OrcidWindow,
+    HydroshareWindow,
+    SubmitHydroshare
 )
 
 from cuahsi_base.cuahsi_base import BaseTestSuite, parse_args_run_tests
@@ -26,6 +29,8 @@ from config import (
     BASE_URL,
     USERNAME,
     PASSWORD,
+    HS_PASSWORD,
+    HS_USERNAME,
     GITHUB_ORG,
     GITHUB_REPO,
 )
@@ -54,11 +59,27 @@ class DspTestSuite(BaseTestSuite):
         """Authenticate with orcid"""
         Dsp.show_mobile_nav(self.driver)
         Dsp.drawer_to_submit(self.driver)
-        SubmitLandingPage.to_hydroshare_repo(self.driver)
-        # TODO: how do we switch to the new window?
-        SubmitLandingPage.to_orcid_window(self.driver)
-        TestSystem.wait(10)
+        SubmitLandingPage.hydroshare_repo_select(self.driver)
 
+        #new ORCID window
+        SubmitLandingPage.to_orcid_window(self.driver)
+        self.assertIn("ORCID", TestSystem.title(self.driver))
+
+        OrcidWindow.fill_credentials(self.driver, USERNAME, PASSWORD)
+        # OrcidWindow.to_previous_window(self.driver)
+        OrcidWindow.to_origin_window(self.driver)
+
+        #new HS auth window
+        SubmitLandingPage.to_hs_window(self.driver)
+        self.assertIn("HydroShare", TestSystem.title(self.driver))
+        HydroshareWindow.authorize_hs_backend(self.driver, HS_USERNAME, HS_PASSWORD)
+        # HydroshareWindow.to_previous_window(self.driver, wait=True)
+        
+        # HydroshareWindow.to_previous_window(self.driver)
+        HydroshareWindow.to_origin_window(self.driver)
+
+        header = SubmitHydroshare.get_header(self.driver)
+        self.assertIn("Submit", header)
 
 if __name__ == "__main__":
     parse_args_run_tests(DspTestSuite)

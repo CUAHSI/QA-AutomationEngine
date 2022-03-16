@@ -19,12 +19,26 @@ from config import BASE_URL
 from timing import (
     EXTERNAL_PAGE_LOAD,
     KEYS_RESPONSE,
-    MY_SUBMISSIONS_LOAD
+    MY_SUBMISSIONS_LOAD,
+    RETURN_PREVIOUS,
+    AUTH_WINDOW
 )
 
 
 class WebPage:
     body_locator = By.CSS_SELECTOR, "body"
+
+    @classmethod
+    def to_previous_window(self, driver, wait=False):
+        if wait:
+            TestSystem.wait(RETURN_PREVIOUS)
+        External.switch_old_page(driver)
+    
+    @classmethod
+    def to_origin_window(self, driver, wait=False):
+        if wait:
+            TestSystem.wait(RETURN_PREVIOUS)
+        External.switch_first_page(driver)
 
 
 class Dsp(WebPage):
@@ -141,10 +155,31 @@ class Dsp(WebPage):
     def to_orcid_window(self, driver):
         num_windows_now = len(driver.window_handles)
         self.orcid_login_continue.click(driver)
-        External.switch_new_page(driver, num_windows_now, OrcidWindow.username)
+        External.switch_new_page(driver, num_windows_now, self.body_locator)
 
 class OrcidWindow(WebPage):
     username = SiteElement(By.ID, "username")
+    password = SiteElement(By.ID, "password")
+    submit = SiteElement(By.ID, "signin-button")
+
+    @classmethod
+    def fill_credentials(self, driver, username, password):
+        self.username.inject_text(driver, username)
+        self.password.inject_text(driver, password)
+        self.submit.click(driver)
+
+class HydroshareWindow(WebPage):
+    username = SiteElement(By.ID, "id_username")
+    password = SiteElement(By.ID, "id_password")
+    submit = SiteElement(By.CSS_SELECTOR, ".account-form .btn-primary")
+    authorize =  SiteElement(By.CSS_SELECTOR, '#authorizationForm input[name="allow"]')
+
+    @classmethod
+    def authorize_hs_backend(self, driver, username, password):
+        self.username.inject_text(driver, username)
+        self.password.inject_text(driver, password)
+        self.submit.click(driver)
+        self.authorize.click(driver)
 
 class MySubmissions(Dsp):
     # TODO: tests for my_submissions
@@ -153,14 +188,31 @@ class MySubmissions(Dsp):
 
 class SubmitLandingPage(Dsp):
     hydroshare_repo = SiteElement(By.CSS_SELECTOR, 'div.repositories img[alt="HydroShare"]')
+    submit_to_hs_modal = SiteElement(By.CSS_SELECTOR, ".v-dialog div.cz-authorize")
+    submit_to_hs_authorize = SiteElement(By.CSS_SELECTOR, ".cz-authorize button.primary")
 
     @classmethod
-    def to_hydroshare_repo(self, driver):
+    def hydroshare_repo_select(self, driver):
         self.hydroshare_repo.click(driver)
 
+    @classmethod
+    def authorize_hs_submit(self, driver):
+        self.submit_to_hs_authorize.click(driver)
+
+    @classmethod
+    def to_hs_window(self, driver):
+        TestSystem.wait(AUTH_WINDOW)
+        num_windows_now = len(driver.window_handles)
+        self.submit_to_hs_authorize.click(driver)
+        External.switch_new_page(driver, num_windows_now, self.body_locator)
 
 class SubmitHydroshare(Dsp):
-    pass
+    header = SiteElement(By.CSS_SELECTOR, ".cz-new-submission h1")
+
+    @classmethod
+    def get_header(self, driver):
+        return self.header.get_text(driver)
+
 
 
 class Utilities:
