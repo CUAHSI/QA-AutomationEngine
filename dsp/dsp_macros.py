@@ -205,13 +205,33 @@ class SubmitLandingPage(Dsp):
         num_windows_now = len(driver.window_handles)
         self.submit_to_hs_authorize.click(driver)
         External.switch_new_page(driver, num_windows_now, self.body_locator)
+    
+    @classmethod
+    def to_hs_submit(self, driver):
+        Dsp.show_mobile_nav(driver)
+        Dsp.drawer_to_submit(driver)
+        self.hydroshare_repo_select(driver)
 
 class SubmitHydroshare(Dsp):
     header = SiteElement(By.CSS_SELECTOR, ".cz-new-submission h1")
+    alert = SiteElement(By.CSS_SELECTOR,  ".v-alert .v-alert__content")
+    save = SiteElement(By.CSS_SELECTOR, ".cz-new-submission-actions button:nth-of-type(1)")
+    title =  SiteElement(By.ID, "#/properties/title-input")
+    abstract = SiteElement(By.ID, "#/properties/abstract-input")
+    subjects_input = SiteElement(By.ID, "#/properties/subjects-input")
 
     @classmethod
-    def get_header(self, driver):
+    def get_header_text(self, driver):
         return self.header.get_text(driver)
+    
+    @classmethod
+    def get_alert_text(self, driver):
+        return self.alert.get_text(driver)
+
+    @classmethod
+    def is_form_saveable(self, driver):
+        return self.save.get_attribute(driver, "disabled") != "disabled"
+
 
 
 

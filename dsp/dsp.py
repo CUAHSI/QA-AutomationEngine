@@ -47,16 +47,9 @@ class DspTestSuite(BaseTestSuite):
     def setUp(self):
         super(DspTestSuite, self).setUp()
         self.driver.get(BASE_URL)
-
-    def test_A_000001(self):
-        """Ensure anonymous navigation to my submissions shows orcid login modal"""
-        Dsp.show_mobile_nav(self.driver)
-        Dsp.drawer_to_my_submissions(self.driver)
-        login_visible = MySubmissions.is_visible_orcid_modal(self.driver)
-        self.assertTrue(login_visible)
     
-    def test_A_000002(self):
-        """Authenticate with orcid"""
+    def login_orcid_and_hs(self):
+        """Authenticate with orcid and then HS credentials"""
         Dsp.show_mobile_nav(self.driver)
         Dsp.drawer_to_submit(self.driver)
         SubmitLandingPage.hydroshare_repo_select(self.driver)
@@ -66,20 +59,49 @@ class DspTestSuite(BaseTestSuite):
         self.assertIn("ORCID", TestSystem.title(self.driver))
 
         OrcidWindow.fill_credentials(self.driver, USERNAME, PASSWORD)
-        # OrcidWindow.to_previous_window(self.driver)
         OrcidWindow.to_origin_window(self.driver)
 
         #new HS auth window
         SubmitLandingPage.to_hs_window(self.driver)
         self.assertIn("HydroShare", TestSystem.title(self.driver))
         HydroshareWindow.authorize_hs_backend(self.driver, HS_USERNAME, HS_PASSWORD)
-        # HydroshareWindow.to_previous_window(self.driver, wait=True)
-        
-        # HydroshareWindow.to_previous_window(self.driver)
         HydroshareWindow.to_origin_window(self.driver)
 
-        header = SubmitHydroshare.get_header(self.driver)
+    def test_A_000001(self):
+        """Ensure anonymous navigation to my submissions shows orcid login modal"""
+        Dsp.show_mobile_nav(self.driver)
+        Dsp.drawer_to_my_submissions(self.driver)
+        login_visible = MySubmissions.is_visible_orcid_modal(self.driver)
+        self.assertTrue(login_visible)
+    
+    def test_A_000002(self):
+        """Check authentication to submit page"""
+        self.login_orcid_and_hs()
+        header = SubmitHydroshare.get_header_text(self.driver)
         self.assertIn("Submit", header)
+
+    def test_A_000003(self):
+        """Submit instructions shown"""
+        self.login_orcid_and_hs()
+        SubmitLandingPage.to_hs_submit(self.driver)
+        alert = SubmitHydroshare.get_alert_text(self.driver)
+        self.assertIn("Instructions:", alert)
+
+    def test_A_000004(self):
+        """Initial HS Form is not saveable"""
+        # TODO: selectors for buttons
+        pass
+        self.login_orcid_and_hs()
+        SubmitLandingPage.to_hs_submit(self.driver)
+        self.assertTrue(SubmitHydroshare.is_form_saveable(self.driver))
+
+    def test_A_000005(self):
+        """"""
+        self.login_orcid_and_hs()
+        SubmitLandingPage.to_hs_submit(self.driver)
+        
+
+
 
 if __name__ == "__main__":
     parse_args_run_tests(DspTestSuite)
