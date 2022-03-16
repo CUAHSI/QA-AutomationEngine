@@ -64,32 +64,6 @@ class Dsp(WebPage):
     orcid_login_modal = SiteElement(By.CSS_SELECTOR, ".v-dialog .cz-login")
     orcid_login_continue = SiteElement(By.CSS_SELECTOR, ".v-dialog .cz-login button.primary")
 
-    # navigation_login = SiteElement(By.CSS_SELECTOR, "#signin-menu a")
-    # signout_menu = SiteElement(By.ID, "signout-menu")
-    # footer = SiteElement(By.CSS_SELECTOR, "footer")
-    # footer_terms = SiteElement(By.CSS_SELECTOR, "footer a[href='/terms-of-use']")
-    # footer_privacy = SiteElement(By.CSS_SELECTOR, "footer a[href='/privacy']")
-    # footer_sitemap = SiteElement(By.CSS_SELECTOR, "footer a[href='/sitemap/']")
-    # footer_twitter = SiteElement(
-    #     By.CSS_SELECTOR, ".content.social ul li:nth-child(1) > a"
-    # )
-    # footer_facebook = SiteElement(
-    #     By.CSS_SELECTOR, ".content.social ul li:nth-child(2) > a"
-    # )
-    # footer_youtube = SiteElement(
-    #     By.CSS_SELECTOR, ".content.social ul li:nth-child(3) > a"
-    # )
-    # footer_github = SiteElement(
-    #     By.CSS_SELECTOR, ".content.social ul li:nth-child(4) > a"
-    # )
-    # footer_linkedin = SiteElement(
-    #     By.CSS_SELECTOR, ".content.social ul li:nth-child(5) > a"
-    # )
-    # footer_version = SiteElement(By.CSS_SELECTOR, ".content p b")
-    # page_tip = SiteElement(By.CSS_SELECTOR, ".page-tip > .container > .row > div > p")
-    # notifications = SiteElement(By.CSS_SELECTOR, "#notifications-dropdown > a")
-    # notifications_clear = SiteElement(By.CSS_SELECTOR, "#btn-notifications-clear")
-
     @classmethod
     def logo_to_home(self, driver):
         self.navigation_logo.click(driver)
@@ -131,21 +105,6 @@ class Dsp(WebPage):
     @classmethod
     def to_contact(self, driver):
         self.navigation_contact.click(driver)
-
-    # @classmethod
-    # def to_login(self, driver):
-    #     self.navigation_login.click(driver)
-
-    # @classmethod
-    # def logout(self, driver):
-    #     self.profile_menu.click(driver)
-    #     self.signout_menu.click(driver)
-
-    # @classmethod
-    # def clear_notifications(self, driver):
-    #     self.notifications.click(driver)
-    #     self.notifications_clear.click(driver)
-    #     self.notifications.click(driver)
 
     @classmethod
     def is_visible_orcid_modal(self, driver):
