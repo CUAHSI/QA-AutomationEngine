@@ -62,7 +62,7 @@ class Dsp(WebPage):
 
     # login
     orcid_login_modal = SiteElement(By.CSS_SELECTOR, ".v-dialog .cz-login")
-    orcid_login_continue = SiteElement(By.CSS_SELECTOR, ".v-dialog .cz-login button.primary")
+    orcid_login_continue = SiteElement(By.ID, "orcid_login_continue")
 
     @classmethod
     def logo_to_home(self, driver):
