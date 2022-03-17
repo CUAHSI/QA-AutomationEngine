@@ -43,22 +43,22 @@ class WebPage:
 
 class Dsp(WebPage):
     navigation_logo = SiteElement(By.CSS_SELECTOR, "#app-bar .logo")
-    navigation_home = SiteElement(By.CSS_SELECTOR, '.nav-items a[href="/"]')
-    navigation_my_submissions = SiteElement(By.CSS_SELECTOR, '.nav-items a[href="/submissions"]')
-    navigation_resources = SiteElement(By.CSS_SELECTOR, '.nav-items a[href="/resources"]')
-    navigation_submit = SiteElement(By.CSS_SELECTOR, '.nav-items a[href="/submit"]')
-    navigation_about = SiteElement(By.CSS_SELECTOR, '.nav-items a[href="/about"]')
-    navigation_contact = SiteElement(By.CSS_SELECTOR, '.nav-items a[href="/contact"]')
+    navigation_home = SiteElement(By.ID, "navbar-nav-home")
+    navigation_my_submissions = SiteElement(By.ID, "navbar-nav-MySubmissions")
+    navigation_resources = SiteElement(By.ID, "navbar-nav-Resources")
+    navigation_submit = SiteElement(By.ID, "navbar-nav-SubmitData")
+    navigation_about = SiteElement(By.ID, "navbar-nav-About")
+    navigation_contact = SiteElement(By.ID,"navbar-nav-Contact")
     
     # responsive
     navigation_hamburger = SiteElement(By.CSS_SELECTOR, "#app-bar .v-app-bar__nav-icon")
     navigation_drawer = SiteElement(By.CSS_SELECTOR, ".v-navigation-drawer")
-    drawer_nav_home = SiteElement(By.CSS_SELECTOR, '.v-navigation-drawer__content a[href="/"]')
-    drawer_nav_my_submissions = SiteElement(By.CSS_SELECTOR, '.v-navigation-drawer__content a[href="/submissions"]')
-    drawer_nav_resources = SiteElement(By.CSS_SELECTOR, '.v-navigation-drawer__content a[href="/resources"]')
-    drawer_nav_submit = SiteElement(By.CSS_SELECTOR, '.v-navigation-drawer__content a[href="/submit"]')
-    drawer_nav_about = SiteElement(By.CSS_SELECTOR, '.v-navigation-drawer__content a[href="/about"]')
-    drawer_nav_contact = SiteElement(By.CSS_SELECTOR, '.v-navigation-drawer__content a[href="/contact"]')
+    drawer_nav_home = SiteElement(By.ID, "drawer-nav-home")
+    drawer_nav_my_submissions = SiteElement(By.ID, "drawer-nav-MySubmissions")
+    drawer_nav_resources = SiteElement(By.ID, "drawer-nav-Resources")
+    drawer_nav_submit = SiteElement(By.ID, "drawer-nav-SubmitData")
+    drawer_nav_about = SiteElement(By.ID, "drawer-nav-About")
+    drawer_nav_contact = SiteElement(By.ID, "drawer-nav-Contact")
 
     # login
     orcid_login_modal = SiteElement(By.CSS_SELECTOR, ".v-dialog .cz-login")
@@ -180,11 +180,11 @@ class SubmitHydroshare(Dsp):
 
     header = SiteElement(By.CSS_SELECTOR, ".cz-new-submission h1")
     alert = SiteElement(By.CSS_SELECTOR,  ".v-alert .v-alert__content")
-    top_save = SiteElement(By.CSS_SELECTOR, "div.cz-new-submission-actions:nth-of-type(1) button:nth-of-type(1)")
+    top_save = SiteElement(By.CSS_SELECTOR, "#cz-new-submission-actions-top button.submission-save")
     title =  SiteElement(By.ID, "#/properties/title-input")
     abstract = SiteElement(By.ID, "#/properties/abstract-input")
     subjects_input = SiteElement(By.ID, "#/properties/subjects-input")
-    bottom_save = SiteElement(By.CSS_SELECTOR, ".cz-new-submission-actions:nth-of-type(2) button:nth-of-type(1)")
+    bottom_save = SiteElement(By.CSS_SELECTOR, "#cz-new-submission-actions-bottom button.submission-save")
 
     @classmethod
     def get_header_text(self, driver):
