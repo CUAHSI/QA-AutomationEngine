@@ -1,4 +1,5 @@
 """ Runs various smoke tests for the data submission portal """
+from doctest import TestResults
 import boto3
 import inspect
 import json
@@ -81,25 +82,36 @@ class DspTestSuite(BaseTestSuite):
         self.assertIn("Submit", header)
 
     def test_A_000003(self):
-        """Submit instructions shown"""
+        """Check that submit instructions are shown"""
         self.login_orcid_and_hs()
         SubmitLandingPage.to_hs_submit(self.driver)
         alert = SubmitHydroshare.get_alert_text(self.driver)
         self.assertIn("Instructions:", alert)
 
     def test_A_000004(self):
-        """Initial HS Form is not saveable"""
-        # TODO: selectors for buttons
-        pass
+        """Confirm successful submit of basic required fields to HS"""
         self.login_orcid_and_hs()
         SubmitLandingPage.to_hs_submit(self.driver)
-        self.assertTrue(SubmitHydroshare.is_form_saveable(self.driver))
-
-    def test_A_000005(self):
-        """"""
-        self.login_orcid_and_hs()
-        SubmitLandingPage.to_hs_submit(self.driver)
+        auto_text = time.strftime("%d %b %Y %H:%M:%S", time.gmtime())
+        SubmitHydroshare.autofill_required_elements(self.driver, auto_text)
+        self.assertTrue(SubmitHydroshare.is_finishable(self.driver))
+        SubmitHydroshare.finish_submission(self.driver)
+        self.assertEqual("My Submissions", MySubmissions.get_title(self.driver))
         
+        # The page isn't sorted upon load 
+        MySubmissions.enter_text_in_search(self.driver, auto_text)
+        top_name = MySubmissions.get_top_submission_name(self.driver)
+
+        self.assertEqual(auto_text, top_name)
+        
+
+    # def test_A_000005(self):
+    #     """Not implemented"""
+    #     self.login_orcid_and_hs()
+    #     SubmitLandingPage.to_hs_submit(self.driver)
+    #     title = "test_A_000004--Title"
+    #     abstract = "test_A_000004--Abstract"
+    #     subject_keywords = ["test_A_000004-k1"]
 
 
 

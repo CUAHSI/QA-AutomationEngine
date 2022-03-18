@@ -21,7 +21,8 @@ from timing import (
     KEYS_RESPONSE,
     MY_SUBMISSIONS_LOAD,
     RETURN_PREVIOUS,
-    AUTH_WINDOW
+    AUTH_WINDOW,
+    HS_SUBMIT
 )
 
 
@@ -144,8 +145,42 @@ class HydroshareWindow(WebPage):
 
 class MySubmissions(Dsp):
     """ Page displaying users submissions """
-    # TODO: tests for my_submissions
-    pass
+    title = SiteElement(By.CSS_SELECTOR, ".text-h4")
+    total_submissions = SiteElement(By.ID, "total_submissions")
+    top_submission = SiteElement(By.ID, "submission-0")
+    top_submission_name = SiteElement(By.ID, "sub-0-title")
+    top_submission_date = SiteElement(By.ID, "sub-0-date")
+    sort_order_select = SiteElement(By.ID, "sort-order")
+    my_submissions_search = SiteElement(By.ID, "my_submissions_search")
+
+    @classmethod
+    def get_title(self, driver):
+        return self.title.get_text(driver)
+
+    @classmethod
+    def get_total_submissions(self, driver):
+        text = self.total_submissions.get_text(driver)
+        return int(text.split(" ", 1)[0])
+    
+    # TODO: get sort order working with Vuetify dropdowns
+    # @classmethod
+    # def sort_order(self, driver, index=1):
+    #     self.sort_order_select.javascript_click_invisible(driver)
+    #     select_string = f"#sort-order v-list-item__content:nth-of-type({index})"
+    #     to_select = SiteElement(By.CSS_SELECTOR, select_string)
+    #     to_select.click(driver)
+
+    @classmethod
+    def get_top_submission_name(self, driver):
+        return self.top_submission_name.get_text(driver)
+    
+    @classmethod
+    def get_top_submission_date(self, driver):
+        return self.top_submission_date.get_text(driver)
+
+    @classmethod
+    def enter_text_in_search(self, driver, field_text):
+        self.my_submissions_search.inject_text(driver, field_text)
 
 
 class SubmitLandingPage(Dsp):
@@ -183,8 +218,15 @@ class SubmitHydroshare(Dsp):
     top_save = SiteElement(By.CSS_SELECTOR, "#cz-new-submission-actions-top button.submission-save")
     title =  SiteElement(By.ID, "#/properties/title-input")
     abstract = SiteElement(By.ID, "#/properties/abstract-input")
-    subjects_input = SiteElement(By.ID, "#/properties/subjects-input")
+    # subject_keywords = SiteElement(By.ID, "#/properties/subjects-input")
+    subject_keywords = SiteElement(By.CSS_SELECTOR, 'input[id="#/properties/subjects-input"]:nth-of-type(1)')
+    # subject_keywords = SiteElement(By.CSS_SELECTOR, ".v-select__selections")
     bottom_save = SiteElement(By.CSS_SELECTOR, "#cz-new-submission-actions-bottom button.submission-save")
+    bottom_finish = SiteElement(By.CSS_SELECTOR, "#cz-new-submission-actions-bottom button.submission-finish")
+
+    # required_elements = SiteElementsCollection(By.CSS_SELECTOR, "input[required='required']")
+    expand_funding_agency = SiteElement(By.CSS_SELECTOR, 'button[aria-label*="Funding agency"]')
+    agency_name = SiteElement(By.ID, "#/properties/funding_agency_name-input")
 
     @classmethod
     def get_header_text(self, driver):
@@ -197,6 +239,52 @@ class SubmitHydroshare(Dsp):
     @classmethod
     def is_form_saveable(self, driver):
         return self.top_save.get_attribute(driver, "disabled") != "disabled"
+    
+    @classmethod
+    def autofill_required_elements(self, driver, auto):
+        self.fill_basic_info(driver, auto, auto, auto)
+        self.fill_funding_agency(driver, auto)
+        self.save_bottom(driver)
+            
+
+    @classmethod
+    def fill_basic_info(self, driver, title, abstract, subject_keywords):
+        self.title.scroll_to(driver)
+        self.title.inject_text(driver, title)
+        self.abstract.inject_text(driver, abstract)
+        self.subject_keywords.javascript_click_invisible(driver)
+        if isinstance(subject_keywords, str):
+            self.subject_keywords.inject_invisible_text(driver, subject_keywords)
+            self.subject_keywords.submit_invisible(driver)
+        else:
+            for keyword in subject_keywords:
+                self.subject_keywords.inject_invisible_text(driver, keyword)
+                self.subject_keywords.submit_invisible(driver)
+    
+    @classmethod
+    def fill_funding_agency(self, driver, agency):
+        self.expand_funding_agency.scroll_to(driver)
+        self.expand_funding_agency.javascript_click(driver)
+        self.agency_name.inject_text(driver, agency)
+        self.agency_name.submit(driver)
+    
+    @classmethod
+    def save_bottom(self, driver):
+        self.bottom_save.scroll_to(driver)
+        self.bottom_save.click(driver)
+        TestSystem.wait(HS_SUBMIT)
+
+    @classmethod
+    def is_finishable(self, driver):
+        self.bottom_finish.scroll_to(driver)
+        finishable = self.bottom_finish.get_attribute(driver, "disabled") == None \
+            or self.bottom_finish.get_attribute(driver, "disabled") != "disabled"
+        return finishable
+
+    @classmethod
+    def finish_submission(self, driver):
+        self.bottom_finish.invisible_scroll_to(driver)
+        self.bottom_finish.click(driver)
 
 
 

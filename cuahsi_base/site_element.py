@@ -42,6 +42,22 @@ class SiteElement:
             raise e
 
         return target_el
+    
+    def loc_invisible(self, driver):
+        """
+        Identifies element on page, based on an element locator.
+        """
+        wait = WebDriverWait(driver, 10)
+        try:
+            target_el = wait.until(EC.presence_of_element_located((self.by, self.locator)))
+        except TimeoutException as e:
+            print(
+                "\nUnable to locate element by {}, "
+                "locator: '{}'".format(self.by, self.locator)
+            )
+            raise e
+
+        return target_el
 
     def exists(self, driver):
         """
@@ -90,11 +106,37 @@ class SiteElement:
         """
         target_el = self.loc_it(driver)
         driver.execute_script("arguments[0].click();", target_el)
+    
+    def javascript_click_invisible(self, driver):
+        """
+        Clicks an element using JavaScript
+        """
+        target_el = self.loc_invisible(driver)
+        driver.execute_script("arguments[0].click();", target_el)
+    
+    def javascript_fill_text(self, driver, text):
+        """
+        Set text using JavaScript
+        """
+        target_el = self.loc_invisible(driver)
+        driver.execute_script(f'arguments[0].value="{text}";', target_el)
 
     def submit(self, driver):
         """Send ENTER to element, simulates submit"""
         target_el = self.loc_it(driver)
         target_el.send_keys(Keys.ENTER)
+    
+    def submit_invisible(self, driver):
+        """Send ENTER to element, simulates submit"""
+        actions = ActionChains(driver)
+        target_el = self.loc_invisible(driver)
+        actions.key_down(Keys.ENTER)
+        actions.key_up(Keys.ENTER)
+        # actions.key_down(Keys.TAB)
+        # actions.key_up(Keys.TAB)
+        actions.perform()
+        # target_el = self.loc_invisible(driver)
+        # target_el.send_keys(Keys.ENTER)
 
     def multi_click(self, driver):
         """Clicks an element while holding the control key, as to enable
@@ -126,6 +168,14 @@ class SiteElement:
         or not
         """
         target_el = self.loc_it(driver)
+        ActionChains(driver).move_to_element(target_el).click(target_el).perform()
+    
+    def click_invisible(self, driver):
+        """Identifies an element on the page.  After identification
+        the element is then clicked, regardless if it is "interactable"
+        or not
+        """
+        target_el = self.loc_invisible(driver)
         ActionChains(driver).move_to_element(target_el).click(target_el).perform()
 
     def clear_all_text(self, driver):
@@ -160,6 +210,13 @@ class SiteElement:
         select_el = Select(target_el)
         select_el.select_by_visible_text(select_choice)
 
+    def invisible_scroll_to(self, driver):
+        """After element identification, the window is scrolled
+        such that the element becomes visible in the window
+        """
+        target_el = self.loc_invisible(driver)
+        target_el.location_once_scrolled_into_view
+    
     def scroll_to(self, driver):
         """After element identification, the window is scrolled
         such that the element becomes visible in the window
@@ -186,6 +243,14 @@ class SiteElement:
         element using send keys
         """
         target_el = self.loc_it(driver)
+        for i in range(0, len(field_text)):
+            target_el.send_keys(field_text[i])
+    
+    def inject_invisible_text(self, driver, field_text):
+        """Enters text into a field or other input-capable html
+        element that is hidden using send keys
+        """
+        target_el = self.loc_invisible(driver)
         for i in range(0, len(field_text)):
             target_el.send_keys(field_text[i])
 
