@@ -169,14 +169,6 @@ class SiteElement:
         """
         target_el = self.loc_it(driver)
         ActionChains(driver).move_to_element(target_el).click(target_el).perform()
-    
-    def click_invisible(self, driver):
-        """Identifies an element on the page.  After identification
-        the element is then clicked, regardless if it is "interactable"
-        or not
-        """
-        target_el = self.loc_invisible(driver)
-        ActionChains(driver).move_to_element(target_el).click(target_el).perform()
 
     def clear_all_text(self, driver):
         """Uses the Ctrl+A keys combination to select all text before using

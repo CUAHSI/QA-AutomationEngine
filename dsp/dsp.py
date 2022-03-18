@@ -1,5 +1,4 @@
 """ Runs various smoke tests for the data submission portal """
-from doctest import TestResults
 import boto3
 import inspect
 import json
