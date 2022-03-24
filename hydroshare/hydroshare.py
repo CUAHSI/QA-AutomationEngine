@@ -1528,7 +1528,7 @@ class HydroshareTestSuite(BaseTestSuite):
         LandingPage.to_login(self.driver)
         Login.login(self.driver, USERNAME, PASSWORD)
         Home.create_resource(self.driver, "ToolResource")
-        NewResource.configure(self.driver, "TEST120 Web App")
+        NewResource.configure(self.driver, "Web App (TEST 120)")
         NewResource.create(self.driver)
 
         img_url = "https://upload.wikimedia.org/wikipedia/commons/0/02/SVG_logo.svg"
@@ -1542,7 +1542,7 @@ class HydroshareTestSuite(BaseTestSuite):
         LandingPage.to_login(self.driver)
         Login.login(self.driver, USERNAME, PASSWORD)
         Home.create_resource(self.driver, "ToolResource")
-        NewResource.configure(self.driver, "TEST121 Web App")
+        NewResource.configure(self.driver, "Web App (TEST 121)")
         NewResource.create(self.driver)
         img_url = "https://duckduckgo.com/favicon.ico"
         WebApp.add_photo_by_url(self.driver, img_url)
@@ -1560,7 +1560,7 @@ class HydroshareTestSuite(BaseTestSuite):
         LandingPage.to_login(self.driver)
         Login.login(self.driver, USERNAME, PASSWORD)
         Home.create_resource(self.driver, "CompositeResource")
-        NewResource.configure(self.driver, "Zip folder test")
+        NewResource.configure(self.driver, "Zip folder test (TEST 122)")
         NewResource.create(self.driver)
         Resource.create_folder(self.driver, folder_name)
         folder_index = Resource.get_file_index_by_name(self.driver, folder_name)
@@ -1584,9 +1584,8 @@ class HydroshareTestSuite(BaseTestSuite):
                 "keywords": ["test", "QA", "CUAHSI"],
             },
         )
-        resource_id = r.json()["resource_id"]
-        files = {"file": open(folder_name, "rb")}
 
+        # get a large zip that we can test with
         if not os.path.exists(folder_name):
             if "localhost" in BASE_URL:
                 # local instance might not have the Beaver Divide so get it from Beta
@@ -1603,6 +1602,8 @@ class HydroshareTestSuite(BaseTestSuite):
                     folder_name,
                 )
 
+        resource_id = r.json()["resource_id"]
+        files = {"file": open(folder_name, "rb")}
         r = requests.post(
             BASE_URL + "/hsapi/resource/{}/files/".format(resource_id),
             auth=(USERNAME, PASSWORD),
@@ -1617,6 +1618,17 @@ class HydroshareTestSuite(BaseTestSuite):
         Resource.wait_on_task_completion(self.driver, 1, 30)
         unzip_index = Resource.get_file_index_by_name(self.driver, folder_name)
         self.assertGreaterEqual(unzip_index, 1)
+
+    def test_B_000124(self):
+        """Confirm that duplicate authors are not permitted on a resource"""
+        LandingPage.to_login(self.driver)
+        Login.login(self.driver, USERNAME, PASSWORD)
+        Home.create_resource(self.driver, "CompositeResource")
+        NewResource.configure(self.driver, "Duplicate Author (TEST 124)")
+        NewResource.create(self.driver)
+        Resource.add_dup_authors(self.driver, "CZO")
+        error_text = Resource.check_author_warning(self.driver)
+        self.assertIn("author", error_text)
 
 
 class PerformanceTestSuite(BaseTestSuite):

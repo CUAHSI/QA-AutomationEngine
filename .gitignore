@@ -3,6 +3,7 @@ propsfile
 *.log
 __pycache__
 .idea/
+.vscode
 
 node_modules
 build
