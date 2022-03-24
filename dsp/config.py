@@ -1,4 +1,4 @@
-BASE_URL = "https://localhost"
+BASE_URL = "https://dsp-alpha.criticalzone.org/"
 USERNAME = "jmcuahsi@gmail.com"
 PASSWORD = "62meister"
 
