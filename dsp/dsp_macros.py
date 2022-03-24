@@ -248,7 +248,22 @@ class SubmitHydroshare(Dsp):
     def autofill_required_elements(self, driver, auto):
         self.fill_basic_info(driver, auto, auto, auto)
         self.fill_funding_agency(driver, auto)
-        self.save_bottom(driver)
+    
+    @classmethod
+    def unfill_text_element_by_name(self, driver, element):
+        self.header.scroll_to(driver)
+        eval("self.{}.scroll_to(driver)".format(element))
+        eval("self.{}.click(driver)".format(element))
+        eval("self.{}.clear_all_text(driver)".format(element))
+        self.header.scroll_to(driver)
+    
+    @classmethod
+    def fill_text_element_by_name(self, driver, element, text_to_fill):
+        self.header.scroll_to(driver)
+        eval("self.{}.scroll_to(driver)".format(element))
+        eval("self.{}.click(driver)".format(element))
+        eval("self.{}.inject_text(driver, '{}')".format(element, text_to_fill))
+        self.header.scroll_to(driver)
 
     @classmethod
     def fill_basic_info(self, driver, title, abstract, subject_keyword_input):
@@ -336,11 +351,10 @@ class EditHSSubmission(SubmitHydroshare):
                     return False
             return True
     
-        
     @classmethod
-    def get_keyword_text(self, driver, number):
+    def get_keyword_text(self, driver, index):
         #TODO: this test fails because this CSS selector doesn't work for any but the first span
-        span = SiteElement(By.CSS_SELECTOR, "div.v-select__selections span.v-chip__content:nth-of-type({})".format(number))
+        span = SiteElement(By.CSS_SELECTOR, "div.v-select__selections span.v-chip__content:nth-of-type({})".format(index))
         return span.get_text(driver)
 
 class Utilities:
