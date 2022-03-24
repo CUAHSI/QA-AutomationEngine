@@ -300,7 +300,7 @@ class EditHSSubmission(SubmitHydroshare):
     
     @classmethod
     def check_required_elements(self, driver, auto):
-        if not self.check_basic_info(driver, auto, auto, auto):
+        if not self.check_basic_info(driver, auto, auto, ["CZNet", auto]):
             return False
         if not self.check_funding_agency(driver, auto):
             return False
@@ -324,11 +324,24 @@ class EditHSSubmission(SubmitHydroshare):
     @classmethod
     def check_keywords(self, driver, keywords=None):
         if isinstance(keywords, str):
-            return True
+            text = self.get_keyword_text(driver, 1)
+            if text != keywords:
+                print(f"\nThe keyword text is: {text}")
+                return False
         else:
-            for keyword in keywords:
-                todo="much"
+            for idx, keyword in enumerate(keywords):
+                text = self.get_keyword_text(driver, idx+1)
+                if text != keyword:
+                    print(f"\nThe keyword text is: {text}")
+                    return False
             return True
+    
+        
+    @classmethod
+    def get_keyword_text(self, driver, number):
+        #TODO: this test fails because this CSS selector doesn't work for any but the first span
+        span = SiteElement(By.CSS_SELECTOR, "div.v-select__selections span.v-chip__content:nth-of-type({})".format(number))
+        return span.get_text(driver)
 
 class Utilities:
     run_test = SiteElement(By.ID, "run-test")
