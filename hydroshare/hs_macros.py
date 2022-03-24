@@ -1476,6 +1476,17 @@ class Resource(Hydroshare):
             self.add_author_input.inject_text(driver, username)
             self.add_author_select.click(driver)
             self.add_author_save.click(driver)
+            self.wait_on_author_save(driver, 3)
+
+    @classmethod
+    def wait_on_author_save(self, driver, timeout):
+        waited = 0
+        while waited < timeout:
+            if self.add_author_button.is_visible(driver):
+                return
+            else:
+                time.sleep(1)
+                waited += 1
 
     @classmethod
     def check_author_warning(self, driver):
