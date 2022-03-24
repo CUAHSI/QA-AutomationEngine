@@ -1,4 +1,4 @@
-BASE_URL = "https://dsp-beta.criticalzone.org/"
+BASE_URL = "https://localhost"
 USERNAME = "jmcuahsi@gmail.com"
 PASSWORD = "62meister"
 

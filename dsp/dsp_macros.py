@@ -152,6 +152,7 @@ class MySubmissions(Dsp):
     top_submission_date = SiteElement(By.ID, "sub-0-date")
     sort_order_select = SiteElement(By.ID, "sort-order")
     my_submissions_search = SiteElement(By.ID, "my_submissions_search")
+    top_submission_edit = SiteElement(By.ID, "sub-0-edit")
 
     @classmethod
     def get_title(self, driver):
@@ -181,6 +182,10 @@ class MySubmissions(Dsp):
     @classmethod
     def enter_text_in_search(self, driver, field_text):
         self.my_submissions_search.inject_text(driver, field_text)
+    
+    @classmethod
+    def edit_top_submission(self, driver):
+        self.top_submission_edit.click(driver)
 
 
 class SubmitLandingPage(Dsp):
@@ -218,9 +223,8 @@ class SubmitHydroshare(Dsp):
     top_save = SiteElement(By.CSS_SELECTOR, "#cz-new-submission-actions-top button.submission-save")
     title =  SiteElement(By.ID, "#/properties/title-input")
     abstract = SiteElement(By.ID, "#/properties/abstract-input")
-    # subject_keywords = SiteElement(By.ID, "#/properties/subjects-input")
-    subject_keywords = SiteElement(By.CSS_SELECTOR, 'input[id="#/properties/subjects-input"]:nth-of-type(1)')
-    # subject_keywords = SiteElement(By.CSS_SELECTOR, ".v-select__selections")
+    subject_keyword_input = SiteElement(By.CSS_SELECTOR, 'input[id="#/properties/subjects-input"]:nth-of-type(1)')
+    subject_keywords = SiteElementsCollection(By.CSS_SELECTOR, 'span.v-chip__content')
     bottom_save = SiteElement(By.CSS_SELECTOR, "#cz-new-submission-actions-bottom button.submission-save")
     bottom_finish = SiteElement(By.CSS_SELECTOR, "#cz-new-submission-actions-bottom button.submission-finish")
 
@@ -245,21 +249,20 @@ class SubmitHydroshare(Dsp):
         self.fill_basic_info(driver, auto, auto, auto)
         self.fill_funding_agency(driver, auto)
         self.save_bottom(driver)
-            
 
     @classmethod
-    def fill_basic_info(self, driver, title, abstract, subject_keywords):
+    def fill_basic_info(self, driver, title, abstract, subject_keyword_input):
         self.title.scroll_to(driver)
         self.title.inject_text(driver, title)
         self.abstract.inject_text(driver, abstract)
-        self.subject_keywords.javascript_click_invisible(driver)
-        if isinstance(subject_keywords, str):
-            self.subject_keywords.inject_invisible_text(driver, subject_keywords)
-            self.subject_keywords.submit_invisible(driver)
+        self.subject_keyword_input.javascript_click_invisible(driver)
+        if isinstance(subject_keyword_input, str):
+            self.subject_keyword_input.inject_invisible_text(driver, subject_keyword_input)
+            self.subject_keyword_input.submit_invisible(driver)
         else:
-            for keyword in subject_keywords:
-                self.subject_keywords.inject_invisible_text(driver, keyword)
-                self.subject_keywords.submit_invisible(driver)
+            for keyword in subject_keyword_input:
+                self.subject_keyword_input.inject_invisible_text(driver, keyword)
+                self.subject_keyword_input.submit_invisible(driver)
     
     @classmethod
     def fill_funding_agency(self, driver, agency):
@@ -288,6 +291,44 @@ class SubmitHydroshare(Dsp):
 
 
 
+class EditHSSubmission(SubmitHydroshare):
+    header_title = SiteElement(By.CSS_SELECTOR, ".text-h4")
+    
+    @classmethod
+    def get_header_title(self, driver):
+        return self.header_title.get_text(driver)
+    
+    @classmethod
+    def check_required_elements(self, driver, auto):
+        if not self.check_basic_info(driver, auto, auto, auto):
+            return False
+        if not self.check_funding_agency(driver, auto):
+            return False
+        return True
+    
+    @classmethod
+    def check_funding_agency(self, driver, agency):
+        self.expand_funding_agency.scroll_to(driver)
+        return self.agency_name.get_value(driver) == agency
+    
+    @classmethod
+    def check_basic_info(self, driver, title, abstract, keywords):
+        self.title.scroll_to(driver)
+        if self.title.get_value(driver) != title:
+            return False
+        self.abstract.scroll_to(driver)
+        if self.abstract.get_value(driver) != abstract:
+            return False
+        return self.check_keywords(driver, keywords)
+    
+    @classmethod
+    def check_keywords(self, driver, keywords=None):
+        if isinstance(keywords, str):
+            return True
+        else:
+            for keyword in keywords:
+                todo="much"
+            return True
 
 class Utilities:
     run_test = SiteElement(By.ID, "run-test")

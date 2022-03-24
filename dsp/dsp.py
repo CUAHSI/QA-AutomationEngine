@@ -20,7 +20,8 @@ from dsp_macros import (
     MySubmissions,
     OrcidWindow,
     HydroshareWindow,
-    SubmitHydroshare
+    SubmitHydroshare,
+    EditHSSubmission
 )
 
 from cuahsi_base.cuahsi_base import BaseTestSuite, parse_args_run_tests
@@ -100,8 +101,13 @@ class DspTestSuite(BaseTestSuite):
         # The page isn't sorted upon load 
         MySubmissions.enter_text_in_search(self.driver, auto_text)
         top_name = MySubmissions.get_top_submission_name(self.driver)
-
         self.assertEqual(auto_text, top_name)
+
+        MySubmissions.edit_top_submission(self.driver)
+        self.assertEqual("Edit Submission", EditHSSubmission.get_header_title(self.driver))
+
+        self.assertTrue(EditHSSubmission.check_required_elements(self.driver, auto_text))
+
         
 
     # def test_A_000005(self):
@@ -110,7 +116,7 @@ class DspTestSuite(BaseTestSuite):
     #     SubmitLandingPage.to_hs_submit(self.driver)
     #     title = "test_A_000004--Title"
     #     abstract = "test_A_000004--Abstract"
-    #     subject_keywords = ["test_A_000004-k1"]
+    #     subject_keyword_input = ["test_A_000004-k1"]
 
 
 

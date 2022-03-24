@@ -1049,7 +1049,7 @@ class Resource(Hydroshare):
     abstract = SiteElement(By.ID, "id_abstract")
     abstract_save = SiteElement(By.CSS_SELECTOR, "#div_id_abstract button")
     public_resource_notice = SiteElement(By.ID, "missing-metadata-or-file")
-    subject_keywords = SiteElement(By.ID, "txt-keyword")
+    subject_keyword_input = SiteElement(By.ID, "txt-keyword")
     subject_keyword_save = SiteElement(
         By.CSS_SELECTOR, "#cv-add-keyword-wrapper button"
     )
@@ -1256,7 +1256,7 @@ class Resource(Hydroshare):
 
     @classmethod
     def add_subject_keyword(self, driver, keyword):
-        self.subject_keywords.inject_text(driver, keyword)
+        self.subject_keyword_input.inject_text(driver, keyword)
         self.subject_keyword_save.click(driver)
 
     @classmethod
