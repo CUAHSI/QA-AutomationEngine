@@ -41,6 +41,7 @@ SPAM_DATA_STREAM_CONFIG = Config(
     region_name="us-east-2",
 )
 
+
 # Test cases definition
 class DspTestSuite(BaseTestSuite):
     """Python unittest setup for functional tests"""
@@ -51,21 +52,21 @@ class DspTestSuite(BaseTestSuite):
             self.driver.get(BASE_URL)
         else:
             self.driver.get(self.base_url_arg)
-    
+
     def login_orcid_and_hs(self):
         """Authenticate with orcid and then HS credentials"""
         Dsp.show_mobile_nav(self.driver)
         Dsp.drawer_to_submit(self.driver)
         SubmitLandingPage.hydroshare_repo_select(self.driver)
 
-        #new ORCID window
+        # new ORCID window
         SubmitLandingPage.to_orcid_window(self.driver)
         self.assertIn("ORCID", TestSystem.title(self.driver))
 
         OrcidWindow.fill_credentials(self.driver, USERNAME, PASSWORD)
         OrcidWindow.to_origin_window(self.driver)
 
-        #new HS auth window
+        # new HS auth window
         SubmitLandingPage.to_hs_window(self.driver)
         self.assertIn("HydroShare", TestSystem.title(self.driver))
         HydroshareWindow.authorize_hs_backend(self.driver, HS_USERNAME, HS_PASSWORD)
@@ -77,7 +78,7 @@ class DspTestSuite(BaseTestSuite):
         Dsp.drawer_to_my_submissions(self.driver)
         login_visible = MySubmissions.is_visible_orcid_modal(self.driver)
         self.assertTrue(login_visible)
-    
+
     def test_A_000002(self):
         """Check authentication to submit page"""
         self.login_orcid_and_hs()
@@ -100,7 +101,7 @@ class DspTestSuite(BaseTestSuite):
         self.assertTrue(SubmitHydroshare.is_finishable(self.driver))
         SubmitHydroshare.finish_submission(self.driver)
         self.assertEqual("My Submissions", MySubmissions.get_title(self.driver))
-        
+
         # The page isn't sorted upon load 
         MySubmissions.enter_text_in_search(self.driver, auto_text)
         top_name = MySubmissions.get_top_submission_name(self.driver)
@@ -131,6 +132,7 @@ class DspTestSuite(BaseTestSuite):
             self.assertRaises(BaseException, SubmitHydroshare.is_finishable(self.driver))
             SubmitHydroshare.fill_text_element_by_name(self.driver, text_elem, auto_text)
             self.assertTrue(SubmitHydroshare.is_finishable(self.driver))
+
 
 if __name__ == "__main__":
     parse_args_run_tests(DspTestSuite)
