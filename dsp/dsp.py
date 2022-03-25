@@ -112,11 +112,8 @@ class DspTestSuite(BaseTestSuite):
 
         self.assertTrue(EditHSSubmission.check_required_elements(self.driver, auto_text))
 
-        # TODO: this test fails because of a bad css selector for checking keywords
-        TestSystem.wait()
-
     def test_A_000005(self):
-        """Confirm that one can't submit to HS each required field"""
+        """Confirm that one can't submit to HS without each required field"""
         self.login_orcid_and_hs()
         SubmitLandingPage.to_hs_submit(self.driver)
         auto_text = time.strftime("%d %b %Y %H:%M:%S", time.gmtime())
@@ -131,6 +128,26 @@ class DspTestSuite(BaseTestSuite):
             SubmitHydroshare.fill_text_element_by_name(self.driver, text_elem, auto_text)
             self.assertTrue(SubmitHydroshare.is_finishable(self.driver))
 
+    def test_A_000006(self):
+        """Confirm that CREATOR is populated from HS profile"""
+        self.login_orcid_and_hs()
+        SubmitLandingPage.to_hs_submit(self.driver)
+        auto_text = time.strftime("%d %b %Y %H:%M:%S", time.gmtime())
+        SubmitHydroshare.autofill_required_elements(self.driver, auto_text)
+        SubmitHydroshare.finish_submission(self.driver)
+
+        # The page isn't sorted upon load
+        MySubmissions.enter_text_in_search(self.driver, auto_text)
+        MySubmissions.edit_top_submission(self.driver)
+
+        jmdict = {
+            "name-input": "Meister, Jim",
+            "phone-input": "4444444444",
+            "organization-input": "Freie Universität Berlin;Agricultural University of Warsaw",
+            "email-input": "concretejackbill@gmail.com"
+        }
+        match = EditHSSubmission.check_first_creator(self.driver, jmdict)
+        self.assertTrue(match)
 
 if __name__ == "__main__":
     parse_args_run_tests(DspTestSuite)

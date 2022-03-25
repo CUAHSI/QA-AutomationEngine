@@ -116,18 +116,9 @@ class Dsp(WebPage):
     @classmethod
     def to_orcid_window(self, driver):
         num_windows_now = len(driver.window_handles)
+        self.wait_until_element_visible(driver, self.orcid_login_continue, AUTH_WINDOW)
         self.orcid_login_continue.click(driver)
         External.switch_new_page(driver, num_windows_now, self.body_locator)
-
-    @classmethod
-    def wait_on_save(self, driver):
-        waited = 0
-        while waited < NEW_SUBMISSION_SAVE:
-            if not self.is_saving.is_visible(driver):
-                return
-            else:
-                time.sleep(1)
-                waited += 1
 
     @classmethod
     def wait_until_css_visible(self, driver, css_selector, timeout=DEFAULT_TIMEOUT):
@@ -156,6 +147,28 @@ class Dsp(WebPage):
         waited = 0
         while waited < timeout:
             if element.is_visible(driver):
+                return
+            else:
+                time.sleep(1)
+                waited += 1
+
+    @classmethod
+    def wait_until_element_not_visible(self, driver, element, timeout=DEFAULT_TIMEOUT):
+        waited = 0
+        while waited < timeout:
+            # if not element.is_visible(driver):
+            if not element.is_visible(driver):
+                return
+            else:
+                time.sleep(1)
+                waited += 1
+
+    @classmethod
+    def wait_until_element_not_exist(self, driver, element, timeout=DEFAULT_TIMEOUT):
+        waited = 0
+        while waited < timeout:
+            # if not element.is_visible(driver):
+            if not element.exists(driver):
                 return
             else:
                 time.sleep(1)
@@ -334,7 +347,7 @@ class SubmitHydroshare(Dsp):
     def save_bottom(self, driver):
         self.bottom_save.scroll_to(driver)
         self.bottom_save.click(driver)
-        self.wait_on_save(driver)
+        self.wait_until_element_not_visible(driver, self.is_saving, NEW_SUBMISSION_SAVE)
 
     @classmethod
     def is_finishable(self, driver):
@@ -347,6 +360,8 @@ class SubmitHydroshare(Dsp):
     def finish_submission(self, driver):
         self.bottom_finish.invisible_scroll_to(driver)
         self.bottom_finish.click(driver)
+        self.wait_until_element_not_exist(driver, self.is_saving, NEW_SUBMISSION_SAVE)
+
         self.wait_on_save(driver)
 
 
@@ -366,11 +381,6 @@ class EditHSSubmission(SubmitHydroshare):
         return True
 
     @classmethod
-    def check_funding_agency(self, driver, agency):
-        self.expand_funding_agency.scroll_to(driver)
-        return self.agency_name.get_value(driver) == agency
-
-    @classmethod
     def check_basic_info(self, driver, title, abstract, keywords):
         self.title.scroll_to(driver)
         if self.title.get_value(driver) != title:
@@ -379,6 +389,11 @@ class EditHSSubmission(SubmitHydroshare):
         if self.abstract.get_value(driver) != abstract:
             return False
         return self.check_keywords(driver, keywords)
+
+    @classmethod
+    def check_funding_agency(self, driver, agency):
+        self.expand_funding_agency.scroll_to(driver)
+        return self.agency_name.get_value(driver) == agency
 
     @classmethod
     def check_keywords(self, driver, keywords=None):
@@ -397,9 +412,15 @@ class EditHSSubmission(SubmitHydroshare):
 
     @classmethod
     def get_keyword_text(self, driver, index):
-        # TODO: this test fails because this CSS selector doesn't work for any but the first span
-        span = SiteElement(By.CSS_SELECTOR, "div.v-select__selections span.v-chip__content:nth-of-type({})".format(index))
+        span = SiteElement(By.CSS_SELECTOR, ".v-select__selections span:nth-of-type({}) span.v-chip__content".format(index))
         return span.get_text(driver)
+
+    @classmethod
+    def check_first_creator(self, driver, dict):
+        for k, v in dict.items():
+            if SiteElement(By.ID, "#/properties/"+k).get_value(driver) != v:
+                return False
+        return True
 
 
 class Utilities:
