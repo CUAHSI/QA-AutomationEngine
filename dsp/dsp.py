@@ -47,7 +47,10 @@ class DspTestSuite(BaseTestSuite):
 
     def setUp(self):
         super(DspTestSuite, self).setUp()
-        self.driver.get(BASE_URL)
+        if not self.base_url_arg:
+            self.driver.get(BASE_URL)
+        else:
+            self.driver.get(self.base_url_arg)
     
     def login_orcid_and_hs(self):
         """Authenticate with orcid and then HS credentials"""

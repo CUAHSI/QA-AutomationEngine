@@ -33,6 +33,7 @@ class BaseTestSuite(unittest.TestCase):
     resource = None
     browser = "firefox"
     records = None
+    base_url_arg = None
     data = {}
     past_errors = 0
     past_failures = 0
@@ -141,6 +142,7 @@ def basecli():
     parser.add_argument("--browser")
     parser.add_argument("--resource")
     parser.add_argument("--records")
+    parser.add_argument("--base")
     parser.add_argument("unittest_args", nargs="*")
 
     return parser
@@ -154,6 +156,8 @@ def parse_args_run_tests(test_class):
         test_class.browser = args.browser
     if args.records is not None:
         test_class.records = args.records
+    if args.base is not None:
+        test_class.base_url_arg = args.base
     if args.records == "gcp":
         test_class.publisher = pubsub_v1.PublisherClient()
         test_class.topic_path = test_class.publisher.topic_path(
