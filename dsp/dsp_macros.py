@@ -299,19 +299,15 @@ class SubmitHydroshare(Dsp):
 
     @classmethod
     def unfill_text_element_by_name(self, driver, element):
-        self.header.scroll_to(driver)
         eval("self.{}.scroll_to(driver)".format(element))
-        eval("self.{}.click(driver)".format(element))
+        eval("self.{}.javascript_click(driver)".format(element))
         eval("self.{}.clear_all_text(driver)".format(element))
-        self.header.scroll_to(driver)
 
     @classmethod
     def fill_text_element_by_name(self, driver, element, text_to_fill):
-        self.header.scroll_to(driver)
         eval("self.{}.scroll_to(driver)".format(element))
-        eval("self.{}.click(driver)".format(element))
+        eval("self.{}.javascript_click(driver)".format(element))
         eval("self.{}.inject_text(driver, '{}')".format(element, text_to_fill))
-        self.header.scroll_to(driver)
 
     @classmethod
     def fill_basic_info(self, driver, title, abstract, subject_keyword_input):

@@ -116,17 +116,15 @@ class DspTestSuite(BaseTestSuite):
         TestSystem.wait()
 
     def test_A_000005(self):
-        """Confirm that one can't submit to HS without required fields"""
+        """Confirm that one can't submit to HS each required field"""
         self.login_orcid_and_hs()
         SubmitLandingPage.to_hs_submit(self.driver)
         auto_text = time.strftime("%d %b %Y %H:%M:%S", time.gmtime())
         SubmitHydroshare.autofill_required_elements(self.driver, auto_text)
         self.assertTrue(SubmitHydroshare.is_finishable(self.driver))
 
-        # TODO: this works for abstract, but not for agency or title...
-        # required_text_items = ["abstract", "title", "agency_name"]
-
-        required_text_items = ["abstract"]
+        # TODO: pull required items out of the json schema instead of defining here...
+        required_text_items = ["agency_name", "abstract", "title"]
         for text_elem in required_text_items:
             SubmitHydroshare.unfill_text_element_by_name(self.driver, text_elem)
             self.assertRaises(BaseException, SubmitHydroshare.is_finishable(self.driver))
