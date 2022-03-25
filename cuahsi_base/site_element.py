@@ -42,7 +42,7 @@ class SiteElement:
             raise e
 
         return target_el
-    
+
     def loc_invisible(self, driver):
         """
         Identifies element on page, based on an element locator.
@@ -68,7 +68,7 @@ class SiteElement:
             wait.until(EC.visibility_of_element_located((self.by, self.locator)))
             target_el = wait.until(EC.element_to_be_clickable((self.by, self.locator)))
             return True
-        except TimeoutException as e:
+        except TimeoutException:
             return False
 
     def is_visible(self, driver):
@@ -106,14 +106,14 @@ class SiteElement:
         """
         target_el = self.loc_it(driver)
         driver.execute_script("arguments[0].click();", target_el)
-    
+
     def javascript_click_invisible(self, driver):
         """
         Clicks an element using JavaScript
         """
         target_el = self.loc_invisible(driver)
         driver.execute_script("arguments[0].click();", target_el)
-    
+
     def javascript_fill_text(self, driver, text):
         """
         Set text using JavaScript
@@ -125,18 +125,13 @@ class SiteElement:
         """Send ENTER to element, simulates submit"""
         target_el = self.loc_it(driver)
         target_el.send_keys(Keys.ENTER)
-    
+
     def submit_invisible(self, driver):
         """Send ENTER to element, simulates submit"""
         actions = ActionChains(driver)
-        target_el = self.loc_invisible(driver)
         actions.key_down(Keys.ENTER)
         actions.key_up(Keys.ENTER)
-        # actions.key_down(Keys.TAB)
-        # actions.key_up(Keys.TAB)
         actions.perform()
-        # target_el = self.loc_invisible(driver)
-        # target_el.send_keys(Keys.ENTER)
 
     def multi_click(self, driver):
         """Clicks an element while holding the control key, as to enable
@@ -208,7 +203,7 @@ class SiteElement:
         """
         target_el = self.loc_invisible(driver)
         target_el.location_once_scrolled_into_view
-    
+
     def scroll_to(self, driver):
         """After element identification, the window is scrolled
         such that the element becomes visible in the window
@@ -237,7 +232,7 @@ class SiteElement:
         target_el = self.loc_it(driver)
         for i in range(0, len(field_text)):
             target_el.send_keys(field_text[i])
-    
+
     def inject_invisible_text(self, driver, field_text):
         """Enters text into a field or other input-capable html
         element that is hidden using send keys

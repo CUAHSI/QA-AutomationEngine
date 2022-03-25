@@ -102,7 +102,7 @@ class DspTestSuite(BaseTestSuite):
         SubmitHydroshare.finish_submission(self.driver)
         self.assertEqual("My Submissions", MySubmissions.get_title(self.driver))
 
-        # The page isn't sorted upon load 
+        # The page isn't sorted upon load
         MySubmissions.enter_text_in_search(self.driver, auto_text)
         top_name = MySubmissions.get_top_submission_name(self.driver)
         self.assertEqual(auto_text, top_name)

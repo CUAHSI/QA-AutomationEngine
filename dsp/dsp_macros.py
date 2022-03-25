@@ -22,7 +22,8 @@ from timing import (
     MY_SUBMISSIONS_LOAD,
     RETURN_PREVIOUS,
     AUTH_WINDOW,
-    HS_SUBMIT
+    NEW_SUBMISSION_SAVE,
+    DEFAULT_TIMEOUT
 )
 
 
@@ -50,6 +51,7 @@ class Dsp(WebPage):
     navigation_submit = SiteElement(By.ID, "navbar-nav-SubmitData")
     navigation_about = SiteElement(By.ID, "navbar-nav-About")
     navigation_contact = SiteElement(By.ID, "navbar-nav-Contact")
+    is_saving = SiteElement(By.ID, "new-submission-saving")
 
     # responsive
     navigation_hamburger = SiteElement(By.CSS_SELECTOR, "#app-bar .v-app-bar__nav-icon")
@@ -80,12 +82,12 @@ class Dsp(WebPage):
     @classmethod
     def to_my_submissions(self, driver):
         self.navigation_my_submissions.click(driver)
-        TestSystem.wait(MY_SUBMISSIONS_LOAD)
+        self.wait_until_element_visible(MySubmissions.title, MY_SUBMISSIONS_LOAD)
 
     @classmethod
     def drawer_to_my_submissions(self, driver):
         self.drawer_nav_my_submissions.click(driver)
-        TestSystem.wait(MY_SUBMISSIONS_LOAD)
+        self.wait_until_element_visible(MySubmissions.title, MY_SUBMISSIONS_LOAD)
 
     @classmethod
     def drawer_to_submit(self, driver):
@@ -117,6 +119,48 @@ class Dsp(WebPage):
         self.orcid_login_continue.click(driver)
         External.switch_new_page(driver, num_windows_now, self.body_locator)
 
+    @classmethod
+    def wait_on_save(self, driver):
+        waited = 0
+        while waited < NEW_SUBMISSION_SAVE:
+            if not self.is_saving.is_visible(driver):
+                return
+            else:
+                time.sleep(1)
+                waited += 1
+
+    @classmethod
+    def wait_until_css_visible(self, driver, css_selector, timeout=DEFAULT_TIMEOUT):
+        element = SiteElement(By.CSS_SELECTOR, css_selector)
+        waited = 0
+        while waited < timeout:
+            if element.is_visible(driver):
+                return
+            else:
+                time.sleep(1)
+                waited += 1
+
+    @classmethod
+    def wait_until_css_dissapear(self, driver, css_selector, timeout=DEFAULT_TIMEOUT):
+        element = SiteElement(By.CSS_SELECTOR, css_selector)
+        waited = 0
+        while waited < timeout:
+            if not element.is_visible(driver):
+                return
+            else:
+                time.sleep(1)
+                waited += 1
+
+    @classmethod
+    def wait_until_element_visible(self, driver, element, timeout=DEFAULT_TIMEOUT):
+        waited = 0
+        while waited < timeout:
+            if element.is_visible(driver):
+                return
+            else:
+                time.sleep(1)
+                waited += 1
+
 
 class OrcidWindow(WebPage):
     """ Orcid window"""
@@ -136,7 +180,7 @@ class HydroshareWindow(WebPage):
     username = SiteElement(By.ID, "id_username")
     password = SiteElement(By.ID, "id_password")
     submit = SiteElement(By.CSS_SELECTOR, ".account-form .btn-primary")
-    authorize =  SiteElement(By.CSS_SELECTOR, '#authorizationForm input[name="allow"]')
+    authorize = SiteElement(By.CSS_SELECTOR, '#authorizationForm input[name="allow"]')
 
     @classmethod
     def authorize_hs_backend(self, driver, username, password):
@@ -294,12 +338,12 @@ class SubmitHydroshare(Dsp):
     def save_bottom(self, driver):
         self.bottom_save.scroll_to(driver)
         self.bottom_save.click(driver)
-        TestSystem.wait(HS_SUBMIT)
+        self.wait_on_save(driver)
 
     @classmethod
     def is_finishable(self, driver):
         self.bottom_finish.scroll_to(driver)
-        finishable = self.bottom_finish.get_attribute(driver, "disabled") == None \
+        finishable = self.bottom_finish.get_attribute(driver, "disabled") is None \
             or self.bottom_finish.get_attribute(driver, "disabled") != "disabled"
         return finishable
 
@@ -307,6 +351,7 @@ class SubmitHydroshare(Dsp):
     def finish_submission(self, driver):
         self.bottom_finish.invisible_scroll_to(driver)
         self.bottom_finish.click(driver)
+        self.wait_on_save(driver)
 
 
 class EditHSSubmission(SubmitHydroshare):
