@@ -292,6 +292,7 @@ class SubmitHydroshare(Dsp):
     # required_elements = SiteElementsCollection(By.CSS_SELECTOR, "input[required='required']")
     expand_funding_agency = SiteElement(By.CSS_SELECTOR, 'button[aria-label*="Funding agency"]')
     agency_name = SiteElement(By.ID, "#/properties/funding_agency_name-input")
+    expand_contributors = SiteElement(By.CSS_SELECTOR, 'button[aria-label*="Contributors"]')
     rights_statement = SiteElement(By.ID, "#/properties/statement-input")
     rights_url = SiteElement(By.ID, "#/properties/url-input")
 
@@ -363,6 +364,11 @@ class SubmitHydroshare(Dsp):
         self.agency_name.submit(driver)
 
     @classmethod
+    def click_expand_contributors(self, driver):
+        self.expand_contributors.scroll_to(driver)
+        self.expand_contributors.javascript_click(driver)
+
+    @classmethod
     def save_bottom(self, driver):
         self.bottom_save.scroll_to(driver)
         self.bottom_save.click(driver)
@@ -399,7 +405,7 @@ class SubmitHydroshare(Dsp):
         return True
 
     @classmethod
-    def fill_agency(self, driver, dict):
+    def fill_text_elements_by_dict(self, driver, dict):
         for k, v in dict.items():
             element = SiteElement(By.ID, "#/properties/"+k)
             if element.exists_in_dom(driver):
@@ -464,7 +470,9 @@ class EditHSSubmission(SubmitHydroshare):
     @classmethod
     def check_fields_by_dict(self, driver, dict):
         for k, v in dict.items():
-            if SiteElement(By.ID, "#/properties/"+k).get_value(driver) != v:
+            value = SiteElement(By.ID, "#/properties/"+k).get_value(driver)
+            if value != v:
+                print(f"\nMismatch when checking field: {k}. Expected {v} got {value}")
                 return False
         return True
 

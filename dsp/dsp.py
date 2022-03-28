@@ -185,10 +185,9 @@ class DspTestSuite(BaseTestSuite):
         temporal_dict = {
             "start-input": "2022-03-25T01:00",
             "end-input": "2022-04-25T02:00",
-            "name2-input": "Meister, Jim",
+            "name-input": auto_text+"Meister, Jim",
         }
         # TODO: this test fills the date/times but they fail to submit
-        # Also the name input fails to show in the DOM for selenium
         success_filling = SubmitHydroshare.fill_temporal(self.driver, temporal_dict)
         self.assertTrue(success_filling)
         SubmitHydroshare.finish_submission(self.driver)
@@ -196,6 +195,13 @@ class DspTestSuite(BaseTestSuite):
         # The page isn't sorted upon load
         MySubmissions.enter_text_in_search(self.driver, auto_text)
         MySubmissions.edit_top_submission(self.driver)
+
+        # TODO: because of dynamic ids in jsonforms, we have to iterate the name id
+        # this needs to be fixed in VUE or json-forms. This should be removed once 
+        # that is patched in jsonforms
+        name = temporal_dict.pop("name-input")
+        name = {"name2-input": name}
+        self.assertTrue(EditHSSubmission.check_fields_by_dict(self.driver, name))
 
         match = EditHSSubmission.check_fields_by_dict(self.driver, temporal_dict)
         self.assertTrue(match)
@@ -207,11 +213,11 @@ class DspTestSuite(BaseTestSuite):
         auto_text = time.strftime("%d %b %Y %H:%M:%S", time.gmtime())
         SubmitHydroshare.autofill_required_elements(self.driver, auto_text)
         agency_dict = {
-            "title2-input": "Funding Agency title2-input",
+            "title2-input": auto_text+"Funding Agency title2-input",
             "number-input": "5",
-            "funding_agency_url-input": "http://funding-agency.com",
+            "funding_agency_url-input": "http://funding-agency.com/"+auto_text,
         }
-        success = SubmitHydroshare.fill_agency(self.driver, agency_dict)
+        success = SubmitHydroshare.fill_text_elements_by_dict(self.driver, agency_dict)
         self.assertTrue(success)
         SubmitHydroshare.finish_submission(self.driver)
 
@@ -222,5 +228,41 @@ class DspTestSuite(BaseTestSuite):
         match = EditHSSubmission.check_fields_by_dict(self.driver, agency_dict)
         self.assertTrue(match)
 
+    def test_A_000010(self):
+        """Confirm that Contributors info persists from submit to edit"""
+        self.login_orcid_and_hs()
+        SubmitLandingPage.to_hs_submit(self.driver)
+        auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
+        SubmitHydroshare.autofill_required_elements(self.driver, auto_text)
+        contributor_dict = {
+            "name2-input": auto_text+"Contributor name2-input",
+            "phone-input": "1234567890",
+            "address-input": "contributor address "+auto_text,
+            "organization-input": "contributor org "+auto_text,
+            "email-input": auto_text + "@gmail.com",
+            "homepage-input": "http://contibutor_homepage.com/"+auto_text,
+        }
+        SubmitHydroshare.click_expand_contributors(self.driver)
+        success = SubmitHydroshare.fill_text_elements_by_dict(self.driver, contributor_dict)
+        self.assertTrue(success)
+        SubmitHydroshare.finish_submission(self.driver)
+
+        # The page isn't sorted upon load
+        MySubmissions.enter_text_in_search(self.driver, auto_text)
+        MySubmissions.edit_top_submission(self.driver)
+
+        # TODO: because of dynamic ids in jsonforms, we have to iterate the name id
+        # this needs to be fixed in VUE or json-forms. This should be removed once 
+        # that is patched in jsonforms
+        contributor_dict = {
+            "name2-input": auto_text+"Contributor name2-input",
+            "phone2-input": "1234567890",
+            "address2-input": "contributor address "+auto_text,
+            "organization2-input": "contributor org "+auto_text,
+            "email2-input": auto_text + "@gmail.com",
+            "homepage2-input": "http://contibutor_homepage.com/"+auto_text,
+        }
+        match = EditHSSubmission.check_fields_by_dict(self.driver, contributor_dict)
+        self.assertTrue(match)
 if __name__ == "__main__":
     parse_args_run_tests(DspTestSuite)
