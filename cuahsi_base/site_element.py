@@ -70,6 +70,18 @@ class SiteElement:
             return True
         except TimeoutException:
             return False
+    
+    def exists_in_dom(self, driver):
+        """
+        Checks if element is visible on the page.
+        """
+        wait = WebDriverWait(driver, 3)
+        try:
+            # wait.until(EC.presence_of_element_located((self.by, self.locator)))
+            target_el = wait.until(EC.presence_of_element_located((self.by, self.locator)))
+            return True
+        except TimeoutException:
+            return False
 
     def is_visible(self, driver):
         """
@@ -310,6 +322,12 @@ class SiteElement:
         """
         target_el = self.loc_it(driver)
         return len(target_el.find_elements_by_xpath(".//*"))
+
+    def get_parent(self, driver):
+        """Returns the parent element
+        """
+        target_el = self.loc_invisible(driver)
+        return target_el.find_element_by_xpath("..")
 
     def get_immediate_child_count(self, driver):
         """Returns the number of immediate child elements, given a parent

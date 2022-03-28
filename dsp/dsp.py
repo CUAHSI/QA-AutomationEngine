@@ -121,11 +121,14 @@ class DspTestSuite(BaseTestSuite):
         self.assertTrue(SubmitHydroshare.is_finishable(self.driver))
 
         # TODO: pull required items out of the json schema instead of defining here...
-        required_text_items = ["agency_name", "abstract", "title"]
+        required_text_items = ["agency_name", "abstract", "title", "rights_statement", "rights_url"]
         for text_elem in required_text_items:
             SubmitHydroshare.unfill_text_element_by_name(self.driver, text_elem)
             self.assertRaises(BaseException, SubmitHydroshare.is_finishable(self.driver))
-            SubmitHydroshare.fill_text_element_by_name(self.driver, text_elem, auto_text)
+            if "url" in text_elem:
+                SubmitHydroshare.fill_text_element_by_name(self.driver, text_elem, "http://"+auto_text)
+            else:
+                SubmitHydroshare.fill_text_element_by_name(self.driver, text_elem, auto_text)
             self.assertTrue(SubmitHydroshare.is_finishable(self.driver))
 
     def test_A_000006(self):
@@ -140,13 +143,83 @@ class DspTestSuite(BaseTestSuite):
         MySubmissions.enter_text_in_search(self.driver, auto_text)
         MySubmissions.edit_top_submission(self.driver)
 
-        jmdict = {
+        profile_dict = {
             "name-input": "Meister, Jim",
             "phone-input": "4444444444",
             "organization-input": "Freie Universität Berlin;Agricultural University of Warsaw",
             "email-input": "concretejackbill@gmail.com"
         }
-        match = EditHSSubmission.check_first_creator(self.driver, jmdict)
+        match = EditHSSubmission.check_fields_by_dict(self.driver, profile_dict)
+        self.assertTrue(match)
+
+    def test_A_000007(self):
+        """Confirm that Basic Info persists from submit to edit"""
+        self.login_orcid_and_hs()
+        SubmitLandingPage.to_hs_submit(self.driver)
+        auto_text = time.strftime("%d %b %Y %H:%M:%S", time.gmtime())
+        basic_info_dict = {
+            "title-input": auto_text+"title-input",
+            "abstract-input": auto_text+"abstract-input",
+            "subjects-input": ["keyword1", "keyword2"],
+            "funding_agency_name-input": auto_text+"funding_agency_name-input"
+        }
+        SubmitHydroshare.autofill_required_elements(self.driver, basic_info_dict)
+        SubmitHydroshare.finish_submission(self.driver)
+
+        # The page isn't sorted upon load
+        MySubmissions.enter_text_in_search(self.driver, auto_text+"title-input")
+        MySubmissions.edit_top_submission(self.driver)
+
+        keywords = basic_info_dict.pop("subjects-input")
+        keywords.insert(0, "CZNet")
+        match = EditHSSubmission.check_fields_by_dict(self.driver, basic_info_dict)
+        self.assertTrue(match)
+        self.assertTrue(EditHSSubmission.check_keywords(self.driver, keywords))
+
+    def test_A_000008(self):
+        """Confirm that Temporal coverage persists from submit to edit"""
+        self.login_orcid_and_hs()
+        SubmitLandingPage.to_hs_submit(self.driver)
+        auto_text = time.strftime("%d %b %Y %H:%M:%S", time.gmtime())
+        # SubmitHydroshare.autofill_required_elements(self.driver, auto_text)
+        temporal_dict = {
+            "start-input": "2022-03-25T01:00",
+            "end-input": "2022-04-25T02:00",
+            "name2-input": "Meister, Jim",
+        }
+        # TODO: this test fills the date/times but they fail to submit
+        # Also the name input fails to show in the DOM for selenium
+        success_filling = SubmitHydroshare.fill_temporal(self.driver, temporal_dict)
+        self.assertTrue(success_filling)
+        SubmitHydroshare.finish_submission(self.driver)
+
+        # The page isn't sorted upon load
+        MySubmissions.enter_text_in_search(self.driver, auto_text)
+        MySubmissions.edit_top_submission(self.driver)
+
+        match = EditHSSubmission.check_fields_by_dict(self.driver, temporal_dict)
+        self.assertTrue(match)
+
+    def test_A_000009(self):
+        """Confirm that Funding Agency info persists from submit to edit"""
+        self.login_orcid_and_hs()
+        SubmitLandingPage.to_hs_submit(self.driver)
+        auto_text = time.strftime("%d %b %Y %H:%M:%S", time.gmtime())
+        SubmitHydroshare.autofill_required_elements(self.driver, auto_text)
+        agency_dict = {
+            "title2-input": "Funding Agency title2-input",
+            "number-input": "5",
+            "funding_agency_url-input": "http://funding-agency.com",
+        }
+        success = SubmitHydroshare.fill_agency(self.driver, agency_dict)
+        self.assertTrue(success)
+        SubmitHydroshare.finish_submission(self.driver)
+
+        # The page isn't sorted upon load
+        MySubmissions.enter_text_in_search(self.driver, auto_text)
+        MySubmissions.edit_top_submission(self.driver)
+
+        match = EditHSSubmission.check_fields_by_dict(self.driver, agency_dict)
         self.assertTrue(match)
 
 if __name__ == "__main__":

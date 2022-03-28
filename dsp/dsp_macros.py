@@ -292,6 +292,13 @@ class SubmitHydroshare(Dsp):
     # required_elements = SiteElementsCollection(By.CSS_SELECTOR, "input[required='required']")
     expand_funding_agency = SiteElement(By.CSS_SELECTOR, 'button[aria-label*="Funding agency"]')
     agency_name = SiteElement(By.ID, "#/properties/funding_agency_name-input")
+    rights_statement = SiteElement(By.ID, "#/properties/statement-input")
+    rights_url = SiteElement(By.ID, "#/properties/url-input")
+
+    # Temporal
+    name2_input = SiteElement(By.ID, "#/properties/name2-input")
+    start_input = SiteElement(By.ID, "#/properties/start-input")
+    end_input = SiteElement(By.ID, "#/properties/end-input")
 
     @classmethod
     def get_header_text(self, driver):
@@ -307,8 +314,11 @@ class SubmitHydroshare(Dsp):
 
     @classmethod
     def autofill_required_elements(self, driver, auto):
-        self.fill_basic_info(driver, auto, auto, auto)
-        self.fill_funding_agency(driver, auto)
+        self.fill_basic_info(driver, auto)
+        if isinstance(auto, str):
+            self.fill_funding_agency(driver, auto)
+        else:
+            self.fill_funding_agency(driver, auto["funding_agency_name-input"])
 
     @classmethod
     def unfill_text_element_by_name(self, driver, element):
@@ -323,7 +333,16 @@ class SubmitHydroshare(Dsp):
         eval("self.{}.inject_text(driver, '{}')".format(element, text_to_fill))
 
     @classmethod
-    def fill_basic_info(self, driver, title, abstract, subject_keyword_input):
+    def fill_basic_info(self, driver, basic_info):
+        if isinstance(basic_info, str):
+            title = basic_info
+            abstract = basic_info
+            subject_keyword_input = basic_info
+        else:
+            title = basic_info["title-input"]
+            abstract = basic_info["abstract-input"]
+            subject_keyword_input = basic_info["subjects-input"]
+
         self.title.scroll_to(driver)
         self.title.inject_text(driver, title)
         self.abstract.inject_text(driver, abstract)
@@ -362,7 +381,34 @@ class SubmitHydroshare(Dsp):
         self.bottom_finish.click(driver)
         self.wait_until_element_not_exist(driver, self.is_saving, NEW_SUBMISSION_SAVE)
 
-        self.wait_on_save(driver)
+    @classmethod
+    def fill_temporal(self, driver, dict):
+        for k, v in dict.items():
+            element = SiteElement(By.ID, "#/properties/"+k)
+            #####
+            # element.scroll_to(driver)
+            # element.javascript_click(driver)
+            # element.inject_text(driver, v)
+            # TODO: exists in DOM returns false...why?!
+            if element.exists_in_dom(driver):
+                element.scroll_to(driver)
+                element.javascript_click(driver)
+                element.inject_text(driver, v)
+            else:
+                return False
+        return True
+
+    @classmethod
+    def fill_agency(self, driver, dict):
+        for k, v in dict.items():
+            element = SiteElement(By.ID, "#/properties/"+k)
+            if element.exists_in_dom(driver):
+                element.scroll_to(driver)
+                element.javascript_click(driver)
+                element.inject_text(driver, v)
+            else:
+                return False
+        return True
 
 
 class EditHSSubmission(SubmitHydroshare):
@@ -376,7 +422,7 @@ class EditHSSubmission(SubmitHydroshare):
     def check_required_elements(self, driver, auto):
         if not self.check_basic_info(driver, auto, auto, ["CZNet", auto]):
             return False
-        if not self.check_funding_agency(driver, auto):
+        if not self.check_funding_agency_name(driver, auto):
             return False
         return True
 
@@ -391,7 +437,7 @@ class EditHSSubmission(SubmitHydroshare):
         return self.check_keywords(driver, keywords)
 
     @classmethod
-    def check_funding_agency(self, driver, agency):
+    def check_funding_agency_name(self, driver, agency):
         self.expand_funding_agency.scroll_to(driver)
         return self.agency_name.get_value(driver) == agency
 
@@ -416,7 +462,7 @@ class EditHSSubmission(SubmitHydroshare):
         return span.get_text(driver)
 
     @classmethod
-    def check_first_creator(self, driver, dict):
+    def check_fields_by_dict(self, driver, dict):
         for k, v in dict.items():
             if SiteElement(By.ID, "#/properties/"+k).get_value(driver) != v:
                 return False
