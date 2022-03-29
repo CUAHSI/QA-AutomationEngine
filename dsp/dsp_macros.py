@@ -82,12 +82,12 @@ class Dsp(WebPage):
     @classmethod
     def to_my_submissions(self, driver):
         self.navigation_my_submissions.click(driver)
-        self.wait_until_element_visible(MySubmissions.title, MY_SUBMISSIONS_LOAD)
+        self.wait_until_element_visible(driver, MySubmissions.title, MY_SUBMISSIONS_LOAD)
 
     @classmethod
     def drawer_to_my_submissions(self, driver):
         self.drawer_nav_my_submissions.click(driver)
-        self.wait_until_element_visible(MySubmissions.title, MY_SUBMISSIONS_LOAD)
+        self.wait_until_element_visible(driver, MySubmissions.title, MY_SUBMISSIONS_LOAD)
 
     @classmethod
     def drawer_to_submit(self, driver):
@@ -284,12 +284,14 @@ class SubmitHydroshare(Dsp):
     top_save = SiteElement(By.CSS_SELECTOR, "#cz-new-submission-actions-top button.submission-save")
     title = SiteElement(By.ID, "#/properties/title-input")
     abstract = SiteElement(By.ID, "#/properties/abstract-input")
-    subject_keyword_input = SiteElement(By.CSS_SELECTOR, 'input[id="#/properties/subjects-input"]:nth-of-type(1)')
-    subject_keywords = SiteElementsCollection(By.CSS_SELECTOR, 'span.v-chip__content')
+    subject_keyword_input = SiteElement(By.CSS_SELECTOR, 'input[data-id*="Subjectkeywords"]')
+    # TODO: this selector is still fragile to additions of other v-select items withing the basic info
+    subject_keywords = SiteElementsCollection(By.CSS_SELECTOR, 'fieldset[data-id*="group-BasicInformation"] span.v-chip__content')
     bottom_save = SiteElement(By.CSS_SELECTOR, "#cz-new-submission-actions-bottom button.submission-save")
     bottom_finish = SiteElement(By.CSS_SELECTOR, "#cz-new-submission-actions-bottom button.submission-finish")
 
     # required_elements = SiteElementsCollection(By.CSS_SELECTOR, "input[required='required']")
+    # required_elements = SiteElementsCollection(By.CSS_SELECTOR, "input[data-id$="*")
     expand_funding_agency = SiteElement(By.CSS_SELECTOR, 'button[aria-label*="Funding agency"]')
     agency_name = SiteElement(By.ID, "#/properties/funding_agency_name-input")
     expand_contributors = SiteElement(By.CSS_SELECTOR, 'button[aria-label*="Contributors"]')
@@ -297,7 +299,7 @@ class SubmitHydroshare(Dsp):
     rights_url = SiteElement(By.ID, "#/properties/url-input")
 
     # Temporal
-    name2_input = SiteElement(By.ID, "#/properties/name2-input")
+    temporal_name_input = SiteElement(By.CSS_SELECTOR, 'div[data-id*="Temporalcoverage"] input[data-id*="Name"]')
     start_input = SiteElement(By.ID, "#/properties/start-input")
     end_input = SiteElement(By.ID, "#/properties/end-input")
 
@@ -416,6 +418,32 @@ class SubmitHydroshare(Dsp):
                 return False
         return True
 
+    @classmethod
+    def fill_inputs_by_data_ids(self, driver, dict):
+        try:
+            section = dict.pop("section")
+            nth = dict.pop("nth-of-type")
+        except KeyError:
+            pass
+
+        for k, v in dict.items():
+            try:
+                if section and nth:
+                    selector = f'div[data-id*="{section}"] [data-id*="{k}"]:nth-of-type({nth})'
+                    element = SiteElement(By.CSS_SELECTOR, selector)
+                else:
+                    element = SiteElement(By.CSS_SELECTOR, '[data-id*="{k}"]:nth-of-type(1)')
+            except TimeoutException as e:
+                print(f"{e}\nElement not found for key: {k}")
+                return False
+            if element.exists_in_dom(driver):
+                element.scroll_to(driver)
+                element.javascript_click(driver)
+                element.inject_text(driver, v)
+            else:
+                return False
+        return True
+
 
 class EditHSSubmission(SubmitHydroshare):
     header_title = SiteElement(By.CSS_SELECTOR, ".text-h4")
@@ -471,6 +499,27 @@ class EditHSSubmission(SubmitHydroshare):
     def check_fields_by_dict(self, driver, dict):
         for k, v in dict.items():
             value = SiteElement(By.ID, "#/properties/"+k).get_value(driver)
+            if value != v:
+                print(f"\nMismatch when checking field: {k}. Expected {v} got {value}")
+                return False
+        return True
+
+    @classmethod
+    def check_inputs_by_data_ids(self, driver, dict):
+        try:
+            section = dict.pop("section")
+            nth = dict.pop("nth-of-type")
+        except KeyError:
+            section = None
+            nth = None
+            pass
+
+        for k, v in dict.items():
+            if section and nth:
+                selector = f'div[data-id*="{section}"] [data-id*="{k}"]:nth-of-type({nth})'
+                value = SiteElement(By.CSS_SELECTOR, selector).get_value(driver)
+            else:
+                value = SiteElement(By.CSS_SELECTOR, f'[data-id*="{k}"]:nth-of-type(1)').get_value(driver)
             if value != v:
                 print(f"\nMismatch when checking field: {k}. Expected {v} got {value}")
                 return False
