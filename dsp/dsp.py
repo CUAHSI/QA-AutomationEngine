@@ -142,16 +142,16 @@ class DspTestSuite(BaseTestSuite):
         # The page isn't sorted upon load
         MySubmissions.enter_text_in_search(self.driver, auto_text)
         MySubmissions.edit_top_submission(self.driver)
+        section = "Creators"
+        nth = 1
 
         profile_dict = {
-            "section": "Creators",
-            "nth-of-type": "1",
             "Name": "Meister, Jim",
             "Phone": "4444444444",
             "Organization": "Freie Universität Berlin;Agricultural University of Warsaw",
             "Email": "concretejackbill@gmail.com"
         }
-        match = EditHSSubmission.check_inputs_by_data_ids(self.driver, profile_dict)
+        match = EditHSSubmission.check_inputs_by_data_ids(self.driver, profile_dict, section, nth)
         self.assertTrue(match)
 
     def test_A_000007(self):
@@ -172,11 +172,12 @@ class DspTestSuite(BaseTestSuite):
         MySubmissions.enter_text_in_search(self.driver, auto_text+"title-input")
         MySubmissions.edit_top_submission(self.driver)
 
+        # check keywords separately
         keywords = basic_info_dict.pop("subjects-input")
-        keywords.insert(0, "CZNet")
-        match = EditHSSubmission.check_inputs_by_data_ids(self.driver, basic_info_dict)
-        self.assertTrue(match)
         self.assertTrue(EditHSSubmission.check_keywords(self.driver, keywords))
+
+        match = EditHSSubmission.check_fields_by_dict(self.driver, basic_info_dict)
+        self.assertTrue(match)
 
     def test_A_000008(self):
         """Confirm that Temporal coverage persists from submit to edit"""

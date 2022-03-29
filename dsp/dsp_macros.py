@@ -287,6 +287,7 @@ class SubmitHydroshare(Dsp):
     subject_keyword_input = SiteElement(By.CSS_SELECTOR, 'input[data-id*="Subjectkeywords"]')
     # TODO: this selector is still fragile to additions of other v-select items withing the basic info
     subject_keywords = SiteElementsCollection(By.CSS_SELECTOR, 'fieldset[data-id*="group-BasicInformation"] span.v-chip__content')
+    subject_keyword_container = SiteElement(By.CSS_SELECTOR, '[data-id="group-BasicInformation"] .v-select__selections')
     bottom_save = SiteElement(By.CSS_SELECTOR, "#cz-new-submission-actions-bottom button.submission-save")
     bottom_finish = SiteElement(By.CSS_SELECTOR, "#cz-new-submission-actions-bottom button.submission-finish")
 
@@ -390,35 +391,6 @@ class SubmitHydroshare(Dsp):
         self.wait_until_element_not_exist(driver, self.is_saving, NEW_SUBMISSION_SAVE)
 
     @classmethod
-    def fill_temporal(self, driver, dict):
-        for k, v in dict.items():
-            element = SiteElement(By.ID, "#/properties/"+k)
-            #####
-            # element.scroll_to(driver)
-            # element.javascript_click(driver)
-            # element.inject_text(driver, v)
-            # TODO: exists in DOM returns false...why?!
-            if element.exists_in_dom(driver):
-                element.scroll_to(driver)
-                element.javascript_click(driver)
-                element.inject_text(driver, v)
-            else:
-                return False
-        return True
-
-    @classmethod
-    def fill_text_elements_by_dict(self, driver, dict):
-        for k, v in dict.items():
-            element = SiteElement(By.ID, "#/properties/"+k)
-            if element.exists_in_dom(driver):
-                element.scroll_to(driver)
-                element.javascript_click(driver)
-                element.inject_text(driver, v)
-            else:
-                return False
-        return True
-
-    @classmethod
     def fill_inputs_by_data_ids(self, driver, dict, section=None, nth=1):
         for k, v in dict.items():
             try:
@@ -470,29 +442,32 @@ class EditHSSubmission(SubmitHydroshare):
         return self.agency_name.get_value(driver) == agency
 
     @classmethod
-    def check_keywords(self, driver, keywords=None):
-        if isinstance(keywords, str):
-            text = self.get_keyword_text(driver, 1)
-            if text != keywords:
-                print(f"\nThe keyword text is: {text}")
-                return False
-        else:
-            for idx, keyword in enumerate(keywords):
-                text = self.get_keyword_text(driver, idx+1)
-                if text != keyword:
-                    print(f"\nThe keyword text is: {text}")
-                    return False
-            return True
+    def get_keywords(self, driver):
+        keywords = self.subject_keyword_container.get_texts_from_xpath(driver, './/span/span[contains(@class, "v-chip__content")]')
+        return keywords
 
     @classmethod
-    def get_keyword_text(self, driver, index):
+    def check_keywords(self, driver, keywords=None):
+        saved_keywords = self.get_keywords(driver)
+        if isinstance(keywords, str):
+            if keywords not in saved_keywords:
+                return False
+        else:
+            if not all(elem in saved_keywords for elem in keywords):
+                return False
+        return True
+
+    @classmethod
+    def get_nth_keyword_text(self, driver, index):
         span = SiteElement(By.CSS_SELECTOR, ".v-select__selections span:nth-of-type({}) span.v-chip__content".format(index))
         return span.get_text(driver)
 
     @classmethod
     def check_fields_by_dict(self, driver, dict):
         for k, v in dict.items():
-            value = SiteElement(By.ID, "#/properties/"+k).get_value(driver)
+            element = SiteElement(By.ID, "#/properties/"+k)
+            element.scroll_to(driver)
+            value = element.get_value(driver)
             if value != v:
                 print(f"\nMismatch when checking field: {k}. Expected {v} got {value}")
                 return False

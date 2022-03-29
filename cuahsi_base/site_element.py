@@ -70,7 +70,7 @@ class SiteElement:
             return True
         except TimeoutException:
             return False
-    
+
     def exists_in_dom(self, driver):
         """
         Checks if element is visible on the page.
@@ -322,6 +322,23 @@ class SiteElement:
         """
         target_el = self.loc_it(driver)
         return len(target_el.find_elements_by_xpath(".//*"))
+
+    def get_relatives_by_xpath(self, driver, xpath):
+        """Returns the relatives by xpath, given a parent
+        element specification
+        """
+        target_el = self.loc_it(driver)
+        return target_el.find_elements_by_xpath(xpath)
+
+    def get_texts_from_xpath(self, driver, xpath):
+        """Returns the text in relatives matching xpath, given a parent
+        element specification
+        """
+        web_elements = self.get_relatives_by_xpath(driver, xpath)
+        keywords = []
+        for el in web_elements:
+            keywords.append(el.text)
+        return keywords
 
     def get_parent(self, driver):
         """Returns the parent element
