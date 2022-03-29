@@ -184,16 +184,15 @@ class DspTestSuite(BaseTestSuite):
         SubmitLandingPage.to_hs_submit(self.driver)
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
         SubmitHydroshare.autofill_required_elements(self.driver, auto_text)
+        section = "Temporalcoverage"
+        nth = 1
         temporal_dict = {
-            "section": "Temporalcoverage",
-            "nth-of-type": "1",
             "Start": "2022-03-25T01:00",
             "End": "2022-04-25T02:00",
             "Name": auto_text+"Meister, Jim",
         }
         # TODO: this test fills the date/times but they fail to submit
-        # success_filling = SubmitHydroshare.fill_temporal(self.driver, temporal_dict)
-        success_filling = SubmitHydroshare.fill_inputs_by_data_ids(self.driver, temporal_dict)
+        success_filling = SubmitHydroshare.fill_inputs_by_data_ids(self.driver, temporal_dict, section, nth)
         self.assertTrue(success_filling)
         SubmitHydroshare.finish_submission(self.driver)
 
@@ -201,7 +200,7 @@ class DspTestSuite(BaseTestSuite):
         MySubmissions.enter_text_in_search(self.driver, auto_text)
         MySubmissions.edit_top_submission(self.driver)
 
-        match = EditHSSubmission.check_inputs_by_data_ids(self.driver, temporal_dict)
+        match = EditHSSubmission.check_inputs_by_data_ids(self.driver, temporal_dict, section, nth)
         self.assertTrue(match)
 
     def test_A_000009(self):
@@ -210,14 +209,14 @@ class DspTestSuite(BaseTestSuite):
         SubmitLandingPage.to_hs_submit(self.driver)
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
         SubmitHydroshare.autofill_required_elements(self.driver, auto_text)
+        section = "Fundingagencyinformation"
+        nth = 1
         agency_dict = {
-            "section": "Fundingagencyinformation",
-            "nth-of-type": "1",
             "Awardtitle": auto_text+"Funding Agency title2-input",
             "Awardnumber": "5",
             "AgencyURL": "http://funding-agency.com/"+auto_text,
         }
-        success = SubmitHydroshare.fill_inputs_by_data_ids(self.driver, agency_dict)
+        success = SubmitHydroshare.fill_inputs_by_data_ids(self.driver, agency_dict, section, nth)
         self.assertTrue(success)
         SubmitHydroshare.finish_submission(self.driver)
 
@@ -225,7 +224,7 @@ class DspTestSuite(BaseTestSuite):
         MySubmissions.enter_text_in_search(self.driver, auto_text)
         MySubmissions.edit_top_submission(self.driver)
 
-        match = EditHSSubmission.check_inputs_by_data_ids(self.driver, agency_dict)
+        match = EditHSSubmission.check_inputs_by_data_ids(self.driver, agency_dict, section, nth)
         self.assertTrue(match)
 
     def test_A_000010(self):
@@ -234,16 +233,18 @@ class DspTestSuite(BaseTestSuite):
         SubmitLandingPage.to_hs_submit(self.driver)
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
         SubmitHydroshare.autofill_required_elements(self.driver, auto_text)
+        section = "Contributors"
+        nth = 1
         contributor_dict = {
-            "name2-input": auto_text+"Contributor name2-input",
-            "phone-input": "1234567890",
-            "address-input": "contributor address "+auto_text,
-            "organization-input": "contributor org "+auto_text,
-            "email-input": auto_text + "@gmail.com",
-            "homepage-input": "http://contibutor_homepage.com/"+auto_text,
+            "Name": auto_text+"Contributor name2-input",
+            "Phone": "1234567890",
+            "Address": "contributor address "+auto_text,
+            "Organization": "contributor org "+auto_text,
+            "Email": auto_text + "@gmail.com",
+            "Homepage": "http://contibutor_homepage.com/"+auto_text,
         }
         SubmitHydroshare.click_expand_contributors(self.driver)
-        success = SubmitHydroshare.fill_text_elements_by_dict(self.driver, contributor_dict)
+        success = SubmitHydroshare.fill_inputs_by_data_ids(self.driver, contributor_dict, section, nth)
         self.assertTrue(success)
         SubmitHydroshare.finish_submission(self.driver)
 
@@ -251,18 +252,7 @@ class DspTestSuite(BaseTestSuite):
         MySubmissions.enter_text_in_search(self.driver, auto_text)
         MySubmissions.edit_top_submission(self.driver)
 
-        # TODO: because of dynamic ids in jsonforms, we have to iterate the name id
-        # this needs to be fixed in VUE or json-forms. This should be removed once 
-        # that is patched in jsonforms
-        contributor_dict = {
-            "name2-input": auto_text+"Contributor name2-input",
-            "phone2-input": "1234567890",
-            "address2-input": "contributor address "+auto_text,
-            "organization2-input": "contributor org "+auto_text,
-            "email2-input": auto_text + "@gmail.com",
-            "homepage2-input": "http://contibutor_homepage.com/"+auto_text,
-        }
-        match = EditHSSubmission.check_fields_by_dict(self.driver, contributor_dict)
+        match = EditHSSubmission.check_inputs_by_data_ids(self.driver, contributor_dict, section, nth)
         self.assertTrue(match)
 if __name__ == "__main__":
     parse_args_run_tests(DspTestSuite)

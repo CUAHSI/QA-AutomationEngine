@@ -419,13 +419,7 @@ class SubmitHydroshare(Dsp):
         return True
 
     @classmethod
-    def fill_inputs_by_data_ids(self, driver, dict):
-        try:
-            section = dict.pop("section")
-            nth = dict.pop("nth-of-type")
-        except KeyError:
-            pass
-
+    def fill_inputs_by_data_ids(self, driver, dict, section=None, nth=1):
         for k, v in dict.items():
             try:
                 if section and nth:
@@ -505,15 +499,7 @@ class EditHSSubmission(SubmitHydroshare):
         return True
 
     @classmethod
-    def check_inputs_by_data_ids(self, driver, dict):
-        try:
-            section = dict.pop("section")
-            nth = dict.pop("nth-of-type")
-        except KeyError:
-            section = None
-            nth = None
-            pass
-
+    def check_inputs_by_data_ids(self, driver, dict, section=None, nth=1):
         for k, v in dict.items():
             if section and nth:
                 selector = f'div[data-id*="{section}"] [data-id*="{k}"]:nth-of-type({nth})'
