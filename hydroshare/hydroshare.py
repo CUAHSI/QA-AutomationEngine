@@ -1630,6 +1630,25 @@ class HydroshareTestSuite(BaseTestSuite):
         error_text = Resource.check_author_warning(self.driver)
         self.assertIn("author", error_text)
 
+    def test_B_000125(self):
+        """Confirm that HTML injection is not possible for resource labels"""
+        LandingPage.to_login(self.driver)
+        Login.login(self.driver, USERNAME, PASSWORD)
+        Home.to_my_resources(self.driver)
+        MyResources.create_label(self.driver, "<span>Span</span>")
+        self.assertTrue(MyResources.check_html_injection_error(self.driver))
+
+    def test_B_000126(self):
+        """Ensure cancelled metadata key:value pairs are cleared"""
+        LandingPage.to_login(self.driver)
+        Login.login(self.driver, USERNAME, PASSWORD)
+        Home.create_resource(self.driver, "CompositeResource")
+        NewResource.configure(self.driver, "Cancelled Metadata Test")
+        NewResource.create(self.driver)
+        Resource.prepare_metadata(self.driver, "Key", "Value")
+        Resource.cancel_metadata(self.driver)
+        self.assertTrue(Resource.check_residual_metadata(self.driver))
+
 
 class PerformanceTestSuite(BaseTestSuite):
     """Python unittest setup for smoke tests"""

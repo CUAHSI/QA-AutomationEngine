@@ -1014,7 +1014,10 @@ class Resource(Hydroshare):
     metadata_entry = SiteElement(By.CSS_SELECTOR, 'a[title="Add New Entry"]')
     metadata_name = SiteElement(By.ID, "extra_meta_name_input")
     metadata_value = SiteElement(By.ID, "extra_meta_value_input")
-    confirm_metadata = SiteElement(By.ID, "btn-confirm-extended-metadata")
+    metadata_confirm = SiteElement(By.ID, "btn-confirm-extended-metadata")
+    metadata_cancel = SiteElement(
+        By.CSS_SELECTOR, "#extraMetaDialog button.btn.btn-default"
+    )
     learn_more = SiteElement(By.PARTIAL_LINK_TEXT, "Learn more")
     how_to_cite = SiteElement(
         By.CSS_SELECTOR, "#rights > span:nth-child(2) > a:nth-child(1)"
@@ -1202,7 +1205,25 @@ class Resource(Hydroshare):
         self.metadata_entry.click(driver)
         self.metadata_name.inject_text(driver, name)
         self.metadata_value.inject_text(driver, value)
-        self.confirm_metadata.click(driver)
+        self.metadata_confirm.click(driver)
+
+    @classmethod
+    def prepare_metadata(self, driver, name, value):
+        self.metadata_entry.click(driver)
+        self.metadata_name.inject_text(driver, name)
+        self.metadata_value.inject_text(driver, value)
+
+    @classmethod
+    def cancel_metadata(self, driver):
+        self.metadata_cancel.click(driver)
+
+    @classmethod
+    def check_residual_metadata(self, driver):
+        self.metadata_entry.click(driver)
+        return (
+            self.metadata_name.get_text(driver) == ""
+            and self.metadata_value.get_text(driver) == ""
+        )
 
     @classmethod
     def exists_name(self, driver, name):
@@ -2019,6 +2040,10 @@ class MyResources(Hydroshare):
         By.CSS_SELECTOR,
         "#legend-collapse div:first-child div:first-child div.col-xs-12.col-sm-7",
     )
+    html_injection_error = SiteElement(
+        By.XPATH,
+        '//div[contains(text(), "Your label contains HTML and cannot be saved.")]',
+    )
 
     @classmethod
     def label_checkbox(self, label_name):
@@ -2139,6 +2164,10 @@ class MyResources(Hydroshare):
         self.new_label_name.inject_text(driver, new_name)
         self.create_label_submit.click(driver)
         time.sleep(LABEL_CREATION)
+
+    @classmethod
+    def check_html_injection_error(self, driver):
+        return self.html_injection_error.is_visible(driver)
 
     @classmethod
     def toggle_label(self, driver, label):
