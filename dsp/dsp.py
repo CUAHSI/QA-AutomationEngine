@@ -32,8 +32,6 @@ from config import (
     PASSWORD,
     HS_PASSWORD,
     HS_USERNAME,
-    GITHUB_ORG,
-    GITHUB_REPO,
 )
 
 SPAM_DATA_STREAM_NAME = "cuahsi-quality-spam-data-stream"
@@ -142,12 +140,12 @@ class DspTestSuite(BaseTestSuite):
 
         required_text_items = ["agency_name", "abstract", "title", "rights_statement", "rights_url"]
         for text_elem in required_text_items:
-            SubmitHydroshare.unfill_text_by_class_property(self.driver, text_elem)
+            SubmitHydroshare.unfill_text_by_page_property(self.driver, text_elem)
             self.assertRaises(BaseException, SubmitHydroshare.is_finishable(self.driver))
             if "url" in text_elem:
-                SubmitHydroshare.fill_text_by_class_property(self.driver, text_elem, "http://" + auto_text)
+                SubmitHydroshare.fill_text_by_page_property(self.driver, text_elem, "http://" + auto_text)
             else:
-                SubmitHydroshare.fill_text_by_class_property(self.driver, text_elem, auto_text)
+                SubmitHydroshare.fill_text_by_page_property(self.driver, text_elem, auto_text)
             self.assertTrue(SubmitHydroshare.is_finishable(self.driver))
 
     def test_A_000006(self):
@@ -279,18 +277,23 @@ class DspTestSuite(BaseTestSuite):
 
     def test_A_000013(self):
         """Confirm that Related Resources info persists from submit to edit"""
-        # TODO: relation type dropdown
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
         self.login_and_autofill_hs_required(auto_text)
-        section = "Relatedresources"
-        nth = 1
         dict = {
-            "RelationType": auto_text + " key",
+            "RelationType": "This resource includes",
             "Value": auto_text + " value"
         }
-        SubmitHydroshare.click_expand_related_resources(self.driver)
-        self.fill_ids_submit_and_check(auto_text, section, nth, dict)
+        nth = 1
+        section = "Relatedresources"
+        SubmitHydroshare.fill_related_resources(self.driver, dict["RelationType"], dict["Value"], nth)
+        SubmitHydroshare.finish_submission(self.driver)
 
+        # The page isn't sorted upon load
+        MySubmissions.enter_text_in_search(self.driver, auto_text)
+        MySubmissions.edit_top_submission(self.driver)
+
+        relation = EditHSSubmission.get_nth_relation_type(self.driver, nth)
+        self.assertEqual(relation.pop(), dict.pop("RelationType"))
         match = EditHSSubmission.check_inputs_by_data_ids(self.driver, dict, section, nth)
         self.assertTrue(match)
 

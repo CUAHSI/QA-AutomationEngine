@@ -295,7 +295,7 @@ class SubmitHydroshare(Dsp):
     # Additional metadata
     expand_metadata = SiteElement(By.CSS_SELECTOR, '[data-id*="Additionalmetadata"] button.btn-add')
 
-    # Additional metadata
+    # Related resources
     expand_related_resources = SiteElement(By.CSS_SELECTOR, '[data-id*="Relatedresources"] button.btn-add')
 
     # Temporal
@@ -385,6 +385,40 @@ class SubmitHydroshare(Dsp):
         self.expand_related_resources.javascript_click(driver)
 
     @classmethod
+    def fill_related_resources(self, driver, relation_type, value, n):
+        self.click_expand_related_resources(driver)
+
+        sel = f'div[data-id*="Relatedresources"] input[data-id*="RelationType"]:nth-of-type({n})'
+        relation_type_input = SiteElement(By.CSS_SELECTOR, sel)
+        sel = f'div[data-id*="Relatedresources"] input[data-id*="Value"]:nth-of-type({n})'
+        related_resources_value = SiteElement(By.CSS_SELECTOR, sel)
+        sel = f'div[data-id*="Relatedresources"] div.v-select:nth-of-type({n})'
+        relation_type_container = SiteElement(By.CSS_SELECTOR, sel)
+
+        relation_type_container.scroll_to(driver)
+        relation_type_container.javascript_click(driver)
+        relation_type_input.inject_text(driver, relation_type)
+        relation_type_input.submit(driver)
+        related_resources_value.inject_text(driver, value)
+        related_resources_value.submit(driver)
+
+    # @classmethod
+    # def fill_related_resources(self, driver, related_resources):
+    #     self.click_expand_related_resources(driver)
+    #     self.relation_type_input.scroll_to(driver)
+    #     self.relation_type_input.click(driver)
+    #     self.relation_type_input.inject_text(driver, title)
+    #     self.related_resources_value.inject_text(driver, abstract)
+    #     self.subject_keyword_container.click(driver)
+    #     if isinstance(subject_keyword_input, str):
+    #         self.subject_keyword_input.inject_text(driver, subject_keyword_input)
+    #         self.subject_keyword_input.submit(driver)
+    #     else:
+    #         for keyword in subject_keyword_input:
+    #             self.subject_keyword_input.inject_text(driver, keyword)
+    #             self.subject_keyword_input.submit(driver)
+
+    @classmethod
     def save_bottom(self, driver):
         self.bottom_save.scroll_to(driver)
         self.bottom_save.click(driver)
@@ -404,6 +438,16 @@ class SubmitHydroshare(Dsp):
         self.wait_until_element_not_exist(driver, self.is_saving, NEW_SUBMISSION_SAVE)
 
     @classmethod
+    def get_did_in_section(self, driver, section=None, data_id="", nth=1):
+        selector = f'div[data-id*="{section}"] [data-id*="{data_id}"]:nth-of-type({nth})'
+        return SiteElement(By.CSS_SELECTOR, selector)
+
+    @classmethod
+    def get_css_in_section(self, driver, section=None, css="", nth=1):
+        selector = f'div[data-id*="{section}"] {css}'
+        return SiteElement(By.CSS_SELECTOR, selector)
+
+    @classmethod
     def fill_inputs_by_data_ids(self, driver, dict, section=None, nth=1):
         for k, v in dict.items():
             try:
@@ -411,7 +455,7 @@ class SubmitHydroshare(Dsp):
                     selector = f'div[data-id*="{section}"] [data-id*="{k}"]:nth-of-type({nth})'
                     element = SiteElement(By.CSS_SELECTOR, selector)
                 else:
-                    element = SiteElement(By.CSS_SELECTOR, '[data-id*="{k}"]:nth-of-type(1)')
+                    element = SiteElement(By.CSS_SELECTOR, f'[data-id*="{k}"]:nth-of-type(1)')
             except TimeoutException as e:
                 print(f"{e}\nElement not found for key: {k}")
                 return False
@@ -425,13 +469,13 @@ class SubmitHydroshare(Dsp):
         return True
 
     @classmethod
-    def unfill_text_by_class_property(self, driver, element):
+    def unfill_text_by_page_property(self, driver, element):
         eval("self.{}.scroll_to(driver)".format(element))
         eval("self.{}.javascript_click(driver)".format(element))
         eval("self.{}.clear_all_text(driver)".format(element))
 
     @classmethod
-    def fill_text_by_class_property(self, driver, element, text_to_fill):
+    def fill_text_by_page_property(self, driver, element, text_to_fill):
         eval("self.{}.scroll_to(driver)".format(element))
         eval("self.{}.javascript_click(driver)".format(element))
         eval("self.{}.inject_text(driver, '{}')".format(element, text_to_fill))
@@ -473,6 +517,12 @@ class EditHSSubmission(SubmitHydroshare):
         return keywords
 
     @classmethod
+    def get_nth_relation_type(self, driver, n):
+        sel = f'div[data-id*="Relatedresources"] input[data-id*="RelationType"]:nth-of-type({n})'
+        relation_type_input = SiteElement(By.CSS_SELECTOR, sel)
+        return relation_type_input.get_texts_from_xpath(driver, './preceding::div[1]')
+
+    @classmethod
     def check_keywords(self, driver, keywords=None):
         saved_keywords = self.get_keywords(driver)
         if isinstance(keywords, str):
@@ -484,8 +534,8 @@ class EditHSSubmission(SubmitHydroshare):
         return True
 
     @classmethod
-    def get_nth_keyword_text(self, driver, index):
-        span = SiteElement(By.CSS_SELECTOR, ".v-select__selections span:nth-of-type({}) span.v-chip__content".format(index))
+    def get_nth_keyword_text(self, driver, n):
+        span = SiteElement(By.CSS_SELECTOR, ".v-select__selections span:nth-of-type({}) span.v-chip__content".format(n))
         return span.get_text(driver)
 
     @classmethod
@@ -504,9 +554,11 @@ class EditHSSubmission(SubmitHydroshare):
         for k, v in dict.items():
             if section and nth:
                 selector = f'div[data-id*="{section}"] [data-id*="{k}"]:nth-of-type({nth})'
-                value = SiteElement(By.CSS_SELECTOR, selector).get_value(driver)
+                elem = SiteElement(By.CSS_SELECTOR, selector)
             else:
-                value = SiteElement(By.CSS_SELECTOR, f'[data-id*="{k}"]:nth-of-type(1)').get_value(driver)
+                elem = SiteElement(By.CSS_SELECTOR, f'[data-id*="{k}"]:nth-of-type(1)')
+            elem.scroll_to(driver)
+            value = elem.get_value(driver)
             if value != v:
                 print(f"\nMismatch when checking field: {k}. Expected {v} got {value}")
                 return False

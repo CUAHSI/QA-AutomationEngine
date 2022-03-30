@@ -77,7 +77,7 @@ class SiteElement:
         """
         wait = WebDriverWait(driver, 3)
         try:
-            target_el = wait.until(EC.presence_of_element_located((self.by, self.locator)))
+            wait.until(EC.presence_of_element_located((self.by, self.locator)))
             return True
         except TimeoutException:
             return False
