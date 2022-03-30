@@ -280,7 +280,7 @@ class SubmitHydroshare(Dsp):
     """ Page containing forms for submitting data with HS backend"""
 
     header = SiteElement(By.CSS_SELECTOR, ".cz-new-submission h1")
-    alert = SiteElement(By.CSS_SELECTOR,  ".v-alert .v-alert__content")
+    alert = SiteElement(By.CSS_SELECTOR, ".v-alert .v-alert__content")
     top_save = SiteElement(By.CSS_SELECTOR, "#cz-new-submission-actions-top button.submission-save")
     title = SiteElement(By.ID, "#/properties/title-input")
     abstract = SiteElement(By.ID, "#/properties/abstract-input")
@@ -465,7 +465,7 @@ class EditHSSubmission(SubmitHydroshare):
     @classmethod
     def check_fields_by_dict(self, driver, dict):
         for k, v in dict.items():
-            element = SiteElement(By.ID, "#/properties/"+k)
+            element = SiteElement(By.ID, "#/properties/" + k)
             element.scroll_to(driver)
             value = element.get_value(driver)
             if value != v:

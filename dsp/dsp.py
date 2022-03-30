@@ -126,7 +126,7 @@ class DspTestSuite(BaseTestSuite):
             SubmitHydroshare.unfill_text_element_by_name(self.driver, text_elem)
             self.assertRaises(BaseException, SubmitHydroshare.is_finishable(self.driver))
             if "url" in text_elem:
-                SubmitHydroshare.fill_text_element_by_name(self.driver, text_elem, "http://"+auto_text)
+                SubmitHydroshare.fill_text_element_by_name(self.driver, text_elem, "http://" + auto_text)
             else:
                 SubmitHydroshare.fill_text_element_by_name(self.driver, text_elem, auto_text)
             self.assertTrue(SubmitHydroshare.is_finishable(self.driver))
@@ -160,16 +160,16 @@ class DspTestSuite(BaseTestSuite):
         SubmitLandingPage.to_hs_submit(self.driver)
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
         basic_info_dict = {
-            "title-input": auto_text+"title-input",
-            "abstract-input": auto_text+"abstract-input",
+            "title-input": auto_text + "title-input",
+            "abstract-input": auto_text + "abstract-input",
             "subjects-input": ["keyword1", "keyword2"],
-            "funding_agency_name-input": auto_text+"funding_agency_name-input"
+            "funding_agency_name-input": auto_text + "funding_agency_name-input"
         }
         SubmitHydroshare.autofill_required_elements(self.driver, basic_info_dict)
         SubmitHydroshare.finish_submission(self.driver)
 
         # The page isn't sorted upon load
-        MySubmissions.enter_text_in_search(self.driver, auto_text+"title-input")
+        MySubmissions.enter_text_in_search(self.driver, auto_text + "title-input")
         MySubmissions.edit_top_submission(self.driver)
 
         # check keywords separately
@@ -190,7 +190,7 @@ class DspTestSuite(BaseTestSuite):
         temporal_dict = {
             "Start": "2022-03-25T01:00",
             "End": "2022-04-25T02:00",
-            "Name": auto_text+"Meister, Jim",
+            "Name": auto_text + "Meister, Jim",
         }
         # TODO: this test fills the date/times but they fail to submit
         success_filling = SubmitHydroshare.fill_inputs_by_data_ids(self.driver, temporal_dict, section, nth)
@@ -213,9 +213,9 @@ class DspTestSuite(BaseTestSuite):
         section = "Fundingagencyinformation"
         nth = 1
         agency_dict = {
-            "Awardtitle": auto_text+"Funding Agency title2-input",
+            "Awardtitle": auto_text + "Funding Agency title2-input",
             "Awardnumber": "5",
-            "AgencyURL": "http://funding-agency.com/"+auto_text,
+            "AgencyURL": "http://funding-agency.com/" + auto_text,
         }
         success = SubmitHydroshare.fill_inputs_by_data_ids(self.driver, agency_dict, section, nth)
         self.assertTrue(success)
@@ -237,12 +237,12 @@ class DspTestSuite(BaseTestSuite):
         section = "Contributors"
         nth = 1
         contributor_dict = {
-            "Name": auto_text+"Contributor name2-input",
+            "Name": auto_text + "Contributor name2-input",
             "Phone": "1234567890",
-            "Address": "contributor address "+auto_text,
-            "Organization": "contributor org "+auto_text,
+            "Address": "contributor address " + auto_text,
+            "Organization": "contributor org " + auto_text,
             "Email": auto_text + "@gmail.com",
-            "Homepage": "http://contibutor_homepage.com/"+auto_text,
+            "Homepage": "http://contibutor_homepage.com/" + auto_text,
         }
         SubmitHydroshare.click_expand_contributors(self.driver)
         success = SubmitHydroshare.fill_inputs_by_data_ids(self.driver, contributor_dict, section, nth)
