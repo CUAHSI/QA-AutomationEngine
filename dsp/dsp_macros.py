@@ -223,14 +223,6 @@ class MySubmissions(Dsp):
         text = self.total_submissions.get_text(driver)
         return int(text.split(" ", 1)[0])
 
-    # TODO: get sort order working with Vuetify dropdowns
-    # @classmethod
-    # def sort_order(self, driver, index=1):
-    #     self.sort_order_select.javascript_click_hidden(driver)
-    #     select_string = f"#sort-order v-list-item__content:nth-of-type({index})"
-    #     to_select = SiteElement(By.CSS_SELECTOR, select_string)
-    #     to_select.click(driver)
-
     @classmethod
     def get_top_submission_name(self, driver):
         return self.top_submission_name.get_text(driver)
@@ -350,14 +342,14 @@ class SubmitHydroshare(Dsp):
         self.title.scroll_to(driver)
         self.title.inject_text(driver, title)
         self.abstract.inject_text(driver, abstract)
-        self.subject_keyword_input.javascript_click_hidden(driver)
+        self.subject_keyword_container.click(driver)
         if isinstance(subject_keyword_input, str):
-            self.subject_keyword_input.hidden_inject_text(driver, subject_keyword_input)
-            self.subject_keyword_input.submit_hidden(driver)
+            self.subject_keyword_input.inject_text(driver, subject_keyword_input)
+            self.subject_keyword_input.submit(driver)
         else:
             for keyword in subject_keyword_input:
-                self.subject_keyword_input.hidden_inject_text(driver, keyword)
-                self.subject_keyword_input.submit_hidden(driver)
+                self.subject_keyword_input.inject_text(driver, keyword)
+                self.subject_keyword_input.submit(driver)
 
     @classmethod
     def fill_funding_agency(self, driver, agency):
@@ -386,7 +378,7 @@ class SubmitHydroshare(Dsp):
 
     @classmethod
     def finish_submission(self, driver):
-        self.bottom_finish.invisible_scroll_to(driver)
+        self.bottom_finish.scroll_to(driver)
         self.bottom_finish.click(driver)
         self.wait_until_element_not_exist(driver, self.is_saving, NEW_SUBMISSION_SAVE)
 

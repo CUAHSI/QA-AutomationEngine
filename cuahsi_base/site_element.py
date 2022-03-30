@@ -45,7 +45,7 @@ class SiteElement:
 
     def loc_hidden(self, driver):
         """
-        Identifies element on page, based on an element locator.
+        Identifies potentially hidden element on page, based on an element locator.
         """
         wait = WebDriverWait(driver, 10)
         try:
@@ -73,11 +73,10 @@ class SiteElement:
 
     def exists_in_dom(self, driver):
         """
-        Checks if element is visible on the page.
+        Checks if element exists within the DOM.
         """
         wait = WebDriverWait(driver, 3)
         try:
-            # wait.until(EC.presence_of_element_located((self.by, self.locator)))
             target_el = wait.until(EC.presence_of_element_located((self.by, self.locator)))
             return True
         except TimeoutException:
@@ -121,14 +120,14 @@ class SiteElement:
 
     def javascript_click_hidden(self, driver):
         """
-        Clicks an element using JavaScript
+        Simulate click on a hidden element using JavaScript
         """
         target_el = self.loc_hidden(driver)
         driver.execute_script("arguments[0].click();", target_el)
 
-    def javascript_fill_text(self, driver, text):
+    def javascript_fill_hidden_text(self, driver, text):
         """
-        Set text using JavaScript
+        Set text using JavaScript for a potentially hidden element
         """
         target_el = self.loc_hidden(driver)
         driver.execute_script(f'arguments[0].value="{text}";', target_el)
@@ -139,7 +138,9 @@ class SiteElement:
         target_el.send_keys(Keys.ENTER)
 
     def submit_hidden(self, driver):
-        """Send ENTER to element, simulates submit"""
+        """Send ENTER to element that is perhaps hidden,
+        simulates submit
+        """
         actions = ActionChains(driver)
         actions.key_down(Keys.ENTER)
         actions.key_up(Keys.ENTER)
@@ -209,7 +210,7 @@ class SiteElement:
         select_el = Select(target_el)
         select_el.select_by_visible_text(select_choice)
 
-    def invisible_scroll_to(self, driver):
+    def scroll_to_hidden(self, driver):
         """After element identification, the window is scrolled
         such that the element becomes visible in the window
         """
@@ -254,8 +255,8 @@ class SiteElement:
             target_el.send_keys(field_text[i])
 
     def send_caps(self, driver, field_text):
-        """Enters text into a field or other input-capable html
-        element using send_keys_to_element
+        """Enters capitalized text into a field or other input-capable
+        html element using send_keys_to_element
         """
         actionchains = ActionChains(driver)
         target_el = self.loc_it(driver)
