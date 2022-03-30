@@ -402,22 +402,6 @@ class SubmitHydroshare(Dsp):
         related_resources_value.inject_text(driver, value)
         related_resources_value.submit(driver)
 
-    # @classmethod
-    # def fill_related_resources(self, driver, related_resources):
-    #     self.click_expand_related_resources(driver)
-    #     self.relation_type_input.scroll_to(driver)
-    #     self.relation_type_input.click(driver)
-    #     self.relation_type_input.inject_text(driver, title)
-    #     self.related_resources_value.inject_text(driver, abstract)
-    #     self.subject_keyword_container.click(driver)
-    #     if isinstance(subject_keyword_input, str):
-    #         self.subject_keyword_input.inject_text(driver, subject_keyword_input)
-    #         self.subject_keyword_input.submit(driver)
-    #     else:
-    #         for keyword in subject_keyword_input:
-    #             self.subject_keyword_input.inject_text(driver, keyword)
-    #             self.subject_keyword_input.submit(driver)
-
     @classmethod
     def save_bottom(self, driver):
         self.bottom_save.scroll_to(driver)
