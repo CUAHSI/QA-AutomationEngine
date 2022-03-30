@@ -181,6 +181,9 @@ class DspTestSuite(BaseTestSuite):
 
     def test_A_000008(self):
         """Confirm that Temporal coverage persists from submit to edit"""
+        # TODO: this test fills the date/times but they fail to submit
+        # so this test will fail until this issue is fixed in DSP
+        # https://github.com/cznethub/dspfront/issues/52
         self.login_orcid_and_hs()
         SubmitLandingPage.to_hs_submit(self.driver)
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
@@ -192,7 +195,6 @@ class DspTestSuite(BaseTestSuite):
             "End": "2022-04-25T02:00",
             "Name": auto_text + "Meister, Jim",
         }
-        # TODO: this test fills the date/times but they fail to submit
         success_filling = SubmitHydroshare.fill_inputs_by_data_ids(self.driver, temporal_dict, section, nth)
         self.assertTrue(success_filling)
         SubmitHydroshare.finish_submission(self.driver)

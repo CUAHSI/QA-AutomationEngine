@@ -226,7 +226,7 @@ class MySubmissions(Dsp):
     # TODO: get sort order working with Vuetify dropdowns
     # @classmethod
     # def sort_order(self, driver, index=1):
-    #     self.sort_order_select.javascript_click_invisible(driver)
+    #     self.sort_order_select.javascript_click_hidden(driver)
     #     select_string = f"#sort-order v-list-item__content:nth-of-type({index})"
     #     to_select = SiteElement(By.CSS_SELECTOR, select_string)
     #     to_select.click(driver)
@@ -282,7 +282,7 @@ class SubmitHydroshare(Dsp):
     header = SiteElement(By.CSS_SELECTOR, ".cz-new-submission h1")
     alert = SiteElement(By.CSS_SELECTOR, ".v-alert .v-alert__content")
     top_save = SiteElement(By.CSS_SELECTOR, "#cz-new-submission-actions-top button.submission-save")
-    title = SiteElement(By.ID, "#/properties/title-input")
+    title = SiteElement(By.CSS_SELECTOR, '[data-id*="BasicInformation"] input[data-id*="Title"]')
     abstract = SiteElement(By.ID, "#/properties/abstract-input")
     subject_keyword_input = SiteElement(By.CSS_SELECTOR, 'input[data-id*="Subjectkeywords"]')
     # TODO: this selector is still fragile to additions of other v-select items withing the basic info
@@ -350,14 +350,14 @@ class SubmitHydroshare(Dsp):
         self.title.scroll_to(driver)
         self.title.inject_text(driver, title)
         self.abstract.inject_text(driver, abstract)
-        self.subject_keyword_input.javascript_click_invisible(driver)
+        self.subject_keyword_input.javascript_click_hidden(driver)
         if isinstance(subject_keyword_input, str):
-            self.subject_keyword_input.inject_invisible_text(driver, subject_keyword_input)
-            self.subject_keyword_input.submit_invisible(driver)
+            self.subject_keyword_input.hidden_inject_text(driver, subject_keyword_input)
+            self.subject_keyword_input.submit_hidden(driver)
         else:
             for keyword in subject_keyword_input:
-                self.subject_keyword_input.inject_invisible_text(driver, keyword)
-                self.subject_keyword_input.submit_invisible(driver)
+                self.subject_keyword_input.hidden_inject_text(driver, keyword)
+                self.subject_keyword_input.submit_hidden(driver)
 
     @classmethod
     def fill_funding_agency(self, driver, agency):

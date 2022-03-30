@@ -43,7 +43,7 @@ class SiteElement:
 
         return target_el
 
-    def loc_invisible(self, driver):
+    def loc_hidden(self, driver):
         """
         Identifies element on page, based on an element locator.
         """
@@ -119,18 +119,18 @@ class SiteElement:
         target_el = self.loc_it(driver)
         driver.execute_script("arguments[0].click();", target_el)
 
-    def javascript_click_invisible(self, driver):
+    def javascript_click_hidden(self, driver):
         """
         Clicks an element using JavaScript
         """
-        target_el = self.loc_invisible(driver)
+        target_el = self.loc_hidden(driver)
         driver.execute_script("arguments[0].click();", target_el)
 
     def javascript_fill_text(self, driver, text):
         """
         Set text using JavaScript
         """
-        target_el = self.loc_invisible(driver)
+        target_el = self.loc_hidden(driver)
         driver.execute_script(f'arguments[0].value="{text}";', target_el)
 
     def submit(self, driver):
@@ -138,7 +138,7 @@ class SiteElement:
         target_el = self.loc_it(driver)
         target_el.send_keys(Keys.ENTER)
 
-    def submit_invisible(self, driver):
+    def submit_hidden(self, driver):
         """Send ENTER to element, simulates submit"""
         actions = ActionChains(driver)
         actions.key_down(Keys.ENTER)
@@ -213,7 +213,7 @@ class SiteElement:
         """After element identification, the window is scrolled
         such that the element becomes visible in the window
         """
-        target_el = self.loc_invisible(driver)
+        target_el = self.loc_hidden(driver)
         target_el.location_once_scrolled_into_view
 
     def scroll_to(self, driver):
@@ -245,11 +245,11 @@ class SiteElement:
         for i in range(0, len(field_text)):
             target_el.send_keys(field_text[i])
 
-    def inject_invisible_text(self, driver, field_text):
+    def hidden_inject_text(self, driver, field_text):
         """Enters text into a field or other input-capable html
         element that is hidden using send keys
         """
-        target_el = self.loc_invisible(driver)
+        target_el = self.loc_hidden(driver)
         for i in range(0, len(field_text)):
             target_el.send_keys(field_text[i])
 
@@ -343,7 +343,7 @@ class SiteElement:
     def get_parent(self, driver):
         """Returns the parent element
         """
-        target_el = self.loc_invisible(driver)
+        target_el = self.loc_hidden(driver)
         return target_el.find_element_by_xpath("..")
 
     def get_immediate_child_count(self, driver):
