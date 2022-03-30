@@ -72,6 +72,30 @@ class DspTestSuite(BaseTestSuite):
         HydroshareWindow.authorize_hs_backend(self.driver, HS_USERNAME, HS_PASSWORD)
         HydroshareWindow.to_origin_window(self.driver)
 
+    def login_and_autofill_hs_required(self, auto_text):
+        """A shortcut to fill required fields of HS submit page
+        So that additional non-required fields can easily be checked
+        """
+        self.login_orcid_and_hs()
+        SubmitLandingPage.to_hs_submit(self.driver)
+        SubmitHydroshare.autofill_required_elements(self.driver, auto_text)
+
+    def fill_ids_submit_and_check(self, sort_text, section, nth, dict):
+        """Fill additional fields of HS submit page based on 'data-id'
+        Then submit the form, search in 'My Submissions',
+        and check that all of the fields match what was entered
+        """
+        success_filling = SubmitHydroshare.fill_inputs_by_data_ids(self.driver, dict, section, nth)
+        self.assertTrue(success_filling)
+        SubmitHydroshare.finish_submission(self.driver)
+
+        # The page isn't sorted upon load
+        MySubmissions.enter_text_in_search(self.driver, sort_text)
+        MySubmissions.edit_top_submission(self.driver)
+
+        match = EditHSSubmission.check_inputs_by_data_ids(self.driver, dict, section, nth)
+        self.assertTrue(match)
+
     def test_A_000001(self):
         """Ensure anonymous navigation to my submissions shows orcid login modal"""
         Dsp.show_mobile_nav(self.driver)
@@ -94,10 +118,8 @@ class DspTestSuite(BaseTestSuite):
 
     def test_A_000004(self):
         """Confirm successful submit of basic required fields to HS"""
-        self.login_orcid_and_hs()
-        SubmitLandingPage.to_hs_submit(self.driver)
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
-        SubmitHydroshare.autofill_required_elements(self.driver, auto_text)
+        self.login_and_autofill_hs_required(auto_text)
         self.assertTrue(SubmitHydroshare.is_finishable(self.driver))
         SubmitHydroshare.finish_submission(self.driver)
         self.assertEqual("My Submissions", MySubmissions.get_title(self.driver))
@@ -114,13 +136,10 @@ class DspTestSuite(BaseTestSuite):
 
     def test_A_000005(self):
         """Confirm that one can't submit to HS without each required field"""
-        self.login_orcid_and_hs()
-        SubmitLandingPage.to_hs_submit(self.driver)
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
-        SubmitHydroshare.autofill_required_elements(self.driver, auto_text)
+        self.login_and_autofill_hs_required(auto_text)
         self.assertTrue(SubmitHydroshare.is_finishable(self.driver))
 
-        # TODO: pull required items out of the json schema instead of defining here...
         required_text_items = ["agency_name", "abstract", "title", "rights_statement", "rights_url"]
         for text_elem in required_text_items:
             SubmitHydroshare.unfill_text_by_class_property(self.driver, text_elem)
@@ -133,10 +152,8 @@ class DspTestSuite(BaseTestSuite):
 
     def test_A_000006(self):
         """Confirm that CREATOR is populated from HS profile"""
-        self.login_orcid_and_hs()
-        SubmitLandingPage.to_hs_submit(self.driver)
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
-        SubmitHydroshare.autofill_required_elements(self.driver, auto_text)
+        self.login_and_autofill_hs_required(auto_text)
         SubmitHydroshare.finish_submission(self.driver)
 
         # The page isn't sorted upon load
@@ -144,7 +161,6 @@ class DspTestSuite(BaseTestSuite):
         MySubmissions.edit_top_submission(self.driver)
         section = "Creators"
         nth = 1
-
         dict = {
             "Name": "Meister, Jim",
             "Phone": "4444444444",
@@ -184,10 +200,8 @@ class DspTestSuite(BaseTestSuite):
         # TODO: this test fills the date/times but they fail to submit
         # so this test will fail until this issue is fixed in DSP
         # https://github.com/cznethub/dspfront/issues/52
-        self.login_orcid_and_hs()
-        SubmitLandingPage.to_hs_submit(self.driver)
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
-        SubmitHydroshare.autofill_required_elements(self.driver, auto_text)
+        self.login_and_autofill_hs_required(auto_text)
         section = "Temporalcoverage"
         nth = 1
         dict = {
@@ -208,10 +222,8 @@ class DspTestSuite(BaseTestSuite):
 
     def test_A_000009(self):
         """Confirm that Funding Agency info persists from submit to edit"""
-        self.login_orcid_and_hs()
-        SubmitLandingPage.to_hs_submit(self.driver)
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
-        SubmitHydroshare.autofill_required_elements(self.driver, auto_text)
+        self.login_and_autofill_hs_required(auto_text)
         section = "Fundingagencyinformation"
         nth = 1
         dict = {
@@ -219,23 +231,12 @@ class DspTestSuite(BaseTestSuite):
             "Awardnumber": "5",
             "AgencyURL": "http://funding-agency.com/" + auto_text,
         }
-        success = SubmitHydroshare.fill_inputs_by_data_ids(self.driver, dict, section, nth)
-        self.assertTrue(success)
-        SubmitHydroshare.finish_submission(self.driver)
-
-        # The page isn't sorted upon load
-        MySubmissions.enter_text_in_search(self.driver, auto_text)
-        MySubmissions.edit_top_submission(self.driver)
-
-        match = EditHSSubmission.check_inputs_by_data_ids(self.driver, dict, section, nth)
-        self.assertTrue(match)
+        self.fill_ids_submit_and_check(auto_text, section, nth, dict)
 
     def test_A_000010(self):
         """Confirm that Contributors info persists from submit to edit"""
-        self.login_orcid_and_hs()
-        SubmitLandingPage.to_hs_submit(self.driver)
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
-        SubmitHydroshare.autofill_required_elements(self.driver, auto_text)
+        self.login_and_autofill_hs_required(auto_text)
         section = "Contributors"
         nth = 1
         dict = {
@@ -247,23 +248,12 @@ class DspTestSuite(BaseTestSuite):
             "Homepage": "http://contibutor_homepage.com/" + auto_text,
         }
         SubmitHydroshare.click_expand_contributors(self.driver)
-        success = SubmitHydroshare.fill_inputs_by_data_ids(self.driver, dict, section, nth)
-        self.assertTrue(success)
-        SubmitHydroshare.finish_submission(self.driver)
-
-        # The page isn't sorted upon load
-        MySubmissions.enter_text_in_search(self.driver, auto_text)
-        MySubmissions.edit_top_submission(self.driver)
-
-        match = EditHSSubmission.check_inputs_by_data_ids(self.driver, dict, section, nth)
-        self.assertTrue(match)
+        self.fill_ids_submit_and_check(auto_text, section, nth, dict)
 
     def test_A_000011(self):
         """Confirm that Spatial Point Coverage info persists from submit to edit"""
-        self.login_orcid_and_hs()
-        SubmitLandingPage.to_hs_submit(self.driver)
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
-        SubmitHydroshare.autofill_required_elements(self.driver, auto_text)
+        self.login_and_autofill_hs_required(auto_text)
         section = "Spatialcoverage"
         nth = 1
         dict = {
@@ -272,23 +262,12 @@ class DspTestSuite(BaseTestSuite):
             "North": "-20",
         }
         SubmitHydroshare.click_expand_spatial(self.driver)
-        success = SubmitHydroshare.fill_inputs_by_data_ids(self.driver, dict, section, nth)
-        self.assertTrue(success)
-        SubmitHydroshare.finish_submission(self.driver)
-
-        # The page isn't sorted upon load
-        MySubmissions.enter_text_in_search(self.driver, auto_text)
-        MySubmissions.edit_top_submission(self.driver)
-
-        match = EditHSSubmission.check_inputs_by_data_ids(self.driver, dict, section, nth)
-        self.assertTrue(match)
+        self.fill_ids_submit_and_check(auto_text, section, nth, dict)
 
     def test_A_000012(self):
         """Confirm that additional metadata info persists from submit to edit"""
-        self.login_orcid_and_hs()
-        SubmitLandingPage.to_hs_submit(self.driver)
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
-        SubmitHydroshare.autofill_required_elements(self.driver, auto_text)
+        self.login_and_autofill_hs_required(auto_text)
         section = "Additionalmetadata"
         nth = 1
         dict = {
@@ -296,24 +275,13 @@ class DspTestSuite(BaseTestSuite):
             "Value": auto_text + " value"
         }
         SubmitHydroshare.click_expand_metadata(self.driver)
-        success = SubmitHydroshare.fill_inputs_by_data_ids(self.driver, dict, section, nth)
-        self.assertTrue(success)
-        SubmitHydroshare.finish_submission(self.driver)
-
-        # The page isn't sorted upon load
-        MySubmissions.enter_text_in_search(self.driver, auto_text)
-        MySubmissions.edit_top_submission(self.driver)
-
-        match = EditHSSubmission.check_inputs_by_data_ids(self.driver, dict, section, nth)
-        self.assertTrue(match)
+        self.fill_ids_submit_and_check(auto_text, section, nth, dict)
 
     def test_A_000013(self):
         """Confirm that Related Resources info persists from submit to edit"""
         # TODO: relation type dropdown
-        self.login_orcid_and_hs()
-        SubmitLandingPage.to_hs_submit(self.driver)
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
-        SubmitHydroshare.autofill_required_elements(self.driver, auto_text)
+        self.login_and_autofill_hs_required(auto_text)
         section = "Relatedresources"
         nth = 1
         dict = {
@@ -321,13 +289,7 @@ class DspTestSuite(BaseTestSuite):
             "Value": auto_text + " value"
         }
         SubmitHydroshare.click_expand_related_resources(self.driver)
-        success = SubmitHydroshare.fill_inputs_by_data_ids(self.driver, dict, section, nth)
-        self.assertTrue(success)
-        SubmitHydroshare.finish_submission(self.driver)
-
-        # The page isn't sorted upon load
-        MySubmissions.enter_text_in_search(self.driver, auto_text)
-        MySubmissions.edit_top_submission(self.driver)
+        self.fill_ids_submit_and_check(auto_text, section, nth, dict)
 
         match = EditHSSubmission.check_inputs_by_data_ids(self.driver, dict, section, nth)
         self.assertTrue(match)
