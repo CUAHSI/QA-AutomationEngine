@@ -375,6 +375,10 @@ class SubmitHydroshare(Dsp):
         self.expand_spatial.javascript_click(driver)
 
     @classmethod
+    def open_box_coverage(self, driver):
+        self.click_expand_spatial(driver)
+
+    @classmethod
     def click_expand_metadata(self, driver):
         self.expand_metadata.scroll_to(driver)
         self.expand_metadata.javascript_click(driver)

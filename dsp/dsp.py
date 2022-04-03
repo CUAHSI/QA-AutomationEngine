@@ -297,5 +297,31 @@ class DspTestSuite(BaseTestSuite):
         match = EditHSSubmission.check_inputs_by_data_ids(self.driver, dict, section, nth)
         self.assertTrue(match)
 
+    def test_A_000014(self):
+        """Confirm that Spatial Box Coverage info persists from submit to edit"""
+        auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
+        self.login_and_autofill_hs_required(auto_text)
+        section = "Spatialcoverage"
+        nth = 1
+        dict = {
+            "Name": auto_text + "Contributor name2-input",
+            "Northlimit": "-20",
+            "Eastlimit": "120",
+            "Southlimit": "20",
+            "Westlimit": "-120"
+        }
+        SubmitHydroshare.open_box_coverage(self.driver)
+        success_filling = SubmitHydroshare.fill_inputs_by_data_ids(self.driver, dict, section, nth)
+        self.assertTrue(success_filling)
+        SubmitHydroshare.finish_submission(self.driver)
+
+        # The page isn't sorted upon load
+        MySubmissions.enter_text_in_search(self.driver, auto_text)
+        MySubmissions.edit_top_submission(self.driver)
+
+        EditHSSubmission.open_box_coverage(self.driver)
+        match = EditHSSubmission.check_inputs_by_data_ids(self.driver, dict, section, nth)
+        self.assertTrue(match)
+
 if __name__ == "__main__":
     parse_args_run_tests(DspTestSuite)
