@@ -52,6 +52,7 @@ class Dsp(WebPage):
     navigation_about = SiteElement(By.ID, "navbar-nav-About")
     navigation_contact = SiteElement(By.ID, "navbar-nav-Contact")
     is_saving = SiteElement(By.ID, "new-submission-saving")
+    navigation_login = SiteElement(By.ID, "navbar-login")
 
     # responsive
     navigation_hamburger = SiteElement(By.CSS_SELECTOR, "#app-bar .v-app-bar__nav-icon")
@@ -62,6 +63,7 @@ class Dsp(WebPage):
     drawer_nav_submit = SiteElement(By.ID, "drawer-nav-SubmitData")
     drawer_nav_about = SiteElement(By.ID, "drawer-nav-About")
     drawer_nav_contact = SiteElement(By.ID, "drawer-nav-Contact")
+    drawer_nav_login = SiteElement(By.ID, "drawer-nav-login")
 
     # login
     orcid_login_modal = SiteElement(By.CSS_SELECTOR, ".v-dialog .cz-login")
@@ -188,7 +190,7 @@ class OrcidWindow(WebPage):
         self.submit.click(driver)
 
 
-class HydroshareWindow(WebPage):
+class RepoAuthWindow(WebPage):
     """ Authentication window to use Hydroshare as Backend """
     username = SiteElement(By.ID, "id_username")
     password = SiteElement(By.ID, "id_password")
@@ -196,7 +198,7 @@ class HydroshareWindow(WebPage):
     authorize = SiteElement(By.CSS_SELECTOR, '#authorizationForm input[name="allow"]')
 
     @classmethod
-    def authorize_hs_backend(self, driver, username, password):
+    def authorize_repo(self, driver, username, password):
         self.username.inject_text(driver, username)
         self.password.inject_text(driver, password)
         self.submit.click(driver)
@@ -242,35 +244,36 @@ class MySubmissions(Dsp):
 
 class SubmitLandingPage(Dsp):
     """ Page containing options for submitting data """
-    hydroshare_repo = SiteElement(By.ID, "HydroShare-card")
-    submit_to_hs_modal = SiteElement(By.CSS_SELECTOR, ".v-dialog div.cz-authorize")
-    submit_to_hs_authorize = SiteElement(By.CSS_SELECTOR, ".cz-authorize button.primary")
+    submit_to_repo_modal = SiteElement(By.CSS_SELECTOR, ".v-dialog div.cz-authorize")
+    submit_to_repo_authorize = SiteElement(By.CSS_SELECTOR, ".cz-authorize button.primary")
 
     @classmethod
-    def hydroshare_repo_select(self, driver):
-        self.hydroshare_repo.click(driver)
+    def select_repo_by_id(self, driver, id):
+        repo_card = SiteElement(By.CSS_SELECTOR, f'div[id*="{id}"]')
+        repo_card.scroll_to(driver)
+        repo_card.click(driver)
 
     @classmethod
-    def authorize_hs_submit(self, driver):
-        self.submit_to_hs_authorize.click(driver)
+    def select_nth_repo(self, driver, n):
+        repo_card = SiteElement(By.CSS_SELECTOR, f'div.repositories div.v-card:nth-of-type({n})')
+        repo_card.scroll_to(driver)
+        repo_card.click(driver)
 
     @classmethod
-    def to_hs_window(self, driver):
+    def to_repo_window(self, driver):
         TestSystem.wait(AUTH_WINDOW)
         num_windows_now = len(driver.window_handles)
-        self.submit_to_hs_authorize.click(driver)
+        self.submit_to_repo_authorize.click(driver)
         External.switch_new_page(driver, num_windows_now, self.body_locator)
 
     @classmethod
-    def to_hs_submit(self, driver):
+    def to_repo_submit(self, driver, id):
         Dsp.show_mobile_nav(driver)
         Dsp.drawer_to_submit(driver)
-        self.hydroshare_repo_select(driver)
+        self.select_repo_by_id(driver, id)
 
 
-class SubmitHydroshare(Dsp):
-    """ Page containing forms for submitting data with HS backend"""
-
+class GeneralSubmitToRepo(Dsp):
     header = SiteElement(By.CSS_SELECTOR, ".cz-new-submission h1")
     alert = SiteElement(By.CSS_SELECTOR, ".v-alert .v-alert__content")
     top_save = SiteElement(By.CSS_SELECTOR, "#cz-new-submission-actions-top button.submission-save")
@@ -279,40 +282,9 @@ class SubmitHydroshare(Dsp):
     # required_elements = SiteElementsCollection(By.CSS_SELECTOR, "input[required='required']")
     # required_elements = SiteElementsCollection(By.CSS_SELECTOR, "input[data-id$="*")
 
-    # Basic info
-    abstract = SiteElement(By.ID, "#/properties/abstract-input")
-    subject_keyword_input = SiteElement(By.CSS_SELECTOR, 'input[data-id*="Subjectkeywords"]')
-    # TODO: this selector is still fragile to additions of other v-select items withing the basic info
-    subject_keywords = SiteElementsCollection(By.CSS_SELECTOR, 'fieldset[data-id*="group-BasicInformation"] span.v-chip__content')
-    subject_keyword_container = SiteElement(By.CSS_SELECTOR, '[data-id="group-BasicInformation"] .v-select__selections')
-
-    # Contributors
-    expand_contributors = SiteElement(By.CSS_SELECTOR, '[data-id*="Contributors"] button.btn-add')
-
-    # Spatial coverage
-    expand_spatial = SiteElement(By.CSS_SELECTOR, '[data-id*="Spatialcoverage"] button.btn-add')
-
-    # Additional metadata
-    expand_metadata = SiteElement(By.CSS_SELECTOR, '[data-id*="Additionalmetadata"] button.btn-add')
-
-    # Related resources
-    expand_related_resources = SiteElement(By.CSS_SELECTOR, '[data-id*="Relatedresources"] button.btn-add')
-
-    # Temporal
-    temporal_name_input = SiteElement(By.CSS_SELECTOR, 'div[data-id*="Temporalcoverage"] input[data-id*="Name"]')
-    start_input = SiteElement(By.CSS_SELECTOR, '[data-id*="Temporalcoverage"] input[data-id*="Start"]')
-    end_input = SiteElement(By.CSS_SELECTOR, '[data-id*="Temporalcoverage"] input[data-id*="End"]')
-
-    # Funding agency
-    expand_funding_agency = SiteElement(By.CSS_SELECTOR, 'button[aria-label*="Funding agency"]')
-    agency_name = SiteElement(By.ID, "#/properties/funding_agency_name-input")
-
-    # Rights
-    rights_statement = SiteElement(By.ID, "#/properties/statement-input")
-    rights_url = SiteElement(By.ID, "#/properties/url-input")
-
     bottom_save = SiteElement(By.CSS_SELECTOR, "#cz-new-submission-actions-bottom button.submission-save")
     bottom_finish = SiteElement(By.CSS_SELECTOR, "#cz-new-submission-actions-bottom button.submission-finish")
+
 
     @classmethod
     def get_header_text(self, driver):
@@ -327,86 +299,10 @@ class SubmitHydroshare(Dsp):
         return self.top_save.get_attribute(driver, "disabled") != "disabled"
 
     @classmethod
-    def autofill_required_elements(self, driver, auto):
-        self.fill_basic_info(driver, auto)
-        if isinstance(auto, str):
-            self.fill_funding_agency(driver, auto)
-        else:
-            self.fill_funding_agency(driver, auto["funding_agency_name-input"])
-
-    @classmethod
-    def fill_basic_info(self, driver, basic_info):
-        if isinstance(basic_info, str):
-            title = basic_info
-            abstract = basic_info
-            subject_keyword_input = basic_info
-        else:
-            title = basic_info["title-input"]
-            abstract = basic_info["abstract-input"]
-            subject_keyword_input = basic_info["subjects-input"]
-
-        self.title.scroll_to(driver)
-        self.title.inject_text(driver, title)
-        self.abstract.inject_text(driver, abstract)
-        self.subject_keyword_container.click(driver)
-        if isinstance(subject_keyword_input, str):
-            self.subject_keyword_input.inject_text(driver, subject_keyword_input)
-            self.subject_keyword_input.submit(driver)
-        else:
-            for keyword in subject_keyword_input:
-                self.subject_keyword_input.inject_text(driver, keyword)
-                self.subject_keyword_input.submit(driver)
-
-    @classmethod
-    def fill_funding_agency(self, driver, agency):
-        self.expand_funding_agency.scroll_to(driver)
-        self.expand_funding_agency.javascript_click(driver)
-        self.agency_name.inject_text(driver, agency)
-        self.agency_name.submit(driver)
-
-    @classmethod
-    def click_expand_contributors(self, driver):
-        self.expand_contributors.scroll_to(driver)
-        self.expand_contributors.javascript_click(driver)
-
-    @classmethod
-    def click_expand_spatial(self, driver):
-        self.expand_spatial.scroll_to(driver)
-        self.expand_spatial.javascript_click(driver)
-
-    @classmethod
     def open_tab(self, driver, section, tab_number):
         box_coverage_tab = self.get_tab(section, tab_number)
         box_coverage_tab.scroll_to(driver)
         box_coverage_tab.javascript_click(driver)
-
-    @classmethod
-    def click_expand_metadata(self, driver):
-        self.expand_metadata.scroll_to(driver)
-        self.expand_metadata.javascript_click(driver)
-
-    @classmethod
-    def click_expand_related_resources(self, driver):
-        self.expand_related_resources.scroll_to(driver)
-        self.expand_related_resources.javascript_click(driver)
-
-    @classmethod
-    def fill_related_resources(self, driver, relation_type, value, n):
-        self.click_expand_related_resources(driver)
-
-        sel = f'div[data-id*="Relatedresources"] input[data-id*="RelationType"]:nth-of-type({n})'
-        relation_type_input = SiteElement(By.CSS_SELECTOR, sel)
-        sel = f'div[data-id*="Relatedresources"] input[data-id*="Value"]:nth-of-type({n})'
-        related_resources_value = SiteElement(By.CSS_SELECTOR, sel)
-        sel = f'div[data-id*="Relatedresources"] div.v-select:nth-of-type({n})'
-        relation_type_container = SiteElement(By.CSS_SELECTOR, sel)
-
-        relation_type_container.scroll_to(driver)
-        relation_type_container.javascript_click(driver)
-        relation_type_input.inject_text(driver, relation_type)
-        relation_type_input.submit(driver)
-        related_resources_value.inject_text(driver, value)
-        related_resources_value.submit(driver)
 
     @classmethod
     def save_bottom(self, driver):
@@ -477,13 +373,153 @@ class SubmitHydroshare(Dsp):
         eval("self.{}.inject_text(driver, '{}')".format(element, text_to_fill))
 
 
-class EditHSSubmission(SubmitHydroshare):
+class GeneralEditSubmission(Dsp):
     header_title = SiteElement(By.CSS_SELECTOR, ".text-h4")
 
     @classmethod
     def get_header_title(self, driver):
         return self.header_title.get_text(driver)
 
+    @classmethod
+    def check_fields_by_dict(self, driver, dict):
+        for k, v in dict.items():
+            element = SiteElement(By.ID, "#/properties/" + k)
+            element.scroll_to(driver)
+            value = element.get_value(driver)
+            if value != v:
+                print(f"\nMismatch when checking field: {k}. Expected {v} got {value}")
+                return False
+        return True
+
+    @classmethod
+    def check_inputs_by_data_ids(self, driver, dict, section=None, nth=1):
+        for k, v in dict.items():
+            if section and nth:
+                selector = f'div[data-id*="{section}"] [data-id*="{k}"]:nth-of-type({nth})'
+                elem = SiteElement(By.CSS_SELECTOR, selector)
+            else:
+                elem = SiteElement(By.CSS_SELECTOR, f'[data-id*="{k}"]:nth-of-type(1)')
+            elem.scroll_to(driver)
+            value = elem.get_value(driver)
+            if value != v:
+                print(f"\nMismatch when checking field: {k}. Expected {v} got {value}")
+                return False
+        return True
+
+
+class SubmitHydroshare(GeneralSubmitToRepo):
+    """ Page containing forms for submitting data with HS backend"""
+
+    # Basic info
+    abstract = SiteElement(By.ID, "#/properties/abstract-input")
+    subject_keyword_input = SiteElement(By.CSS_SELECTOR, 'input[data-id*="Subjectkeywords"]')
+    # TODO: this selector is still fragile to additions of other v-select items withing the basic info
+    subject_keywords = SiteElementsCollection(By.CSS_SELECTOR, 'fieldset[data-id*="group-BasicInformation"] span.v-chip__content')
+    subject_keyword_container = SiteElement(By.CSS_SELECTOR, '[data-id="group-BasicInformation"] .v-select__selections')
+
+    # Contributors
+    expand_contributors = SiteElement(By.CSS_SELECTOR, '[data-id*="Contributors"] button.btn-add')
+
+    # Spatial coverage
+    expand_spatial = SiteElement(By.CSS_SELECTOR, '[data-id*="Spatialcoverage"] button.btn-add')
+
+    # Additional metadata
+    expand_metadata = SiteElement(By.CSS_SELECTOR, '[data-id*="Additionalmetadata"] button.btn-add')
+
+    # Related resources
+    expand_related_resources = SiteElement(By.CSS_SELECTOR, '[data-id*="Relatedresources"] button.btn-add')
+
+    # Temporal
+    temporal_name_input = SiteElement(By.CSS_SELECTOR, 'div[data-id*="Temporalcoverage"] input[data-id*="Name"]')
+    start_input = SiteElement(By.CSS_SELECTOR, '[data-id*="Temporalcoverage"] input[data-id*="Start"]')
+    end_input = SiteElement(By.CSS_SELECTOR, '[data-id*="Temporalcoverage"] input[data-id*="End"]')
+
+    # Funding agency
+    expand_funding_agency = SiteElement(By.CSS_SELECTOR, 'button[aria-label*="Funding agency"]')
+    agency_name = SiteElement(By.ID, "#/properties/funding_agency_name-input")
+
+    # Rights
+    rights_statement = SiteElement(By.ID, "#/properties/statement-input")
+    rights_url = SiteElement(By.ID, "#/properties/url-input")
+
+    @classmethod
+    def autofill_required_elements(self, driver, auto):
+        self.fill_basic_info(driver, auto)
+        if isinstance(auto, str):
+            self.fill_funding_agency(driver, auto)
+        else:
+            self.fill_funding_agency(driver, auto["funding_agency_name-input"])
+
+    @classmethod
+    def fill_basic_info(self, driver, basic_info):
+        if isinstance(basic_info, str):
+            title = basic_info
+            abstract = basic_info
+            subject_keyword_input = basic_info
+        else:
+            title = basic_info["title-input"]
+            abstract = basic_info["abstract-input"]
+            subject_keyword_input = basic_info["subjects-input"]
+
+        self.title.scroll_to(driver)
+        self.title.inject_text(driver, title)
+        self.abstract.inject_text(driver, abstract)
+        self.subject_keyword_container.click(driver)
+        if isinstance(subject_keyword_input, str):
+            self.subject_keyword_input.inject_text(driver, subject_keyword_input)
+            self.subject_keyword_input.submit(driver)
+        else:
+            for keyword in subject_keyword_input:
+                self.subject_keyword_input.inject_text(driver, keyword)
+                self.subject_keyword_input.submit(driver)
+
+    @classmethod
+    def fill_funding_agency(self, driver, agency):
+        self.expand_funding_agency.scroll_to(driver)
+        self.expand_funding_agency.javascript_click(driver)
+        self.agency_name.inject_text(driver, agency)
+        self.agency_name.submit(driver)
+
+    @classmethod
+    def click_expand_contributors(self, driver):
+        self.expand_contributors.scroll_to(driver)
+        self.expand_contributors.javascript_click(driver)
+
+    @classmethod
+    def click_expand_spatial(self, driver):
+        self.expand_spatial.scroll_to(driver)
+        self.expand_spatial.javascript_click(driver)
+
+    @classmethod
+    def click_expand_metadata(self, driver):
+        self.expand_metadata.scroll_to(driver)
+        self.expand_metadata.javascript_click(driver)
+
+    @classmethod
+    def click_expand_related_resources(self, driver):
+        self.expand_related_resources.scroll_to(driver)
+        self.expand_related_resources.javascript_click(driver)
+
+    @classmethod
+    def fill_related_resources(self, driver, relation_type, value, n):
+        self.click_expand_related_resources(driver)
+
+        sel = f'div[data-id*="Relatedresources"] input[data-id*="RelationType"]:nth-of-type({n})'
+        relation_type_input = SiteElement(By.CSS_SELECTOR, sel)
+        sel = f'div[data-id*="Relatedresources"] input[data-id*="Value"]:nth-of-type({n})'
+        related_resources_value = SiteElement(By.CSS_SELECTOR, sel)
+        sel = f'div[data-id*="Relatedresources"] div.v-select:nth-of-type({n})'
+        relation_type_container = SiteElement(By.CSS_SELECTOR, sel)
+
+        relation_type_container.scroll_to(driver)
+        relation_type_container.javascript_click(driver)
+        relation_type_input.inject_text(driver, relation_type)
+        relation_type_input.submit(driver)
+        related_resources_value.inject_text(driver, value)
+        related_resources_value.submit(driver)
+
+
+class EditHSSubmission(GeneralEditSubmission):
     @classmethod
     def check_required_elements(self, driver, auto):
         if not self.check_basic_info(driver, auto, auto, ["CZNet", auto]):
@@ -533,32 +569,6 @@ class EditHSSubmission(SubmitHydroshare):
     def get_nth_keyword_text(self, driver, n):
         span = SiteElement(By.CSS_SELECTOR, ".v-select__selections span:nth-of-type({}) span.v-chip__content".format(n))
         return span.get_text(driver)
-
-    @classmethod
-    def check_fields_by_dict(self, driver, dict):
-        for k, v in dict.items():
-            element = SiteElement(By.ID, "#/properties/" + k)
-            element.scroll_to(driver)
-            value = element.get_value(driver)
-            if value != v:
-                print(f"\nMismatch when checking field: {k}. Expected {v} got {value}")
-                return False
-        return True
-
-    @classmethod
-    def check_inputs_by_data_ids(self, driver, dict, section=None, nth=1):
-        for k, v in dict.items():
-            if section and nth:
-                selector = f'div[data-id*="{section}"] [data-id*="{k}"]:nth-of-type({nth})'
-                elem = SiteElement(By.CSS_SELECTOR, selector)
-            else:
-                elem = SiteElement(By.CSS_SELECTOR, f'[data-id*="{k}"]:nth-of-type(1)')
-            elem.scroll_to(driver)
-            value = elem.get_value(driver)
-            if value != v:
-                print(f"\nMismatch when checking field: {k}. Expected {v} got {value}")
-                return False
-        return True
 
 
 class Utilities:

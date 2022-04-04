@@ -19,7 +19,8 @@ from dsp_macros import (
     SubmitLandingPage,
     MySubmissions,
     OrcidWindow,
-    HydroshareWindow,
+    RepoAuthWindow,
+    GeneralSubmitToRepo,
     SubmitHydroshare,
     EditHSSubmission
 )
@@ -51,11 +52,25 @@ class DspTestSuite(BaseTestSuite):
         else:
             self.driver.get(self.base_url_arg)
 
+    def login_orcid(self):
+        """Authenticate with orcid"""
+        Dsp.show_mobile_nav(self.driver)
+        Dsp.drawer_nav_login.click(self.driver)
+        Dsp.to_orcid_window(self.driver)
+        self.assertIn("ORCID", TestSystem.title(self.driver))
+
+        OrcidWindow.fill_credentials(self.driver, USERNAME, PASSWORD)
+        OrcidWindow.to_origin_window(self.driver, wait=True)
+
+
+class DspHydroshareTestSuite(DspTestSuite):
+    """DSP tests for Hydroshare repository"""
+
     def login_orcid_and_hs(self):
         """Authenticate with orcid and then HS credentials"""
         Dsp.show_mobile_nav(self.driver)
         Dsp.drawer_to_submit(self.driver)
-        SubmitLandingPage.hydroshare_repo_select(self.driver)
+        SubmitLandingPage.select_repo_by_id(self.driver, "HydroShare")
 
         # new ORCID window
         SubmitLandingPage.to_orcid_window(self.driver)
@@ -65,17 +80,17 @@ class DspTestSuite(BaseTestSuite):
         OrcidWindow.to_origin_window(self.driver)
 
         # new HS auth window
-        SubmitLandingPage.to_hs_window(self.driver)
+        SubmitLandingPage.to_repo_window(self.driver)
         self.assertIn("HydroShare", TestSystem.title(self.driver))
-        HydroshareWindow.authorize_hs_backend(self.driver, HS_USERNAME, HS_PASSWORD)
-        HydroshareWindow.to_origin_window(self.driver)
+        RepoAuthWindow.authorize_repo(self.driver, HS_USERNAME, HS_PASSWORD)
+        RepoAuthWindow.to_origin_window(self.driver)
 
     def login_and_autofill_hs_required(self, auto_text):
         """A shortcut to fill required fields of HS submit page
         So that additional non-required fields can easily be checked
         """
         self.login_orcid_and_hs()
-        SubmitLandingPage.to_hs_submit(self.driver)
+        SubmitLandingPage.to_repo_submit(self.driver, "HydroShare")
         SubmitHydroshare.autofill_required_elements(self.driver, auto_text)
 
     def fill_ids_submit_and_check(self, sort_text, section, nth, dict):
@@ -110,7 +125,7 @@ class DspTestSuite(BaseTestSuite):
     def test_A_000003(self):
         """Check that submit instructions are shown"""
         self.login_orcid_and_hs()
-        SubmitLandingPage.to_hs_submit(self.driver)
+        SubmitLandingPage.to_repo_submit(self.driver, "HydroShare")
         alert = SubmitHydroshare.get_alert_text(self.driver)
         self.assertIn("Instructions:", alert)
 
@@ -171,7 +186,7 @@ class DspTestSuite(BaseTestSuite):
     def test_A_000007(self):
         """Confirm that Basic Info persists from submit to edit"""
         self.login_orcid_and_hs()
-        SubmitLandingPage.to_hs_submit(self.driver)
+        SubmitLandingPage.to_repo_submit(self.driver, "HydroShare")
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
         dict = {
             "title-input": auto_text + "title-input",
@@ -324,6 +339,43 @@ class DspTestSuite(BaseTestSuite):
         EditHSSubmission.open_tab(self.driver, section, tab_number=2)
         match = EditHSSubmission.check_inputs_by_data_ids(self.driver, dict, section, nth)
         self.assertTrue(match)
+
+
+class DspExternalTestSuite(DspTestSuite):
+    """DSP tests for External (No Repo)"""
+
+    def login_orcid_and_external(self):
+        """Authenticate with orcid and then HS credentials"""
+        Dsp.show_mobile_nav(self.driver)
+        Dsp.drawer_to_submit(self.driver)
+        SubmitLandingPage.select_nth_repo(self.driver, 4)
+
+        # new ORCID window
+        SubmitLandingPage.to_orcid_window(self.driver)
+        self.assertIn("ORCID", TestSystem.title(self.driver))
+
+        OrcidWindow.fill_credentials(self.driver, USERNAME, PASSWORD)
+        OrcidWindow.to_origin_window(self.driver)
+
+    def test_A_000001(self):
+        """Ensure anonymous navigation to my submissions shows orcid login modal"""
+        Dsp.show_mobile_nav(self.driver)
+        Dsp.drawer_to_my_submissions(self.driver)
+        login_visible = MySubmissions.is_visible_orcid_modal(self.driver)
+        self.assertTrue(login_visible)
+
+    def test_A_000002(self):
+        """Check authentication to submit page"""
+        self.login_orcid_and_external()
+        header = GeneralSubmitToRepo.get_header_text(self.driver)
+        self.assertIn("External", header)
+
+    def test_A_000003(self):
+        """Check that submit instructions are shown"""
+        self.login_orcid_and_external()
+        alert = GeneralSubmitToRepo.get_alert_text(self.driver)
+        self.assertIn("Instructions:", alert)
+
 
 if __name__ == "__main__":
     parse_args_run_tests(DspTestSuite)
