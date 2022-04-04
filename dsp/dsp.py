@@ -161,7 +161,7 @@ class DspTestSuite(BaseTestSuite):
         nth = 1
         dict = {
             "Name": "Meister, Jim",
-            "Phone": "4444444444",
+            # "Phone": "4444444444", phone is no longer showing up on beta HS
             "Organization": "Freie Universität Berlin;Agricultural University of Warsaw",
             "Email": "concretejackbill@gmail.com"
         }
@@ -310,7 +310,8 @@ class DspTestSuite(BaseTestSuite):
             "Southlimit": "20",
             "Westlimit": "-120"
         }
-        SubmitHydroshare.open_box_coverage(self.driver)
+        SubmitHydroshare.click_expand_spatial(self.driver)
+        SubmitHydroshare.open_tab(self.driver, section, tab_number=2)
         success_filling = SubmitHydroshare.fill_inputs_by_data_ids(self.driver, dict, section, nth)
         self.assertTrue(success_filling)
         SubmitHydroshare.finish_submission(self.driver)
@@ -319,7 +320,8 @@ class DspTestSuite(BaseTestSuite):
         MySubmissions.enter_text_in_search(self.driver, auto_text)
         MySubmissions.edit_top_submission(self.driver)
 
-        EditHSSubmission.open_box_coverage(self.driver)
+        EditHSSubmission.click_expand_spatial(self.driver)
+        EditHSSubmission.open_tab(self.driver, section, tab_number=2)
         match = EditHSSubmission.check_inputs_by_data_ids(self.driver, dict, section, nth)
         self.assertTrue(match)
 

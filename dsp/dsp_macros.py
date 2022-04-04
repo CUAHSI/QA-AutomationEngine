@@ -375,8 +375,10 @@ class SubmitHydroshare(Dsp):
         self.expand_spatial.javascript_click(driver)
 
     @classmethod
-    def open_box_coverage(self, driver):
-        self.click_expand_spatial(driver)
+    def open_tab(self, driver, section, tab_number):
+        box_coverage_tab = self.get_tab(section, tab_number)
+        box_coverage_tab.scroll_to(driver)
+        box_coverage_tab.javascript_click(driver)
 
     @classmethod
     def click_expand_metadata(self, driver):
@@ -455,6 +457,12 @@ class SubmitHydroshare(Dsp):
             else:
                 return False
         return True
+
+    @classmethod
+    def get_tab(self, section=None, tab_number=1):
+        # index if off by 1
+        selector = f'div[data-id*="{section}"] .v-tabs .v-tab:nth-of-type({tab_number+1})'
+        return SiteElement(By.CSS_SELECTOR, selector)
 
     @classmethod
     def unfill_text_by_page_property(self, driver, element):
