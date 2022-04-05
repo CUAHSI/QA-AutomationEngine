@@ -1,4 +1,5 @@
 import json
+from multiprocessing.dummy import Array
 import os
 import re
 import requests
@@ -277,7 +278,6 @@ class GeneralSubmitToRepo(Dsp):
     header = SiteElement(By.CSS_SELECTOR, ".cz-new-submission h1")
     alert = SiteElement(By.CSS_SELECTOR, ".v-alert .v-alert__content")
     top_save = SiteElement(By.CSS_SELECTOR, "#cz-new-submission-actions-top button.submission-save")
-    title = SiteElement(By.CSS_SELECTOR, '[data-id*="BasicInformation"] input[data-id*="Title"]')
 
     # required_elements = SiteElementsCollection(By.CSS_SELECTOR, "input[required='required']")
     # required_elements = SiteElementsCollection(By.CSS_SELECTOR, "input[data-id$="*")
@@ -323,18 +323,21 @@ class GeneralSubmitToRepo(Dsp):
         self.wait_until_element_not_exist(driver, self.is_saving, NEW_SUBMISSION_SAVE)
 
     @classmethod
-    def get_did_in_section(self, driver, section=None, data_id="", nth=1):
+    def get_did_in_section(self, section=None, data_id="", nth=1):
         selector = f'div[data-id*="{section}"] [data-id*="{data_id}"]:nth-of-type({nth})'
         return SiteElement(By.CSS_SELECTOR, selector)
 
     @classmethod
-    def get_css_in_section(self, driver, section=None, css="", nth=1):
+    def get_css_in_section(self, section=None, css="", nth=1):
         selector = f'div[data-id*="{section}"] {css}'
         return SiteElement(By.CSS_SELECTOR, selector)
 
     @classmethod
     def expand_section_by_did(self, driver, data_id):
         element = SiteElement(By.CSS_SELECTOR, f'[data-id*="{data_id}"] button.btn-add')
+        if not element.exists_in_dom(driver):
+            print(f"\n Ignoring attempt to expand static section: {data_id}")
+            return False
         element.scroll_to(driver)
         # make sure the section isn't already open
         if element.get_attribute(driver, "aria-label") != "Remove":
@@ -345,7 +348,7 @@ class GeneralSubmitToRepo(Dsp):
         for k, v in dict.items():
             try:
                 if section and nth:
-                    selector = f'div[data-id*="{section}"] [data-id*="{k}"]:nth-of-type({nth})'
+                    selector = f'[data-id*="{section}"] [data-id*="{k}"]:nth-of-type({nth})'
                     element = SiteElement(By.CSS_SELECTOR, selector)
                 else:
                     element = SiteElement(By.CSS_SELECTOR, f'[data-id*="{k}"]:nth-of-type(1)')
@@ -353,17 +356,57 @@ class GeneralSubmitToRepo(Dsp):
                 print(f"{e}\nElement not found for key: {k}")
                 return False
             if element.exists_in_dom(driver):
-                element.scroll_to(driver)
-                element.javascript_click(driver)
-                element.inject_text(driver, v)
-                element.submit(driver)
+                if isinstance(v, list):
+                    # assume this is a v-multi-select
+                    self.fill_v_multi_select(driver, container_id=section, input_id=k, keywords=v)
+                else:
+                    # TODO: remove uneeded scroll-tos
+                    # element.scroll_to_hidden(driver)
+                    element.javascript_click(driver)
+                    element.inject_text(driver, v)
+                    element.submit(driver)
             else:
+                print(f'\nAttempt to fill element {k} in section {section} failed. Not in DOM \
+                    \nSelector used="{selector}"')
                 return False
         return True
 
     @classmethod
+    def unfill_and_refill(self, driver, section, did, value):
+        selector = f'[data-id*="{section}"] [data-id*="{did}"]'
+        element = SiteElement(By.CSS_SELECTOR, selector)
+        if element.exists_in_dom(driver):
+            element.scroll_to_hidden(driver)
+            element.javascript_click(driver)
+            element.clear_all_text(driver)
+            element.submit(driver)
+            element.javascript_click(driver)
+            element.inject_text(driver, value)
+            element.submit(driver)
+        else:
+            print(f'\nAttempt to fill element {k} in section {section} failed. Not in DOM \
+                \nSelector used="{selector}"')
+            return False
+        return True
+
+    @classmethod
+    def fill_v_multi_select(self, driver, container_id, input_id, keywords=["default_keyword"]):
+        container = SiteElement(By.CSS_SELECTOR, f'[data-id*="{container_id}"] .v-select__selections')
+        input = SiteElement(By.CSS_SELECTOR, f'.v-select__selections input[data-id*="{input_id}"]')
+
+        # container.scroll_to(driver)
+        container.click(driver)
+        if isinstance(keywords, str):
+            input.inject_text(driver, keywords)
+            input.submit(driver)
+        else:
+            for keyword in keywords:
+                input.inject_text(driver, keyword)
+                input.submit(driver)
+
+    @classmethod
     def get_tab(self, section=None, tab_number=1):
-        # index if off by 1
+        # tab index is off by 1 because one hidden?
         selector = f'div[data-id*="{section}"] .v-tabs .v-tab:nth-of-type({tab_number+1})'
         return SiteElement(By.CSS_SELECTOR, selector)
 
@@ -418,10 +461,8 @@ class SubmitHydroshare(GeneralSubmitToRepo):
     """ Page containing forms for submitting data with HS backend"""
 
     # Basic info
+    title = SiteElement(By.CSS_SELECTOR, '[data-id*="BasicInformation"] input[data-id*="Title"]')
     abstract = SiteElement(By.ID, "#/properties/abstract-input")
-    subject_keyword_input = SiteElement(By.CSS_SELECTOR, 'input[data-id*="Subjectkeywords"]')
-    # TODO: this selector is still fragile to additions of other v-select items withing the basic info
-    subject_keywords = SiteElementsCollection(By.CSS_SELECTOR, 'fieldset[data-id*="group-BasicInformation"] span.v-chip__content')
     subject_keyword_container = SiteElement(By.CSS_SELECTOR, '[data-id="group-BasicInformation"] .v-select__selections')
 
     # Temporal
@@ -430,7 +471,6 @@ class SubmitHydroshare(GeneralSubmitToRepo):
     end_input = SiteElement(By.CSS_SELECTOR, '[data-id*="Temporalcoverage"] input[data-id*="End"]')
 
     # Funding agency
-    expand_funding_agency = SiteElement(By.CSS_SELECTOR, 'button[aria-label*="Funding agency"]')
     agency_name = SiteElement(By.ID, "#/properties/funding_agency_name-input")
 
     # Rights
@@ -459,19 +499,11 @@ class SubmitHydroshare(GeneralSubmitToRepo):
         self.title.scroll_to(driver)
         self.title.inject_text(driver, title)
         self.abstract.inject_text(driver, abstract)
-        self.subject_keyword_container.click(driver)
-        if isinstance(subject_keyword_input, str):
-            self.subject_keyword_input.inject_text(driver, subject_keyword_input)
-            self.subject_keyword_input.submit(driver)
-        else:
-            for keyword in subject_keyword_input:
-                self.subject_keyword_input.inject_text(driver, keyword)
-                self.subject_keyword_input.submit(driver)
+        self.fill_v_multi_select(driver, container_id="BasicInformation", input_id="Subjectkeywords", keywords=subject_keyword_input)
 
     @classmethod
     def fill_funding_agency(self, driver, agency):
-        self.expand_funding_agency.scroll_to(driver)
-        self.expand_funding_agency.javascript_click(driver)
+        self.expand_section_by_did(driver, "Fundingagencyinformation")
         self.agency_name.inject_text(driver, agency)
         self.agency_name.submit(driver)
 
@@ -492,6 +524,22 @@ class SubmitHydroshare(GeneralSubmitToRepo):
         relation_type_input.submit(driver)
         related_resources_value.inject_text(driver, value)
         related_resources_value.submit(driver)
+
+
+class SubmitExternal(GeneralSubmitToRepo):
+    """ Page containing forms for submitting data with EXTERNAL backend"""
+
+    @classmethod
+    def autofill_required_elements(self, driver, required):
+        for section, dict in required.items():
+            self.expand_section_by_did(driver, section)
+            self.fill_inputs_by_data_ids(driver, dict, section, nth=1)
+
+
+class EditExternalSubmission(SubmitHydroshare, GeneralEditSubmission):
+    @classmethod
+    def check_required_elements(self, driver, required_elements):
+        self.check_inputs_by_data_ids(self, driver, dict, section=None, nth=1)
 
 
 class EditHSSubmission(SubmitHydroshare, GeneralEditSubmission):
@@ -515,7 +563,7 @@ class EditHSSubmission(SubmitHydroshare, GeneralEditSubmission):
 
     @classmethod
     def check_funding_agency_name(self, driver, agency):
-        self.expand_funding_agency.scroll_to(driver)
+        self.expand_section_by_did(driver, "Fundingagencyinformation")
         return self.agency_name.get_value(driver) == agency
 
     @classmethod

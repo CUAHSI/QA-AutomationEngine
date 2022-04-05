@@ -22,7 +22,9 @@ from dsp_macros import (
     RepoAuthWindow,
     GeneralSubmitToRepo,
     SubmitHydroshare,
-    EditHSSubmission
+    EditHSSubmission,
+    SubmitExternal,
+    EditExternalSubmission
 )
 
 from cuahsi_base.cuahsi_base import BaseTestSuite, parse_args_run_tests
@@ -342,6 +344,8 @@ class DspHydroshareTestSuite(DspTestSuite):
 
     def test_A_000015(self):
         """Confirm that invalid Spatial Box Coverage info doesn't submit"""
+        # TODO: this test fails pending issue:
+        # https://github.com/cznethub/dspfront/issues/55
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
         self.login_and_autofill_hs_required(auto_text)
         section = "Spatialcoverage"
@@ -363,11 +367,45 @@ class DspHydroshareTestSuite(DspTestSuite):
 class DspExternalTestSuite(DspTestSuite):
     """DSP tests for External (No Repo)"""
 
+    @classmethod
+    def required_elements_template(self, auto_text):
+        basic_info = {
+            "Nameortitle": auto_text + " Nameortitle",
+            "URL": "http://basic_info_url.com/" + auto_text,
+            "Datepublished": "2022-04-05T00:04",
+            "Descriptionorabstract": auto_text + " Descriptionorabstract",
+            "SubjectKeywords": [auto_text + " SubjectKeywords"]
+        }
+        creator = {
+            "Name": "Meister, Jim",
+            "Organization": "Freie Universität Berlin;Agricultural University of Warsaw",
+            "Email": "concretejackbill@gmail.com",
+            "ORCID": "0000-0003-0813-0443"
+        }
+        funding_agency = {
+            "Fundingagencyname": auto_text + " Fundingagencyname",
+            "Awardnumberoridentifier*": auto_text + " Awardnumberoridentifier",
+            "Awardname": auto_text + " Awardname"
+        }
+        provider = {
+            "ProviderName": auto_text + " ProviderName",
+            "ProviderURL": "http://provider_url.com/" + auto_text
+        }
+
+        # created separately so that we can check indidually if needed
+        required_elements = {
+            "BasicInformation": basic_info,
+            "Creators": creator,
+            "Fundingagencyinformation": funding_agency,
+            "Provider": provider,
+        }
+        return required_elements
+
     def login_orcid_and_external(self):
         """Authenticate with orcid and then HS credentials"""
         Dsp.show_mobile_nav(self.driver)
         Dsp.drawer_to_submit(self.driver)
-        SubmitLandingPage.select_nth_repo(self.driver, 4)
+        SubmitLandingPage.select_repo_by_id(self.driver, "RegisterDataset")
 
         # new ORCID window
         SubmitLandingPage.to_orcid_window(self.driver)
@@ -375,6 +413,13 @@ class DspExternalTestSuite(DspTestSuite):
 
         OrcidWindow.fill_credentials(self.driver, USERNAME, PASSWORD)
         OrcidWindow.to_origin_window(self.driver)
+
+    def login_and_autofill_external_required(self, auto_text):
+        """A shortcut to fill required fields of submit page
+        So that additional non-required fields can easily be checked
+        """
+        self.login_orcid_and_external()
+        SubmitExternal.autofill_required_elements(self.driver, self.required_elements_template(auto_text))
 
     def test_A_000001(self):
         """Ensure anonymous navigation to my submissions shows orcid login modal"""
@@ -394,6 +439,26 @@ class DspExternalTestSuite(DspTestSuite):
         self.login_orcid_and_external()
         alert = GeneralSubmitToRepo.get_alert_text(self.driver)
         self.assertIn("Instructions:", alert)
+
+    def test_A_000004(self):
+        """Confirm successful submit of basic required fields for External Repo"""
+        auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
+        self.login_and_autofill_external_required(auto_text)
+
+        # TODO: this test fails due to date-time issue:
+        # https://github.com/cznethub/dspfront/issues/52
+        self.assertTrue(SubmitExternal.is_finishable(self.driver))
+        SubmitExternal.finish_submission(self.driver)
+        self.assertEqual("My Submissions", MySubmissions.get_title(self.driver))
+
+        MySubmissions.enter_text_in_search(self.driver, auto_text)
+        top_name = MySubmissions.get_top_submission_name(self.driver)
+        self.assertEqual(auto_text, top_name)
+
+        MySubmissions.edit_top_submission(self.driver)
+        self.assertEqual("Edit Submission", EditExternalSubmission.get_header_title(self.driver))
+
+        self.assertTrue(EditExternalSubmission.check_required_elements(self.driver, auto_text))
 
 
 if __name__ == "__main__":
