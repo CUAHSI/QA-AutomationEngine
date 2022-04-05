@@ -384,7 +384,7 @@ class GeneralSubmitToRepo(Dsp):
             element.inject_text(driver, value)
             element.submit(driver)
         else:
-            print(f'\nAttempt to fill element {k} in section {section} failed. Not in DOM \
+            print(f'\nAttempt to fill element {did} in section {section} failed. Not in DOM \
                 \nSelector used="{selector}"')
             return False
         return True
@@ -422,6 +422,12 @@ class GeneralSubmitToRepo(Dsp):
         eval("self.{}.javascript_click(driver)".format(element))
         eval("self.{}.inject_text(driver, '{}')".format(element, text_to_fill))
 
+    @classmethod
+    def autofill_required_elements(self, driver, required):
+        for section, dict in required.items():
+            self.expand_section_by_did(driver, section)
+            self.fill_inputs_by_data_ids(driver, dict, section, nth=1)
+
 
 class GeneralEditSubmission(Dsp):
     header_title = SiteElement(By.CSS_SELECTOR, ".text-h4")
@@ -455,6 +461,10 @@ class GeneralEditSubmission(Dsp):
                 print(f"\nMismatch when checking field: {k}. Expected {v} got {value}")
                 return False
         return True
+
+    @classmethod
+    def check_required_elements(self, driver, required_elements):
+        self.check_inputs_by_data_ids(self, driver, dict, section=None, nth=1)
 
 
 class SubmitHydroshare(GeneralSubmitToRepo):
@@ -528,21 +538,26 @@ class SubmitHydroshare(GeneralSubmitToRepo):
 
 class SubmitExternal(GeneralSubmitToRepo):
     """ Page containing forms for submitting data with EXTERNAL backend"""
+    pass
 
-    @classmethod
-    def autofill_required_elements(self, driver, required):
-        for section, dict in required.items():
-            self.expand_section_by_did(driver, section)
-            self.fill_inputs_by_data_ids(driver, dict, section, nth=1)
+
+class SubmitZenodo(GeneralSubmitToRepo):
+    """ Page containing forms for submitting data with Zenodo backend"""
+    pass
 
 
 class EditExternalSubmission(SubmitHydroshare, GeneralEditSubmission):
-    @classmethod
-    def check_required_elements(self, driver, required_elements):
-        self.check_inputs_by_data_ids(self, driver, dict, section=None, nth=1)
+    """ Page containing forms for editing existing submission with Zenodo backend"""
+    pass
+
+
+class EditZenodoSubmission(SubmitHydroshare, GeneralEditSubmission):
+    """ Page containing forms for editing existing submission with Zenodo backend"""
+    pass
 
 
 class EditHSSubmission(SubmitHydroshare, GeneralEditSubmission):
+    """ Page containing forms for editing existing submission with Hydroshare backend"""
     @classmethod
     def check_required_elements(self, driver, auto):
         if not self.check_basic_info(driver, auto, auto, ["CZNet", auto]):

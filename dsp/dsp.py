@@ -24,7 +24,9 @@ from dsp_macros import (
     SubmitHydroshare,
     EditHSSubmission,
     SubmitExternal,
-    EditExternalSubmission
+    EditExternalSubmission,
+    SubmitZenodo,
+    EditZenodoSubmission
 )
 
 from cuahsi_base.cuahsi_base import BaseTestSuite, parse_args_run_tests
@@ -392,7 +394,7 @@ class DspExternalTestSuite(DspTestSuite):
             "ProviderURL": "http://provider_url.com/" + auto_text
         }
 
-        # created separately so that we can check indidually if needed
+        # created separately so that we can check individually if needed
         required_elements = {
             "BasicInformation": basic_info,
             "Creators": creator,
@@ -402,7 +404,7 @@ class DspExternalTestSuite(DspTestSuite):
         return required_elements
 
     def login_orcid_and_external(self):
-        """Authenticate with orcid and then HS credentials"""
+        """Authenticate with orcid"""
         Dsp.show_mobile_nav(self.driver)
         Dsp.drawer_to_submit(self.driver)
         SubmitLandingPage.select_repo_by_id(self.driver, "RegisterDataset")
@@ -422,25 +424,18 @@ class DspExternalTestSuite(DspTestSuite):
         SubmitExternal.autofill_required_elements(self.driver, self.required_elements_template(auto_text))
 
     def test_A_000001(self):
-        """Ensure anonymous navigation to my submissions shows orcid login modal"""
-        Dsp.show_mobile_nav(self.driver)
-        Dsp.drawer_to_my_submissions(self.driver)
-        login_visible = MySubmissions.is_visible_orcid_modal(self.driver)
-        self.assertTrue(login_visible)
-
-    def test_A_000002(self):
         """Check authentication to submit page"""
         self.login_orcid_and_external()
         header = GeneralSubmitToRepo.get_header_text(self.driver)
         self.assertIn("External", header)
 
-    def test_A_000003(self):
+    def test_A_000002(self):
         """Check that submit instructions are shown"""
         self.login_orcid_and_external()
         alert = GeneralSubmitToRepo.get_alert_text(self.driver)
         self.assertIn("Instructions:", alert)
 
-    def test_A_000004(self):
+    def test_A_000003(self):
         """Confirm successful submit of basic required fields for External Repo"""
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
         self.login_and_autofill_external_required(auto_text)
@@ -460,6 +455,49 @@ class DspExternalTestSuite(DspTestSuite):
 
         self.assertTrue(EditExternalSubmission.check_required_elements(self.driver, auto_text))
 
+
+class DspZenodoTestSuite(DspTestSuite):
+    """DSP tests for Zenodo backend"""
+
+    @classmethod
+    def required_elements_template(self, auto_text):
+        basic_info = {
+            "Title": auto_text + " Title",
+            "Description/Abstract": auto_text + " Description/Abstract*",
+            "Keywords": [auto_text + " Keywords"]
+        }
+
+        required_elements = {
+            "BasicInformation": basic_info
+        }
+        return required_elements
+
+    def login_orcid_and_zenodo(self):
+        """Authenticate with orcid and then Zenodo credentials"""
+        Dsp.show_mobile_nav(self.driver)
+        Dsp.drawer_to_submit(self.driver)
+        SubmitLandingPage.select_repo_by_id(self.driver, "Zenodo")
+
+        # new ORCID window
+        SubmitLandingPage.to_orcid_window(self.driver)
+        self.assertIn("ORCID", TestSystem.title(self.driver))
+
+        OrcidWindow.fill_credentials(self.driver, USERNAME, PASSWORD)
+        OrcidWindow.to_origin_window(self.driver)
+
+        # new Zenodo auth window
+        SubmitLandingPage.to_repo_window(self.driver)
+        self.assertIn("Zenodo", TestSystem.title(self.driver))
+        # TODO: authorize using orcid
+        RepoAuthWindow.authorize_repo(self.driver, "todo", "todo")
+        RepoAuthWindow.to_origin_window(self.driver)
+
+    def login_and_autofill_zenodo_required(self, auto_text):
+        """A shortcut to fill required fields of submit page
+        So that additional non-required fields can easily be checked
+        """
+        self.login_orcid_and_zenodo()
+        SubmitZenodo.autofill_required_elements(self.driver, self.required_elements_template(auto_text))
 
 if __name__ == "__main__":
     parse_args_run_tests(DspTestSuite)
