@@ -285,7 +285,6 @@ class GeneralSubmitToRepo(Dsp):
     bottom_save = SiteElement(By.CSS_SELECTOR, "#cz-new-submission-actions-bottom button.submission-save")
     bottom_finish = SiteElement(By.CSS_SELECTOR, "#cz-new-submission-actions-bottom button.submission-finish")
 
-
     @classmethod
     def get_header_text(self, driver):
         return self.header.get_text(driver)
@@ -332,6 +331,14 @@ class GeneralSubmitToRepo(Dsp):
     def get_css_in_section(self, driver, section=None, css="", nth=1):
         selector = f'div[data-id*="{section}"] {css}'
         return SiteElement(By.CSS_SELECTOR, selector)
+
+    @classmethod
+    def expand_section_by_did(self, driver, data_id):
+        element = SiteElement(By.CSS_SELECTOR, f'[data-id*="{data_id}"] button.btn-add')
+        element.scroll_to(driver)
+        # make sure the section isn't already open
+        if element.get_attribute(driver, "aria-label") != "Remove":
+            element.javascript_click(driver)
 
     @classmethod
     def fill_inputs_by_data_ids(self, driver, dict, section=None, nth=1):
@@ -417,18 +424,6 @@ class SubmitHydroshare(GeneralSubmitToRepo):
     subject_keywords = SiteElementsCollection(By.CSS_SELECTOR, 'fieldset[data-id*="group-BasicInformation"] span.v-chip__content')
     subject_keyword_container = SiteElement(By.CSS_SELECTOR, '[data-id="group-BasicInformation"] .v-select__selections')
 
-    # Contributors
-    expand_contributors = SiteElement(By.CSS_SELECTOR, '[data-id*="Contributors"] button.btn-add')
-
-    # Spatial coverage
-    expand_spatial = SiteElement(By.CSS_SELECTOR, '[data-id*="Spatialcoverage"] button.btn-add')
-
-    # Additional metadata
-    expand_metadata = SiteElement(By.CSS_SELECTOR, '[data-id*="Additionalmetadata"] button.btn-add')
-
-    # Related resources
-    expand_related_resources = SiteElement(By.CSS_SELECTOR, '[data-id*="Relatedresources"] button.btn-add')
-
     # Temporal
     temporal_name_input = SiteElement(By.CSS_SELECTOR, 'div[data-id*="Temporalcoverage"] input[data-id*="Name"]')
     start_input = SiteElement(By.CSS_SELECTOR, '[data-id*="Temporalcoverage"] input[data-id*="Start"]')
@@ -481,28 +476,8 @@ class SubmitHydroshare(GeneralSubmitToRepo):
         self.agency_name.submit(driver)
 
     @classmethod
-    def click_expand_contributors(self, driver):
-        self.expand_contributors.scroll_to(driver)
-        self.expand_contributors.javascript_click(driver)
-
-    @classmethod
-    def click_expand_spatial(self, driver):
-        self.expand_spatial.scroll_to(driver)
-        self.expand_spatial.javascript_click(driver)
-
-    @classmethod
-    def click_expand_metadata(self, driver):
-        self.expand_metadata.scroll_to(driver)
-        self.expand_metadata.javascript_click(driver)
-
-    @classmethod
-    def click_expand_related_resources(self, driver):
-        self.expand_related_resources.scroll_to(driver)
-        self.expand_related_resources.javascript_click(driver)
-
-    @classmethod
     def fill_related_resources(self, driver, relation_type, value, n):
-        self.click_expand_related_resources(driver)
+        self.expand_section_by_did(driver, "Relatedresources")
 
         sel = f'div[data-id*="Relatedresources"] input[data-id*="RelationType"]:nth-of-type({n})'
         relation_type_input = SiteElement(By.CSS_SELECTOR, sel)
@@ -519,7 +494,7 @@ class SubmitHydroshare(GeneralSubmitToRepo):
         related_resources_value.submit(driver)
 
 
-class EditHSSubmission(GeneralEditSubmission):
+class EditHSSubmission(SubmitHydroshare, GeneralEditSubmission):
     @classmethod
     def check_required_elements(self, driver, auto):
         if not self.check_basic_info(driver, auto, auto, ["CZNet", auto]):

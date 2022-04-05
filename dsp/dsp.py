@@ -260,7 +260,7 @@ class DspHydroshareTestSuite(DspTestSuite):
             "Email": auto_text + "@gmail.com",
             "Homepage": "http://contibutor_homepage.com/" + auto_text,
         }
-        SubmitHydroshare.click_expand_contributors(self.driver)
+        SubmitHydroshare.expand_section_by_did(self.driver, data_id=section)
         self.fill_ids_submit_and_check(auto_text, section, nth, dict)
 
     def test_A_000011(self):
@@ -274,7 +274,7 @@ class DspHydroshareTestSuite(DspTestSuite):
             "East": "20",
             "North": "-20",
         }
-        SubmitHydroshare.click_expand_spatial(self.driver)
+        SubmitHydroshare.expand_section_by_did(self.driver, data_id=section)
         self.fill_ids_submit_and_check(auto_text, section, nth, dict)
 
     def test_A_000012(self):
@@ -287,7 +287,7 @@ class DspHydroshareTestSuite(DspTestSuite):
             "Key": auto_text + " key",
             "Value": auto_text + " value"
         }
-        SubmitHydroshare.click_expand_metadata(self.driver)
+        SubmitHydroshare.expand_section_by_did(self.driver, data_id=section)
         self.fill_ids_submit_and_check(auto_text, section, nth, dict)
 
     def test_A_000013(self):
@@ -320,12 +320,12 @@ class DspHydroshareTestSuite(DspTestSuite):
         nth = 1
         dict = {
             "Name": auto_text + "Contributor name2-input",
-            "Northlimit": "-20",
+            "Northlimit": "20",
             "Eastlimit": "120",
-            "Southlimit": "20",
+            "Southlimit": "-20",
             "Westlimit": "-120"
         }
-        SubmitHydroshare.click_expand_spatial(self.driver)
+        SubmitHydroshare.expand_section_by_did(self.driver, data_id=section)
         SubmitHydroshare.open_tab(self.driver, section, tab_number=2)
         success_filling = SubmitHydroshare.fill_inputs_by_data_ids(self.driver, dict, section, nth)
         self.assertTrue(success_filling)
@@ -335,10 +335,29 @@ class DspHydroshareTestSuite(DspTestSuite):
         MySubmissions.enter_text_in_search(self.driver, auto_text)
         MySubmissions.edit_top_submission(self.driver)
 
-        EditHSSubmission.click_expand_spatial(self.driver)
+        SubmitHydroshare.expand_section_by_did(self.driver, data_id=section)
         EditHSSubmission.open_tab(self.driver, section, tab_number=2)
         match = EditHSSubmission.check_inputs_by_data_ids(self.driver, dict, section, nth)
         self.assertTrue(match)
+
+    def test_A_000015(self):
+        """Confirm that invalid Spatial Box Coverage info doesn't submit"""
+        auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
+        self.login_and_autofill_hs_required(auto_text)
+        section = "Spatialcoverage"
+        nth = 1
+        dict = {
+            "Name": auto_text + "Contributor name2-input",
+            "Northlimit": "-20",
+            "Southlimit": "20",
+            "Eastlimit": "120",
+            "Westlimit": "-120"
+        }
+        SubmitHydroshare.expand_section_by_did(self.driver, data_id=section)
+        SubmitHydroshare.open_tab(self.driver, section, tab_number=2)
+        success_filling = SubmitHydroshare.fill_inputs_by_data_ids(self.driver, dict, section, nth)
+        self.assertTrue(success_filling)
+        self.assertFalse(SubmitHydroshare.is_finishable(self.driver))
 
 
 class DspExternalTestSuite(DspTestSuite):
