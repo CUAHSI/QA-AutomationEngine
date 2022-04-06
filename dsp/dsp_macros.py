@@ -191,7 +191,7 @@ class OrcidWindow(WebPage):
         self.submit.click(driver)
 
 
-class RepoAuthWindow(WebPage):
+class HydroshareAuthWindow(WebPage):
     """ Authentication window to use Hydroshare as Backend """
     username = SiteElement(By.ID, "id_username")
     password = SiteElement(By.ID, "id_password")
@@ -204,6 +204,31 @@ class RepoAuthWindow(WebPage):
         self.password.inject_text(driver, password)
         self.submit.click(driver)
         self.authorize.click(driver)
+
+
+class ZenodoAuthWindow(WebPage):
+    """ Authentication window to use Zenodo as Backend """
+    github_button = SiteElement(By.CSS_SELECTOR, '.social-signup .btn[href*="github"]')
+    orcid_button = SiteElement(By.CSS_SELECTOR, '.social-signup .btn[href*="orcid"]')
+    email = SiteElement(By.ID, "email")
+    password = SiteElement(By.ID, "password")
+    login_button = SiteElement(By.CSS_SELECTOR, 'button[type="submit"]')
+    authorize_czhub_button = SiteElement(By.CSS_SELECTOR, 'form button[value="yes"]')
+
+    @classmethod
+    def authorize_via_orcid(self, driver):
+        self.orcid_button.click(driver)
+
+    @classmethod
+    def authorize_via_github(self, driver):
+        self.github_button.click(driver)
+
+    @classmethod
+    def authorize_email_password(self, driver, email, password):
+        self.email.inject_text(driver, email)
+        self.password.inject_text(driver, password)
+        self.login_button.click(driver)
+        self.authorize_czhub_button.click(driver)
 
 
 class MySubmissions(Dsp):
@@ -243,10 +268,20 @@ class MySubmissions(Dsp):
         self.top_submission_edit.click(driver)
 
 
-class SubmitLandingPage(Dsp):
-    """ Page containing options for submitting data """
+class RepoAuthWindow(WebPage):
     submit_to_repo_modal = SiteElement(By.CSS_SELECTOR, ".v-dialog div.cz-authorize")
     submit_to_repo_authorize = SiteElement(By.CSS_SELECTOR, ".cz-authorize button.primary")
+
+    @classmethod
+    def to_repo_auth_window(self, driver):
+        TestSystem.wait(AUTH_WINDOW)
+        num_windows_now = len(driver.window_handles)
+        self.submit_to_repo_authorize.click(driver)
+        External.switch_new_page(driver, num_windows_now, self.body_locator)
+
+
+class SubmitLandingPage(Dsp, RepoAuthWindow):
+    """ Page containing options for submitting data """
 
     @classmethod
     def select_repo_by_id(self, driver, id):
@@ -261,20 +296,13 @@ class SubmitLandingPage(Dsp):
         repo_card.click(driver)
 
     @classmethod
-    def to_repo_window(self, driver):
-        TestSystem.wait(AUTH_WINDOW)
-        num_windows_now = len(driver.window_handles)
-        self.submit_to_repo_authorize.click(driver)
-        External.switch_new_page(driver, num_windows_now, self.body_locator)
-
-    @classmethod
-    def to_repo_submit(self, driver, id):
+    def to_repo_form(self, driver, id):
         Dsp.show_mobile_nav(driver)
         Dsp.drawer_to_submit(driver)
         self.select_repo_by_id(driver, id)
 
 
-class GeneralSubmitToRepo(Dsp):
+class GeneralSubmitToRepo(Dsp, RepoAuthWindow):
     header = SiteElement(By.CSS_SELECTOR, ".cz-new-submission h1")
     alert = SiteElement(By.CSS_SELECTOR, ".v-alert .v-alert__content")
     top_save = SiteElement(By.CSS_SELECTOR, "#cz-new-submission-actions-top button.submission-save")
@@ -391,11 +419,8 @@ class GeneralSubmitToRepo(Dsp):
 
     @classmethod
     def fill_v_multi_select(self, driver, container_id, input_id, keywords=["default_keyword"]):
-        container = SiteElement(By.CSS_SELECTOR, f'[data-id*="{container_id}"] .v-select__selections')
         input = SiteElement(By.CSS_SELECTOR, f'.v-select__selections input[data-id*="{input_id}"]')
-
-        # container.scroll_to(driver)
-        container.click(driver)
+        input.javascript_click_hidden(driver)
         if isinstance(keywords, str):
             input.inject_text(driver, keywords)
             input.submit(driver)

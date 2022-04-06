@@ -19,14 +19,15 @@ from dsp_macros import (
     SubmitLandingPage,
     MySubmissions,
     OrcidWindow,
-    RepoAuthWindow,
+    HydroshareAuthWindow,
     GeneralSubmitToRepo,
     SubmitHydroshare,
     EditHSSubmission,
     SubmitExternal,
     EditExternalSubmission,
     SubmitZenodo,
-    EditZenodoSubmission
+    EditZenodoSubmission,
+    ZenodoAuthWindow
 )
 
 from cuahsi_base.cuahsi_base import BaseTestSuite, parse_args_run_tests
@@ -66,15 +67,23 @@ class DspTestSuite(BaseTestSuite):
         OrcidWindow.fill_credentials(self.driver, USERNAME, PASSWORD)
         OrcidWindow.to_origin_window(self.driver, wait=True)
 
+    def login_orcid_to_submit(self, repo):
+        self.login_orcid()
+        Dsp.show_mobile_nav(self.driver)
+        Dsp.drawer_to_submit(self.driver)
+        SubmitLandingPage.select_repo_by_id(self.driver, repo)
+
 
 class DspHydroshareTestSuite(DspTestSuite):
     """DSP tests for Hydroshare repository"""
+
+    repo_name = "HydroShare"
 
     def login_orcid_and_hs(self):
         """Authenticate with orcid and then HS credentials"""
         Dsp.show_mobile_nav(self.driver)
         Dsp.drawer_to_submit(self.driver)
-        SubmitLandingPage.select_repo_by_id(self.driver, "HydroShare")
+        SubmitLandingPage.select_repo_by_id(self.driver, self.repo_name)
 
         # new ORCID window
         SubmitLandingPage.to_orcid_window(self.driver)
@@ -84,17 +93,17 @@ class DspHydroshareTestSuite(DspTestSuite):
         OrcidWindow.to_origin_window(self.driver)
 
         # new HS auth window
-        SubmitLandingPage.to_repo_window(self.driver)
-        self.assertIn("HydroShare", TestSystem.title(self.driver))
-        RepoAuthWindow.authorize_repo(self.driver, HS_USERNAME, HS_PASSWORD)
-        RepoAuthWindow.to_origin_window(self.driver)
+        SubmitLandingPage.to_repo_auth_window(self.driver)
+        self.assertIn(self.repo_name, TestSystem.title(self.driver))
+        HydroshareAuthWindow.authorize_repo(self.driver, HS_USERNAME, HS_PASSWORD)
+        HydroshareAuthWindow.to_origin_window(self.driver)
 
     def login_and_autofill_hs_required(self, auto_text):
         """A shortcut to fill required fields of HS submit page
         So that additional non-required fields can easily be checked
         """
         self.login_orcid_and_hs()
-        SubmitLandingPage.to_repo_submit(self.driver, "HydroShare")
+        SubmitLandingPage.to_repo_form(self.driver, self.repo_name)
         SubmitHydroshare.autofill_required_elements(self.driver, auto_text)
 
     def fill_ids_submit_and_check(self, sort_text, section, nth, dict):
@@ -129,7 +138,7 @@ class DspHydroshareTestSuite(DspTestSuite):
     def test_A_000003(self):
         """Check that submit instructions are shown"""
         self.login_orcid_and_hs()
-        SubmitLandingPage.to_repo_submit(self.driver, "HydroShare")
+        SubmitLandingPage.to_repo_form(self.driver, self.repo_name)
         alert = SubmitHydroshare.get_alert_text(self.driver)
         self.assertIn("Instructions:", alert)
 
@@ -190,7 +199,7 @@ class DspHydroshareTestSuite(DspTestSuite):
     def test_A_000007(self):
         """Confirm that Basic Info persists from submit to edit"""
         self.login_orcid_and_hs()
-        SubmitLandingPage.to_repo_submit(self.driver, "HydroShare")
+        SubmitLandingPage.to_repo_form(self.driver, self.repo_name)
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
         dict = {
             "title-input": auto_text + "title-input",
@@ -459,11 +468,13 @@ class DspExternalTestSuite(DspTestSuite):
 class DspZenodoTestSuite(DspTestSuite):
     """DSP tests for Zenodo backend"""
 
+    repo_name = "Zenodo"
+
     @classmethod
     def required_elements_template(self, auto_text):
         basic_info = {
             "Title": auto_text + " Title",
-            "Description/Abstract": auto_text + " Description/Abstract*",
+            "Description/Abstract": auto_text + " Description/Abstract",
             "Keywords": [auto_text + " Keywords"]
         }
 
@@ -472,11 +483,12 @@ class DspZenodoTestSuite(DspTestSuite):
         }
         return required_elements
 
-    def login_orcid_and_zenodo(self):
-        """Authenticate with orcid and then Zenodo credentials"""
+    def zenodo_then_login_orcid(self):
+        # # TODO: this fails, ORCID authentication issue with zenodo
+        """Select Zenodo repo then authenticate with orcid"""
         Dsp.show_mobile_nav(self.driver)
         Dsp.drawer_to_submit(self.driver)
-        SubmitLandingPage.select_repo_by_id(self.driver, "Zenodo")
+        SubmitLandingPage.select_repo_by_id(self.driver, self.repo_name)
 
         # new ORCID window
         SubmitLandingPage.to_orcid_window(self.driver)
@@ -486,18 +498,90 @@ class DspZenodoTestSuite(DspTestSuite):
         OrcidWindow.to_origin_window(self.driver)
 
         # new Zenodo auth window
-        SubmitLandingPage.to_repo_window(self.driver)
-        self.assertIn("Zenodo", TestSystem.title(self.driver))
-        # TODO: authorize using orcid
-        RepoAuthWindow.authorize_repo(self.driver, "todo", "todo")
-        RepoAuthWindow.to_origin_window(self.driver)
+        SubmitLandingPage.to_repo_auth_window(self.driver)
+
+        ZenodoAuthWindow.authorize_via_orcid(self.driver)
+        self.assertIn("ORCID", TestSystem.title(self.driver))
+        OrcidWindow.fill_credentials(self.driver, USERNAME, PASSWORD)
+        OrcidWindow.to_origin_window(self.driver)
+
+    def login_orcid_to_submit(self):
+        """Authenticate with orcid the select repo"""
+        super().login_orcid_to_submit(self.repo_name)
 
     def login_and_autofill_zenodo_required(self, auto_text):
         """A shortcut to fill required fields of submit page
         So that additional non-required fields can easily be checked
         """
-        self.login_orcid_and_zenodo()
+        self.login_orcid_to_submit()
         SubmitZenodo.autofill_required_elements(self.driver, self.required_elements_template(auto_text))
+
+    def test_A_000001(self):
+        """Check authentication to submit page"""
+        self.login_orcid_to_submit()
+        header = SubmitZenodo.get_header_text(self.driver)
+        self.assertIn(self.repo_name, header)
+        alert = SubmitZenodo.get_alert_text(self.driver)
+        self.assertIn("Instructions:", alert)
+
+    def test_A_000002(self):
+        # TODO: this test currently fails to auth using Orcid with zenodo
+        """Authenticate to DSP using Orcid, then to Zenodo with Orcid"""
+        auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
+        self.login_and_autofill_zenodo_required(auto_text)
+        self.assertTrue(SubmitZenodo.is_finishable(self.driver))
+        SubmitZenodo.finish_submission(self.driver)
+
+        # when attempt to finish, prompted to auth with zenodo
+        SubmitZenodo.to_repo_auth_window(self.driver)
+        ZenodoAuthWindow.authorize_via_orcid(self.driver)
+        self.assertIn("ORCID", TestSystem.title(self.driver))
+        OrcidWindow.fill_credentials(self.driver, USERNAME, PASSWORD)
+        OrcidWindow.to_origin_window(self.driver, wait=True)
+
+        self.assertEqual("My Submissions", MySubmissions.get_title(self.driver))
+
+    def test_A_000003(self):
+        """Authenticate to DSP using Orcid, then to Zenodo with U/PW"""
+        auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
+        self.login_and_autofill_zenodo_required(auto_text)
+        self.assertTrue(SubmitZenodo.is_finishable(self.driver))
+
+        # when attempt to finish, prompted to auth with zenodo
+        SubmitZenodo.finish_submission(self.driver)
+        SubmitZenodo.to_repo_auth_window(self.driver)
+        ZenodoAuthWindow.authorize_email_password(self.driver, USERNAME, PASSWORD)
+        ZenodoAuthWindow.to_origin_window(self.driver, wait=True)
+
+        # Attempt to finish should be successful this time
+        SubmitZenodo.finish_submission(self.driver)
+        self.assertEqual("My Submissions", MySubmissions.get_title(self.driver))
+
+    def test_A_000004(self):
+        """Confirm successful submit of basic required fields for Zenodo Repo"""
+        auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
+        self.login_and_autofill_zenodo_required(auto_text)
+        self.assertTrue(SubmitZenodo.is_finishable(self.driver))
+        SubmitZenodo.finish_submission(self.driver)
+
+        # when attempt to finish, prompted to auth with zenodo
+        SubmitZenodo.to_repo_auth_window(self.driver)
+        ZenodoAuthWindow.authorize_via_orcid(self.driver)
+        self.assertIn("ORCID", TestSystem.title(self.driver))
+        OrcidWindow.fill_credentials(self.driver, USERNAME, PASSWORD)
+        OrcidWindow.to_origin_window(self.driver, wait=True)
+
+        # TODO: this test currently fails to auth using Orcid with zenodo
+        self.assertEqual("My Submissions", MySubmissions.get_title(self.driver))
+        MySubmissions.enter_text_in_search(self.driver, auto_text)
+        top_name = MySubmissions.get_top_submission_name(self.driver)
+        self.assertEqual(auto_text, top_name)
+
+        MySubmissions.edit_top_submission(self.driver)
+        self.assertEqual("Edit Submission", EditExternalSubmission.get_header_title(self.driver))
+
+        self.assertTrue(EditZenodoSubmission.check_required_elements(self.driver, auto_text))
+
 
 if __name__ == "__main__":
     parse_args_run_tests(DspTestSuite)
