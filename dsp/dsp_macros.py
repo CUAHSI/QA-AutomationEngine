@@ -352,24 +352,22 @@ class GeneralSubmitToRepo(Dsp, RepoAuthWindow):
 
     @classmethod
     def get_did_in_section(self, section=None, data_id="", nth=1):
-        selector = f'div[data-id*="{section}"] [data-id*="{data_id}"]:nth-of-type({nth})'
+        selector = f'fieldset[data-id*="{section}"] [data-id*="{data_id}"]:nth-of-type({nth})'
         return SiteElement(By.CSS_SELECTOR, selector)
 
     @classmethod
     def get_css_in_section(self, section=None, css="", nth=1):
-        selector = f'div[data-id*="{section}"] {css}'
+        selector = f'fieldset[data-id*="{section}"] {css}'
         return SiteElement(By.CSS_SELECTOR, selector)
 
     @classmethod
     def expand_section_by_did(self, driver, data_id):
-        element = SiteElement(By.CSS_SELECTOR, f'[data-id*="{data_id}"] button.btn-add')
+        element = SiteElement(By.CSS_SELECTOR, f'fieldset[data-id*="{data_id}"] legend')
         if not element.exists_in_dom(driver):
             print(f"\n Ignoring attempt to expand static section: {data_id}")
             return False
         element.scroll_to(driver)
-        # make sure the section isn't already open
-        if element.get_attribute(driver, "aria-label") != "Remove":
-            element.javascript_click(driver)
+        element.javascript_click(driver)
 
     @classmethod
     def fill_inputs_by_data_ids(self, driver, dict, section=None, nth=1):
@@ -432,7 +430,7 @@ class GeneralSubmitToRepo(Dsp, RepoAuthWindow):
     @classmethod
     def get_tab(self, section=None, tab_number=1):
         # tab index is off by 1 because one hidden?
-        selector = f'div[data-id*="{section}"] .v-tabs .v-tab:nth-of-type({tab_number+1})'
+        selector = f'fieldset[data-id*="{section}"] .v-tabs .v-tab:nth-of-type({tab_number+1})'
         return SiteElement(By.CSS_SELECTOR, selector)
 
     @classmethod
@@ -476,7 +474,7 @@ class GeneralEditSubmission(Dsp):
     def check_inputs_by_data_ids(self, driver, dict, section=None, nth=1):
         for k, v in dict.items():
             if section and nth:
-                selector = f'div[data-id*="{section}"] [data-id*="{k}"]:nth-of-type({nth})'
+                selector = f'fieldset[data-id*="{section}"] [data-id*="{k}"]:nth-of-type({nth})'
                 elem = SiteElement(By.CSS_SELECTOR, selector)
             else:
                 elem = SiteElement(By.CSS_SELECTOR, f'[data-id*="{k}"]:nth-of-type(1)')
@@ -489,7 +487,9 @@ class GeneralEditSubmission(Dsp):
 
     @classmethod
     def check_required_elements(self, driver, required_elements):
-        self.check_inputs_by_data_ids(self, driver, dict, section=None, nth=1)
+        """Unless otherwise defined, Editsubmission pages should check required fields by dict"""
+        for section, dict_to_check in required_elements.items():
+            self.check_inputs_by_data_ids(driver, dict=dict_to_check, section=section, nth=1)
 
 
 class SubmitHydroshare(GeneralSubmitToRepo):
@@ -501,7 +501,7 @@ class SubmitHydroshare(GeneralSubmitToRepo):
     subject_keyword_container = SiteElement(By.CSS_SELECTOR, '[data-id="group-BasicInformation"] .v-select__selections')
 
     # Temporal
-    temporal_name_input = SiteElement(By.CSS_SELECTOR, 'div[data-id*="Temporalcoverage"] input[data-id*="Name"]')
+    temporal_name_input = SiteElement(By.CSS_SELECTOR, 'fieldset[data-id*="Temporalcoverage"] input[data-id*="Name"]')
     start_input = SiteElement(By.CSS_SELECTOR, '[data-id*="Temporalcoverage"] input[data-id*="Start"]')
     end_input = SiteElement(By.CSS_SELECTOR, '[data-id*="Temporalcoverage"] input[data-id*="End"]')
 
@@ -546,11 +546,11 @@ class SubmitHydroshare(GeneralSubmitToRepo):
     def fill_related_resources(self, driver, relation_type, value, n):
         self.expand_section_by_did(driver, "Relatedresources")
 
-        sel = f'div[data-id*="Relatedresources"] input[data-id*="RelationType"]:nth-of-type({n})'
+        sel = f'fieldset[data-id*="Relatedresources"] input[data-id*="RelationType"]:nth-of-type({n})'
         relation_type_input = SiteElement(By.CSS_SELECTOR, sel)
-        sel = f'div[data-id*="Relatedresources"] input[data-id*="Value"]:nth-of-type({n})'
+        sel = f'fieldset[data-id*="Relatedresources"] input[data-id*="Value"]:nth-of-type({n})'
         related_resources_value = SiteElement(By.CSS_SELECTOR, sel)
-        sel = f'div[data-id*="Relatedresources"] div.v-select:nth-of-type({n})'
+        sel = f'fieldset[data-id*="Relatedresources"] div.v-select:nth-of-type({n})'
         relation_type_container = SiteElement(By.CSS_SELECTOR, sel)
 
         relation_type_container.scroll_to(driver)
@@ -613,7 +613,7 @@ class EditHSSubmission(SubmitHydroshare, GeneralEditSubmission):
 
     @classmethod
     def get_nth_relation_type(self, driver, n):
-        sel = f'div[data-id*="Relatedresources"] input[data-id*="RelationType"]:nth-of-type({n})'
+        sel = f'fieldset[data-id*="Relatedresources"] input[data-id*="RelationType"]:nth-of-type({n})'
         relation_type_input = SiteElement(By.CSS_SELECTOR, sel)
         return relation_type_input.get_texts_from_xpath(driver, './preceding::div[1]')
 
