@@ -504,6 +504,24 @@ class DspZenodoTestSuite(DspTestSuite):
         OrcidWindow.fill_credentials(self.driver, USERNAME, PASSWORD)
         OrcidWindow.to_origin_window(self.driver)
 
+    def zenodo_then_login_username_password(self):
+        """Select Zenodo repo then authenticate with orcid"""
+        Dsp.show_mobile_nav(self.driver)
+        Dsp.drawer_to_submit(self.driver)
+        SubmitLandingPage.select_repo_by_id(self.driver, self.repo_name)
+
+        # new ORCID window
+        SubmitLandingPage.to_orcid_window(self.driver)
+        self.assertIn("ORCID", TestSystem.title(self.driver))
+
+        OrcidWindow.fill_credentials(self.driver, USERNAME, PASSWORD)
+        OrcidWindow.to_origin_window(self.driver)
+
+        # new Zenodo auth window
+        SubmitLandingPage.to_repo_auth_window(self.driver)
+        ZenodoAuthWindow.authorize_email_password(self.driver, email=USERNAME, password=PASSWORD)
+        ZenodoAuthWindow.to_origin_window(self.driver, wait=True)
+
     def login_orcid_to_submit(self):
         """Authenticate with orcid the select repo"""
         super().login_orcid_to_submit(self.repo_name)
@@ -512,7 +530,7 @@ class DspZenodoTestSuite(DspTestSuite):
         """A shortcut to fill required fields of submit page
         So that additional non-required fields can easily be checked
         """
-        self.login_orcid_to_submit()
+        self.zenodo_then_login_username_password()
         SubmitZenodo.autofill_required_elements(self.driver, self.required_elements_template(auto_text))
 
     def test_A_000001(self):
@@ -525,11 +543,19 @@ class DspZenodoTestSuite(DspTestSuite):
 
     def test_A_000002(self):
         """Navigate to repo then auth with orcid"""
+        # TODO: this test fails pending issue
+        # https://github.com/cznethub/dspfront/issues/57
         self.zenodo_then_login_orcid()
         header = SubmitZenodo.get_header_text(self.driver)
         self.assertIn(self.repo_name, header)
 
     def test_A_000003(self):
+        """Navigate to repo then auth with orcid"""
+        self.zenodo_then_login_username_password()
+        header = SubmitZenodo.get_header_text(self.driver)
+        self.assertIn(self.repo_name, header)
+
+    def test_A_000004(self):
         """Confirm successful submit of required fields for Zenodo Repo"""
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
         self.login_and_autofill_zenodo_required(auto_text)
@@ -537,7 +563,7 @@ class DspZenodoTestSuite(DspTestSuite):
         SubmitZenodo.finish_submission(self.driver)
         self.assertEqual("My Submissions", MySubmissions.get_title(self.driver))
 
-    def test_A_000004(self):
+    def test_A_000005(self):
         """Check that required fields persist after submit"""
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
         template = self.required_elements_template(auto_text)

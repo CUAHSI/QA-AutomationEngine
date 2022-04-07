@@ -387,8 +387,6 @@ class GeneralSubmitToRepo(Dsp, RepoAuthWindow):
                     # assume this is a v-multi-select
                     self.fill_v_multi_select(driver, container_id=section, input_id=k, values=v)
                 else:
-                    # TODO: remove uneeded scroll-tos
-                    # element.scroll_to_hidden(driver)
                     element.javascript_click(driver)
                     element.inject_text(driver, v)
                     element.submit(driver)
@@ -498,7 +496,7 @@ class GeneralEditSubmission(Dsp):
     def check_required_elements(self, driver, required_elements):
         """Unless otherwise defined, Editsubmission pages should check required fields by dict"""
         for section, dict_to_check in required_elements.items():
-            self.check_inputs_by_data_ids(driver, dict=dict_to_check, section=section, nth=1)
+            return self.check_inputs_by_data_ids(driver, dict=dict_to_check, section=section, nth=1)
 
     @classmethod
     def get_v_multi_select_vals(self, driver, container_id, input_id):
