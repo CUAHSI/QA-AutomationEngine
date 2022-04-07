@@ -328,7 +328,7 @@ class SiteElement:
         """Returns the relatives by xpath, given a parent
         element specification
         """
-        target_el = self.loc_it(driver)
+        target_el = self.loc_hidden(driver)
         return target_el.find_elements_by_xpath(xpath)
 
     def get_texts_from_xpath(self, driver, xpath):

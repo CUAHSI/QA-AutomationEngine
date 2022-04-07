@@ -484,7 +484,6 @@ class DspZenodoTestSuite(DspTestSuite):
         return required_elements
 
     def zenodo_then_login_orcid(self):
-        # # TODO: this fails, ORCID authentication issue with zenodo
         """Select Zenodo repo then authenticate with orcid"""
         Dsp.show_mobile_nav(self.driver)
         Dsp.drawer_to_submit(self.driver)
@@ -517,7 +516,7 @@ class DspZenodoTestSuite(DspTestSuite):
         SubmitZenodo.autofill_required_elements(self.driver, self.required_elements_template(auto_text))
 
     def test_A_000001(self):
-        """Check authentication to submit page"""
+        """Orcid auth first, then to submit page"""
         self.login_orcid_to_submit()
         header = SubmitZenodo.get_header_text(self.driver)
         self.assertIn(self.repo_name, header)
@@ -525,6 +524,12 @@ class DspZenodoTestSuite(DspTestSuite):
         self.assertIn("Instructions:", alert)
 
     def test_A_000002(self):
+        """Navigate to repo then auth with orcid"""
+        self.zenodo_then_login_orcid()
+        header = SubmitZenodo.get_header_text(self.driver)
+        self.assertIn(self.repo_name, header)
+
+    def test_A_000003(self):
         """Confirm successful submit of required fields for Zenodo Repo"""
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
         self.login_and_autofill_zenodo_required(auto_text)
@@ -532,7 +537,7 @@ class DspZenodoTestSuite(DspTestSuite):
         SubmitZenodo.finish_submission(self.driver)
         self.assertEqual("My Submissions", MySubmissions.get_title(self.driver))
 
-    def test_A_000003(self):
+    def test_A_000004(self):
         """Check that required fields persist after submit"""
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
         template = self.required_elements_template(auto_text)
@@ -543,9 +548,8 @@ class DspZenodoTestSuite(DspTestSuite):
         MySubmissions.enter_text_in_search(self.driver, auto_text)
         MySubmissions.edit_top_submission(self.driver)
         self.assertEqual("Edit Submission", EditExternalSubmission.get_header_title(self.driver))
-        # TODO: check the submission
-        # check = EditZenodoSubmission.check_required_elements(self.driver, template)
-        # self.assertTrue(check)
+        check = EditZenodoSubmission.check_required_elements(self.driver, template)
+        self.assertTrue(check)
 
 
 if __name__ == "__main__":

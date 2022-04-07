@@ -1,3 +1,4 @@
+from importlib import import_module
 import json
 from multiprocessing.dummy import Array
 import os
@@ -384,7 +385,7 @@ class GeneralSubmitToRepo(Dsp, RepoAuthWindow):
             if element.exists_in_dom(driver):
                 if isinstance(v, list):
                     # assume this is a v-multi-select
-                    self.fill_v_multi_select(driver, container_id=section, input_id=k, keywords=v)
+                    self.fill_v_multi_select(driver, container_id=section, input_id=k, values=v)
                 else:
                     # TODO: remove uneeded scroll-tos
                     # element.scroll_to_hidden(driver)
@@ -416,15 +417,15 @@ class GeneralSubmitToRepo(Dsp, RepoAuthWindow):
         return True
 
     @classmethod
-    def fill_v_multi_select(self, driver, container_id, input_id, keywords=["default_keyword"]):
-        input = SiteElement(By.CSS_SELECTOR, f'.v-select__selections input[data-id*="{input_id}"]')
+    def fill_v_multi_select(self, driver, container_id, input_id, values=["default_value"]):
+        input = SiteElement(By.CSS_SELECTOR, f'fieldset[data-id*="{container_id}"] .v-select__selections input[data-id*="{input_id}"]')
         input.javascript_click_hidden(driver)
-        if isinstance(keywords, str):
-            input.inject_text(driver, keywords)
+        if isinstance(values, str):
+            input.inject_text(driver, values)
             input.submit(driver)
         else:
-            for keyword in keywords:
-                input.inject_text(driver, keyword)
+            for value in values:
+                input.inject_text(driver, value)
                 input.submit(driver)
 
     @classmethod
@@ -473,16 +474,24 @@ class GeneralEditSubmission(Dsp):
     @classmethod
     def check_inputs_by_data_ids(self, driver, dict, section=None, nth=1):
         for k, v in dict.items():
-            if section and nth:
-                selector = f'fieldset[data-id*="{section}"] [data-id*="{k}"]:nth-of-type({nth})'
-                elem = SiteElement(By.CSS_SELECTOR, selector)
+            if isinstance(v, list):
+                # assume this is a v-multi-select
+                check = self.check_v_multi_select(driver, container_id=section, input_id=k, values=v)
+                if not check:
+                    print(f"\nMismatch when checking field: {k}. Expected {v}.")
+                    return False
             else:
-                elem = SiteElement(By.CSS_SELECTOR, f'[data-id*="{k}"]:nth-of-type(1)')
-            elem.scroll_to(driver)
-            value = elem.get_value(driver)
-            if value != v:
-                print(f"\nMismatch when checking field: {k}. Expected {v} got {value}")
-                return False
+                # not a v-multi-select
+                if section and nth:
+                    selector = f'fieldset[data-id*="{section}"] [data-id*="{k}"]:nth-of-type({nth})'
+                    elem = SiteElement(By.CSS_SELECTOR, selector)
+                else:
+                    elem = SiteElement(By.CSS_SELECTOR, f'[data-id*="{k}"]:nth-of-type(1)')
+                elem.scroll_to(driver)
+                value = elem.get_value(driver)
+                if value != v:
+                    print(f"\nMismatch when checking field: {k}. Expected {v} got {value}")
+                    return False
         return True
 
     @classmethod
@@ -490,6 +499,28 @@ class GeneralEditSubmission(Dsp):
         """Unless otherwise defined, Editsubmission pages should check required fields by dict"""
         for section, dict_to_check in required_elements.items():
             self.check_inputs_by_data_ids(driver, dict=dict_to_check, section=section, nth=1)
+
+    @classmethod
+    def get_v_multi_select_vals(self, driver, container_id, input_id):
+        input = SiteElement(By.CSS_SELECTOR, f'fieldset[data-id*="{container_id}"] input[data-id*="{input_id}"]')
+        values = input.get_texts_from_xpath(driver, './preceding-sibling::*/span[contains(@class, "v-chip__content")]')
+        return values
+
+    @classmethod
+    def check_v_multi_select(self, driver, container_id, input_id, values=None):
+        saved_values = self.get_v_multi_select_vals(driver, container_id, input_id)
+        if isinstance(values, str):
+            if values not in saved_values:
+                return False
+        else:
+            if not all(elem in saved_values for elem in values):
+                return False
+        return True
+
+    @classmethod
+    def get_nth_v_multi_select(self, driver, container_id, input_id, n):
+        saved_values = self.get_v_multi_select_vals(driver, container_id, input_id)
+        return saved_values[n]
 
 
 class SubmitHydroshare(GeneralSubmitToRepo):
@@ -534,7 +565,7 @@ class SubmitHydroshare(GeneralSubmitToRepo):
         self.title.scroll_to(driver)
         self.title.inject_text(driver, title)
         self.abstract.inject_text(driver, abstract)
-        self.fill_v_multi_select(driver, container_id="BasicInformation", input_id="Subjectkeywords", keywords=subject_keyword_input)
+        self.fill_v_multi_select(driver, container_id="BasicInformation", input_id="Subjectkeywords", values=subject_keyword_input)
 
     @classmethod
     def fill_funding_agency(self, driver, agency):
@@ -607,15 +638,14 @@ class EditHSSubmission(SubmitHydroshare, GeneralEditSubmission):
         return self.agency_name.get_value(driver) == agency
 
     @classmethod
-    def get_keywords(self, driver):
-        keywords = self.subject_keyword_container.get_texts_from_xpath(driver, './/span/span[contains(@class, "v-chip__content")]')
-        return keywords
-
-    @classmethod
     def get_nth_relation_type(self, driver, n):
         sel = f'fieldset[data-id*="Relatedresources"] input[data-id*="RelationType"]:nth-of-type({n})'
         relation_type_input = SiteElement(By.CSS_SELECTOR, sel)
         return relation_type_input.get_texts_from_xpath(driver, './preceding::div[1]')
+
+    @classmethod
+    def get_keywords(self, driver):
+        return self.get_v_multi_select_vals(driver, "BasicInformation", "Subjectkeywords")
 
     @classmethod
     def check_keywords(self, driver, keywords=None):
@@ -627,11 +657,6 @@ class EditHSSubmission(SubmitHydroshare, GeneralEditSubmission):
             if not all(elem in saved_keywords for elem in keywords):
                 return False
         return True
-
-    @classmethod
-    def get_nth_keyword_text(self, driver, n):
-        span = SiteElement(By.CSS_SELECTOR, ".v-select__selections span:nth-of-type({}) span.v-chip__content".format(n))
-        return span.get_text(driver)
 
 
 class Utilities:
