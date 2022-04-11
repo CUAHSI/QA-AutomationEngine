@@ -52,6 +52,9 @@ class DspTestSuite(BaseTestSuite):
 
     def setUp(self):
         super(DspTestSuite, self).setUp()
+        self.driver.set_window_size(1200, 1080)
+        size = self.driver.get_window_size()
+        print("Window size: width = {}px, height = {}px.".format(size["width"], size["height"]))
         if not self.base_url_arg:
             self.driver.get(BASE_URL)
         else:
