@@ -476,7 +476,7 @@ class GeneralEditSubmission(Dsp):
                 # assume this is a v-multi-select
                 check = self.check_v_multi_select(driver, container_id=section, input_id=k, values=v)
                 if not check:
-                    print(f"\nMismatch when checking field: {k}. Expected {v}.")
+                    print(f"\nMismatch when checking field: |{k}|. Expected |{v}|.")
                     return False
             else:
                 # not a v-multi-select
@@ -488,8 +488,12 @@ class GeneralEditSubmission(Dsp):
                 elem.scroll_to(driver)
                 value = elem.get_value(driver)
                 if value != v:
-                    print(f"\nMismatch when checking field: {k}. Expected {v} got {value}")
-                    return False
+                    if value.strip() == v:
+                        print(f"\nWARNING: while checking field: |{k}|.\nExpected: |{v}|\nBut got : |{value}| \
+                        \nWhitespace will be ignored and this field considered valid")
+                    else:
+                        print(f"\nMismatch when checking field: |{k}|.\nExpected |{v}| got |{value}|")
+                        return False
         return True
 
     @classmethod
@@ -542,36 +546,6 @@ class SubmitHydroshare(GeneralSubmitToRepo):
     rights_url = SiteElement(By.ID, "#/properties/url-input")
 
     @classmethod
-    def autofill_required_elements(self, driver, auto):
-        self.fill_basic_info(driver, auto)
-        if isinstance(auto, str):
-            self.fill_funding_agency(driver, auto)
-        else:
-            self.fill_funding_agency(driver, auto["funding_agency_name-input"])
-
-    @classmethod
-    def fill_basic_info(self, driver, basic_info):
-        if isinstance(basic_info, str):
-            title = basic_info
-            abstract = basic_info
-            subject_keyword_input = basic_info
-        else:
-            title = basic_info["title-input"]
-            abstract = basic_info["abstract-input"]
-            subject_keyword_input = basic_info["subjects-input"]
-
-        self.title.scroll_to(driver)
-        self.title.inject_text(driver, title)
-        self.abstract.inject_text(driver, abstract)
-        self.fill_v_multi_select(driver, container_id="BasicInformation", input_id="Subjectkeywords", values=subject_keyword_input)
-
-    @classmethod
-    def fill_funding_agency(self, driver, agency):
-        self.expand_section_by_did(driver, "Fundingagencyinformation")
-        self.agency_name.inject_text(driver, agency)
-        self.agency_name.submit(driver)
-
-    @classmethod
     def fill_related_resources(self, driver, relation_type, value, n):
         self.expand_section_by_did(driver, "Relatedresources")
 
@@ -612,28 +586,6 @@ class EditZenodoSubmission(SubmitHydroshare, GeneralEditSubmission):
 
 class EditHSSubmission(SubmitHydroshare, GeneralEditSubmission):
     """ Page containing forms for editing existing submission with Hydroshare backend"""
-    @classmethod
-    def check_required_elements(self, driver, auto):
-        if not self.check_basic_info(driver, auto, auto, ["CZNet", auto]):
-            return False
-        if not self.check_funding_agency_name(driver, auto):
-            return False
-        return True
-
-    @classmethod
-    def check_basic_info(self, driver, title, abstract, keywords):
-        self.title.scroll_to(driver)
-        if self.title.get_value(driver) != title:
-            return False
-        self.abstract.scroll_to(driver)
-        if self.abstract.get_value(driver) != abstract:
-            return False
-        return self.check_keywords(driver, keywords)
-
-    @classmethod
-    def check_funding_agency_name(self, driver, agency):
-        self.expand_section_by_did(driver, "Fundingagencyinformation")
-        return self.agency_name.get_value(driver) == agency
 
     @classmethod
     def get_nth_relation_type(self, driver, n):

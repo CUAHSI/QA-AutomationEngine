@@ -53,8 +53,6 @@ class DspTestSuite(BaseTestSuite):
     def setUp(self):
         super(DspTestSuite, self).setUp()
         self.driver.set_window_size(1200, 1080)
-        size = self.driver.get_window_size()
-        print("Window size: width = {}px, height = {}px.".format(size["width"], size["height"]))
         if not self.base_url_arg:
             self.driver.get(BASE_URL)
         else:
@@ -82,6 +80,24 @@ class DspHydroshareTestSuite(DspTestSuite):
 
     repo_name = "HydroShare"
 
+    @classmethod
+    def required_elements_template(self, auto_text):
+        basic_info = {
+            "Title": auto_text + " Title",
+            "Abstract": auto_text + " Abstract",
+            "Subjectkeywords": [auto_text + " SubjectKeywords"]
+        }
+        funding_agency = {
+            "Agencyname": auto_text + " Agencyname",
+        }
+
+        # created separately so that we can check individually if needed
+        required_elements = {
+            "BasicInformation": basic_info,
+            "Fundingagencyinformation": funding_agency,
+        }
+        return required_elements
+
     def login_orcid_and_hs(self):
         """Authenticate with orcid and then HS credentials"""
         Dsp.show_mobile_nav(self.driver)
@@ -106,8 +122,8 @@ class DspHydroshareTestSuite(DspTestSuite):
         So that additional non-required fields can easily be checked
         """
         self.login_orcid_and_hs()
-        SubmitLandingPage.to_repo_form(self.driver, self.repo_name)
-        SubmitHydroshare.autofill_required_elements(self.driver, auto_text)
+        template = self.required_elements_template(auto_text)
+        SubmitHydroshare.autofill_required_elements(self.driver, template)
 
     def fill_ids_submit_and_check(self, sort_text, section, nth, dict):
         """Fill additional fields of HS submit page based on 'data-id'
@@ -148,20 +164,20 @@ class DspHydroshareTestSuite(DspTestSuite):
     def test_A_000004(self):
         """Confirm successful submit of basic required fields to HS"""
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
-        self.login_and_autofill_hs_required(auto_text)
+        template = self.required_elements_template(auto_text)
+        self.login_orcid_and_hs()
+        SubmitHydroshare.autofill_required_elements(self.driver, template)
         self.assertTrue(SubmitHydroshare.is_finishable(self.driver))
         SubmitHydroshare.finish_submission(self.driver)
         self.assertEqual("My Submissions", MySubmissions.get_title(self.driver))
 
         # The page isn't sorted upon load
         MySubmissions.enter_text_in_search(self.driver, auto_text)
-        top_name = MySubmissions.get_top_submission_name(self.driver)
-        self.assertEqual(auto_text, top_name)
 
         MySubmissions.edit_top_submission(self.driver)
         self.assertEqual("Edit Submission", EditHSSubmission.get_header_title(self.driver))
-
-        self.assertTrue(EditHSSubmission.check_required_elements(self.driver, auto_text))
+        check = EditHSSubmission.check_required_elements(self.driver, template)
+        self.assertTrue(check)
 
     def test_A_000005(self):
         """Confirm that one can't submit to HS without each required field"""
