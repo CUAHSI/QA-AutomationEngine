@@ -216,29 +216,18 @@ class DspHydroshareTestSuite(DspTestSuite):
         self.assertTrue(match)
 
     def test_A_000007(self):
-        """Confirm that Basic Info persists from submit to edit"""
-        self.login_orcid_and_hs()
-        SubmitLandingPage.to_repo_form(self.driver, self.repo_name)
+        """Check that required fields persist after submit"""
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
-        dict = {
-            "title-input": auto_text + "title-input",
-            "abstract-input": auto_text + "abstract-input",
-            "subjects-input": ["keyword1", "keyword2"],
-            "funding_agency_name-input": auto_text + "funding_agency_name-input"
-        }
-        SubmitHydroshare.autofill_required_elements(self.driver, dict)
+        template = self.required_elements_template(auto_text)
+        self.login_and_autofill_hs_required(auto_text)
+        self.assertTrue(SubmitHydroshare.is_finishable(self.driver))
         SubmitHydroshare.finish_submission(self.driver)
 
-        # The page isn't sorted upon load
-        MySubmissions.enter_text_in_search(self.driver, auto_text + "title-input")
+        MySubmissions.enter_text_in_search(self.driver, auto_text)
         MySubmissions.edit_top_submission(self.driver)
-
-        # check keywords separately
-        keywords = dict.pop("subjects-input")
-        self.assertTrue(EditHSSubmission.check_keywords(self.driver, keywords))
-
-        match = EditHSSubmission.check_fields_by_dict(self.driver, dict)
-        self.assertTrue(match)
+        self.assertEqual("Edit Submission", EditHSSubmission.get_header_title(self.driver))
+        check = EditHSSubmission.check_required_elements(self.driver, template)
+        self.assertTrue(check)
 
     def test_A_000008(self):
         """Confirm that Temporal coverage persists from submit to edit"""
@@ -454,13 +443,13 @@ class DspExternalTestSuite(DspTestSuite):
     def test_A_000001(self):
         """Check authentication to submit page"""
         self.login_orcid_and_external()
-        header = GeneralSubmitToRepo.get_header_text(self.driver)
+        header = SubmitExternal.get_header_text(self.driver)
         self.assertIn("External", header)
 
     def test_A_000002(self):
         """Check that submit instructions are shown"""
         self.login_orcid_and_external()
-        alert = GeneralSubmitToRepo.get_alert_text(self.driver)
+        alert = SubmitExternal.get_alert_text(self.driver)
         self.assertIn("Instructions:", alert)
 
     def test_A_000003(self):
@@ -592,7 +581,7 @@ class DspZenodoTestSuite(DspTestSuite):
 
         MySubmissions.enter_text_in_search(self.driver, auto_text)
         MySubmissions.edit_top_submission(self.driver)
-        self.assertEqual("Edit Submission", EditExternalSubmission.get_header_title(self.driver))
+        self.assertEqual("Edit Submission", EditZenodoSubmission.get_header_title(self.driver))
         check = EditZenodoSubmission.check_required_elements(self.driver, template)
         self.assertTrue(check)
 
