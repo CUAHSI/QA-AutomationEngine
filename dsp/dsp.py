@@ -384,26 +384,21 @@ class DspHydroshareTestSuite(DspTestSuite):
     def test_A_000016(self):
         """Confirm that submissions are sorted after submission"""
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
-        self.login_and_autofill_hs_required(auto_text)
-        section = "Fundingagencyinformation"
-        nth = 1
-        dict = {
-            "Awardtitle": auto_text + "Funding Agency title2-input",
-            "Awardnumber": "5",
-            "AgencyURL": "http://funding-agency.com/" + auto_text,
-        }
-
-        success_filling = SubmitHydroshare.fill_inputs_by_data_ids(self.driver, dict, section, nth)
-        self.assertTrue(success_filling)
+        template = self.required_elements_template(auto_text)
+        self.login_orcid_and_hs()
+        SubmitHydroshare.autofill_required_elements(self.driver, template)
+        self.assertTrue(SubmitHydroshare.is_finishable(self.driver))
         SubmitHydroshare.finish_submission(self.driver)
+        self.assertEqual("My Submissions", MySubmissions.get_title(self.driver))
 
         # TODO: this test fails pending this issue
         # https://github.com/cznethub/dspfront/issues/53
         # The page isn't sorted upon load, so top submission will not be the most recent
         MySubmissions.edit_top_submission(self.driver)
 
-        match = EditHSSubmission.check_inputs_by_data_ids(self.driver, dict, section, nth)
-        self.assertTrue(match)
+        self.assertEqual("Edit Submission", EditHSSubmission.get_header_title(self.driver))
+        check = EditHSSubmission.check_required_elements(self.driver, template)
+        self.assertTrue(check)
 
 
 class DspExternalTestSuite(DspTestSuite):
