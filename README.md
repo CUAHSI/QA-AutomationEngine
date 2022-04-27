@@ -78,10 +78,17 @@ $ ./hydrotest hydroclient --records aws
 $ ./hydrotest hydroclient --records aws HydroclientTestSuite.test_A_000002
 ```
 
+To set the target against which tests will be run at runtime, add the `--base` argument:
+```
+$ ./hydrotest hydroclient --base https://www.hydroshare.org
+$ ./hydrotest hydroclient HydroclientTestSuite.test_A_000002 --base https://www.hydroshare.org
+```
+
 ### Jenkins Deployments
 After following the README in [docker/continuous-integration/](https://github.com/CUAHSI/QA-AutomationEngine/blob/master/docker/continuous-integration/) to setup a QA automation server, the tests to run can be configured using the following configuration files:
 1) [hydroclient.conf](hydroclient/hydroclient.conf)
 2) [hydroshare.conf](hydroshare/hydroshare.conf)
+3) [dsp.conf](dsp/dsp.conf)
 
 ### Flake8 Compliance
 To confirm Flake8 compliance, use:
@@ -133,6 +140,7 @@ The [utilities](cuahsi_base/utils.py) are also common to all CUAHSI test suites.
 
 [@cuahsi](https://github.com/cuahsi).
 [@hydroshare](https://github.com/hydroshare).
+[@CZNet](https://github.com/cznethub).
 [@ndebuhr](https://github.com/ndebuhr).
 
 ## Contribute
