@@ -124,20 +124,28 @@ class DspHydroshareTestSuite(DspTestSuite):
         template = self.required_elements_template(auto_text)
         SubmitHydroshare.autofill_required_elements(self.driver, template)
 
-    def fill_ids_submit_and_check(self, sort_text, section, nth, dict):
+    def fill_ids_submit_and_check(self, sort_text, section, nth, dict, array=False):
         """Fill additional fields of HS submit page based on 'data-id'
         Then submit the form, search in 'My Submissions',
         and check that all of the fields match what was entered
         """
         success_filling = SubmitHydroshare.fill_inputs_by_data_ids(self.driver, dict, section, nth)
         self.assertTrue(success_filling)
+        self.submit_and_check(sort_text, section, nth, dict, array)
+
+    def submit_and_check(self, sort_text, section, nth, dict, array=False):
+        self.submit(sort_text)
+        self.check(section, nth, dict, array)
+
+    def submit(self, sort_text):
         SubmitHydroshare.finish_submission(self.driver)
 
         # The page isn't sorted upon load
         MySubmissions.enter_text_in_search(self.driver, sort_text)
         MySubmissions.edit_top_submission(self.driver)
 
-        match = EditHSSubmission.check_inputs_by_data_ids(self.driver, dict, section, nth)
+    def check(self, section, nth, dict, array=False):
+        match = EditHSSubmission.check_inputs_by_data_ids(self.driver, dict, section, nth, array)
         self.assertTrue(match)
 
     def test_A_000001(self):
@@ -158,7 +166,7 @@ class DspHydroshareTestSuite(DspTestSuite):
         self.login_orcid_and_hs()
         SubmitLandingPage.to_repo_form(self.driver, self.repo_name)
         alert = SubmitHydroshare.get_alert_text(self.driver)
-        self.assertIn("Instructions:", alert)
+        self.assertIn("Instructions", alert)
 
     def test_A_000004(self):
         """Confirm successful submit of basic required fields to HS"""
@@ -184,7 +192,7 @@ class DspHydroshareTestSuite(DspTestSuite):
         self.login_and_autofill_hs_required(auto_text)
         self.assertTrue(SubmitHydroshare.is_finishable(self.driver))
 
-        required_text_items = ["agency_name", "abstract", "title", "rights_statement", "rights_url"]
+        required_text_items = ["agency_name", "abstract", "title"]
         for text_elem in required_text_items:
             SubmitHydroshare.unfill_text_by_page_property(self.driver, text_elem)
             self.assertRaises(BaseException, SubmitHydroshare.is_finishable(self.driver))
@@ -204,7 +212,7 @@ class DspHydroshareTestSuite(DspTestSuite):
         MySubmissions.enter_text_in_search(self.driver, auto_text)
         MySubmissions.edit_top_submission(self.driver)
         section = "Creators"
-        nth = 1
+        nth = 0
         dict = {
             "Name": "Meister, Jim",
             # "Phone": "4444444444", phone is no longer showing up on beta HS
@@ -236,7 +244,7 @@ class DspHydroshareTestSuite(DspTestSuite):
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
         self.login_and_autofill_hs_required(auto_text)
         section = "Temporalcoverage"
-        nth = 1
+        nth = 0
         dict = {
             "Start": "2022-03-25T01:00",
             "End": "2022-04-25T02:00",
@@ -258,7 +266,7 @@ class DspHydroshareTestSuite(DspTestSuite):
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
         self.login_and_autofill_hs_required(auto_text)
         section = "Fundingagencyinformation"
-        nth = 1
+        nth = 0
         dict = {
             "Awardtitle": auto_text + "Funding Agency title2-input",
             "Awardnumber": "5",
@@ -271,7 +279,7 @@ class DspHydroshareTestSuite(DspTestSuite):
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
         self.login_and_autofill_hs_required(auto_text)
         section = "Contributors"
-        nth = 1
+        nth = 0
         dict = {
             "Name": auto_text + "Contributor name2-input",
             "Phone": "1234567890",
@@ -288,7 +296,7 @@ class DspHydroshareTestSuite(DspTestSuite):
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
         self.login_and_autofill_hs_required(auto_text)
         section = "Spatialcoverage"
-        nth = 1
+        nth = 0
         dict = {
             "Name": auto_text + "Contributor name2-input",
             "East": "20",
@@ -302,7 +310,7 @@ class DspHydroshareTestSuite(DspTestSuite):
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
         self.login_and_autofill_hs_required(auto_text)
         section = "Additionalmetadata"
-        nth = 1
+        nth = 0
         dict = {
             "Key": auto_text + " key",
             "Value": auto_text + " value"
@@ -318,7 +326,7 @@ class DspHydroshareTestSuite(DspTestSuite):
             "RelationType": "This resource includes",
             "Value": auto_text + " value"
         }
-        nth = 1
+        nth = 0
         section = "Relatedresources"
         SubmitHydroshare.fill_related_resources(self.driver, dict["RelationType"], dict["Value"], nth)
         SubmitHydroshare.finish_submission(self.driver)
@@ -337,7 +345,7 @@ class DspHydroshareTestSuite(DspTestSuite):
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
         self.login_and_autofill_hs_required(auto_text)
         section = "Spatialcoverage"
-        nth = 1
+        nth = 0
         dict = {
             "Name": auto_text + "Contributor name2-input",
             "Northlimit": "20",
@@ -367,7 +375,7 @@ class DspHydroshareTestSuite(DspTestSuite):
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
         self.login_and_autofill_hs_required(auto_text)
         section = "Spatialcoverage"
-        nth = 1
+        nth = 0
         dict = {
             "Name": auto_text + "Contributor name2-input",
             "Northlimit": "-20",
@@ -399,6 +407,129 @@ class DspHydroshareTestSuite(DspTestSuite):
         self.assertEqual("Edit Submission", EditHSSubmission.get_header_title(self.driver))
         check = EditHSSubmission.check_required_elements(self.driver, template)
         self.assertTrue(check)
+
+    def test_A_000017(self):
+        """Confirm that multiple Creators info persists from submit to edit"""
+        auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
+        self.login_and_autofill_hs_required(auto_text)
+        section = "Creators"
+        ns = [0, 1]
+        dicts = [None] * len(ns)
+        array = True
+        for nth in ns:
+            dicts[nth] = {
+                "Name": f"{auto_text} name {nth}",
+                "Phone": "1234567890",
+                "Address": f"creator address {auto_text} {nth}",
+                "Organization": f"creator org {auto_text} {nth}",
+                "Email": f"{auto_text}{nth}@gmail.com",
+                "Homepage": f"http://contibutor_homepage.com/{auto_text}{nth}",
+            }
+            SubmitHydroshare.add_form_array_item_by_did(self.driver, data_id=section)
+            success_filling = SubmitHydroshare.fill_inputs_by_data_ids(self.driver, dicts[nth], section, nth, array)
+            self.assertTrue(success_filling)
+
+        self.submit(auto_text)
+        for nth in ns:
+            self.check(section, nth, dicts[nth], array)
+
+    def test_A_000018(self):
+        """Confirm that multiple Contributors info persists from submit to edit"""
+        auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
+        self.login_and_autofill_hs_required(auto_text)
+        section = "Contributors"
+        ns = [0, 1]
+        array = True
+        dicts = [None] * len(ns)
+        for nth in ns:
+            dicts[nth] = {
+                "Name": f"{auto_text} name {nth}",
+                "Phone": "1234567890",
+                "Address": f"contributor address {auto_text} {nth}",
+                "Organization": f"contributor org {auto_text} {nth}",
+                "Email": f"{auto_text}{nth}@gmail.com",
+                "Homepage": f"http://contibutor_homepage.com/{auto_text}{nth}"
+            }
+            SubmitHydroshare.add_form_array_item_by_did(self.driver, data_id=section)
+            success_filling = SubmitHydroshare.fill_inputs_by_data_ids(self.driver, dicts[nth], section, nth, array)
+            self.assertTrue(success_filling)
+
+        self.submit(auto_text)
+        for nth in ns:
+            self.check(section, (nth), dicts[nth], array)
+
+    def test_A_000019(self):
+        """Confirm that multiple Additional Metadata info persists from submit to edit"""
+        auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
+        self.login_and_autofill_hs_required(auto_text)
+        section = "Additionalmetadata"
+        ns = [0, 1]
+        dicts = [None] * len(ns)
+        array = True
+        for nth in ns:
+            dicts[nth] = {
+                "Key": f"{auto_text} key {nth}",
+                "Value": f"{auto_text} value {nth}"
+            }
+            SubmitHydroshare.add_form_array_item_by_did(self.driver, data_id=section)
+            success_filling = SubmitHydroshare.fill_inputs_by_data_ids(self.driver, dicts[nth], section, nth, array)
+            self.assertTrue(success_filling)
+
+        self.submit(auto_text)
+        for nth in ns:
+            self.check(section, nth, dicts.pop(), array)
+
+    def test_A_000020(self):
+        """Confirm that multiple Related Resources info persists from submit to edit"""
+        auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
+        self.login_and_autofill_hs_required(auto_text)
+        section = "Relatedresources"
+        ns = [0, 1]
+        array = True
+        dicts = [None] * len(ns)
+        for nth in ns:
+            dicts[nth] = {
+                "RelationType": "This resource includes",
+                "Value": f"{auto_text} value {nth}"
+            }
+            SubmitHydroshare.add_form_array_item_by_did(self.driver, data_id=section)
+            success_filling = SubmitHydroshare.fill_inputs_by_data_ids(self.driver, dicts[nth], section, nth, array)
+            self.assertTrue(success_filling)
+
+        self.submit(auto_text)
+        for nth in ns:
+            relation = EditHSSubmission.get_nth_relation_type(self.driver, nth)
+            self.assertEqual(relation.pop(), dicts[nth].pop("RelationType"))
+            self.check(section, nth, dicts[nth], array)
+
+    def test_A_000021(self):
+        """Confirm that multiple Funding Agencies info persists from submit to edit"""
+        auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
+        self.login_orcid_and_hs()
+        template = {"BasicInformation": {
+            "Title": auto_text + " Title",
+            "Abstract": auto_text + " Abstract",
+            "Subjectkeywords": [auto_text + " SubjectKeywords"]
+        }}
+        SubmitHydroshare.autofill_required_elements(self.driver, template)
+        section = "Fundingagencyinformation"
+        ns = [0, 1]
+        dicts = [None] * len(ns)
+        array = True
+        for nth in ns:
+            dicts[nth] = {
+                "Agencyname": f"{auto_text} Funding Agency Name {nth}",
+                "Awardtitle": f"{auto_text} Funding Agency title2-input {nth}",
+                "Awardnumber": f"5{nth}",
+                "AgencyURL": f"http://funding-agency.com/{auto_text}/{nth}",
+            }
+            SubmitHydroshare.add_form_array_item_by_did(self.driver, data_id=section)
+            success_filling = SubmitHydroshare.fill_inputs_by_data_ids(self.driver, dicts[nth], section, nth, array)
+            self.assertTrue(success_filling)
+
+        self.submit(auto_text)
+        for nth in ns:
+            self.check(section, nth, dicts[nth], array)
 
 
 class DspExternalTestSuite(DspTestSuite):
@@ -468,7 +599,7 @@ class DspExternalTestSuite(DspTestSuite):
         """Check that submit instructions are shown"""
         self.login_orcid_and_external()
         alert = SubmitExternal.get_alert_text(self.driver)
-        self.assertIn("Instructions:", alert)
+        self.assertIn("Instructions", alert)
 
     def test_A_000003(self):
         """Confirm successful submit of basic required fields for External Repo"""
@@ -565,7 +696,7 @@ class DspZenodoTestSuite(DspTestSuite):
         header = SubmitZenodo.get_header_text(self.driver)
         self.assertIn(self.repo_name, header)
         alert = SubmitZenodo.get_alert_text(self.driver)
-        self.assertIn("Instructions:", alert)
+        self.assertIn("Instructions", alert)
 
     def test_A_000002(self):
         """Navigate to repo then auth with orcid"""
