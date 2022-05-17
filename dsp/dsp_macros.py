@@ -121,6 +121,8 @@ class Dsp(WebPage):
     def to_orcid_window(self, driver):
         num_windows_now = len(driver.window_handles)
         self.wait_until_element_visible(driver, self.orcid_login_continue, AUTH_WINDOW)
+        # artifact is getting in the way of button click
+        self.wait_until_css_dissapear(driver, ".v-card__actions", AUTH_WINDOW)
         self.orcid_login_continue.click(driver)
         External.switch_new_page(driver, num_windows_now, self.body_locator)
 
@@ -232,6 +234,26 @@ class ZenodoAuthWindow(WebPage):
         self.authorize_czhub_button.click(driver)
 
 
+class EarthchemAuthWindow(WebPage):
+    """ Authentication window to use Earthchem as Backend """
+    github_button = SiteElement(By.CSS_SELECTOR, '.social-signup .btn[href*="github"]')
+    orcid_button = SiteElement(By.ID, "social-orcid")
+    username = SiteElement(By.ID, "username")
+    password = SiteElement(By.ID, "password")
+    login_button = SiteElement(By.ID, "kc-login")
+    authorize_czhub_button = SiteElement(By.CSS_SELECTOR, 'form button[value="yes"]')
+
+    @classmethod
+    def authorize_via_orcid(self, driver):
+        self.orcid_button.click(driver)
+
+    @classmethod
+    def authorize_username_password(self, driver, username, password):
+        self.username.inject_text(driver, username)
+        self.password.inject_text(driver, password)
+        self.login_button.click(driver)
+
+
 class MySubmissions(Dsp):
     """ Page displaying users submissions """
     title = SiteElement(By.CSS_SELECTOR, ".text-h4:nth-of-type(1)")
@@ -292,7 +314,7 @@ class SubmitLandingPage(Dsp, RepoAuthWindow):
 
     @classmethod
     def select_nth_repo(self, driver, n):
-        repo_card = SiteElement(By.CSS_SELECTOR, f'div.repositories div.v-card:nth-of-type({n})')
+        repo_card = SiteElement(By.CSS_SELECTOR, f'div.repositories div.v-card:nth-of-type({n+1})')
         repo_card.scroll_to(driver)
         repo_card.click(driver)
 
@@ -352,12 +374,12 @@ class GeneralSubmitToRepo(Dsp, RepoAuthWindow):
         self.wait_until_element_not_exist(driver, self.is_saving, NEW_SUBMISSION_SAVE)
 
     @classmethod
-    def get_did_in_section(self, section=None, data_id="", nth=1):
-        selector = f'fieldset[data-id*="{section}"] [data-id*="{data_id}"]:nth-of-type({nth})'
+    def get_did_in_section(self, section=None, data_id="", nth=0):
+        selector = f'fieldset[data-id*="{section}"] [data-id*="{data_id}"]:nth-of-type({nth+1})'
         return SiteElement(By.CSS_SELECTOR, selector)
 
     @classmethod
-    def get_css_in_section(self, section=None, css="", nth=1):
+    def get_css_in_section(self, section=None, css="", nth=0):
         selector = f'fieldset[data-id*="{section}"] {css}'
         return SiteElement(By.CSS_SELECTOR, selector)
 
@@ -371,11 +393,23 @@ class GeneralSubmitToRepo(Dsp, RepoAuthWindow):
         element.javascript_click(driver)
 
     @classmethod
-    def fill_inputs_by_data_ids(self, driver, dict, section=None, nth=1):
+    def add_form_array_item_by_did(self, driver, data_id):
+        element = SiteElement(By.CSS_SELECTOR, f'fieldset[data-id*="{data_id}"] button:first-of-type')
+        if not element.exists_in_dom(driver):
+            print(f"\n Ignoring attempt to expand static section: {data_id}")
+            return False
+        element.scroll_to(driver)
+        element.javascript_click(driver)
+
+    @classmethod
+    def fill_inputs_by_data_ids(self, driver, dict, section=None, nth=0, array=False):
         for k, v in dict.items():
             try:
-                if section and nth:
-                    selector = f'[data-id*="{section}"] [data-id*="{k}"]:nth-of-type({nth})'
+                if section and nth is not None:
+                    if array:
+                        selector = f'[data-id*="{section}"] [data-id="array-item-{nth}"] [data-id*="{k}"]'
+                    else:
+                        selector = f'[data-id*="{section}"] [data-id*="{k}"]:nth-of-type({nth+1})'
                     element = SiteElement(By.CSS_SELECTOR, selector)
                 else:
                     element = SiteElement(By.CSS_SELECTOR, f'[data-id*="{k}"]:nth-of-type(1)')
@@ -448,7 +482,7 @@ class GeneralSubmitToRepo(Dsp, RepoAuthWindow):
     def autofill_required_elements(self, driver, required):
         for section, dict in required.items():
             self.expand_section_by_did(driver, section)
-            self.fill_inputs_by_data_ids(driver, dict, section, nth=1)
+            self.fill_inputs_by_data_ids(driver, dict, section, nth=0)
 
 
 class GeneralEditSubmission(Dsp):
@@ -470,7 +504,7 @@ class GeneralEditSubmission(Dsp):
         return True
 
     @classmethod
-    def check_inputs_by_data_ids(self, driver, dict, section=None, nth=1):
+    def check_inputs_by_data_ids(self, driver, dict, section=None, nth=0, array=False):
         for k, v in dict.items():
             if isinstance(v, list):
                 # assume this is a v-multi-select
@@ -480,9 +514,13 @@ class GeneralEditSubmission(Dsp):
                     return False
             else:
                 # not a v-multi-select
-                if section and nth:
-                    selector = f'fieldset[data-id*="{section}"] [data-id*="{k}"]:nth-of-type({nth})'
-                    elem = SiteElement(By.CSS_SELECTOR, selector)
+                if section and nth is not None:
+                    if array:
+                        selector = f'fieldset[data-id*="{section}"] [data-id="array-item-{nth}"] [data-id*="{k}"]'
+                        elem = SiteElement(By.CSS_SELECTOR, selector)
+                    else:
+                        selector = f'fieldset[data-id*="{section}"] [data-id*="{k}"]:nth-of-type({nth+1})'
+                        elem = SiteElement(By.CSS_SELECTOR, selector)
                 else:
                     elem = SiteElement(By.CSS_SELECTOR, f'[data-id*="{k}"]:nth-of-type(1)')
                 elem.scroll_to(driver)
@@ -500,7 +538,7 @@ class GeneralEditSubmission(Dsp):
     def check_required_elements(self, driver, required_elements):
         """Unless otherwise defined, Editsubmission pages should check required fields by dict"""
         for section, dict_to_check in required_elements.items():
-            return self.check_inputs_by_data_ids(driver, dict=dict_to_check, section=section, nth=1)
+            return self.check_inputs_by_data_ids(driver, dict=dict_to_check, section=section, nth=0)
 
     @classmethod
     def get_v_multi_select_vals(self, driver, container_id, input_id):
@@ -549,11 +587,11 @@ class SubmitHydroshare(GeneralSubmitToRepo):
     def fill_related_resources(self, driver, relation_type, value, n):
         self.expand_section_by_did(driver, "Relatedresources")
 
-        sel = f'fieldset[data-id*="Relatedresources"] input[data-id*="RelationType"]:nth-of-type({n})'
+        sel = f'fieldset[data-id*="Relatedresources"] input[data-id*="RelationType"]:nth-of-type({n+1})'
         relation_type_input = SiteElement(By.CSS_SELECTOR, sel)
-        sel = f'fieldset[data-id*="Relatedresources"] input[data-id*="Value"]:nth-of-type({n})'
+        sel = f'fieldset[data-id*="Relatedresources"] input[data-id*="Value"]:nth-of-type({n+1})'
         related_resources_value = SiteElement(By.CSS_SELECTOR, sel)
-        sel = f'fieldset[data-id*="Relatedresources"] div.v-select:nth-of-type({n})'
+        sel = f'fieldset[data-id*="Relatedresources"] div.v-select:nth-of-type({n+1})'
         relation_type_container = SiteElement(By.CSS_SELECTOR, sel)
 
         relation_type_container.scroll_to(driver)
@@ -584,12 +622,22 @@ class EditZenodoSubmission(SubmitHydroshare, GeneralEditSubmission):
     pass
 
 
+class SubmitEarthchem(GeneralSubmitToRepo):
+    """ Page containing forms for submitting data with Earthchem backend"""
+    pass
+
+
+class EditEarthchemSubmission(SubmitHydroshare, GeneralEditSubmission):
+    """ Page containing forms for editing existing submission with Earthchem backend"""
+    pass
+
+
 class EditHSSubmission(SubmitHydroshare, GeneralEditSubmission):
     """ Page containing forms for editing existing submission with Hydroshare backend"""
 
     @classmethod
     def get_nth_relation_type(self, driver, n):
-        sel = f'fieldset[data-id*="Relatedresources"] input[data-id*="RelationType"]:nth-of-type({n})'
+        sel = f'fieldset[data-id*="Relatedresources"] [data-id="array-item-{n}"] input[data-id*="RelationType"]'
         relation_type_input = SiteElement(By.CSS_SELECTOR, sel)
         return relation_type_input.get_texts_from_xpath(driver, './preceding::div[1]')
 
