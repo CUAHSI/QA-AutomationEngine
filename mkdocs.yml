@@ -7,7 +7,17 @@ plugins:
   - mkdocstrings
 
 nav:
-  - QA Docs: index.md
-  - DSP: dsp.md
-  - Hydroshare: hydroshare.md
-  - Hydroclient: hydroclient.md
+  - About: index.md
+  - Base:
+    - Cuahsi Base: cuahsi_base/cuahsi_base.md
+    - Site Element: cuahsi_base/site_element.md
+    - Utils: cuahsi_base/utils.md
+  - DSP: 
+    - DSP Tests: dsp/dsp.md
+    - DSP Macros: dsp/dsp_macros.md
+  - Hydroshare:
+    - Hydroshare Tests: hydroshare/hydroshare.md
+    - Hydroshare Macros: hydroshare/hs_macros.md
+  - Hydroclient:
+    - Hydroclient Tests: hydroclient/hydroclient.md
+    - Hydroclient Macros: hydroclient/hc_macros.md
