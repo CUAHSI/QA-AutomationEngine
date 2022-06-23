@@ -143,6 +143,11 @@ The [utilities](cuahsi_base/utils.py) are also common to all CUAHSI test suites.
 [@CZNet](https://github.com/cznethub).
 [@ndebuhr](https://github.com/ndebuhr).
 
+## Aditional documentation
+
+[MkDocs](https://www.mkdocs.org/) is used to generate test-level documentation. The configuration lives in [mkdocs.yml](mkdocs.yml) and [/docs](docs).
+You can serve a local instance of the static documentation site with `mkdocs serve` or deploy it to https://cuahsi.github.io/QA-AutomationEngine/ using `mkdocs gh-deploy`
+
 ## Contribute
 
 Please feel free to contribute.  [Open an issue](https://github.com/CUAHSI/QA-AutomationEngine/issues/new) or submit PRs.
