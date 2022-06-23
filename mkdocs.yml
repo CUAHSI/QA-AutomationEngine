@@ -1,0 +1,13 @@
+site_name: CUAHSI QA Documentation
+
+theme:
+  name: "material"
+
+plugins:
+  - mkdocstrings
+
+nav:
+  - QA Docs: index.md
+  - DSP: dsp.md
+  - Hydroshare: hydroshare.md
+  - Hydroclient: hydroclient.md
