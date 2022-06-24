@@ -747,13 +747,19 @@ class DspEarthchemTestSuite(DspTestSuite):
     @classmethod
     def required_elements_template(self, auto_text):
         basic_info = {
-            "Title": auto_text + " Title",
-            "Description/Abstract": auto_text + " Description/Abstract",
+            # TODO: title-input is not selectable
+            "Dataset Title": auto_text + " Title",
+            "AbstractorDescription": auto_text + " Description/Abstract",
+            "DataTypes": "Collection",
             "Keywords": [auto_text + " Keywords"]
+        }
+        spatial = {
+            "SpatialCoverage": "Global"
         }
 
         required_elements = {
-            "BasicInformation": basic_info
+            "group-BasicInformation": basic_info,
+            "SpatialCoverageInformation": spatial
         }
         return required_elements
 
@@ -808,7 +814,8 @@ class DspEarthchemTestSuite(DspTestSuite):
         """A shortcut to fill required fields of submit page
         So that additional non-required fields can easily be checked
         """
-        self.earthchem_then_login_username_password()
+        # self.earthchem_then_login_username_password()
+        self.login_orcid_to_submit()
         SubmitEarthchem.autofill_required_elements(self.driver, self.required_elements_template(auto_text))
 
     def test_A_000001(self):
