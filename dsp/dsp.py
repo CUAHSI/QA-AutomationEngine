@@ -633,9 +633,16 @@ class DspZenodoTestSuite(DspTestSuite):
             "Description/Abstract": auto_text + " Description/Abstract",
             "Keywords": [auto_text + " Keywords"]
         }
+        funding_agency = {
+            "Agencyname": auto_text + " Fundingagencyname",
+            "Awardtitle": auto_text + " Awardtitle",
+            "Awardnumber": auto_text + " Awardnumberoridentifier",
+            "AgencyURL": "http://funding-agency.com/" + auto_text
+        }
 
         required_elements = {
-            "BasicInformation": basic_info
+            "BasicInformation": basic_info,
+            "FundingAgencyMetadata": funding_agency
         }
         return required_elements
 
