@@ -287,6 +287,11 @@ class SiteElement:
         target_el = self.loc_it(driver)
         return target_el.get_attribute(attribute)
 
+    def get_attribute_hidden(self, driver, attribute):
+        """Returns any attribute of website element"""
+        target_el = self.loc_hidden(driver)
+        return target_el.get_attribute(attribute)
+
     def get_text(self, driver):
         """Returns content text of website element"""
         target_el = self.loc_it(driver)
