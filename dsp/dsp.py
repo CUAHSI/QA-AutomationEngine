@@ -26,7 +26,10 @@ from dsp_macros import (
     EditExternalSubmission,
     SubmitZenodo,
     EditZenodoSubmission,
-    ZenodoAuthWindow
+    ZenodoAuthWindow,
+    SubmitEarthchem,
+    EditEarthchemSubmission,
+    EarthchemAuthWindow
 )
 
 from cuahsi_base.cuahsi_base import BaseTestSuite, parse_args_run_tests
@@ -37,6 +40,8 @@ from config import (
     PASSWORD,
     HS_PASSWORD,
     HS_USERNAME,
+    EARTHCHEM_USERNAME,
+    EARTHCHEM_PASSWORD
 )
 
 SPAM_DATA_STREAM_NAME = "cuahsi-quality-spam-data-stream"
@@ -601,6 +606,117 @@ class DspZenodoTestSuite(DspTestSuite):
         MySubmissions.edit_top_submission(self.driver)
         self.assertEqual("Edit Submission", EditZenodoSubmission.get_header_title(self.driver))
         check = EditZenodoSubmission.check_required_elements(self.driver, template)
+        self.assertTrue(check)
+
+
+class DspEarthchemTestSuite(DspTestSuite):
+    """DSP tests for Earthchem backend"""
+
+    repo_name = "EarthChem"
+
+    @classmethod
+    def required_elements_template(self, auto_text):
+        basic_info = {
+            "Title": auto_text + " Title",
+            "Description/Abstract": auto_text + " Description/Abstract",
+            "Keywords": [auto_text + " Keywords"]
+        }
+
+        required_elements = {
+            "BasicInformation": basic_info
+        }
+        return required_elements
+
+    def earthchem_then_login_orcid(self):
+        """Select Earthchem repo then authenticate with orcid"""
+        Dsp.show_mobile_nav(self.driver)
+        Dsp.drawer_to_submit(self.driver)
+        SubmitLandingPage.select_repo_by_id(self.driver, self.repo_name)
+
+        # new ORCID window
+        SubmitLandingPage.to_orcid_window(self.driver)
+        self.assertIn("ORCID", TestSystem.title(self.driver))
+
+        OrcidWindow.fill_credentials(self.driver, EARTHCHEM_USERNAME, EARTHCHEM_PASSWORD)
+        OrcidWindow.to_origin_window(self.driver)
+
+        # new Earthchem auth window
+        SubmitLandingPage.to_repo_auth_window(self.driver)
+
+        EarthchemAuthWindow.authorize_via_orcid(self.driver)
+        OrcidWindow.to_origin_window(self.driver)
+
+    def earthchem_then_login_username_password(self):
+        """Select Earthchem repo then authenticate with orcid"""
+        Dsp.show_mobile_nav(self.driver)
+        Dsp.drawer_to_submit(self.driver)
+        SubmitLandingPage.select_repo_by_id(self.driver, self.repo_name)
+
+        # new ORCID window
+        SubmitLandingPage.to_orcid_window(self.driver)
+        self.assertIn("ORCID", TestSystem.title(self.driver))
+
+        OrcidWindow.fill_credentials(self.driver, EARTHCHEM_USERNAME, EARTHCHEM_PASSWORD)
+        OrcidWindow.to_origin_window(self.driver)
+
+        # new Earthchem auth window
+        SubmitLandingPage.to_repo_auth_window(self.driver)
+        EarthchemAuthWindow.authorize_email_password(self.driver, email=EARTHCHEM_USERNAME, password=EARTHCHEM_PASSWORD)
+        EarthchemAuthWindow.to_origin_window(self.driver, wait=True)
+
+    def login_orcid_to_submit(self):
+        """Authenticate with orcid then select repo"""
+        super().login_orcid_to_submit(self.repo_name)
+
+        # new EC auth window
+        SubmitLandingPage.to_repo_auth_window(self.driver)
+        self.assertIn("ecl-realm", TestSystem.title(self.driver))
+        EarthchemAuthWindow.authorize_via_orcid(self.driver)
+        OrcidWindow.to_origin_window(self.driver, wait=True)
+
+    def login_and_autofill_earthchem_required(self, auto_text):
+        """A shortcut to fill required fields of submit page
+        So that additional non-required fields can easily be checked
+        """
+        self.earthchem_then_login_username_password()
+        SubmitEarthchem.autofill_required_elements(self.driver, self.required_elements_template(auto_text))
+
+    def test_A_000001(self):
+        """Orcid auth first, then to submit page"""
+        self.login_orcid_to_submit()
+        header = SubmitEarthchem.get_header_text(self.driver)
+        self.assertIn(self.repo_name, header)
+        alert = SubmitEarthchem.get_alert_text(self.driver)
+        self.assertIn("Instructions", alert)
+
+    def test_A_000002(self):
+        """Navigate to repo then auth with orcid"""
+        self.earthchem_then_login_orcid()
+        header = SubmitEarthchem.get_header_text(self.driver)
+        self.assertIn(self.repo_name, header)
+
+    def test_A_000003(self):
+        """Confirm successful submit of required fields for Earthchem Repo"""
+        # TODO: this doesn't work yet
+        auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
+        self.login_and_autofill_earthchem_required(auto_text)
+        self.assertTrue(SubmitEarthchem.is_finishable(self.driver))
+        SubmitEarthchem.finish_submission(self.driver)
+        self.assertEqual("My Submissions", MySubmissions.get_title(self.driver))
+
+    def test_A_000004(self):
+        """Check that required fields persist after submit"""
+        # TODO: this doesn't work yet
+        auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
+        template = self.required_elements_template(auto_text)
+        self.login_and_autofill_earthchem_required(auto_text)
+        self.assertTrue(SubmitEarthchem.is_finishable(self.driver))
+        SubmitEarthchem.finish_submission(self.driver)
+
+        MySubmissions.enter_text_in_search(self.driver, auto_text)
+        MySubmissions.edit_top_submission(self.driver)
+        self.assertEqual("Edit Submission", EditEarthchemSubmission.get_header_title(self.driver))
+        check = EditEarthchemSubmission.check_required_elements(self.driver, template)
         self.assertTrue(check)
 
 

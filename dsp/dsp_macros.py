@@ -232,6 +232,26 @@ class ZenodoAuthWindow(WebPage):
         self.authorize_czhub_button.click(driver)
 
 
+class EarthchemAuthWindow(WebPage):
+    """ Authentication window to use Earthchem as Backend """
+    github_button = SiteElement(By.CSS_SELECTOR, '.social-signup .btn[href*="github"]')
+    orcid_button = SiteElement(By.ID, "social-orcid")
+    username = SiteElement(By.ID, "username")
+    password = SiteElement(By.ID, "password")
+    login_button = SiteElement(By.ID, "kc-login")
+    authorize_czhub_button = SiteElement(By.CSS_SELECTOR, 'form button[value="yes"]')
+
+    @classmethod
+    def authorize_via_orcid(self, driver):
+        self.orcid_button.click(driver)
+
+    @classmethod
+    def authorize_username_password(self, driver, username, password):
+        self.username.inject_text(driver, username)
+        self.password.inject_text(driver, password)
+        self.login_button.click(driver)
+
+
 class MySubmissions(Dsp):
     """ Page displaying users submissions """
     title = SiteElement(By.CSS_SELECTOR, ".text-h4:nth-of-type(1)")
@@ -581,6 +601,16 @@ class EditExternalSubmission(SubmitHydroshare, GeneralEditSubmission):
 
 class EditZenodoSubmission(SubmitHydroshare, GeneralEditSubmission):
     """ Page containing forms for editing existing submission with Zenodo backend"""
+    pass
+
+
+class SubmitEarthchem(GeneralSubmitToRepo):
+    """ Page containing forms for submitting data with Earthchem backend"""
+    pass
+
+
+class EditEarthchemSubmission(SubmitHydroshare, GeneralEditSubmission):
+    """ Page containing forms for editing existing submission with Earthchem backend"""
     pass
 
 
