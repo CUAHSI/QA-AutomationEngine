@@ -25,7 +25,8 @@ from timing import (
     RETURN_PREVIOUS,
     AUTH_WINDOW,
     NEW_SUBMISSION_SAVE,
-    DEFAULT_TIMEOUT
+    DEFAULT_TIMEOUT,
+    PAUSE_AFTER_FILL_BEFORE_SUBMIT,
 )
 
 
@@ -121,6 +122,8 @@ class Dsp(WebPage):
     def to_orcid_window(self, driver):
         num_windows_now = len(driver.window_handles)
         self.wait_until_element_visible(driver, self.orcid_login_continue, AUTH_WINDOW)
+        # artifact is getting in the way of button click
+        self.wait_until_css_dissapear(driver, ".v-card__actions", AUTH_WINDOW)
         self.orcid_login_continue.click(driver)
         External.switch_new_page(driver, num_windows_now, self.body_locator)
 
@@ -312,7 +315,7 @@ class SubmitLandingPage(Dsp, RepoAuthWindow):
 
     @classmethod
     def select_nth_repo(self, driver, n):
-        repo_card = SiteElement(By.CSS_SELECTOR, f'div.repositories div.v-card:nth-of-type({n})')
+        repo_card = SiteElement(By.CSS_SELECTOR, f'div.repositories div.v-card:nth-of-type({n+1})')
         repo_card.scroll_to(driver)
         repo_card.click(driver)
 
@@ -327,6 +330,7 @@ class GeneralSubmitToRepo(Dsp, RepoAuthWindow):
     header = SiteElement(By.CSS_SELECTOR, ".cz-new-submission h1")
     alert = SiteElement(By.CSS_SELECTOR, ".v-alert .v-alert__content")
     top_save = SiteElement(By.CSS_SELECTOR, "#cz-new-submission-actions-top button.submission-save")
+    instructions = SiteElement(By.CSS_SELECTOR, "#instructions")
 
     # required_elements = SiteElementsCollection(By.CSS_SELECTOR, "input[required='required']")
     # required_elements = SiteElementsCollection(By.CSS_SELECTOR, "input[data-id$="*")
@@ -360,9 +364,9 @@ class GeneralSubmitToRepo(Dsp, RepoAuthWindow):
 
     @classmethod
     def is_finishable(self, driver):
-        self.bottom_finish.scroll_to(driver)
-        finishable = self.bottom_finish.get_attribute(driver, "disabled") is None \
-            or self.bottom_finish.get_attribute(driver, "disabled") != "disabled"
+        self.bottom_finish.scroll_to_hidden(driver)
+        finishable = self.bottom_finish.get_attribute_hidden(driver, "disabled") is None \
+            or self.bottom_finish.get_attribute_hidden(driver, "disabled") != "disabled"
         return finishable
 
     @classmethod
@@ -372,48 +376,67 @@ class GeneralSubmitToRepo(Dsp, RepoAuthWindow):
         self.wait_until_element_not_exist(driver, self.is_saving, NEW_SUBMISSION_SAVE)
 
     @classmethod
-    def get_did_in_section(self, section=None, data_id="", nth=1):
-        selector = f'fieldset[data-id*="{section}"] [data-id*="{data_id}"]:nth-of-type({nth})'
+    def get_did_in_section(self, section=None, data_id="", nth=0):
+        selector = f':is(fieldset, div)[data-id*="{section}"] [data-id*="{data_id}"]:nth-of-type({nth+1})'
         return SiteElement(By.CSS_SELECTOR, selector)
 
     @classmethod
-    def get_css_in_section(self, section=None, css="", nth=1):
-        selector = f'fieldset[data-id*="{section}"] {css}'
+    def get_css_in_section(self, section=None, css="", nth=0):
+        selector = f':is(fieldset, div)[data-id*="{section}"] {css}'
         return SiteElement(By.CSS_SELECTOR, selector)
 
     @classmethod
     def expand_section_by_did(self, driver, data_id):
-        element = SiteElement(By.CSS_SELECTOR, f'fieldset[data-id*="{data_id}"] legend')
+        element = SiteElement(By.CSS_SELECTOR, f':is(fieldset, div)[data-id*="{data_id}"] legend')
         if not element.exists_in_dom(driver):
-            print(f"\n Ignoring attempt to expand static section: {data_id}")
+            # print(f"\n Ignoring attempt to expand static section: {data_id}")
             return False
         element.scroll_to(driver)
         element.javascript_click(driver)
 
     @classmethod
-    def fill_inputs_by_data_ids(self, driver, dict, section=None, nth=1):
+    def add_form_array_item_by_did(self, driver, data_id):
+        element = SiteElement(By.CSS_SELECTOR, f'div[data-id*="{data_id}"] button:first-of-type')
+        if not element.exists_in_dom(driver):
+            # print(f"\n Ignoring attempt to expand static section: {data_id}")
+            return False
+        element.scroll_to(driver)
+        element.javascript_click(driver)
+
+    @classmethod
+    def fill_inputs_by_data_ids(self, driver, dict, section=None, nth=0, array=False):
         for k, v in dict.items():
-            try:
-                if section and nth:
-                    selector = f'[data-id*="{section}"] [data-id*="{k}"]:nth-of-type({nth})'
-                    element = SiteElement(By.CSS_SELECTOR, selector)
-                else:
-                    element = SiteElement(By.CSS_SELECTOR, f'[data-id*="{k}"]:nth-of-type(1)')
-            except TimeoutException as e:
-                print(f"{e}\nElement not found for key: {k}")
+            if not self.fill_input_by_data_id(driver, k, v, section, nth, array):
                 return False
-            if element.exists_in_dom(driver):
-                if isinstance(v, list):
-                    # assume this is a v-multi-select
-                    self.fill_v_multi_select(driver, container_id=section, input_id=k, values=v)
+        TestSystem.wait(PAUSE_AFTER_FILL_BEFORE_SUBMIT)
+        return True
+
+    @classmethod
+    def fill_input_by_data_id(self, driver, data_id, value, section=None, nth=0, array=False):
+        try:
+            if section and nth is not None:
+                if array:
+                    selector = f'[data-id*="{section}"] .array-list-item:nth-of-type({nth+1}) [data-id*="{data_id}"]'
                 else:
-                    element.javascript_click(driver)
-                    element.inject_text(driver, v)
-                    element.submit(driver)
+                    selector = f'[data-id*="{section}"] [data-id*="{data_id}"]:nth-of-type({nth+1})'
+                element = SiteElement(By.CSS_SELECTOR, selector)
             else:
-                print(f'\nAttempt to fill element {k} in section {section} failed. Not in DOM \
-                    \nSelector used="{selector}"')
-                return False
+                element = SiteElement(By.CSS_SELECTOR, f'[data-id*="{data_id}"]:nth-of-type(1)')
+        except TimeoutException as e:
+            print(f"{e}\nElement not found for key: {data_id}")
+            return False
+        if element.exists_in_dom(driver):
+            if isinstance(value, list):
+                # assume this is a v-multi-select
+                self.fill_v_multi_select(driver, container_id=section, input_id=data_id, values=value)
+            else:
+                element.javascript_click(driver)
+                element.inject_text(driver, value)
+                element.submit_hidden(driver)
+        else:
+            print(f'\nAttempt to fill element {data_id} in section {section} failed. Not in DOM \
+                \nSelector used="{selector}"')
+            return False
         return True
 
     @classmethod
@@ -447,6 +470,12 @@ class GeneralSubmitToRepo(Dsp, RepoAuthWindow):
                 input.submit(driver)
 
     @classmethod
+    def unfill_v_multi_select(self, driver, container_id, input_id):
+        input = SiteElement(By.CSS_SELECTOR, f'fieldset[data-id*="{container_id}"] .v-select__selections input[data-id*="{input_id}"]')
+        input.javascript_click_hidden(driver)
+        input.clear_all_text(driver)
+
+    @classmethod
     def get_tab(self, section=None, tab_number=1):
         # tab index is off by 1 because one hidden?
         selector = f'fieldset[data-id*="{section}"] .v-tabs .v-tab:nth-of-type({tab_number+1})'
@@ -459,6 +488,27 @@ class GeneralSubmitToRepo(Dsp, RepoAuthWindow):
         eval("self.{}.clear_all_text(driver)".format(element))
 
     @classmethod
+    def unfill_text_by_data_id(self, driver, data_id, section=None, nth=0, array=False):
+        try:
+            if section and nth is not None:
+                if array:
+                    selector = f'[data-id*="{section}"] .array-list-item:nth-of-type({nth+1}) [data-id*="{data_id}"]'
+                else:
+                    selector = f'[data-id*="{section}"] [data-id*="{data_id}"]:nth-of-type({nth+1})'
+                element = SiteElement(By.CSS_SELECTOR, selector)
+            else:
+                element = SiteElement(By.CSS_SELECTOR, f'[data-id*="{data_id}"]:nth-of-type(1)')
+        except TimeoutException as e:
+            print(f"{e}\nElement not found for key: {data_id}")
+            return False
+        try:
+            element.scroll_to_hidden(driver)
+            element.javascript_click(driver)
+            element.clear_all_text(driver)
+        except TimeoutException:
+            self.unfill_v_multi_select(driver, section, data_id)
+
+    @classmethod
     def fill_text_by_page_property(self, driver, element, text_to_fill):
         eval("self.{}.scroll_to(driver)".format(element))
         eval("self.{}.javascript_click(driver)".format(element))
@@ -468,7 +518,7 @@ class GeneralSubmitToRepo(Dsp, RepoAuthWindow):
     def autofill_required_elements(self, driver, required):
         for section, dict in required.items():
             self.expand_section_by_did(driver, section)
-            self.fill_inputs_by_data_ids(driver, dict, section, nth=1)
+            self.fill_inputs_by_data_ids(driver, dict, section, nth=0)
 
 
 class GeneralEditSubmission(Dsp):
@@ -490,7 +540,7 @@ class GeneralEditSubmission(Dsp):
         return True
 
     @classmethod
-    def check_inputs_by_data_ids(self, driver, dict, section=None, nth=1):
+    def check_inputs_by_data_ids(self, driver, dict, section=None, nth=0, array=False):
         for k, v in dict.items():
             if isinstance(v, list):
                 # assume this is a v-multi-select
@@ -500,11 +550,16 @@ class GeneralEditSubmission(Dsp):
                     return False
             else:
                 # not a v-multi-select
-                if section and nth:
-                    selector = f'fieldset[data-id*="{section}"] [data-id*="{k}"]:nth-of-type({nth})'
-                    elem = SiteElement(By.CSS_SELECTOR, selector)
+                if section and nth is not None:
+                    if array:
+                        selector = f':is(fieldset, div)[data-id*="{section}"] .array-list-item:nth-of-type({nth+1}) [data-id*="{k}"]'
+                        elem = SiteElement(By.CSS_SELECTOR, selector)
+                    else:
+                        selector = f':is(fieldset, div)[data-id*="{section}"] [data-id*="{k}"]:nth-of-type({nth+1})'
+                        elem = SiteElement(By.CSS_SELECTOR, selector)
                 else:
-                    elem = SiteElement(By.CSS_SELECTOR, f'[data-id*="{k}"]:nth-of-type(1)')
+                    selector = f'[data-id*="{k}"]:nth-of-type(1)'
+                    elem = SiteElement(By.CSS_SELECTOR, selector)
                 elem.scroll_to(driver)
                 value = elem.get_value(driver)
                 if value != v:
@@ -513,6 +568,7 @@ class GeneralEditSubmission(Dsp):
                         \nWhitespace will be ignored and this field considered valid")
                     else:
                         print(f"\nMismatch when checking field: |{k}|.\nExpected |{v}| got |{value}|")
+                        print(f"\nSelector used: {selector}")
                         return False
         return True
 
@@ -520,7 +576,7 @@ class GeneralEditSubmission(Dsp):
     def check_required_elements(self, driver, required_elements):
         """Unless otherwise defined, Editsubmission pages should check required fields by dict"""
         for section, dict_to_check in required_elements.items():
-            return self.check_inputs_by_data_ids(driver, dict=dict_to_check, section=section, nth=1)
+            return self.check_inputs_by_data_ids(driver, dict=dict_to_check, section=section, nth=0)
 
     @classmethod
     def get_v_multi_select_vals(self, driver, container_id, input_id):
@@ -554,7 +610,7 @@ class SubmitHydroshare(GeneralSubmitToRepo):
     subject_keyword_container = SiteElement(By.CSS_SELECTOR, '[data-id="group-BasicInformation"] .v-select__selections')
 
     # Temporal
-    temporal_name_input = SiteElement(By.CSS_SELECTOR, 'fieldset[data-id*="Temporalcoverage"] input[data-id*="Name"]')
+    temporal_name_input = SiteElement(By.CSS_SELECTOR, ':is(fieldset, div)[data-id*="Temporalcoverage"] input[data-id*="Name"]')
     start_input = SiteElement(By.CSS_SELECTOR, '[data-id*="Temporalcoverage"] input[data-id*="Start"]')
     end_input = SiteElement(By.CSS_SELECTOR, '[data-id*="Temporalcoverage"] input[data-id*="End"]')
 
@@ -569,11 +625,11 @@ class SubmitHydroshare(GeneralSubmitToRepo):
     def fill_related_resources(self, driver, relation_type, value, n):
         self.expand_section_by_did(driver, "Relatedresources")
 
-        sel = f'fieldset[data-id*="Relatedresources"] input[data-id*="RelationType"]:nth-of-type({n})'
+        sel = f':is(fieldset, div)[data-id*="Relatedresources"] input[data-id*="RelationType"]:nth-of-type({n+1})'
         relation_type_input = SiteElement(By.CSS_SELECTOR, sel)
-        sel = f'fieldset[data-id*="Relatedresources"] input[data-id*="Value"]:nth-of-type({n})'
+        sel = f':is(fieldset, div)[data-id*="Relatedresources"] input[data-id*="Value"]:nth-of-type({n+1})'
         related_resources_value = SiteElement(By.CSS_SELECTOR, sel)
-        sel = f'fieldset[data-id*="Relatedresources"] div.v-select:nth-of-type({n})'
+        sel = f':is(fieldset, div)[data-id*="Relatedresources"] div.v-select:nth-of-type({n+1})'
         relation_type_container = SiteElement(By.CSS_SELECTOR, sel)
 
         relation_type_container.scroll_to(driver)
@@ -619,7 +675,7 @@ class EditHSSubmission(SubmitHydroshare, GeneralEditSubmission):
 
     @classmethod
     def get_nth_relation_type(self, driver, n):
-        sel = f'fieldset[data-id*="Relatedresources"] input[data-id*="RelationType"]:nth-of-type({n})'
+        sel = f':is(fieldset, div)[data-id*="Relatedresources"] .array-list-item:nth-of-type({n+1}) input[data-id*="RelationType"]'
         relation_type_input = SiteElement(By.CSS_SELECTOR, sel)
         return relation_type_input.get_texts_from_xpath(driver, './preceding::div[1]')
 
