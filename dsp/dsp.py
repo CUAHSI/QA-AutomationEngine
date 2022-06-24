@@ -192,15 +192,14 @@ class DspHydroshareTestSuite(DspTestSuite):
         self.login_and_autofill_hs_required(auto_text)
         self.assertTrue(SubmitHydroshare.is_finishable(self.driver))
 
-        required_text_items = ["agency_name", "abstract", "title"]
-        for text_elem in required_text_items:
-            SubmitHydroshare.unfill_text_by_page_property(self.driver, text_elem)
-            self.assertRaises(BaseException, SubmitHydroshare.is_finishable(self.driver))
-            if "url" in text_elem:
-                SubmitHydroshare.fill_text_by_page_property(self.driver, text_elem, "http://" + auto_text)
-            else:
-                SubmitHydroshare.fill_text_by_page_property(self.driver, text_elem, auto_text)
-            self.assertTrue(SubmitHydroshare.is_finishable(self.driver))
+        template = self.required_elements_template(auto_text)
+        for section, dict in template.items():
+            for data_id, value in dict.items():
+                SubmitHydroshare.unfill_text_by_data_id(self.driver, data_id, section=section, nth=0, array=False)
+                self.assertRaises(BaseException, SubmitHydroshare.is_finishable(self.driver))
+                SubmitHydroshare.expand_section_by_did(self.driver, section)
+                SubmitHydroshare.fill_input_by_data_id(self.driver, data_id, value, section, nth=0)
+                self.assertTrue(SubmitHydroshare.is_finishable(self.driver))
 
     def test_A_000006(self):
         """Confirm that CREATOR is populated from HS profile"""
@@ -243,7 +242,7 @@ class DspHydroshareTestSuite(DspTestSuite):
         # https://github.com/cznethub/dspfront/issues/52
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
         self.login_and_autofill_hs_required(auto_text)
-        section = "Temporalcoverage"
+        section = "Periodcoverage"
         nth = 0
         dict = {
             "Start": "2022-03-25T01:00",
