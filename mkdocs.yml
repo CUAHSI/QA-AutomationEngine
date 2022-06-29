@@ -1,0 +1,23 @@
+site_name: CUAHSI QA Documentation
+
+theme:
+  name: "material"
+
+plugins:
+  - mkdocstrings
+
+nav:
+  - About: index.md
+  - Base:
+    - Cuahsi Base: cuahsi_base/cuahsi_base.md
+    - Site Element: cuahsi_base/site_element.md
+    - Utils: cuahsi_base/utils.md
+  - DSP: 
+    - DSP Tests: dsp/dsp_tests.md
+    - DSP Macros: dsp/dsp_macros.md
+  - Hydroshare:
+    - Hydroshare Tests: hydroshare/hydroshare_tests.md
+    - Hydroshare Macros: hydroshare/hs_macros.md
+  - Hydroclient:
+    - Hydroclient Tests: hydroclient/hydroclient_tests.md
+    - Hydroclient Macros: hydroclient/hc_macros.md

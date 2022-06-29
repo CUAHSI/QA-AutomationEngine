@@ -1,7 +1,10 @@
 # install of core requirements
 -r requirements.txt
 
+# install mkdocs requirements
+-r requirements-mkdocs.txt
+
 azure>=4.0.0,<5.0.0
-azure-monitor>=0.3.1,<1.0.0
+azure-mgmt-monitor>=0.5.0,<1.0.0
 seaborn>=0.9.0,<1.0.0
-pandas>=0.24.0,<1.0.0
+pandas>=1.4.0,<2.0.0
