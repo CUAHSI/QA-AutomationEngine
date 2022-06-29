@@ -31,4 +31,4 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           # EXTRA_PACKAGES: 
           # GITHUB_DOMAIN: 
-          REQUIREMENTS: requirements-dev.txt
+          REQUIREMENTS: requirements-mkdocs.txt
