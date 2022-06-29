@@ -148,27 +148,27 @@ class DspHydroshareTestSuite(DspTestSuite):
         match = EditHSSubmission.check_inputs_by_data_ids(self.driver, dict, section, nth, array)
         self.assertTrue(match)
 
-    def test_A_000001(self):
+    def test_hs_000001_anon_nav_my_sumissions_shows_orcid(self):
         """Ensure anonymous navigation to my submissions shows orcid login modal"""
         Dsp.show_mobile_nav(self.driver)
         Dsp.drawer_to_my_submissions(self.driver)
         login_visible = MySubmissions.is_visible_orcid_modal(self.driver)
         self.assertTrue(login_visible)
 
-    def test_A_000002(self):
+    def test_hs_000002_auth_then_nav_to_submit(self):
         """Check authentication to submit page"""
         self.login_orcid_and_hs()
         header = SubmitHydroshare.get_header_text(self.driver)
         self.assertIn("Submit", header)
 
-    def test_A_000003(self):
+    def test_hs_000003_find_submit_instructions(self):
         """Check that submit instructions are shown"""
         self.login_orcid_and_hs()
         SubmitLandingPage.to_repo_form(self.driver, self.repo_name)
         alert = SubmitHydroshare.get_alert_text(self.driver)
         self.assertIn("Instructions", alert)
 
-    def test_A_000004(self):
+    def test_hs_000004_submit_required_fields(self):
         """Confirm successful submit of basic required fields to HS"""
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
         template = self.required_elements_template(auto_text)
@@ -186,7 +186,7 @@ class DspHydroshareTestSuite(DspTestSuite):
         check = EditHSSubmission.check_required_elements(self.driver, template)
         self.assertTrue(check)
 
-    def test_A_000005(self):
+    def test_hs_000005_cant_submit_without_each_required(self):
         """Confirm that one can't submit to HS without each required field"""
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
         self.login_and_autofill_hs_required(auto_text)
@@ -201,7 +201,7 @@ class DspHydroshareTestSuite(DspTestSuite):
                 SubmitHydroshare.fill_input_by_data_id(self.driver, data_id, value, section, nth=0)
                 self.assertTrue(SubmitHydroshare.is_finishable(self.driver))
 
-    def test_A_000006(self):
+    def test_hs_000006_creator_populates_from_hs(self):
         """Confirm that CREATOR is populated from HS profile"""
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
         self.login_and_autofill_hs_required(auto_text)
@@ -221,7 +221,7 @@ class DspHydroshareTestSuite(DspTestSuite):
         match = EditHSSubmission.check_inputs_by_data_ids(self.driver, dict, section, nth)
         self.assertTrue(match)
 
-    def test_A_000007(self):
+    def test_hs_000007_required_fields_persist(self):
         """Check that required fields persist after submit"""
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
         template = self.required_elements_template(auto_text)
@@ -235,7 +235,7 @@ class DspHydroshareTestSuite(DspTestSuite):
         check = EditHSSubmission.check_required_elements(self.driver, template)
         self.assertTrue(check)
 
-    def test_A_000008(self):
+    def test_hs_000008_temporal_coverage_persists(self):
         """Confirm that Temporal coverage persists from submit to edit"""
         # TODO: this test fills the date/times but they fail to submit
         # so this test will fail until this issue is fixed in DSP
@@ -260,7 +260,7 @@ class DspHydroshareTestSuite(DspTestSuite):
         match = EditHSSubmission.check_inputs_by_data_ids(self.driver, dict, section, nth)
         self.assertTrue(match)
 
-    def test_A_000009(self):
+    def test_hs_000009_funding_agency_persists(self):
         """Confirm that Funding Agency info persists from submit to edit"""
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
         self.login_and_autofill_hs_required(auto_text)
@@ -273,7 +273,7 @@ class DspHydroshareTestSuite(DspTestSuite):
         }
         self.fill_ids_submit_and_check(auto_text, section, nth, dict)
 
-    def test_A_000010(self):
+    def test_hs_000010_contributors_info_persists(self):
         """Confirm that Contributors info persists from submit to edit"""
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
         self.login_and_autofill_hs_required(auto_text)
@@ -290,7 +290,7 @@ class DspHydroshareTestSuite(DspTestSuite):
         SubmitHydroshare.expand_section_by_did(self.driver, data_id=section)
         self.fill_ids_submit_and_check(auto_text, section, nth, dict)
 
-    def test_A_000011(self):
+    def test_hs_000011_spatial_coverage_persists(self):
         """Confirm that Spatial Point Coverage info persists from submit to edit"""
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
         self.login_and_autofill_hs_required(auto_text)
@@ -304,7 +304,7 @@ class DspHydroshareTestSuite(DspTestSuite):
         SubmitHydroshare.expand_section_by_did(self.driver, data_id=section)
         self.fill_ids_submit_and_check(auto_text, section, nth, dict)
 
-    def test_A_000012(self):
+    def test_hs_000012_additional_metadata_persists(self):
         """Confirm that additional metadata info persists from submit to edit"""
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
         self.login_and_autofill_hs_required(auto_text)
@@ -317,7 +317,7 @@ class DspHydroshareTestSuite(DspTestSuite):
         SubmitHydroshare.expand_section_by_did(self.driver, data_id=section)
         self.fill_ids_submit_and_check(auto_text, section, nth, dict)
 
-    def test_A_000013(self):
+    def test_hs_000013_related_resources_persists(self):
         """Confirm that Related Resources info persists from submit to edit"""
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
         self.login_and_autofill_hs_required(auto_text)
@@ -339,7 +339,7 @@ class DspHydroshareTestSuite(DspTestSuite):
         match = EditHSSubmission.check_inputs_by_data_ids(self.driver, dict, section, nth)
         self.assertTrue(match)
 
-    def test_A_000014(self):
+    def test_hs_000014_spatial_box_coverate_persists(self):
         """Confirm that Spatial Box Coverage info persists from submit to edit"""
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
         self.login_and_autofill_hs_required(auto_text)
@@ -367,7 +367,7 @@ class DspHydroshareTestSuite(DspTestSuite):
         match = EditHSSubmission.check_inputs_by_data_ids(self.driver, dict, section, nth)
         self.assertTrue(match)
 
-    def test_A_000015(self):
+    def test_hs_000015_invalid_spatial_coverage_rejects(self):
         """Confirm that invalid Spatial Box Coverage info doesn't submit"""
         # TODO: this test fails pending issue:
         # https://github.com/cznethub/dspfront/issues/55
@@ -388,7 +388,7 @@ class DspHydroshareTestSuite(DspTestSuite):
         self.assertTrue(success_filling)
         self.assertFalse(SubmitHydroshare.is_finishable(self.driver))
 
-    def test_A_000016(self):
+    def test_hs_000016_submissions_sorted(self):
         """Confirm that submissions are sorted after submission"""
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
         template = self.required_elements_template(auto_text)
@@ -407,7 +407,7 @@ class DspHydroshareTestSuite(DspTestSuite):
         check = EditHSSubmission.check_required_elements(self.driver, template)
         self.assertTrue(check)
 
-    def test_A_000017(self):
+    def test_hs_000017_multiple_creators_persist(self):
         """Confirm that multiple Creators info persists from submit to edit"""
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
         self.login_and_autofill_hs_required(auto_text)
@@ -432,7 +432,7 @@ class DspHydroshareTestSuite(DspTestSuite):
         for nth in ns:
             self.check(section, nth, dicts[nth], array)
 
-    def test_A_000018(self):
+    def test_hs_000018_multiple_contributors_persist(self):
         """Confirm that multiple Contributors info persists from submit to edit"""
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
         self.login_and_autofill_hs_required(auto_text)
@@ -457,7 +457,7 @@ class DspHydroshareTestSuite(DspTestSuite):
         for nth in ns:
             self.check(section, (nth), dicts[nth], array)
 
-    def test_A_000019(self):
+    def test_hs_000019_multiple_metadata_persists(self):
         """Confirm that multiple Additional Metadata info persists from submit to edit"""
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
         self.login_and_autofill_hs_required(auto_text)
@@ -478,7 +478,7 @@ class DspHydroshareTestSuite(DspTestSuite):
         for nth in ns:
             self.check(section, nth, dicts.pop(), array)
 
-    def test_A_000020(self):
+    def test_hs_000020_multiple_related_resources_persist(self):
         """Confirm that multiple Related Resources info persists from submit to edit"""
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
         self.login_and_autofill_hs_required(auto_text)
@@ -501,7 +501,7 @@ class DspHydroshareTestSuite(DspTestSuite):
             self.assertEqual(relation.pop(), dicts[nth].pop("RelationType"))
             self.check(section, nth, dicts[nth], array)
 
-    def test_A_000021(self):
+    def test_hs_000021_multiple_funding_agencies_persist(self):
         """Confirm that multiple Funding Agencies info persists from submit to edit"""
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
         self.login_orcid_and_hs()
@@ -588,19 +588,19 @@ class DspExternalTestSuite(DspTestSuite):
         self.login_orcid_and_external()
         SubmitExternal.autofill_required_elements(self.driver, self.required_elements_template(auto_text))
 
-    def test_A_000001(self):
+    def test_ex_000001_authenticate_then_submit_page(self):
         """Check authentication to submit page"""
         self.login_orcid_and_external()
         header = SubmitExternal.get_header_text(self.driver)
         self.assertIn("External", header)
 
-    def test_A_000002(self):
+    def test_ex_000002_submit_instructions_shown(self):
         """Check that submit instructions are shown"""
         self.login_orcid_and_external()
         alert = SubmitExternal.get_alert_text(self.driver)
         self.assertIn("Instructions", alert)
 
-    def test_A_000003(self):
+    def test_ex_000003_submit_required_fields(self):
         """Confirm successful submit of basic required fields for External Repo"""
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
         self.login_and_autofill_external_required(auto_text)
@@ -696,7 +696,7 @@ class DspZenodoTestSuite(DspTestSuite):
         self.zenodo_then_login_username_password()
         SubmitZenodo.autofill_required_elements(self.driver, self.required_elements_template(auto_text))
 
-    def test_A_000001(self):
+    def test_ze_000001_orcid_then_submit(self):
         """Orcid auth first, then to submit page"""
         self.login_orcid_to_submit()
         header = SubmitZenodo.get_header_text(self.driver)
@@ -704,7 +704,7 @@ class DspZenodoTestSuite(DspTestSuite):
         alert = SubmitZenodo.get_alert_text(self.driver)
         self.assertIn("Instructions", alert)
 
-    def test_A_000002(self):
+    def test_ze_000002_repo_then_auth_w_orcid(self):
         """Navigate to repo then auth with orcid"""
         # TODO: this test fails pending issue
         # https://github.com/cznethub/dspfront/issues/57
@@ -712,13 +712,13 @@ class DspZenodoTestSuite(DspTestSuite):
         header = SubmitZenodo.get_header_text(self.driver)
         self.assertIn(self.repo_name, header)
 
-    def test_A_000003(self):
-        """Navigate to repo then auth with orcid"""
+    def test_ze_000003_nav_to_repo_then_auth_user_pw(self):
+        """Navigate to repo then auth with uname/pw"""
         self.zenodo_then_login_username_password()
         header = SubmitZenodo.get_header_text(self.driver)
         self.assertIn(self.repo_name, header)
 
-    def test_A_000004(self):
+    def test_ze_000004_submit_required_fields(self):
         """Confirm successful submit of required fields for Zenodo Repo"""
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
         self.login_and_autofill_zenodo_required(auto_text)
@@ -726,7 +726,7 @@ class DspZenodoTestSuite(DspTestSuite):
         SubmitZenodo.finish_submission(self.driver)
         self.assertEqual("My Submissions", MySubmissions.get_title(self.driver))
 
-    def test_A_000005(self):
+    def test_ze_000005_required_fields_persist(self):
         """Check that required fields persist after submit"""
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
         template = self.required_elements_template(auto_text)
