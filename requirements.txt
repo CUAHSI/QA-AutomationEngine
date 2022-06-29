@@ -1,3 +1,4 @@
+wheel>=0.37.1,<1.0.0
 flake8>=3.5.0,<4.0.0
 google-cloud-pubsub>=2.8.0,<3.0.0
 google-cloud-vision>=2.5.0,<3.0.0
