@@ -80,7 +80,7 @@ class DspTestSuite(BaseTestSuite):
 
 
 class DspHydroshareTestSuite(DspTestSuite):
-    """DSP tests for Hydroshare repository"""
+    """DSP tests for the Hydroshare repository"""
 
     repo_name = "HydroShare"
 
@@ -161,13 +161,17 @@ class DspHydroshareTestSuite(DspTestSuite):
         self.assertTrue(login_visible)
 
     def test_hs_000002_auth_then_nav_to_submit(self):
-        """Check authentication to submit page"""
+        """
+        Check authentication to submit page
+        
+        Logs in with Orcid, then navigates to the HS repository for submission
+        """
         self.login_orcid_and_hs()
         header = SubmitHydroshare.get_header_text(self.driver)
         self.assertIn("Submit", header)
 
     def test_hs_000003_find_submit_instructions(self):
-        """Check that submit instructions are shown"""
+        """Check that instructions are shown on the Submit page"""
         self.login_orcid_and_hs()
         SubmitLandingPage.to_repo_form(self.driver, self.repo_name)
         alert = SubmitHydroshare.get_alert_text(self.driver)
@@ -207,7 +211,11 @@ class DspHydroshareTestSuite(DspTestSuite):
                 self.assertTrue(SubmitHydroshare.is_finishable(self.driver))
 
     def test_hs_000006_creator_populates_from_hs(self):
-        """Confirm that CREATOR is populated from HS profile"""
+        """
+        Confirm that CREATOR is populated from HS profile
+        
+        Completing a submission to HS should cause the 'creator' field to be populated with info from HS profile
+        """
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
         self.login_and_autofill_hs_required(auto_text)
         SubmitHydroshare.finish_submission(self.driver)
@@ -373,7 +381,11 @@ class DspHydroshareTestSuite(DspTestSuite):
         self.assertTrue(match)
 
     def test_hs_000015_invalid_spatial_coverage_rejects(self):
-        """Confirm that invalid Spatial Box Coverage info doesn't submit"""
+        """
+        Confirm that invalid Spatial Box Coverage info doesn't submit
+        
+        Attempts to submit Box Coverage that doesn't make geographic sense and ensures that the invalid info is not accepted
+        """
         # TODO: this test fails pending issue:
         # https://github.com/cznethub/dspfront/issues/55
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
@@ -394,7 +406,11 @@ class DspHydroshareTestSuite(DspTestSuite):
         self.assertFalse(SubmitHydroshare.is_finishable(self.driver))
 
     def test_hs_000016_submissions_sorted(self):
-        """Confirm that submissions are sorted after submission"""
+        """
+        Confirm that submissions are sorted after submission
+        
+        The most recent submission should be at the top of the page initially
+        """
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
         template = self.required_elements_template(auto_text)
         self.login_orcid_and_hs()
@@ -594,19 +610,23 @@ class DspExternalTestSuite(DspTestSuite):
         SubmitExternal.autofill_required_elements(self.driver, self.required_elements_template(auto_text))
 
     def test_ex_000001_authenticate_then_submit_page(self):
-        """Check authentication to submit page"""
+        """
+        Check authentication to submit page
+        
+        First, authenticate with Orcid, then navigate to the submit page
+        """
         self.login_orcid_and_external()
         header = SubmitExternal.get_header_text(self.driver)
         self.assertIn("External", header)
 
     def test_ex_000002_submit_instructions_shown(self):
-        """Check that submit instructions are shown"""
+        """Check that instructions are shown on the Submit page"""
         self.login_orcid_and_external()
         alert = SubmitExternal.get_alert_text(self.driver)
         self.assertIn("Instructions", alert)
 
     def test_ex_000003_submit_required_fields(self):
-        """Confirm successful submit of basic required fields for External Repo"""
+        """Confirm successful submit of required fields for External Repo"""
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
         self.login_and_autofill_external_required(auto_text)
 
@@ -702,7 +722,7 @@ class DspZenodoTestSuite(DspTestSuite):
         SubmitZenodo.autofill_required_elements(self.driver, self.required_elements_template(auto_text))
 
     def test_ze_000001_orcid_then_submit(self):
-        """Orcid auth first, then to submit page"""
+        """Check authentication with Orcid, then navigate to submit page"""
         self.login_orcid_to_submit()
         header = SubmitZenodo.get_header_text(self.driver)
         self.assertIn(self.repo_name, header)
@@ -710,7 +730,7 @@ class DspZenodoTestSuite(DspTestSuite):
         self.assertIn("Instructions", alert)
 
     def test_ze_000002_repo_then_auth_w_orcid(self):
-        """Navigate to repo then auth with orcid"""
+        """Navigate to Zenodo submit first, then auth with orcid"""
         # TODO: this test fails pending issue
         # https://github.com/cznethub/dspfront/issues/57
         self.zenodo_then_login_orcid()
@@ -718,7 +738,7 @@ class DspZenodoTestSuite(DspTestSuite):
         self.assertIn(self.repo_name, header)
 
     def test_ze_000003_nav_to_repo_then_auth_user_pw(self):
-        """Navigate to repo then auth with uname/pw"""
+        """Navigate to Zenodo submit, then auth with uname/pw"""
         self.zenodo_then_login_username_password()
         header = SubmitZenodo.get_header_text(self.driver)
         self.assertIn(self.repo_name, header)
@@ -825,21 +845,21 @@ class DspEarthchemTestSuite(DspTestSuite):
         self.login_orcid_to_submit()
         SubmitEarthchem.autofill_required_elements(self.driver, self.required_elements_template(auto_text))
 
-    def test_A_000001(self):
-        """Orcid auth first, then to submit page"""
+    def test_ec_000001_orcid_auth_then_submit(self):
+        """Authenticate with Orcid, then navigate to Earthchem submit page"""
         self.login_orcid_to_submit()
         header = SubmitEarthchem.get_header_text(self.driver)
         self.assertIn(self.repo_name, header)
         alert = SubmitEarthchem.get_alert_text(self.driver)
         self.assertIn("Instructions", alert)
 
-    def test_A_000002(self):
-        """Navigate to repo then auth with orcid"""
+    def test_ec_000002_repo_then_orcid_auth(self):
+        """Navigate to Earthchem submit, then authenticate with orcid"""
         self.earthchem_then_login_orcid()
         header = SubmitEarthchem.get_header_text(self.driver)
         self.assertIn(self.repo_name, header)
 
-    def test_A_000003(self):
+    def test_ec_000003_submit_required_fields(self):
         """Confirm successful submit of required fields for Earthchem Repo"""
         # TODO: this doesn't work yet
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
@@ -848,7 +868,7 @@ class DspEarthchemTestSuite(DspTestSuite):
         SubmitEarthchem.finish_submission(self.driver)
         self.assertEqual("My Submissions", MySubmissions.get_title(self.driver))
 
-    def test_A_000004(self):
+    def test_ec_000004_required_fields_persist(self):
         """Check that required fields persist after submit"""
         # TODO: this doesn't work yet
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
