@@ -93,6 +93,7 @@ class BaseTestSuite(unittest.TestCase):
     def _chrome_options():
         options = webdriver.ChromeOptions()
         options.add_argument('--no-sandbox')
+        options.add_argument('--headless')
         options.add_argument('ignore-certificate-errors')
         options.add_argument("--user-agent={}".format(USER_AGENT))
         return options
