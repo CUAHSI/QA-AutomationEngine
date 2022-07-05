@@ -162,8 +162,8 @@ class DspHydroshareTestSuite(DspTestSuite):
 
     def test_hs_000003_find_submit_instructions(self):
         """Check that submit instructions are shown"""
-        self.login_orcid_and_hs()
-        SubmitLandingPage.to_repo_form(self.driver, self.repo_name)
+        self.login_orcid_and_hs() 
+        # SubmitLandingPage.to_repo_form(self.driver, self.repo_name)
         alert = SubmitHydroshare.get_alert_text(self.driver)
         self.assertIn("Instructions", alert)
 
@@ -236,6 +236,7 @@ class DspHydroshareTestSuite(DspTestSuite):
         """Confirm that Temporal coverage persists from submit to edit"""
         # TODO: fails pending this issue:
         # https://github.com/cznethub/dspfront/issues/71
+        print('\n Fails pending https://github.com/cznethub/dspfront/issues/71')
 
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
         self.login_and_autofill_hs_required(auto_text)
@@ -447,7 +448,12 @@ class DspHydroshareTestSuite(DspTestSuite):
 
         self.submit(auto_text)
         for nth in ns:
-            self.check(section, (nth), dicts.pop(), array)
+            # TODO: seems that these array items are sometimes returned in different order?
+            # https://github.com/cznethub/dspfront/issues/72
+            # sometimes this fails, sometimes it passes
+            # self.check(section, nth, dicts.pop(), array)
+            print('\n Sometimes fails pending https://github.com/cznethub/dspfront/issues/72')
+            self.check(section, nth, dicts[nth], array)
 
     def test_hs_000019_multiple_metadata_persists(self):
         """Confirm that multiple Additional Metadata info persists from submit to edit"""
@@ -468,6 +474,11 @@ class DspHydroshareTestSuite(DspTestSuite):
 
         self.submit(auto_text)
         for nth in ns:
+            # TODO: seems that these array items are sometimes returned in different order?
+            # https://github.com/cznethub/dspfront/issues/72
+            # sometimes this fails, sometimes it passes
+            # self.check(section, nth, dicts.pop(), array)
+            print('\n Sometimes fails pending https://github.com/cznethub/dspfront/issues/72')
             self.check(section, nth, dicts[nth], array)
 
     def test_hs_000020_multiple_related_resources_persist(self):
@@ -491,6 +502,11 @@ class DspHydroshareTestSuite(DspTestSuite):
         for nth in ns:
             relation = EditHSSubmission.get_nth_relation_type(self.driver, nth)
             self.assertEqual(relation.pop(), dicts[nth].pop("RelationType"))
+            # TODO: seems that these array items are sometimes returned in different order?
+            # https://github.com/cznethub/dspfront/issues/72
+            # sometimes this fails, sometimes it passes
+            # self.check(section, nth, dicts.pop(), array)
+            print('\n Sometimes fails pending https://github.com/cznethub/dspfront/issues/72')
             self.check(section, nth, dicts[nth], array)
 
     def test_hs_000021_multiple_funding_agencies_persist(self):
@@ -520,6 +536,10 @@ class DspHydroshareTestSuite(DspTestSuite):
 
         self.submit(auto_text)
         for nth in ns:
+            # TODO: seems that these array items are sometimes returned in different order?
+            # sometimes this fails, sometimes it passes
+            # self.check(section, nth, dicts.pop(), array)
+            print('\n Sometimes fails pending https://github.com/cznethub/dspfront/issues/72')
             self.check(section, nth, dicts[nth], array)
 
 
@@ -595,22 +615,26 @@ class DspExternalTestSuite(DspTestSuite):
     def test_ex_000003_submit_required_fields(self):
         """Confirm successful submit of basic required fields for External Repo"""
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
-        self.login_and_autofill_external_required(auto_text)
+        # self.login_and_autofill_external_required(auto_text)
+        self.login_orcid_and_external()
+        template = self.required_elements_template(auto_text)
+        SubmitExternal.autofill_required_elements(self.driver, template)
 
         # TODO: this test fails due to date-time issue:
         # https://github.com/cznethub/dspfront/issues/71
+        print('\n Fails pending https://github.com/cznethub/dspfront/issues/71')
         self.assertTrue(SubmitExternal.is_finishable(self.driver))
         SubmitExternal.finish_submission(self.driver)
         self.assertEqual("My Submissions", MySubmissions.get_title(self.driver))
 
         MySubmissions.enter_text_in_search(self.driver, auto_text)
         top_name = MySubmissions.get_top_submission_name(self.driver)
-        self.assertEqual(auto_text, top_name)
+        self.assertEqual(template['BasicInformation']['Nameortitle'], top_name)
 
         MySubmissions.edit_top_submission(self.driver)
-        self.assertEqual("Edit Submission", EditExternalSubmission.get_header_title(self.driver))
+        self.assertEqual("Register Dataset from External Repository", EditExternalSubmission.get_header_title(self.driver))
 
-        self.assertTrue(EditExternalSubmission.check_required_elements(self.driver, auto_text))
+        self.assertTrue(EditExternalSubmission.check_required_elements(self.driver, template))
 
 
 class DspZenodoTestSuite(DspTestSuite):
@@ -700,6 +724,7 @@ class DspZenodoTestSuite(DspTestSuite):
         """Navigate to repo then auth with orcid"""
         # TODO: this test fails pending issue
         # https://github.com/cznethub/dspfront/issues/57
+        print('\n Fails pending https://github.com/cznethub/dspfront/issues/57')
         self.zenodo_then_login_orcid()
         header = SubmitZenodo.get_header_text(self.driver)
         self.assertIn(self.repo_name, header)
