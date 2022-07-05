@@ -162,8 +162,8 @@ class DspHydroshareTestSuite(DspTestSuite):
 
     def test_hs_000003_find_submit_instructions(self):
         """Check that submit instructions are shown"""
-        self.login_orcid_and_hs()
-        SubmitLandingPage.to_repo_form(self.driver, self.repo_name)
+        self.login_orcid_and_hs() 
+        # SubmitLandingPage.to_repo_form(self.driver, self.repo_name)
         alert = SubmitHydroshare.get_alert_text(self.driver)
         self.assertIn("Instructions", alert)
 
@@ -520,7 +520,7 @@ class DspHydroshareTestSuite(DspTestSuite):
 
         self.submit(auto_text)
         for nth in ns:
-            self.check(section, nth, dicts[nth], array)
+            self.check(section, (nth), dicts.pop(), array)
 
 
 class DspExternalTestSuite(DspTestSuite):
@@ -595,7 +595,10 @@ class DspExternalTestSuite(DspTestSuite):
     def test_ex_000003_submit_required_fields(self):
         """Confirm successful submit of basic required fields for External Repo"""
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
-        self.login_and_autofill_external_required(auto_text)
+        # self.login_and_autofill_external_required(auto_text)
+        self.login_orcid_and_external()
+        template = self.required_elements_template(auto_text)
+        SubmitExternal.autofill_required_elements(self.driver, template)
 
         # TODO: this test fails due to date-time issue:
         # https://github.com/cznethub/dspfront/issues/71
@@ -605,12 +608,12 @@ class DspExternalTestSuite(DspTestSuite):
 
         MySubmissions.enter_text_in_search(self.driver, auto_text)
         top_name = MySubmissions.get_top_submission_name(self.driver)
-        self.assertEqual(auto_text, top_name)
+        self.assertEqual(template['BasicInformation']['Nameortitle'], top_name)
 
         MySubmissions.edit_top_submission(self.driver)
-        self.assertEqual("Edit Submission", EditExternalSubmission.get_header_title(self.driver))
+        self.assertEqual("Register Dataset from External Repository", EditExternalSubmission.get_header_title(self.driver))
 
-        self.assertTrue(EditExternalSubmission.check_required_elements(self.driver, auto_text))
+        self.assertTrue(EditExternalSubmission.check_required_elements(self.driver, template))
 
 
 class DspZenodoTestSuite(DspTestSuite):
