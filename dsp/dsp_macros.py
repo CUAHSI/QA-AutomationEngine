@@ -405,6 +405,7 @@ class GeneralSubmitToRepo(Dsp, RepoAuthWindow):
 
     @classmethod
     def fill_inputs_by_data_ids(self, driver, dict, section=None, nth=0, array=False):
+        self.expand_section_by_did(driver, data_id=section)
         for k, v in dict.items():
             if not self.fill_input_by_data_id(driver, k, v, section, nth, array):
                 return False
@@ -538,9 +539,19 @@ class GeneralEditSubmission(Dsp):
                 print(f"\nMismatch when checking field: {k}. Expected {v} got {value}")
                 return False
         return True
+    
+    @classmethod
+    def expand_section_by_did(self, driver, data_id):
+        element = SiteElement(By.CSS_SELECTOR, f':is(fieldset, div)[data-id*="{data_id}"] legend')
+        if not element.exists_in_dom(driver):
+            # print(f"\n Ignoring attempt to expand static section: {data_id}")
+            return False
+        element.scroll_to(driver)
+        element.javascript_click(driver)
 
     @classmethod
     def check_inputs_by_data_ids(self, driver, dict, section=None, nth=0, array=False):
+        self.expand_section_by_did(driver, data_id=section)
         for k, v in dict.items():
             if isinstance(v, list):
                 # assume this is a v-multi-select
