@@ -447,7 +447,7 @@ class DspHydroshareTestSuite(DspTestSuite):
 
         self.submit(auto_text)
         for nth in ns:
-            self.check(section, (nth), dicts[nth], array)
+            self.check(section, (nth), dicts.pop(), array)
 
     def test_hs_000019_multiple_metadata_persists(self):
         """Confirm that multiple Additional Metadata info persists from submit to edit"""
@@ -468,7 +468,7 @@ class DspHydroshareTestSuite(DspTestSuite):
 
         self.submit(auto_text)
         for nth in ns:
-            self.check(section, nth, dicts.pop(), array)
+            self.check(section, nth, dicts[nth], array)
 
     def test_hs_000020_multiple_related_resources_persist(self):
         """Confirm that multiple Related Resources info persists from submit to edit"""
