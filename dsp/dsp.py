@@ -140,7 +140,6 @@ class DspHydroshareTestSuite(DspTestSuite):
     def submit(self, sort_text):
         SubmitHydroshare.finish_submission(self.driver)
 
-        # The page isn't sorted upon load
         MySubmissions.enter_text_in_search(self.driver, sort_text)
         MySubmissions.edit_top_submission(self.driver)
 
@@ -178,7 +177,6 @@ class DspHydroshareTestSuite(DspTestSuite):
         SubmitHydroshare.finish_submission(self.driver)
         self.assertEqual("My Submissions", MySubmissions.get_title(self.driver))
 
-        # The page isn't sorted upon load
         MySubmissions.enter_text_in_search(self.driver, auto_text)
 
         MySubmissions.edit_top_submission(self.driver)
@@ -207,7 +205,6 @@ class DspHydroshareTestSuite(DspTestSuite):
         self.login_and_autofill_hs_required(auto_text)
         SubmitHydroshare.finish_submission(self.driver)
 
-        # The page isn't sorted upon load
         MySubmissions.enter_text_in_search(self.driver, auto_text)
         MySubmissions.edit_top_submission(self.driver)
         section = "Creators"
@@ -253,7 +250,6 @@ class DspHydroshareTestSuite(DspTestSuite):
         self.assertTrue(success_filling)
         SubmitHydroshare.finish_submission(self.driver)
 
-        # The page isn't sorted upon load
         MySubmissions.enter_text_in_search(self.driver, auto_text)
         MySubmissions.edit_top_submission(self.driver)
 
@@ -330,7 +326,6 @@ class DspHydroshareTestSuite(DspTestSuite):
         SubmitHydroshare.fill_related_resources(self.driver, dict["RelationType"], dict["Value"], nth)
         SubmitHydroshare.finish_submission(self.driver)
 
-        # The page isn't sorted upon load
         MySubmissions.enter_text_in_search(self.driver, auto_text)
         MySubmissions.edit_top_submission(self.driver)
 
@@ -358,7 +353,6 @@ class DspHydroshareTestSuite(DspTestSuite):
         self.assertTrue(success_filling)
         SubmitHydroshare.finish_submission(self.driver)
 
-        # The page isn't sorted upon load
         MySubmissions.enter_text_in_search(self.driver, auto_text)
         MySubmissions.edit_top_submission(self.driver)
 
@@ -398,9 +392,6 @@ class DspHydroshareTestSuite(DspTestSuite):
         SubmitHydroshare.finish_submission(self.driver)
         self.assertEqual("My Submissions", MySubmissions.get_title(self.driver))
 
-        # TODO: this test fails pending this issue
-        # https://github.com/cznethub/dspfront/issues/53
-        # The page isn't sorted upon load, so top submission will not be the most recent
         MySubmissions.edit_top_submission(self.driver)
 
         self.assertEqual("Edit Submission", EditHSSubmission.get_header_title(self.driver))
