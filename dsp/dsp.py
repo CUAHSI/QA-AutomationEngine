@@ -234,9 +234,9 @@ class DspHydroshareTestSuite(DspTestSuite):
 
     def test_hs_000008_temporal_coverage_persists(self):
         """Confirm that Temporal coverage persists from submit to edit"""
-        # TODO: this test fills the date/times but they fail to submit
-        # so this test will fail until this issue is fixed in DSP
-        # https://github.com/cznethub/dspfront/issues/52
+        # TODO: fails pending this issue:
+        # https://github.com/cznethub/dspfront/issues/71
+
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
         self.login_and_autofill_hs_required(auto_text)
         section = "Periodcoverage"
