@@ -429,9 +429,10 @@ class DspHydroshareTestSuite(DspTestSuite):
         self.login_and_autofill_hs_required(auto_text)
         section = "Contributors"
         ns = [0, 1]
+        # reverse = ns[::-1]
         array = True
         dicts = [None] * len(ns)
-        for nth in ns:
+        for nth in range(0, len(ns)-1):
             dicts[nth] = {
                 "Name": f"{auto_text} name {nth}",
                 "Phone": "1234567890",
@@ -597,7 +598,7 @@ class DspExternalTestSuite(DspTestSuite):
         self.login_and_autofill_external_required(auto_text)
 
         # TODO: this test fails due to date-time issue:
-        # https://github.com/cznethub/dspfront/issues/52
+        # https://github.com/cznethub/dspfront/issues/71
         self.assertTrue(SubmitExternal.is_finishable(self.driver))
         SubmitExternal.finish_submission(self.driver)
         self.assertEqual("My Submissions", MySubmissions.get_title(self.driver))
