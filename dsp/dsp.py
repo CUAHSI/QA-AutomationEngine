@@ -881,11 +881,10 @@ class DspEarthchemTestSuite(DspTestSuite):
         """Authenticate with orcid then select repo"""
         super().login_orcid_to_submit(self.repo_name)
 
-        # EC backend only requires orcid, no auth window for now...
-        # SubmitLandingPage.to_repo_auth_window(self.driver)
+        SubmitLandingPage.to_repo_auth_window(self.driver)
         # self.assertIn("ecl-realm", TestSystem.title(self.driver))
-        # EarthchemAuthWindow.authorize_via_orcid(self.driver)
-        # OrcidWindow.to_origin_window(self.driver, wait=True)
+        EarthchemAuthWindow.authorize_via_orcid(self.driver)
+        OrcidWindow.to_origin_window(self.driver, wait=True)
 
     def login_and_autofill_earthchem_required(self, auto_text):
         """A shortcut to fill required fields of submit page
