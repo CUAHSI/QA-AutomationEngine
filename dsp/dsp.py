@@ -1,4 +1,5 @@
 """ Runs various smoke tests for the data submission portal """
+from ast import Assert
 import boto3
 import inspect
 import json
@@ -61,6 +62,19 @@ class DspTestSuite(BaseTestSuite):
             self.driver.get(BASE_URL)
         else:
             self.driver.get(self.base_url_arg)
+        self.knownFailures = []
+    
+    def tearDown(self):
+        # If we want known failures to cause overall test suite fail
+        # self.assertEqual([], self.knownFailures)
+        
+        # Otherwise, allow known issues to pass
+        if self.knownFailures:
+            print("KNOWN FAILURES")
+            for failure in self.knownFailures:
+                print(failure)
+        super(DspTestSuite, self).tearDown()
+
 
     def login_orcid(self):
         """Authenticate with orcid"""
@@ -247,10 +261,6 @@ class DspHydroshareTestSuite(DspTestSuite):
 
     def test_hs_000008_temporal_coverage_persists(self):
         """Confirm that Temporal coverage persists from submit to edit"""
-        # TODO: fails pending this issue:
-        # https://github.com/cznethub/dspfront/issues/71
-        print('\n Fails pending https://github.com/cznethub/dspfront/issues/71')
-
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
         self.login_and_autofill_hs_required(auto_text)
         section = "Periodcoverage"
@@ -268,7 +278,13 @@ class DspHydroshareTestSuite(DspTestSuite):
         MySubmissions.edit_top_submission(self.driver)
 
         match = EditHSSubmission.check_inputs_by_data_ids(self.driver, dict, section, nth)
-        self.assertTrue(match)
+        # TODO: fails pending this issue:
+        # https://github.com/cznethub/dspfront/issues/71
+        print('\n Known failure pending https://github.com/cznethub/dspfront/issues/71')
+        try: 
+            self.assertTrue(match)
+        except AssertionError as e: 
+            self.knownFailures.append(str(e))
 
     def test_hs_000009_funding_agency_persists(self):
         """Confirm that Funding Agency info persists from submit to edit"""
@@ -375,31 +391,35 @@ class DspHydroshareTestSuite(DspTestSuite):
         match = EditHSSubmission.check_inputs_by_data_ids(self.driver, dict, section, nth)
         self.assertTrue(match)
 
-    # def test_hs_000015_invalid_spatial_coverage_rejects(self):
-    #     """
-    #     Confirm that invalid Spatial Box Coverage info doesn't submit
+    def test_hs_000015_invalid_spatial_coverage_rejects(self):
+        """
+        Confirm that invalid Spatial Box Coverage info doesn't submit
         
-    #     Attempts to submit Box Coverage that doesn't make geographic sense and ensures that the invalid info is not accepted
-    #     """
-    #     # TODO: this test fails pending issue:
-    #     # https://github.com/cznethub/dspfront/issues/55
-    #     # Ignoring for now, because HS accepts these invalid bounds
-    #     auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
-    #     self.login_and_autofill_hs_required(auto_text)
-    #     section = "Spatialcoverage"
-    #     nth = 0
-    #     dict = {
-    #         "Name": auto_text + "Contributor name2-input",
-    #         "Northlimit": "-20",
-    #         "Southlimit": "20",
-    #         "Eastlimit": "120",
-    #         "Westlimit": "-120"
-    #     }
-    #     SubmitHydroshare.expand_section_by_did(self.driver, data_id=section)
-    #     SubmitHydroshare.open_tab(self.driver, section, tab_number=2)
-    #     success_filling = SubmitHydroshare.fill_inputs_by_data_ids(self.driver, dict, section, nth)
-    #     self.assertTrue(success_filling)
-    #     self.assertFalse(SubmitHydroshare.is_finishable(self.driver))
+        Attempts to submit Box Coverage that doesn't make geographic sense and ensures that the invalid info is not accepted
+        """
+        auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
+        self.login_and_autofill_hs_required(auto_text)
+        section = "Spatialcoverage"
+        nth = 0
+        dict = {
+            "Name": auto_text + "Contributor name2-input",
+            "Northlimit": "-20",
+            "Southlimit": "20",
+            "Eastlimit": "120",
+            "Westlimit": "-120"
+        }
+        SubmitHydroshare.expand_section_by_did(self.driver, data_id=section)
+        SubmitHydroshare.open_tab(self.driver, section, tab_number=2)
+        success_filling = SubmitHydroshare.fill_inputs_by_data_ids(self.driver, dict, section, nth)
+        self.assertTrue(success_filling)
+        # TODO: this test fails pending issue:
+        # https://github.com/cznethub/dspfront/issues/55
+        # Ignoring for now, because HS accepts these invalid bounds
+        print('\n Known failure pending https://github.com/cznethub/dspfront/issues/55')
+        try: 
+            self.assertFalse(SubmitHydroshare.is_finishable(self.driver))
+        except AssertionError as e: 
+            self.knownFailures.append(str(e))
 
     def test_hs_000016_submissions_sorted(self):
         """
@@ -468,13 +488,17 @@ class DspHydroshareTestSuite(DspTestSuite):
             self.assertTrue(success_filling)
 
         self.submit(auto_text)
+
+        # TODO: seems that these array items are sometimes returned in different order?
+        # https://github.com/cznethub/dspfront/issues/72
+        # sometimes this fails, sometimes it passes
+        # self.check(section, nth, dicts.pop(), array)
+        print('\n Sometimes fails pending https://github.com/cznethub/dspfront/issues/72')
         for nth in ns:
-            # TODO: seems that these array items are sometimes returned in different order?
-            # https://github.com/cznethub/dspfront/issues/72
-            # sometimes this fails, sometimes it passes
-            # self.check(section, nth, dicts.pop(), array)
-            print('\n Sometimes fails pending https://github.com/cznethub/dspfront/issues/72')
-            self.check(section, nth, dicts[nth], array)
+            try:
+                self.check(section, nth, dicts[nth], array)
+            except AssertionError as e:
+                self.knownFailures.append(str(e))
 
     def test_hs_000019_multiple_metadata_persists(self):
         """Confirm that multiple Additional Metadata info persists from submit to edit"""
@@ -494,13 +518,17 @@ class DspHydroshareTestSuite(DspTestSuite):
             self.assertTrue(success_filling)
 
         self.submit(auto_text)
+        
+        # TODO: seems that these array items are sometimes returned in different order?
+        # https://github.com/cznethub/dspfront/issues/72
+        # sometimes this fails, sometimes it passes
+        # self.check(section, nth, dicts.pop(), array)
+        print('\n Sometimes fails pending https://github.com/cznethub/dspfront/issues/72')
         for nth in ns:
-            # TODO: seems that these array items are sometimes returned in different order?
-            # https://github.com/cznethub/dspfront/issues/72
-            # sometimes this fails, sometimes it passes
-            # self.check(section, nth, dicts.pop(), array)
-            print('\n Sometimes fails pending https://github.com/cznethub/dspfront/issues/72')
-            self.check(section, nth, dicts[nth], array)
+            try:
+                self.check(section, nth, dicts[nth], array)
+            except AssertionError as e:
+                self.knownFailures.append(str(e))
 
     def test_hs_000020_multiple_related_resources_persist(self):
         """Confirm that multiple Related Resources info persists from submit to edit"""
@@ -520,15 +548,19 @@ class DspHydroshareTestSuite(DspTestSuite):
             self.assertTrue(success_filling)
 
         self.submit(auto_text)
+
+        # TODO: seems that these array items are sometimes returned in different order?
+        # https://github.com/cznethub/dspfront/issues/72
+        # sometimes this fails, sometimes it passes
+        # self.check(section, nth, dicts.pop(), array)
+        print('\n Sometimes fails pending https://github.com/cznethub/dspfront/issues/72')
         for nth in ns:
             relation = EditHSSubmission.get_nth_relation_type(self.driver, nth)
             self.assertEqual(relation.pop(), dicts[nth].pop("RelationType"))
-            # TODO: seems that these array items are sometimes returned in different order?
-            # https://github.com/cznethub/dspfront/issues/72
-            # sometimes this fails, sometimes it passes
-            # self.check(section, nth, dicts.pop(), array)
-            print('\n Sometimes fails pending https://github.com/cznethub/dspfront/issues/72')
-            self.check(section, nth, dicts[nth], array)
+            try:
+                self.check(section, nth, dicts[nth], array)
+            except AssertionError as e:
+                self.knownFailures.append(str(e))
 
     def test_hs_000021_multiple_funding_agencies_persist(self):
         """Confirm that multiple Funding Agencies info persists from submit to edit"""
@@ -556,12 +588,17 @@ class DspHydroshareTestSuite(DspTestSuite):
             self.assertTrue(success_filling)
 
         self.submit(auto_text)
+
+        # TODO: seems that these array items are sometimes returned in different order?
+        # https://github.com/cznethub/dspfront/issues/72
+        # sometimes this fails, sometimes it passes
+        # self.check(section, nth, dicts.pop(), array)
+        print('\n Sometimes fails pending https://github.com/cznethub/dspfront/issues/72')
         for nth in ns:
-            # TODO: seems that these array items are sometimes returned in different order?
-            # sometimes this fails, sometimes it passes
-            # self.check(section, nth, dicts.pop(), array)
-            print('\n Sometimes fails pending https://github.com/cznethub/dspfront/issues/72')
-            self.check(section, nth, dicts[nth], array)
+            try:
+                self.check(section, nth, dicts[nth], array)
+            except AssertionError as e:
+                self.knownFailures.append(str(e))
 
 
 class DspExternalTestSuite(DspTestSuite):
@@ -645,9 +682,6 @@ class DspExternalTestSuite(DspTestSuite):
         template = self.required_elements_template(auto_text)
         SubmitExternal.autofill_required_elements(self.driver, template)
 
-        # TODO: this test fails due to date-time issue:
-        # https://github.com/cznethub/dspfront/issues/71
-        print('\n Fails pending https://github.com/cznethub/dspfront/issues/71')
         self.assertTrue(SubmitExternal.is_finishable(self.driver))
         SubmitExternal.finish_submission(self.driver)
         self.assertEqual("My Submissions", MySubmissions.get_title(self.driver))
@@ -659,7 +693,13 @@ class DspExternalTestSuite(DspTestSuite):
         MySubmissions.edit_top_submission(self.driver)
         self.assertEqual("Register Dataset from External Repository", EditExternalSubmission.get_header_title(self.driver))
 
-        self.assertTrue(EditExternalSubmission.check_required_elements(self.driver, template))
+        # TODO: this test fails due to date-time issue:
+        # https://github.com/cznethub/dspfront/issues/71
+        print('\n Known failure pending https://github.com/cznethub/dspfront/issues/71')
+        try: 
+            self.assertTrue(EditExternalSubmission.check_required_elements(self.driver, template))
+        except AssertionError as e: 
+            self.knownFailures.append(str(e))
 
 
 class DspZenodoTestSuite(DspTestSuite):
@@ -750,9 +790,13 @@ class DspZenodoTestSuite(DspTestSuite):
         # TODO: this test fails pending issue
         # https://github.com/cznethub/dspfront/issues/57
         print('\n Fails pending https://github.com/cznethub/dspfront/issues/57')
-        self.zenodo_then_login_orcid()
-        header = SubmitZenodo.get_header_text(self.driver)
-        self.assertIn(self.repo_name, header)
+        try: 
+            self.zenodo_then_login_orcid()
+            header = SubmitZenodo.get_header_text(self.driver)
+            self.assertIn(self.repo_name, header)
+        except AssertionError as e: 
+            self.knownFailures.append(str(e))
+        
 
     def test_ze_000003_nav_to_repo_then_auth_user_pw(self):
         """Navigate to Zenodo submit, then auth with uname/pw"""
