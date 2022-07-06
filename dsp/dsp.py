@@ -307,7 +307,7 @@ class DspHydroshareTestSuite(DspTestSuite):
             "Address": "contributor address " + auto_text,
             "Organization": "contributor org " + auto_text,
             "Email": auto_text + "@gmail.com",
-            "Homepage": "http://contibutor_homepage.com/" + auto_text,
+            "Homepage": "http://contibutor-homepage.com/" + auto_text,
         }
         SubmitHydroshare.expand_section_by_did(self.driver, data_id=section)
         self.fill_ids_submit_and_check(auto_text, section, nth, dict)
@@ -448,7 +448,7 @@ class DspHydroshareTestSuite(DspTestSuite):
                 "Address": f"creator address {auto_text} {nth}",
                 "Organization": f"creator org {auto_text} {nth}",
                 "Email": f"{auto_text}{nth}@gmail.com",
-                "Homepage": f"http://contibutor_homepage.com/{auto_text}{nth}",
+                "Homepage": f"http://contibutor-homepage.com/{auto_text}{nth}",
             }
             SubmitHydroshare.add_form_array_item_by_did(self.driver, data_id=section)
             success_filling = SubmitHydroshare.fill_inputs_by_data_ids(self.driver, dicts[nth], section, nth, array)
@@ -473,7 +473,7 @@ class DspHydroshareTestSuite(DspTestSuite):
                 "Address": f"contributor address {auto_text} {nth}",
                 "Organization": f"contributor org {auto_text} {nth}",
                 "Email": f"{auto_text}{nth}@gmail.com",
-                "Homepage": f"http://contibutor_homepage.com/{auto_text}{nth}"
+                "Homepage": f"http://contibutor-homepage.com/{auto_text}{nth}"
             }
             SubmitHydroshare.add_form_array_item_by_did(self.driver, data_id=section)
             success_filling = SubmitHydroshare.fill_inputs_by_data_ids(self.driver, dicts[nth], section, nth, array)
@@ -485,12 +485,7 @@ class DspHydroshareTestSuite(DspTestSuite):
             try:
                 self.check(section, nth, dicts[nth], array)
             except AssertionError:
-                # TODO: seems that these array items are sometimes returned in different order?
-                # https://github.com/cznethub/dspfront/issues/72
-                # sometimes this fails, sometimes it passes
-                # self.check(section, nth, dicts.pop(), array)
-                print('\n Sometimes fails pending https://github.com/cznethub/dspfront/issues/72')
-                self.knownFailures.append([inspect.stack()[0][3], 'https://github.com/cznethub/dspfront/issues/72'])
+                self.check(section, nth, dicts.pop(), array)
 
     def test_hs_000019_multiple_metadata_persists(self):
         """Confirm that multiple Additional Metadata info persists from submit to edit"""
@@ -515,12 +510,7 @@ class DspHydroshareTestSuite(DspTestSuite):
             try:
                 self.check(section, nth, dicts[nth], array)
             except AssertionError:
-                # TODO: seems that these array items are sometimes returned in different order?
-                # https://github.com/cznethub/dspfront/issues/72
-                # sometimes this fails, sometimes it passes
-                # self.check(section, nth, dicts.pop(), array)
-                print('\n Sometimes fails pending https://github.com/cznethub/dspfront/issues/72')
-                self.knownFailures.append([inspect.stack()[0][3], 'https://github.com/cznethub/dspfront/issues/72'])
+                self.check(section, nth, dicts.pop(), array)
 
     def test_hs_000020_multiple_related_resources_persist(self):
         """Confirm that multiple Related Resources info persists from submit to edit"""
@@ -547,12 +537,7 @@ class DspHydroshareTestSuite(DspTestSuite):
             try:
                 self.check(section, nth, dicts[nth], array)
             except AssertionError:
-                # TODO: seems that these array items are sometimes returned in different order?
-                # https://github.com/cznethub/dspfront/issues/72
-                # sometimes this fails, sometimes it passes
-                # self.check(section, nth, dicts.pop(), array)
-                print('\n Sometimes fails pending https://github.com/cznethub/dspfront/issues/72')
-                self.knownFailures.append([inspect.stack()[0][3], 'https://github.com/cznethub/dspfront/issues/72'])
+                self.check(section, nth, dicts.pop(), array)
 
     def test_hs_000021_multiple_funding_agencies_persist(self):
         """Confirm that multiple Funding Agencies info persists from submit to edit"""
@@ -585,12 +570,7 @@ class DspHydroshareTestSuite(DspTestSuite):
             try:
                 self.check(section, nth, dicts[nth], array)
             except AssertionError:
-                # TODO: seems that these array items are sometimes returned in different order?
-                # https://github.com/cznethub/dspfront/issues/72
-                # sometimes this fails, sometimes it passes
-                # self.check(section, nth, dicts.pop(), array)
-                print('\n Sometimes fails pending https://github.com/cznethub/dspfront/issues/72')
-                self.knownFailures.append([inspect.stack()[0][3], 'https://github.com/cznethub/dspfront/issues/72'])
+                self.check(section, nth, dicts.pop(), array)
 
 
 class DspExternalTestSuite(DspTestSuite):
