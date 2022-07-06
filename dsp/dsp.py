@@ -1,5 +1,6 @@
 """ Runs various smoke tests for the data submission portal """
-from ast import Assert
+import inspect
+import textwrap
 import boto3
 import inspect
 import json
@@ -55,6 +56,10 @@ SPAM_DATA_STREAM_CONFIG = Config(
 class DspTestSuite(BaseTestSuite):
     """Python unittest setup for functional tests"""
 
+    @classmethod
+    def setUpClass(cls):
+        cls.knownFailures = []
+
     def setUp(self):
         super(DspTestSuite, self).setUp()
         self.driver.set_window_size(1200, 1080)
@@ -62,18 +67,23 @@ class DspTestSuite(BaseTestSuite):
             self.driver.get(BASE_URL)
         else:
             self.driver.get(self.base_url_arg)
-        self.knownFailures = []
     
-    def tearDown(self):
+    @classmethod
+    def tearDownClass(cls):
         # If we want known failures to cause overall test suite fail
-        # self.assertEqual([], self.knownFailures)
+        # cls.assertEqual([], cls.knownFailures)
         
         # Otherwise, allow known issues to pass
-        if self.knownFailures:
-            print("KNOWN FAILURES")
-            for failure in self.knownFailures:
-                print(failure)
-        super(DspTestSuite, self).tearDown()
+        if cls.knownFailures:
+            print(textwrap.dedent('''
+
+            ======================================================================
+            KNOWN FAILED TESTS: 
+            The following tests failed, but each has a pending issue slated in GH.
+            '''))
+            for failure in cls.knownFailures:
+                print(f'{failure[0]}: {failure[1]}')
+            print('----------------------------------------------------------------------\n')
 
 
     def login_orcid(self):
@@ -278,13 +288,12 @@ class DspHydroshareTestSuite(DspTestSuite):
         MySubmissions.edit_top_submission(self.driver)
 
         match = EditHSSubmission.check_inputs_by_data_ids(self.driver, dict, section, nth)
-        # TODO: fails pending this issue:
-        # https://github.com/cznethub/dspfront/issues/71
-        print('\n Known failure pending https://github.com/cznethub/dspfront/issues/71')
         try: 
             self.assertTrue(match)
-        except AssertionError as e: 
-            self.knownFailures.append(str(e))
+        except AssertionError:
+            # TODO: fails pending this issue:
+            print('\n Known failure pending https://github.com/cznethub/dspfront/issues/71')
+            self.knownFailures.append([inspect.stack()[0][3], 'https://github.com/cznethub/dspfront/issues/71'])
 
     def test_hs_000009_funding_agency_persists(self):
         """Confirm that Funding Agency info persists from submit to edit"""
@@ -412,14 +421,14 @@ class DspHydroshareTestSuite(DspTestSuite):
         SubmitHydroshare.open_tab(self.driver, section, tab_number=2)
         success_filling = SubmitHydroshare.fill_inputs_by_data_ids(self.driver, dict, section, nth)
         self.assertTrue(success_filling)
-        # TODO: this test fails pending issue:
-        # https://github.com/cznethub/dspfront/issues/55
-        # Ignoring for now, because HS accepts these invalid bounds
-        print('\n Known failure pending https://github.com/cznethub/dspfront/issues/55')
+
         try: 
             self.assertFalse(SubmitHydroshare.is_finishable(self.driver))
-        except AssertionError as e: 
-            self.knownFailures.append(str(e))
+        except AssertionError: 
+            # TODO: this test fails pending issue:
+            # Ignoring for now, because HS accepts these invalid bounds
+            print('\n Known failure pending https://github.com/cznethub/dspfront/issues/55')
+            self.knownFailures.append([inspect.stack()[0][3], 'https://github.com/cznethub/dspfront/issues/55'])
 
     def test_hs_000016_submissions_sorted(self):
         """
@@ -489,16 +498,16 @@ class DspHydroshareTestSuite(DspTestSuite):
 
         self.submit(auto_text)
 
-        # TODO: seems that these array items are sometimes returned in different order?
-        # https://github.com/cznethub/dspfront/issues/72
-        # sometimes this fails, sometimes it passes
-        # self.check(section, nth, dicts.pop(), array)
-        print('\n Sometimes fails pending https://github.com/cznethub/dspfront/issues/72')
         for nth in ns:
             try:
                 self.check(section, nth, dicts[nth], array)
-            except AssertionError as e:
-                self.knownFailures.append(str(e))
+            except AssertionError:
+                # TODO: seems that these array items are sometimes returned in different order?
+                # https://github.com/cznethub/dspfront/issues/72
+                # sometimes this fails, sometimes it passes
+                # self.check(section, nth, dicts.pop(), array)
+                print('\n Sometimes fails pending https://github.com/cznethub/dspfront/issues/72')
+                self.knownFailures.append([inspect.stack()[0][3], 'https://github.com/cznethub/dspfront/issues/72'])
 
     def test_hs_000019_multiple_metadata_persists(self):
         """Confirm that multiple Additional Metadata info persists from submit to edit"""
@@ -518,17 +527,17 @@ class DspHydroshareTestSuite(DspTestSuite):
             self.assertTrue(success_filling)
 
         self.submit(auto_text)
-        
-        # TODO: seems that these array items are sometimes returned in different order?
-        # https://github.com/cznethub/dspfront/issues/72
-        # sometimes this fails, sometimes it passes
-        # self.check(section, nth, dicts.pop(), array)
-        print('\n Sometimes fails pending https://github.com/cznethub/dspfront/issues/72')
+
         for nth in ns:
             try:
                 self.check(section, nth, dicts[nth], array)
-            except AssertionError as e:
-                self.knownFailures.append(str(e))
+            except AssertionError:
+                # TODO: seems that these array items are sometimes returned in different order?
+                # https://github.com/cznethub/dspfront/issues/72
+                # sometimes this fails, sometimes it passes
+                # self.check(section, nth, dicts.pop(), array)
+                print('\n Sometimes fails pending https://github.com/cznethub/dspfront/issues/72')
+                self.knownFailures.append([inspect.stack()[0][3], 'https://github.com/cznethub/dspfront/issues/72'])
 
     def test_hs_000020_multiple_related_resources_persist(self):
         """Confirm that multiple Related Resources info persists from submit to edit"""
@@ -549,18 +558,18 @@ class DspHydroshareTestSuite(DspTestSuite):
 
         self.submit(auto_text)
 
-        # TODO: seems that these array items are sometimes returned in different order?
-        # https://github.com/cznethub/dspfront/issues/72
-        # sometimes this fails, sometimes it passes
-        # self.check(section, nth, dicts.pop(), array)
-        print('\n Sometimes fails pending https://github.com/cznethub/dspfront/issues/72')
         for nth in ns:
             relation = EditHSSubmission.get_nth_relation_type(self.driver, nth)
             self.assertEqual(relation.pop(), dicts[nth].pop("RelationType"))
             try:
                 self.check(section, nth, dicts[nth], array)
-            except AssertionError as e:
-                self.knownFailures.append(str(e))
+            except AssertionError:
+                # TODO: seems that these array items are sometimes returned in different order?
+                # https://github.com/cznethub/dspfront/issues/72
+                # sometimes this fails, sometimes it passes
+                # self.check(section, nth, dicts.pop(), array)
+                print('\n Sometimes fails pending https://github.com/cznethub/dspfront/issues/72')
+                self.knownFailures.append([inspect.stack()[0][3], 'https://github.com/cznethub/dspfront/issues/72'])
 
     def test_hs_000021_multiple_funding_agencies_persist(self):
         """Confirm that multiple Funding Agencies info persists from submit to edit"""
@@ -589,16 +598,16 @@ class DspHydroshareTestSuite(DspTestSuite):
 
         self.submit(auto_text)
 
-        # TODO: seems that these array items are sometimes returned in different order?
-        # https://github.com/cznethub/dspfront/issues/72
-        # sometimes this fails, sometimes it passes
-        # self.check(section, nth, dicts.pop(), array)
-        print('\n Sometimes fails pending https://github.com/cznethub/dspfront/issues/72')
         for nth in ns:
             try:
                 self.check(section, nth, dicts[nth], array)
-            except AssertionError as e:
-                self.knownFailures.append(str(e))
+            except AssertionError:
+                # TODO: seems that these array items are sometimes returned in different order?
+                # https://github.com/cznethub/dspfront/issues/72
+                # sometimes this fails, sometimes it passes
+                # self.check(section, nth, dicts.pop(), array)
+                print('\n Sometimes fails pending https://github.com/cznethub/dspfront/issues/72')
+                self.knownFailures.append([inspect.stack()[0][3], 'https://github.com/cznethub/dspfront/issues/72'])
 
 
 class DspExternalTestSuite(DspTestSuite):
@@ -693,13 +702,13 @@ class DspExternalTestSuite(DspTestSuite):
         MySubmissions.edit_top_submission(self.driver)
         self.assertEqual("Register Dataset from External Repository", EditExternalSubmission.get_header_title(self.driver))
 
-        # TODO: this test fails due to date-time issue:
-        # https://github.com/cznethub/dspfront/issues/71
-        print('\n Known failure pending https://github.com/cznethub/dspfront/issues/71')
         try: 
             self.assertTrue(EditExternalSubmission.check_required_elements(self.driver, template))
-        except AssertionError as e: 
-            self.knownFailures.append(str(e))
+        except AssertionError:
+            # TODO: this test fails due to date-time issue:
+            # https://github.com/cznethub/dspfront/issues/71
+            print('\n Known failure pending https://github.com/cznethub/dspfront/issues/71')
+            self.knownFailures.append([inspect.stack()[0][3], 'https://github.com/cznethub/dspfront/issues/71'])
 
 
 class DspZenodoTestSuite(DspTestSuite):
@@ -787,15 +796,15 @@ class DspZenodoTestSuite(DspTestSuite):
 
     def test_ze_000002_repo_then_auth_w_orcid(self):
         """Navigate to Zenodo submit first, then auth with orcid"""
-        # TODO: this test fails pending issue
-        # https://github.com/cznethub/dspfront/issues/57
-        print('\n Fails pending https://github.com/cznethub/dspfront/issues/57')
         try: 
             self.zenodo_then_login_orcid()
             header = SubmitZenodo.get_header_text(self.driver)
             self.assertIn(self.repo_name, header)
-        except AssertionError as e: 
-            self.knownFailures.append(str(e))
+        except AssertionError:
+            # TODO: this test fails pending issue
+            # https://github.com/cznethub/dspfront/issues/57
+            print('\n Fails pending https://github.com/cznethub/dspfront/issues/57')
+            self.knownFailures.append([inspect.stack()[0][3], 'https://github.com/cznethub/dspfront/issues/57'])
         
 
     def test_ze_000003_nav_to_repo_then_auth_user_pw(self):
