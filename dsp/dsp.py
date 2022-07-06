@@ -28,7 +28,10 @@ from dsp_macros import (
     EditExternalSubmission,
     SubmitZenodo,
     EditZenodoSubmission,
-    ZenodoAuthWindow
+    ZenodoAuthWindow,
+    SubmitEarthchem,
+    EditEarthchemSubmission,
+    EarthchemAuthWindow
 )
 
 from cuahsi_base.cuahsi_base import BaseTestSuite, parse_args_run_tests
@@ -39,6 +42,8 @@ from config import (
     PASSWORD,
     HS_PASSWORD,
     HS_USERNAME,
+    EARTHCHEM_USERNAME,
+    EARTHCHEM_PASSWORD
 )
 
 SPAM_DATA_STREAM_NAME = "cuahsi-quality-spam-data-stream"
@@ -99,7 +104,7 @@ class DspTestSuite(BaseTestSuite):
 
 
 class DspHydroshareTestSuite(DspTestSuite):
-    """DSP tests for Hydroshare repository"""
+    """DSP tests for the Hydroshare repository"""
 
     repo_name = "HydroShare"
 
@@ -179,13 +184,17 @@ class DspHydroshareTestSuite(DspTestSuite):
         self.assertTrue(login_visible)
 
     def test_hs_000002_auth_then_nav_to_submit(self):
-        """Check authentication to submit page"""
+        """
+        Check authentication to submit page
+        
+        Logs in with Orcid, then navigates to the HS repository for submission
+        """
         self.login_orcid_and_hs()
         header = SubmitHydroshare.get_header_text(self.driver)
         self.assertIn("Submit", header)
 
     def test_hs_000003_find_submit_instructions(self):
-        """Check that submit instructions are shown"""
+        """Check that instructions are shown on the Submit page"""
         self.login_orcid_and_hs() 
         # SubmitLandingPage.to_repo_form(self.driver, self.repo_name)
         alert = SubmitHydroshare.get_alert_text(self.driver)
@@ -224,7 +233,11 @@ class DspHydroshareTestSuite(DspTestSuite):
                 self.assertTrue(SubmitHydroshare.is_finishable(self.driver))
 
     def test_hs_000006_creator_populates_from_hs(self):
-        """Confirm that CREATOR is populated from HS profile"""
+        """
+        Confirm that CREATOR is populated from HS profile
+        
+        Completing a submission to HS should cause the 'creator' field to be populated with info from HS profile
+        """
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
         self.login_and_autofill_hs_required(auto_text)
         SubmitHydroshare.finish_submission(self.driver)
@@ -418,7 +431,11 @@ class DspHydroshareTestSuite(DspTestSuite):
             self.knownFailures.append([inspect.stack()[0][3], 'https://github.com/cznethub/dspfront/issues/55'])
 
     def test_hs_000016_submissions_sorted(self):
-        """Confirm that submissions are sorted after submission"""
+        """
+        Confirm that submissions are sorted after submission
+        
+        The most recent submission should be at the top of the page initially
+        """
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
         template = self.required_elements_template(auto_text)
         self.login_orcid_and_hs()
@@ -631,19 +648,23 @@ class DspExternalTestSuite(DspTestSuite):
         SubmitExternal.autofill_required_elements(self.driver, self.required_elements_template(auto_text))
 
     def test_ex_000001_authenticate_then_submit_page(self):
-        """Check authentication to submit page"""
+        """
+        Check authentication to submit page
+        
+        First, authenticate with Orcid, then navigate to the submit page
+        """
         self.login_orcid_and_external()
         header = SubmitExternal.get_header_text(self.driver)
         self.assertIn("External", header)
 
     def test_ex_000002_submit_instructions_shown(self):
-        """Check that submit instructions are shown"""
+        """Check that instructions are shown on the Submit page"""
         self.login_orcid_and_external()
         alert = SubmitExternal.get_alert_text(self.driver)
         self.assertIn("Instructions", alert)
 
     def test_ex_000003_submit_required_fields(self):
-        """Confirm successful submit of basic required fields for External Repo"""
+        """Confirm successful submit of required fields for External Repo"""
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
         # self.login_and_autofill_external_required(auto_text)
         self.login_orcid_and_external()
@@ -746,7 +767,7 @@ class DspZenodoTestSuite(DspTestSuite):
         SubmitZenodo.autofill_required_elements(self.driver, self.required_elements_template(auto_text))
 
     def test_ze_000001_orcid_then_submit(self):
-        """Orcid auth first, then to submit page"""
+        """Check authentication with Orcid, then navigate to submit page"""
         self.login_orcid_to_submit()
         header = SubmitZenodo.get_header_text(self.driver)
         self.assertIn(self.repo_name, header)
@@ -767,7 +788,7 @@ class DspZenodoTestSuite(DspTestSuite):
         
 
     def test_ze_000003_nav_to_repo_then_auth_user_pw(self):
-        """Navigate to repo then auth with uname/pw"""
+        """Navigate to Zenodo submit, then auth with uname/pw"""
         self.zenodo_then_login_username_password()
         header = SubmitZenodo.get_header_text(self.driver)
         self.assertIn(self.repo_name, header)
@@ -792,6 +813,124 @@ class DspZenodoTestSuite(DspTestSuite):
         MySubmissions.edit_top_submission(self.driver)
         self.assertEqual("Edit Submission", EditZenodoSubmission.get_header_title(self.driver))
         check = EditZenodoSubmission.check_required_elements(self.driver, template)
+        self.assertTrue(check)
+
+
+class DspEarthchemTestSuite(DspTestSuite):
+    """DSP tests for Earthchem backend"""
+
+    repo_name = "EarthChem"
+
+    @classmethod
+    def required_elements_template(self, auto_text):
+        basic_info = {
+            # TODO: title-input is not selectable
+            "Dataset Title": auto_text + " Title",
+            "AbstractorDescription": auto_text + " Description/Abstract",
+            "DataTypes": "Collection",
+            "Keywords": [auto_text + " Keywords"]
+        }
+        spatial = {
+            "SpatialCoverage": "Global"
+        }
+
+        required_elements = {
+            "group-BasicInformation": basic_info,
+            "SpatialCoverageInformation": spatial
+        }
+        return required_elements
+
+    def earthchem_then_login_orcid(self):
+        """Select Earthchem repo then authenticate with orcid"""
+        Dsp.show_mobile_nav(self.driver)
+        Dsp.drawer_to_submit(self.driver)
+        SubmitLandingPage.select_repo_by_id(self.driver, self.repo_name)
+
+        # new ORCID window
+        SubmitLandingPage.to_orcid_window(self.driver)
+        self.assertIn("ORCID", TestSystem.title(self.driver))
+
+        OrcidWindow.fill_credentials(self.driver, EARTHCHEM_USERNAME, EARTHCHEM_PASSWORD)
+        OrcidWindow.to_origin_window(self.driver)
+
+        # new Earthchem auth window
+        SubmitLandingPage.to_repo_auth_window(self.driver)
+
+        EarthchemAuthWindow.authorize_via_orcid(self.driver)
+        OrcidWindow.to_origin_window(self.driver)
+
+    def earthchem_then_login_username_password(self):
+        """Select Earthchem repo then authenticate with orcid"""
+        Dsp.show_mobile_nav(self.driver)
+        Dsp.drawer_to_submit(self.driver)
+        SubmitLandingPage.select_repo_by_id(self.driver, self.repo_name)
+
+        # new ORCID window
+        SubmitLandingPage.to_orcid_window(self.driver)
+        self.assertIn("ORCID", TestSystem.title(self.driver))
+
+        OrcidWindow.fill_credentials(self.driver, EARTHCHEM_USERNAME, EARTHCHEM_PASSWORD)
+        OrcidWindow.to_origin_window(self.driver)
+
+        # new Earthchem auth window
+        SubmitLandingPage.to_repo_auth_window(self.driver)
+        EarthchemAuthWindow.authorize_email_password(self.driver, email=EARTHCHEM_USERNAME, password=EARTHCHEM_PASSWORD)
+        EarthchemAuthWindow.to_origin_window(self.driver, wait=True)
+
+    def login_orcid_to_submit(self):
+        """Authenticate with orcid then select repo"""
+        super().login_orcid_to_submit(self.repo_name)
+
+        # EC backend only requires orcid, no auth window for now...
+        # SubmitLandingPage.to_repo_auth_window(self.driver)
+        # self.assertIn("ecl-realm", TestSystem.title(self.driver))
+        # EarthchemAuthWindow.authorize_via_orcid(self.driver)
+        # OrcidWindow.to_origin_window(self.driver, wait=True)
+
+    def login_and_autofill_earthchem_required(self, auto_text):
+        """A shortcut to fill required fields of submit page
+        So that additional non-required fields can easily be checked
+        """
+        # self.earthchem_then_login_username_password()
+        self.login_orcid_to_submit()
+        SubmitEarthchem.autofill_required_elements(self.driver, self.required_elements_template(auto_text))
+
+    def test_ec_000001_orcid_auth_then_submit(self):
+        """Authenticate with Orcid, then navigate to Earthchem submit page"""
+        self.login_orcid_to_submit()
+        header = SubmitEarthchem.get_header_text(self.driver)
+        self.assertIn(self.repo_name, header)
+        alert = SubmitEarthchem.get_alert_text(self.driver)
+        self.assertIn("Instructions", alert)
+
+    def test_ec_000002_repo_then_orcid_auth(self):
+        """Navigate to Earthchem submit, then authenticate with orcid"""
+        self.earthchem_then_login_orcid()
+        header = SubmitEarthchem.get_header_text(self.driver)
+        self.assertIn(self.repo_name, header)
+
+    def test_ec_000003_submit_required_fields(self):
+        """Confirm successful submit of required fields for Earthchem Repo"""
+        # TODO: this doesn't work yet
+        auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
+        self.login_and_autofill_earthchem_required(auto_text)
+        self.assertTrue(SubmitEarthchem.is_finishable(self.driver))
+        SubmitEarthchem.finish_submission(self.driver)
+        self.assertEqual("My Submissions", MySubmissions.get_title(self.driver))
+
+    def test_ec_000004_required_fields_persist(self):
+        """Check that required fields persist after submit"""
+        # TODO: this doesn't work yet
+        auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
+        template = self.required_elements_template(auto_text)
+        self.login_and_autofill_earthchem_required(auto_text)
+        self.assertTrue(SubmitEarthchem.is_finishable(self.driver))
+        SubmitEarthchem.finish_submission(self.driver)
+
+        MySubmissions.enter_text_in_search(self.driver, auto_text)
+        MySubmissions.edit_top_submission(self.driver)
+        self.assertEqual("Edit Submission", EditEarthchemSubmission.get_header_title(self.driver))
+        check = EditEarthchemSubmission.check_required_elements(self.driver, template)
         self.assertTrue(check)
 
 

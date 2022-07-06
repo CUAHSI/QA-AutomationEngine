@@ -9,3 +9,6 @@ HS_PASSWORD = "62meister"
 
 GITHUB_ORG = "cznethub"
 GITHUB_REPO = "dspfront"
+
+EARTHCHEM_USERNAME = "jmcuahsi@gmail.com"
+EARTHCHEM_PASSWORD = "62meister"
