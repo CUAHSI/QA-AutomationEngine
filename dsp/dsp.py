@@ -175,6 +175,19 @@ class DspHydroshareTestSuite(DspTestSuite):
     def check(self, section, nth, dict, array=False):
         match = EditHSSubmission.check_inputs_by_data_ids(self.driver, dict, section, nth, array)
         self.assertTrue(match)
+    
+    def check_array_fieldset_unknown_order(self, section, ns, dicts, array):
+        reversed = False
+        for nth in ns:
+            if not reversed:
+                try:
+                    self.check(section, nth, dicts[nth], array)
+                except AssertionError:
+                    reversed = True
+                    ns.insert(0, nth)
+                    print(f'\n Array items were reversed during this test {inspect.stack()[0][3]}')
+            else:
+                self.check(section, nth, dicts.pop(), array)
 
     def test_hs_000001_anon_nav_my_sumissions_shows_orcid(self):
         """Ensure anonymous navigation to my submissions shows orcid login modal"""
@@ -299,7 +312,7 @@ class DspHydroshareTestSuite(DspTestSuite):
         dict = {
             "Awardtitle": auto_text + "Funding Agency title2-input",
             "Awardnumber": "5",
-            "AgencyURL": "http://funding-agency.com/" + auto_text,
+            "FundingAgencyUrl": "http://funding-agency.com/" + auto_text,
         }
         self.fill_ids_submit_and_check(auto_text, section, nth, dict)
 
@@ -492,12 +505,7 @@ class DspHydroshareTestSuite(DspTestSuite):
             self.assertTrue(success_filling)
 
         self.submit(auto_text)
-
-        for nth in ns:
-            try:
-                self.check(section, nth, dicts[nth], array)
-            except AssertionError:
-                self.check(section, nth, dicts.pop(), array)
+        self.check_array_fieldset_unknown_order(section, ns, dicts, array)
 
     def test_hs_000019_multiple_metadata_persists(self):
         """Confirm that multiple Additional Metadata info persists from submit to edit"""
@@ -517,12 +525,7 @@ class DspHydroshareTestSuite(DspTestSuite):
             self.assertTrue(success_filling)
 
         self.submit(auto_text)
-
-        for nth in ns:
-            try:
-                self.check(section, nth, dicts[nth], array)
-            except AssertionError:
-                self.check(section, nth, dicts.pop(), array)
+        self.check_array_fieldset_unknown_order(section, ns, dicts, array)
 
     def test_hs_000020_multiple_related_resources_persist(self):
         """Confirm that multiple Related Resources info persists from submit to edit"""
@@ -543,13 +546,12 @@ class DspHydroshareTestSuite(DspTestSuite):
 
         self.submit(auto_text)
 
+        reversed = False
         for nth in ns:
             relation = EditHSSubmission.get_nth_relation_type(self.driver, nth)
             self.assertEqual(relation.pop(), dicts[nth].pop("RelationType"))
-            try:
-                self.check(section, nth, dicts[nth], array)
-            except AssertionError:
-                self.check(section, nth, dicts.pop(), array)
+
+        self.check_array_fieldset_unknown_order(section, ns, dicts, array)
 
     def test_hs_000021_multiple_funding_agencies_persist(self):
         """Confirm that multiple Funding Agencies info persists from submit to edit"""
@@ -570,7 +572,7 @@ class DspHydroshareTestSuite(DspTestSuite):
                 "Agencyname": f"{auto_text} Funding Agency Name {nth}",
                 "Awardtitle": f"{auto_text} Funding Agency title2-input {nth}",
                 "Awardnumber": f"5{nth}",
-                "AgencyURL": f"http://funding-agency.com/{auto_text}/{nth}",
+                "FundingAgencyUrl": f"http://funding-agency.com/{auto_text}/{nth}",
             }
             SubmitHydroshare.add_form_array_item_by_did(self.driver, data_id=section)
             success_filling = SubmitHydroshare.fill_inputs_by_data_ids(self.driver, dicts[nth], section, nth, array)
@@ -578,11 +580,7 @@ class DspHydroshareTestSuite(DspTestSuite):
 
         self.submit(auto_text)
 
-        for nth in ns:
-            try:
-                self.check(section, nth, dicts[nth], array)
-            except AssertionError:
-                self.check(section, nth, dicts.pop(), array)
+        self.check_array_fieldset_unknown_order(section, ns, dicts, array)
 
 
 class DspExternalTestSuite(DspTestSuite):
