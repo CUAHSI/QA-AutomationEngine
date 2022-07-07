@@ -288,12 +288,7 @@ class DspHydroshareTestSuite(DspTestSuite):
         MySubmissions.edit_top_submission(self.driver)
 
         match = EditHSSubmission.check_inputs_by_data_ids(self.driver, dict, section, nth)
-        try: 
-            self.assertTrue(match)
-        except AssertionError:
-            # TODO: fails pending this issue:
-            print('\n Known failure pending https://github.com/cznethub/dspfront/issues/71')
-            self.knownFailures.append([inspect.stack()[0][3], 'https://github.com/cznethub/dspfront/issues/71'])
+        self.assertTrue(match)
 
     def test_hs_000009_funding_agency_persists(self):
         """Confirm that Funding Agency info persists from submit to edit"""
@@ -681,14 +676,7 @@ class DspExternalTestSuite(DspTestSuite):
 
         MySubmissions.edit_top_submission(self.driver)
         self.assertEqual("Register Dataset from External Repository", EditExternalSubmission.get_header_title(self.driver))
-
-        try: 
-            self.assertTrue(EditExternalSubmission.check_required_elements(self.driver, template))
-        except AssertionError:
-            # TODO: this test fails due to date-time issue:
-            # https://github.com/cznethub/dspfront/issues/71
-            print('\n Known failure pending https://github.com/cznethub/dspfront/issues/71')
-            self.knownFailures.append([inspect.stack()[0][3], 'https://github.com/cznethub/dspfront/issues/71'])
+        self.assertTrue(EditExternalSubmission.check_required_elements(self.driver, template))
 
 
 class DspZenodoTestSuite(DspTestSuite):
