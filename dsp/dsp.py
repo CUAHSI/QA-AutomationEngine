@@ -597,7 +597,7 @@ class DspExternalTestSuite(DspTestSuite):
     def required_elements_template(self, auto_text):
         basic_info = {
             "Nameortitle": auto_text + " Nameortitle",
-            "URL": "http://basic_info_url.com/" + auto_text,
+            "Url": "http://basicinfourl.com/" + auto_text,
             "Datepublished": "2022-04-05T00:04",
             "Descriptionorabstract": auto_text + " Descriptionorabstract",
             "SubjectKeywords": [auto_text + " SubjectKeywords"]
@@ -615,7 +615,7 @@ class DspExternalTestSuite(DspTestSuite):
         }
         provider = {
             "ProviderName": auto_text + " ProviderName",
-            "ProviderURL": "http://provider_url.com/" + auto_text
+            "Url": "http://providerurl.com/" + auto_text
         }
 
         # created separately so that we can check individually if needed
