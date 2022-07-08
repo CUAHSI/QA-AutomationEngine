@@ -2,6 +2,7 @@
 import inspect
 import textwrap
 import time
+import unittest
 
 from botocore.config import Config
 
@@ -47,10 +48,6 @@ SPAM_DATA_STREAM_CONFIG = Config(
 class DspTestSuite(BaseTestSuite):
     """Python unittest setup for functional tests"""
 
-    @classmethod
-    def setUpClass(cls):
-        cls.knownFailures = []
-
     def setUp(self):
         super(DspTestSuite, self).setUp()
         self.driver.set_window_size(1200, 1080)
@@ -58,29 +55,6 @@ class DspTestSuite(BaseTestSuite):
             self.driver.get(BASE_URL)
         else:
             self.driver.get(self.base_url_arg)
-
-    @classmethod
-    def tearDownClass(cls):
-        # If we want known failures to cause overall test suite fail
-        # cls.assertEqual([], cls.knownFailures)
-
-        # Otherwise, allow known issues to pass
-        if cls.knownFailures:
-            print(
-                textwrap.dedent(
-                    """
-
-            ======================================================================
-            KNOWN FAILED TESTS:
-            The following tests failed, but each has a pending issue slated in GH.
-            """
-                )
-            )
-            for failure in cls.knownFailures:
-                print(f"{failure[0]}: {failure[1]}")
-            print(
-                "--------------------------------------------------------------------\n"
-            )
 
     def login_orcid(self):
         """Authenticate with orcid"""
@@ -432,6 +406,7 @@ class DspHydroshareTestSuite(DspTestSuite):
         )
         self.assertTrue(match)
 
+    @unittest.expectedFailure
     def test_hs_000015_invalid_spatial_coverage_rejects(self):
         """
         Confirm that invalid Spatial Box Coverage info doesn't submit
@@ -439,6 +414,8 @@ class DspHydroshareTestSuite(DspTestSuite):
         Attempts to submit Box Coverage that doesn't make geographic sense and ensures
         that the invalid info is not accepted
         """
+        # TODO: this test fails pending issue
+        # https://github.com/cznethub/dspfront/issues/55
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
         self.login_and_autofill_hs_required(auto_text)
         section = "Spatialcoverage"
@@ -456,22 +433,7 @@ class DspHydroshareTestSuite(DspTestSuite):
             self.driver, dict, section, nth
         )
         self.assertTrue(success_filling)
-
-        try:
-            self.assertFalse(SubmitHydroshare.is_finishable(self.driver))
-        except AssertionError:
-            # TODO: this test fails pending issue:
-            # Ignoring for now, because HS accepts these invalid bounds
-            print(
-                "\n Known failure pending"
-                " https://github.com/cznethub/dspfront/issues/55"
-            )
-            self.knownFailures.append(
-                [
-                    inspect.stack()[0][3],
-                    "https://github.com/cznethub/dspfront/issues/55",
-                ]
-            )
+        self.assertFalse(SubmitHydroshare.is_finishable(self.driver))
 
     def test_hs_000016_submissions_sorted(self):
         """
@@ -815,32 +777,21 @@ class DspZenodoTestSuite(DspTestSuite):
             self.driver, self.required_elements_template(auto_text)
         )
 
+    @unittest.skip("Fails pending https://github.com/cznethub/dspfront/issues/57")
     def test_ze_000001_orcid_then_submit(self):
         """Check authentication with Orcid, then navigate to submit page"""
-        # TODO: this test might fail? pending issue
-        # https://github.com/cznethub/dspfront/issues/57
         self.login_orcid_to_submit()
         header = SubmitZenodo.get_header_text(self.driver)
         self.assertIn(self.repo_name, header)
         alert = SubmitZenodo.get_alert_text(self.driver)
         self.assertIn("Instructions", alert)
 
+    @unittest.skip("Fails pending https://github.com/cznethub/dspfront/issues/57")
     def test_ze_000002_repo_then_auth_w_orcid(self):
         """Navigate to Zenodo submit first, then auth with orcid"""
-        try:
-            self.zenodo_then_login_orcid()
-            header = SubmitZenodo.get_header_text(self.driver)
-            self.assertIn(self.repo_name, header)
-        except AssertionError:
-            # TODO: this test fails pending issue
-            # https://github.com/cznethub/dspfront/issues/57
-            print("\n Fails pending https://github.com/cznethub/dspfront/issues/57")
-            self.knownFailures.append(
-                [
-                    inspect.stack()[0][3],
-                    "https://github.com/cznethub/dspfront/issues/57",
-                ]
-            )
+        self.zenodo_then_login_orcid()
+        header = SubmitZenodo.get_header_text(self.driver)
+        self.assertIn(self.repo_name, header)
 
     def test_ze_000003_nav_to_repo_then_auth_user_pw(self):
         """Navigate to Zenodo submit, then auth with uname/pw"""
@@ -971,51 +922,31 @@ class DspEarthchemTestSuite(DspTestSuite):
         header = SubmitEarthchem.get_header_text(self.driver)
         self.assertIn(self.repo_name, header)
 
+    @unittest.skip("Not implemented")
     def zest_ec_000003_submit_required_fields(self):
         """Confirm successful submit of required fields for Earthchem Repo"""
-        # TODO: this doesn't work yet
-        try:
-            auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
-            self.login_and_autofill_earthchem_required(auto_text)
-            self.assertTrue(SubmitEarthchem.is_finishable(self.driver))
-            SubmitEarthchem.finish_submission(self.driver)
-            self.assertEqual("My Submissions", MySubmissions.get_title(self.driver))
-        except Exception:
-            print("\n Fails pending EC API WORK")
-            self.knownFailures.append(
-                [
-                    inspect.stack()[0][3],
-                    "Fails pending EC API WORK",
-                ]
-            )
+        auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
+        self.login_and_autofill_earthchem_required(auto_text)
+        self.assertTrue(SubmitEarthchem.is_finishable(self.driver))
+        SubmitEarthchem.finish_submission(self.driver)
+        self.assertEqual("My Submissions", MySubmissions.get_title(self.driver))
 
+    @unittest.skip("Not implemented")
     def zest_ec_000004_required_fields_persist(self):
         """Check that required fields persist after submit"""
-        # TODO: this doesn't work yet
-        try:
-            auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
-            template = self.required_elements_template(auto_text)
-            self.login_and_autofill_earthchem_required(auto_text)
-            self.assertTrue(SubmitEarthchem.is_finishable(self.driver))
-            SubmitEarthchem.finish_submission(self.driver)
+        auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
+        template = self.required_elements_template(auto_text)
+        self.login_and_autofill_earthchem_required(auto_text)
+        self.assertTrue(SubmitEarthchem.is_finishable(self.driver))
+        SubmitEarthchem.finish_submission(self.driver)
 
-            MySubmissions.enter_text_in_search(self.driver, auto_text)
-            MySubmissions.edit_top_submission(self.driver)
-            self.assertEqual(
-                "Edit Submission", EditEarthchemSubmission.get_header_title(self.driver)
-            )
-            check = EditEarthchemSubmission.check_required_elements(
-                self.driver, template
-            )
-            self.assertTrue(check)
-        except Exception:
-            print("\n Fails pending EC API WORK")
-            self.knownFailures.append(
-                [
-                    inspect.stack()[0][3],
-                    "Fails pending EC API WORK",
-                ]
-            )
+        MySubmissions.enter_text_in_search(self.driver, auto_text)
+        MySubmissions.edit_top_submission(self.driver)
+        self.assertEqual(
+            "Edit Submission", EditEarthchemSubmission.get_header_title(self.driver)
+        )
+        check = EditEarthchemSubmission.check_required_elements(self.driver, template)
+        self.assertTrue(check)
 
 
 if __name__ == "__main__":
