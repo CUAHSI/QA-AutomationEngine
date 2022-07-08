@@ -5,7 +5,7 @@ on:
     # TODO: change this to develop
     branches: [ dsp-updates ]
     paths:
-    - dsp
+      - dsp
   pull_request:
     branches: [ develop ]
   workflow_dispatch:
