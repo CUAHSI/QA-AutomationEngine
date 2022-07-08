@@ -817,6 +817,8 @@ class DspZenodoTestSuite(DspTestSuite):
 
     def test_ze_000001_orcid_then_submit(self):
         """Check authentication with Orcid, then navigate to submit page"""
+        # TODO: this test might fail? pending issue
+        # https://github.com/cznethub/dspfront/issues/57
         self.login_orcid_to_submit()
         header = SubmitZenodo.get_header_text(self.driver)
         self.assertIn(self.repo_name, header)
