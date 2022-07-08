@@ -34,6 +34,7 @@ class BaseTestSuite(unittest.TestCase):
     browser = "firefox"
     records = None
     base_url_arg = None
+    headless = False
     data = {}
     past_errors = 0
     past_failures = 0
@@ -63,9 +64,19 @@ class BaseTestSuite(unittest.TestCase):
             driver = webdriver.Remote(**remote_args)
         else:
             if self.browser == "firefox":
-                driver = webdriver.Firefox(self._firefox_profile())
+                options = webdriver.FirefoxOptions()
+                if self.headless:
+                    options.add_argument("--headless")
+                    options.set_preference(
+                        "dom.webnotifications.serviceworker.enabled", False
+                    )
+                    options.set_preference("dom.webnotifications.enabled", False)
+                driver = webdriver.Firefox(self._firefox_profile(), options=options)
             elif self.browser == "chrome":
-                driver = webdriver.Chrome(options=self._chrome_options())
+                options = self._chrome_options()
+                if self.headless:
+                    options.add_argument("--headless")
+                driver = webdriver.Chrome(options=options)
             elif self.browser == "safari":
                 # Fails with 'AttributeError' at time of writing this comment
                 # (selenium==3.11.0) because of a bug in selenium code.
@@ -92,9 +103,7 @@ class BaseTestSuite(unittest.TestCase):
     @staticmethod
     def _chrome_options():
         options = webdriver.ChromeOptions()
-        options.add_argument('--no-sandbox')
-        options.add_argument('--headless')
-        options.add_argument('ignore-certificate-errors')
+        options.add_argument("ignore-certificate-errors")
         options.add_argument("--user-agent={}".format(USER_AGENT))
         return options
 
@@ -145,6 +154,7 @@ def basecli():
     parser.add_argument("--resource")
     parser.add_argument("--records")
     parser.add_argument("--base")
+    parser.add_argument("--headless", action=argparse.BooleanOptionalAction)
     parser.add_argument("unittest_args", nargs="*")
 
     return parser
@@ -160,6 +170,8 @@ def parse_args_run_tests(test_class):
         test_class.records = args.records
     if args.base is not None:
         test_class.base_url_arg = args.base
+    if args.headless is not None:
+        test_class.headless = args.headless
     if args.records == "gcp":
         test_class.publisher = pubsub_v1.PublisherClient()
         test_class.topic_path = test_class.publisher.topic_path(
