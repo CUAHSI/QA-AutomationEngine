@@ -879,7 +879,6 @@ class DspEarthchemTestSuite(DspTestSuite):
     @classmethod
     def required_elements_template(self, auto_text):
         basic_info = {
-            # TODO: title-input is not selectable
             "DatasetTitle": auto_text + " Title",
             "AbstractorDescription": auto_text + " Description/Abstract",
             "DataTypes": "Collection",

@@ -1,4 +1,4 @@
-name: Selenium Browser QA Tests
+name: Run DSP Tests Against dsp-test.criticalzone.org
 
 on:
   push:
