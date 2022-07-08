@@ -2,7 +2,6 @@ name: Run DSP Tests Against dsp-test.criticalzone.org
 
 on:
   push:
-    # TODO: change this to develop
     branches: [ dsp-updates ]
     paths:
       - dsp

@@ -1002,7 +1002,9 @@ class DspEarthchemTestSuite(DspTestSuite):
             self.assertEqual(
                 "Edit Submission", EditEarthchemSubmission.get_header_title(self.driver)
             )
-            check = EditEarthchemSubmission.check_required_elements(self.driver, template)
+            check = EditEarthchemSubmission.check_required_elements(
+                self.driver, template
+            )
             self.assertTrue(check)
         except Exception:
             print("\n Fails pending EC API WORK")
