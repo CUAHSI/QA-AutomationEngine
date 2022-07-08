@@ -84,6 +84,12 @@ $ ./hydrotest hydroclient --base https://www.hydroshare.org
 $ ./hydrotest hydroclient HydroclientTestSuite.test_A_000002 --base https://www.hydroshare.org
 ```
 
+To run headless (currently supported in Chrome or Firefox), add the `--headless` argument:
+```
+$ ./hydrotest hydroclient --headless
+$ ./hydrotest hydroclient HydroclientTestSuite.test_A_000002 --headless
+```
+
 ### Jenkins Deployments
 After following the README in [docker/continuous-integration/](https://github.com/CUAHSI/QA-AutomationEngine/blob/master/docker/continuous-integration/) to setup a QA automation server, the tests to run can be configured using the following configuration files:
 1) [hydroclient.conf](hydroclient/hydroclient.conf)
