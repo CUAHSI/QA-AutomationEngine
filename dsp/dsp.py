@@ -972,28 +972,46 @@ class DspEarthchemTestSuite(DspTestSuite):
     def zest_ec_000003_submit_required_fields(self):
         """Confirm successful submit of required fields for Earthchem Repo"""
         # TODO: this doesn't work yet
-        auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
-        self.login_and_autofill_earthchem_required(auto_text)
-        self.assertTrue(SubmitEarthchem.is_finishable(self.driver))
-        SubmitEarthchem.finish_submission(self.driver)
-        self.assertEqual("My Submissions", MySubmissions.get_title(self.driver))
+        try:
+            auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
+            self.login_and_autofill_earthchem_required(auto_text)
+            self.assertTrue(SubmitEarthchem.is_finishable(self.driver))
+            SubmitEarthchem.finish_submission(self.driver)
+            self.assertEqual("My Submissions", MySubmissions.get_title(self.driver))
+        except Exception:
+            print("\n Fails pending EC API WORK")
+            self.knownFailures.append(
+                [
+                    inspect.stack()[0][3],
+                    "Fails pending EC API WORK",
+                ]
+            )
 
     def zest_ec_000004_required_fields_persist(self):
         """Check that required fields persist after submit"""
         # TODO: this doesn't work yet
-        auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
-        template = self.required_elements_template(auto_text)
-        self.login_and_autofill_earthchem_required(auto_text)
-        self.assertTrue(SubmitEarthchem.is_finishable(self.driver))
-        SubmitEarthchem.finish_submission(self.driver)
+        try:
+            auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
+            template = self.required_elements_template(auto_text)
+            self.login_and_autofill_earthchem_required(auto_text)
+            self.assertTrue(SubmitEarthchem.is_finishable(self.driver))
+            SubmitEarthchem.finish_submission(self.driver)
 
-        MySubmissions.enter_text_in_search(self.driver, auto_text)
-        MySubmissions.edit_top_submission(self.driver)
-        self.assertEqual(
-            "Edit Submission", EditEarthchemSubmission.get_header_title(self.driver)
-        )
-        check = EditEarthchemSubmission.check_required_elements(self.driver, template)
-        self.assertTrue(check)
+            MySubmissions.enter_text_in_search(self.driver, auto_text)
+            MySubmissions.edit_top_submission(self.driver)
+            self.assertEqual(
+                "Edit Submission", EditEarthchemSubmission.get_header_title(self.driver)
+            )
+            check = EditEarthchemSubmission.check_required_elements(self.driver, template)
+            self.assertTrue(check)
+        except Exception:
+            print("\n Fails pending EC API WORK")
+            self.knownFailures.append(
+                [
+                    inspect.stack()[0][3],
+                    "Fails pending EC API WORK",
+                ]
+            )
 
 
 if __name__ == "__main__":
