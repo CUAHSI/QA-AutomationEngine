@@ -333,7 +333,6 @@ class GeneralSubmitToRepo(Dsp, RepoAuthWindow):
     )
     instructions = SiteElement(By.CSS_SELECTOR, "#instructions")
 
-    # required_elements = SiteElementsCollection(By.CSS_SELECTOR, "input[required='required']")
     # required_elements = SiteElementsCollection(By.CSS_SELECTOR, "input[data-id$="*")
 
     bottom_save = SiteElement(
@@ -384,7 +383,10 @@ class GeneralSubmitToRepo(Dsp, RepoAuthWindow):
 
     @classmethod
     def get_did_in_section(self, section=None, data_id="", nth=0):
-        selector = f':is(fieldset, div)[data-id*="{section}"] [data-id*="{data_id}"]:nth-of-type({nth+1})'
+        selector = (
+            f':is(fieldset, div)[data-id*="{section}"]'
+            f' [data-id*="{data_id}"]:nth-of-type({nth+1})'
+        )
         return SiteElement(By.CSS_SELECTOR, selector)
 
     @classmethod
@@ -430,9 +432,15 @@ class GeneralSubmitToRepo(Dsp, RepoAuthWindow):
         try:
             if section and nth is not None:
                 if array:
-                    selector = f'[data-id*="{section}"] .array-list-item:nth-of-type({nth+1}) [data-id*="{data_id}"]'
+                    selector = (
+                        f'[data-id*="{section}"] .array-list-item:nth-of-type({nth+1})'
+                        f' [data-id*="{data_id}"]'
+                    )
                 else:
-                    selector = f'[data-id*="{section}"] [data-id*="{data_id}"]:nth-of-type({nth+1})'
+                    selector = (
+                        f'[data-id*="{section}"]'
+                        f' [data-id*="{data_id}"]:nth-of-type({nth+1})'
+                    )
                 element = SiteElement(By.CSS_SELECTOR, selector)
             else:
                 element = SiteElement(
@@ -453,8 +461,8 @@ class GeneralSubmitToRepo(Dsp, RepoAuthWindow):
                 element.submit_hidden(driver)
         else:
             print(
-                f'\nAttempt to fill element {data_id} in section {section} failed. Not in DOM \
-                \nSelector used="{selector}"'
+                f"\nAttempt to fill element {data_id} in section {section} failed. Not"
+                f' in DOM                 \nSelector used="{selector}"'
             )
             return False
         return True
@@ -473,8 +481,8 @@ class GeneralSubmitToRepo(Dsp, RepoAuthWindow):
             element.submit(driver)
         else:
             print(
-                f'\nAttempt to fill element {did} in section {section} failed. Not in DOM \
-                \nSelector used="{selector}"'
+                f"\nAttempt to fill element {did} in section {section} failed. Not in"
+                f' DOM                 \nSelector used="{selector}"'
             )
             return False
         return True
@@ -485,7 +493,8 @@ class GeneralSubmitToRepo(Dsp, RepoAuthWindow):
     ):
         input = SiteElement(
             By.CSS_SELECTOR,
-            f'fieldset[data-id*="{container_id}"] .v-select__selections input[data-id*="{input_id}"]',
+            f'fieldset[data-id*="{container_id}"] .v-select__selections'
+            f' input[data-id*="{input_id}"]',
         )
         input.javascript_click_hidden(driver)
         if isinstance(values, str):
@@ -500,7 +509,8 @@ class GeneralSubmitToRepo(Dsp, RepoAuthWindow):
     def unfill_v_multi_select(self, driver, container_id, input_id):
         input = SiteElement(
             By.CSS_SELECTOR,
-            f'fieldset[data-id*="{container_id}"] .v-select__selections input[data-id*="{input_id}"]',
+            f'fieldset[data-id*="{container_id}"] .v-select__selections'
+            f' input[data-id*="{input_id}"]',
         )
         input.javascript_click_hidden(driver)
         input.clear_all_text(driver)
@@ -524,9 +534,15 @@ class GeneralSubmitToRepo(Dsp, RepoAuthWindow):
         try:
             if section and nth is not None:
                 if array:
-                    selector = f'[data-id*="{section}"] .array-list-item:nth-of-type({nth+1}) [data-id*="{data_id}"]'
+                    selector = (
+                        f'[data-id*="{section}"] .array-list-item:nth-of-type({nth+1})'
+                        f' [data-id*="{data_id}"]'
+                    )
                 else:
-                    selector = f'[data-id*="{section}"] [data-id*="{data_id}"]:nth-of-type({nth+1})'
+                    selector = (
+                        f'[data-id*="{section}"]'
+                        f' [data-id*="{data_id}"]:nth-of-type({nth+1})'
+                    )
                 element = SiteElement(By.CSS_SELECTOR, selector)
             else:
                 element = SiteElement(
@@ -600,10 +616,16 @@ class GeneralEditSubmission(Dsp):
                 # not a v-multi-select
                 if section and nth is not None:
                     if array:
-                        selector = f':is(fieldset, div)[data-id*="{section}"] .array-list-item:nth-of-type({nth+1}) [data-id*="{k}"]'
+                        selector = (
+                            f':is(fieldset, div)[data-id*="{section}"]'
+                            f' .array-list-item:nth-of-type({nth+1}) [data-id*="{k}"]'
+                        )
                         elem = SiteElement(By.CSS_SELECTOR, selector)
                     else:
-                        selector = f':is(fieldset, div)[data-id*="{section}"] [data-id*="{k}"]:nth-of-type({nth+1})'
+                        selector = (
+                            f':is(fieldset, div)[data-id*="{section}"]'
+                            f' [data-id*="{k}"]:nth-of-type({nth+1})'
+                        )
                         elem = SiteElement(By.CSS_SELECTOR, selector)
                 else:
                     selector = f'[data-id*="{k}"]:nth-of-type(1)'
@@ -613,12 +635,15 @@ class GeneralEditSubmission(Dsp):
                 if value != v:
                     if value.strip() == v:
                         print(
-                            f"\nWARNING: while checking field: |{k}|.\nExpected: |{v}|\nBut got : |{value}| \
-                        \nWhitespace will be ignored and this field considered valid"
+                            f"\nWARNING: while checking field: |{k}|.\nExpected:"
+                            f" |{v}|\nBut got : |{value}|                        "
+                            " \nWhitespace will be ignored and this field considered"
+                            " valid"
                         )
                     else:
                         print(
-                            f"\nMismatch when checking field: |{k}|.\nExpected |{v}| got |{value}|"
+                            f"\nMismatch when checking field: |{k}|.\nExpected |{v}|"
+                            f" got |{value}|"
                         )
                         print(f"\nSelector used: {selector}")
                         return False
@@ -626,7 +651,8 @@ class GeneralEditSubmission(Dsp):
 
     @classmethod
     def check_required_elements(self, driver, required_elements):
-        """Unless otherwise defined, Editsubmission pages should check required fields by dict"""
+        """Unless otherwise defined, Editsubmission pages should check required fields
+        by dict"""
         for section, dict_to_check in required_elements.items():
             return self.check_inputs_by_data_ids(
                 driver, dict=dict_to_check, section=section, nth=0
@@ -695,11 +721,20 @@ class SubmitHydroshare(GeneralSubmitToRepo):
     def fill_related_resources(self, driver, relation_type, value, n):
         self.expand_section_by_did(driver, "Relatedresources")
 
-        sel = f':is(fieldset, div)[data-id*="Relatedresources"] input[data-id*="RelationType"]:nth-of-type({n+1})'
+        sel = (
+            ':is(fieldset, div)[data-id*="Relatedresources"]'
+            f' input[data-id*="RelationType"]:nth-of-type({n+1})'
+        )
         relation_type_input = SiteElement(By.CSS_SELECTOR, sel)
-        sel = f':is(fieldset, div)[data-id*="Relatedresources"] input[data-id*="Value"]:nth-of-type({n+1})'
+        sel = (
+            ':is(fieldset, div)[data-id*="Relatedresources"]'
+            f' input[data-id*="Value"]:nth-of-type({n+1})'
+        )
         related_resources_value = SiteElement(By.CSS_SELECTOR, sel)
-        sel = f':is(fieldset, div)[data-id*="Relatedresources"] div.v-select:nth-of-type({n+1})'
+        sel = (
+            ':is(fieldset, div)[data-id*="Relatedresources"]'
+            f" div.v-select:nth-of-type({n+1})"
+        )
         relation_type_container = SiteElement(By.CSS_SELECTOR, sel)
 
         relation_type_container.scroll_to(driver)
@@ -751,7 +786,10 @@ class EditHSSubmission(SubmitHydroshare, GeneralEditSubmission):
 
     @classmethod
     def get_nth_relation_type(self, driver, n):
-        sel = f':is(fieldset, div)[data-id*="Relatedresources"] .array-list-item:nth-of-type({n+1}) input[data-id*="RelationType"]'
+        sel = (
+            ':is(fieldset, div)[data-id*="Relatedresources"]'
+            f' .array-list-item:nth-of-type({n+1}) input[data-id*="RelationType"]'
+        )
         relation_type_input = SiteElement(By.CSS_SELECTOR, sel)
         return relation_type_input.get_texts_from_xpath(driver, "./preceding::div[1]")
 

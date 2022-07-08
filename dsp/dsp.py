@@ -71,7 +71,7 @@ class DspTestSuite(BaseTestSuite):
                     """
 
             ======================================================================
-            KNOWN FAILED TESTS: 
+            KNOWN FAILED TESTS:
             The following tests failed, but each has a pending issue slated in GH.
             """
                 )
@@ -79,7 +79,7 @@ class DspTestSuite(BaseTestSuite):
             for failure in cls.knownFailures:
                 print(f"{failure[0]}: {failure[1]}")
             print(
-                "----------------------------------------------------------------------\n"
+                "--------------------------------------------------------------------\n"
             )
 
     def login_orcid(self):
@@ -186,7 +186,8 @@ class DspHydroshareTestSuite(DspTestSuite):
                     reversed = True
                     ns.insert(0, nth)
                     print(
-                        f"\n Array items were reversed during this test {inspect.stack()[0][3]}"
+                        "\n Array items were reversed during this test"
+                        f" {inspect.stack()[0][3]}"
                     )
             else:
                 self.check(section, nth, dicts.pop(), array)
@@ -259,7 +260,8 @@ class DspHydroshareTestSuite(DspTestSuite):
         """
         Confirm that CREATOR is populated from HS profile
 
-        Completing a submission to HS should cause the 'creator' field to be populated with info from HS profile
+        Completing a submission to HS should cause the 'creator' field to be populated
+        with info from HS profile
         """
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
         self.login_and_autofill_hs_required(auto_text)
@@ -272,7 +274,9 @@ class DspHydroshareTestSuite(DspTestSuite):
         dict = {
             "Name": "Meister, Jim",
             # "Phone": "4444444444", phone is no longer showing up on beta HS
-            "Organization": "Freie Universität Berlin;Agricultural University of Warsaw",
+            "Organization": (
+                "Freie Universität Berlin;Agricultural University of Warsaw"
+            ),
             "Email": "concretejackbill@gmail.com",
         }
         match = EditHSSubmission.check_inputs_by_data_ids(
@@ -432,7 +436,8 @@ class DspHydroshareTestSuite(DspTestSuite):
         """
         Confirm that invalid Spatial Box Coverage info doesn't submit
 
-        Attempts to submit Box Coverage that doesn't make geographic sense and ensures that the invalid info is not accepted
+        Attempts to submit Box Coverage that doesn't make geographic sense and ensures
+        that the invalid info is not accepted
         """
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
         self.login_and_autofill_hs_required(auto_text)
@@ -458,7 +463,8 @@ class DspHydroshareTestSuite(DspTestSuite):
             # TODO: this test fails pending issue:
             # Ignoring for now, because HS accepts these invalid bounds
             print(
-                "\n Known failure pending https://github.com/cznethub/dspfront/issues/55"
+                "\n Known failure pending"
+                " https://github.com/cznethub/dspfront/issues/55"
             )
             self.knownFailures.append(
                 [
@@ -543,7 +549,9 @@ class DspHydroshareTestSuite(DspTestSuite):
         self.check_array_fieldset_unknown_order(section, ns, dicts, array)
 
     def test_hs_000019_multiple_metadata_persists(self):
-        """Confirm that multiple Additional Metadata info persists from submit to edit"""
+        """
+        Confirm that multiple Additional Metadata info persists from submit to edit
+        """
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
         self.login_and_autofill_hs_required(auto_text)
         section = "Additionalmetadata"
@@ -585,7 +593,6 @@ class DspHydroshareTestSuite(DspTestSuite):
 
         self.submit(auto_text)
 
-        reversed = False
         for nth in ns:
             relation = EditHSSubmission.get_nth_relation_type(self.driver, nth)
             self.assertEqual(relation.pop(), dicts[nth].pop("RelationType"))
@@ -640,7 +647,9 @@ class DspExternalTestSuite(DspTestSuite):
         }
         creator = {
             "Name": "Meister, Jim",
-            "Organization": "Freie Universität Berlin;Agricultural University of Warsaw",
+            "Organization": (
+                "Freie Universität Berlin;Agricultural University of Warsaw"
+            ),
             "Email": "concretejackbill@gmail.com",
             "ORCID": "0000-0003-0813-0443",
         }
