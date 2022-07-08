@@ -1,26 +1,12 @@
-from importlib import import_module
-import json
-from multiprocessing.dummy import Array
-import os
-import re
-import requests
 import time
 
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import TimeoutException
-from dateutil import parser
-from urllib.request import urlretrieve, urlopen
-from datetime import datetime
 
-from cuahsi_base.site_element import SiteElement, SiteElementsCollection
+from cuahsi_base.site_element import SiteElement
 from cuahsi_base.utils import External, TestSystem
 
-from config import BASE_URL
-
 from timing import (
-    EXTERNAL_PAGE_LOAD,
-    KEYS_RESPONSE,
     MY_SUBMISSIONS_LOAD,
     RETURN_PREVIOUS,
     AUTH_WINDOW,
@@ -87,12 +73,16 @@ class Dsp(WebPage):
     @classmethod
     def to_my_submissions(self, driver):
         self.navigation_my_submissions.click(driver)
-        self.wait_until_element_visible(driver, MySubmissions.title, MY_SUBMISSIONS_LOAD)
+        self.wait_until_element_visible(
+            driver, MySubmissions.title, MY_SUBMISSIONS_LOAD
+        )
 
     @classmethod
     def drawer_to_my_submissions(self, driver):
         self.drawer_nav_my_submissions.click(driver)
-        self.wait_until_element_visible(driver, MySubmissions.title, MY_SUBMISSIONS_LOAD)
+        self.wait_until_element_visible(
+            driver, MySubmissions.title, MY_SUBMISSIONS_LOAD
+        )
 
     @classmethod
     def drawer_to_submit(self, driver):
@@ -183,7 +173,8 @@ class Dsp(WebPage):
 
 
 class OrcidWindow(WebPage):
-    """ Orcid window"""
+    """Orcid window"""
+
     username = SiteElement(By.ID, "username")
     password = SiteElement(By.ID, "password")
     submit = SiteElement(By.ID, "signin-button")
@@ -196,7 +187,8 @@ class OrcidWindow(WebPage):
 
 
 class HydroshareAuthWindow(WebPage):
-    """ Authentication window to use Hydroshare as Backend """
+    """Authentication window to use Hydroshare as Backend"""
+
     username = SiteElement(By.ID, "id_username")
     password = SiteElement(By.ID, "id_password")
     submit = SiteElement(By.CSS_SELECTOR, ".account-form .btn-primary")
@@ -211,7 +203,8 @@ class HydroshareAuthWindow(WebPage):
 
 
 class ZenodoAuthWindow(WebPage):
-    """ Authentication window to use Zenodo as Backend """
+    """Authentication window to use Zenodo as Backend"""
+
     github_button = SiteElement(By.CSS_SELECTOR, '.social-signup .btn[href*="github"]')
     orcid_button = SiteElement(By.CSS_SELECTOR, '.social-signup .btn[href*="orcid"]')
     email = SiteElement(By.ID, "email")
@@ -236,7 +229,8 @@ class ZenodoAuthWindow(WebPage):
 
 
 class EarthchemAuthWindow(WebPage):
-    """ Authentication window to use Earthchem as Backend """
+    """Authentication window to use Earthchem as Backend"""
+
     github_button = SiteElement(By.CSS_SELECTOR, '.social-signup .btn[href*="github"]')
     orcid_button = SiteElement(By.ID, "social-orcid")
     username = SiteElement(By.ID, "username")
@@ -256,7 +250,8 @@ class EarthchemAuthWindow(WebPage):
 
 
 class MySubmissions(Dsp):
-    """ Page displaying users submissions """
+    """Page displaying users submissions"""
+
     title = SiteElement(By.CSS_SELECTOR, ".text-h4:nth-of-type(1)")
     total_submissions = SiteElement(By.ID, "total_submissions")
     top_submission = SiteElement(By.ID, "submission-0")
@@ -294,7 +289,9 @@ class MySubmissions(Dsp):
 
 class RepoAuthWindow(WebPage):
     submit_to_repo_modal = SiteElement(By.CSS_SELECTOR, ".v-dialog div.cz-authorize")
-    submit_to_repo_authorize = SiteElement(By.CSS_SELECTOR, ".cz-authorize button.primary")
+    submit_to_repo_authorize = SiteElement(
+        By.CSS_SELECTOR, ".cz-authorize button.primary"
+    )
 
     @classmethod
     def to_repo_auth_window(self, driver):
@@ -305,7 +302,7 @@ class RepoAuthWindow(WebPage):
 
 
 class SubmitLandingPage(Dsp, RepoAuthWindow):
-    """ Page containing options for submitting data """
+    """Page containing options for submitting data"""
 
     @classmethod
     def select_repo_by_id(self, driver, id):
@@ -315,7 +312,9 @@ class SubmitLandingPage(Dsp, RepoAuthWindow):
 
     @classmethod
     def select_nth_repo(self, driver, n):
-        repo_card = SiteElement(By.CSS_SELECTOR, f'div.repositories div.v-card:nth-of-type({n+1})')
+        repo_card = SiteElement(
+            By.CSS_SELECTOR, f"div.repositories div.v-card:nth-of-type({n+1})"
+        )
         repo_card.scroll_to(driver)
         repo_card.click(driver)
 
@@ -329,14 +328,20 @@ class SubmitLandingPage(Dsp, RepoAuthWindow):
 class GeneralSubmitToRepo(Dsp, RepoAuthWindow):
     header = SiteElement(By.CSS_SELECTOR, ".cz-new-submission h1")
     alert = SiteElement(By.CSS_SELECTOR, ".v-alert .v-alert__content")
-    top_save = SiteElement(By.CSS_SELECTOR, "#cz-new-submission-actions-top button.submission-save")
+    top_save = SiteElement(
+        By.CSS_SELECTOR, "#cz-new-submission-actions-top button.submission-save"
+    )
     instructions = SiteElement(By.CSS_SELECTOR, "#instructions")
 
     # required_elements = SiteElementsCollection(By.CSS_SELECTOR, "input[required='required']")
     # required_elements = SiteElementsCollection(By.CSS_SELECTOR, "input[data-id$="*")
 
-    bottom_save = SiteElement(By.CSS_SELECTOR, "#cz-new-submission-actions-bottom button.submission-save")
-    bottom_finish = SiteElement(By.CSS_SELECTOR, "#cz-new-submission-actions-bottom button.submission-finish")
+    bottom_save = SiteElement(
+        By.CSS_SELECTOR, "#cz-new-submission-actions-bottom button.submission-save"
+    )
+    bottom_finish = SiteElement(
+        By.CSS_SELECTOR, "#cz-new-submission-actions-bottom button.submission-finish"
+    )
 
     @classmethod
     def get_header_text(self, driver):
@@ -365,8 +370,10 @@ class GeneralSubmitToRepo(Dsp, RepoAuthWindow):
     @classmethod
     def is_finishable(self, driver):
         self.bottom_finish.scroll_to_hidden(driver)
-        finishable = self.bottom_finish.get_attribute_hidden(driver, "disabled") is None \
+        finishable = (
+            self.bottom_finish.get_attribute_hidden(driver, "disabled") is None
             or self.bottom_finish.get_attribute_hidden(driver, "disabled") != "disabled"
+        )
         return finishable
 
     @classmethod
@@ -387,7 +394,9 @@ class GeneralSubmitToRepo(Dsp, RepoAuthWindow):
 
     @classmethod
     def expand_section_by_did(self, driver, data_id):
-        element = SiteElement(By.CSS_SELECTOR, f':is(fieldset, div)[data-id*="{data_id}"] legend')
+        element = SiteElement(
+            By.CSS_SELECTOR, f':is(fieldset, div)[data-id*="{data_id}"] legend'
+        )
         if not element.exists_in_dom(driver):
             # print(f"\n Ignoring attempt to expand static section: {data_id}")
             return False
@@ -396,7 +405,9 @@ class GeneralSubmitToRepo(Dsp, RepoAuthWindow):
 
     @classmethod
     def add_form_array_item_by_did(self, driver, data_id):
-        element = SiteElement(By.CSS_SELECTOR, f'div[data-id*="{data_id}"] button:first-of-type')
+        element = SiteElement(
+            By.CSS_SELECTOR, f'div[data-id*="{data_id}"] button:first-of-type'
+        )
         if not element.exists_in_dom(driver):
             # print(f"\n Ignoring attempt to expand static section: {data_id}")
             return False
@@ -413,7 +424,9 @@ class GeneralSubmitToRepo(Dsp, RepoAuthWindow):
         return True
 
     @classmethod
-    def fill_input_by_data_id(self, driver, data_id, value, section=None, nth=0, array=False):
+    def fill_input_by_data_id(
+        self, driver, data_id, value, section=None, nth=0, array=False
+    ):
         try:
             if section and nth is not None:
                 if array:
@@ -422,21 +435,27 @@ class GeneralSubmitToRepo(Dsp, RepoAuthWindow):
                     selector = f'[data-id*="{section}"] [data-id*="{data_id}"]:nth-of-type({nth+1})'
                 element = SiteElement(By.CSS_SELECTOR, selector)
             else:
-                element = SiteElement(By.CSS_SELECTOR, f'[data-id*="{data_id}"]:nth-of-type(1)')
+                element = SiteElement(
+                    By.CSS_SELECTOR, f'[data-id*="{data_id}"]:nth-of-type(1)'
+                )
         except TimeoutException as e:
             print(f"{e}\nElement not found for key: {data_id}")
             return False
         if element.exists_in_dom(driver):
             if isinstance(value, list):
                 # assume this is a v-multi-select
-                self.fill_v_multi_select(driver, container_id=section, input_id=data_id, values=value)
+                self.fill_v_multi_select(
+                    driver, container_id=section, input_id=data_id, values=value
+                )
             else:
                 element.javascript_click(driver)
                 element.inject_text(driver, value)
                 element.submit_hidden(driver)
         else:
-            print(f'\nAttempt to fill element {data_id} in section {section} failed. Not in DOM \
-                \nSelector used="{selector}"')
+            print(
+                f'\nAttempt to fill element {data_id} in section {section} failed. Not in DOM \
+                \nSelector used="{selector}"'
+            )
             return False
         return True
 
@@ -453,14 +472,21 @@ class GeneralSubmitToRepo(Dsp, RepoAuthWindow):
             element.inject_text(driver, value)
             element.submit(driver)
         else:
-            print(f'\nAttempt to fill element {did} in section {section} failed. Not in DOM \
-                \nSelector used="{selector}"')
+            print(
+                f'\nAttempt to fill element {did} in section {section} failed. Not in DOM \
+                \nSelector used="{selector}"'
+            )
             return False
         return True
 
     @classmethod
-    def fill_v_multi_select(self, driver, container_id, input_id, values=["default_value"]):
-        input = SiteElement(By.CSS_SELECTOR, f'fieldset[data-id*="{container_id}"] .v-select__selections input[data-id*="{input_id}"]')
+    def fill_v_multi_select(
+        self, driver, container_id, input_id, values=["default_value"]
+    ):
+        input = SiteElement(
+            By.CSS_SELECTOR,
+            f'fieldset[data-id*="{container_id}"] .v-select__selections input[data-id*="{input_id}"]',
+        )
         input.javascript_click_hidden(driver)
         if isinstance(values, str):
             input.inject_text(driver, values)
@@ -472,14 +498,19 @@ class GeneralSubmitToRepo(Dsp, RepoAuthWindow):
 
     @classmethod
     def unfill_v_multi_select(self, driver, container_id, input_id):
-        input = SiteElement(By.CSS_SELECTOR, f'fieldset[data-id*="{container_id}"] .v-select__selections input[data-id*="{input_id}"]')
+        input = SiteElement(
+            By.CSS_SELECTOR,
+            f'fieldset[data-id*="{container_id}"] .v-select__selections input[data-id*="{input_id}"]',
+        )
         input.javascript_click_hidden(driver)
         input.clear_all_text(driver)
 
     @classmethod
     def get_tab(self, section=None, tab_number=1):
         # tab index is off by 1 because one hidden?
-        selector = f'fieldset[data-id*="{section}"] .v-tabs .v-tab:nth-of-type({tab_number+1})'
+        selector = (
+            f'fieldset[data-id*="{section}"] .v-tabs .v-tab:nth-of-type({tab_number+1})'
+        )
         return SiteElement(By.CSS_SELECTOR, selector)
 
     @classmethod
@@ -498,7 +529,9 @@ class GeneralSubmitToRepo(Dsp, RepoAuthWindow):
                     selector = f'[data-id*="{section}"] [data-id*="{data_id}"]:nth-of-type({nth+1})'
                 element = SiteElement(By.CSS_SELECTOR, selector)
             else:
-                element = SiteElement(By.CSS_SELECTOR, f'[data-id*="{data_id}"]:nth-of-type(1)')
+                element = SiteElement(
+                    By.CSS_SELECTOR, f'[data-id*="{data_id}"]:nth-of-type(1)'
+                )
         except TimeoutException as e:
             print(f"{e}\nElement not found for key: {data_id}")
             return False
@@ -539,10 +572,12 @@ class GeneralEditSubmission(Dsp):
                 print(f"\nMismatch when checking field: {k}. Expected {v} got {value}")
                 return False
         return True
-    
+
     @classmethod
     def expand_section_by_did(self, driver, data_id):
-        element = SiteElement(By.CSS_SELECTOR, f':is(fieldset, div)[data-id*="{data_id}"] legend')
+        element = SiteElement(
+            By.CSS_SELECTOR, f':is(fieldset, div)[data-id*="{data_id}"] legend'
+        )
         if not element.exists_in_dom(driver):
             # print(f"\n Ignoring attempt to expand static section: {data_id}")
             return False
@@ -555,7 +590,9 @@ class GeneralEditSubmission(Dsp):
         for k, v in dict.items():
             if isinstance(v, list):
                 # assume this is a v-multi-select
-                check = self.check_v_multi_select(driver, container_id=section, input_id=k, values=v)
+                check = self.check_v_multi_select(
+                    driver, container_id=section, input_id=k, values=v
+                )
                 if not check:
                     print(f"\nMismatch when checking field: |{k}|. Expected |{v}|.")
                     return False
@@ -575,10 +612,14 @@ class GeneralEditSubmission(Dsp):
                 value = elem.get_value(driver)
                 if value != v:
                     if value.strip() == v:
-                        print(f"\nWARNING: while checking field: |{k}|.\nExpected: |{v}|\nBut got : |{value}| \
-                        \nWhitespace will be ignored and this field considered valid")
+                        print(
+                            f"\nWARNING: while checking field: |{k}|.\nExpected: |{v}|\nBut got : |{value}| \
+                        \nWhitespace will be ignored and this field considered valid"
+                        )
                     else:
-                        print(f"\nMismatch when checking field: |{k}|.\nExpected |{v}| got |{value}|")
+                        print(
+                            f"\nMismatch when checking field: |{k}|.\nExpected |{v}| got |{value}|"
+                        )
                         print(f"\nSelector used: {selector}")
                         return False
         return True
@@ -587,12 +628,19 @@ class GeneralEditSubmission(Dsp):
     def check_required_elements(self, driver, required_elements):
         """Unless otherwise defined, Editsubmission pages should check required fields by dict"""
         for section, dict_to_check in required_elements.items():
-            return self.check_inputs_by_data_ids(driver, dict=dict_to_check, section=section, nth=0)
+            return self.check_inputs_by_data_ids(
+                driver, dict=dict_to_check, section=section, nth=0
+            )
 
     @classmethod
     def get_v_multi_select_vals(self, driver, container_id, input_id):
-        input = SiteElement(By.CSS_SELECTOR, f'fieldset[data-id*="{container_id}"] input[data-id*="{input_id}"]')
-        values = input.get_texts_from_xpath(driver, './preceding-sibling::*/span[contains(@class, "v-chip__content")]')
+        input = SiteElement(
+            By.CSS_SELECTOR,
+            f'fieldset[data-id*="{container_id}"] input[data-id*="{input_id}"]',
+        )
+        values = input.get_texts_from_xpath(
+            driver, './preceding-sibling::*/span[contains(@class, "v-chip__content")]'
+        )
         return values
 
     @classmethod
@@ -613,17 +661,28 @@ class GeneralEditSubmission(Dsp):
 
 
 class SubmitHydroshare(GeneralSubmitToRepo):
-    """ Page containing forms for submitting data with HS backend"""
+    """Page containing forms for submitting data with HS backend"""
 
     # Basic info
-    title = SiteElement(By.CSS_SELECTOR, '[data-id*="BasicInformation"] input[data-id*="Title"]')
+    title = SiteElement(
+        By.CSS_SELECTOR, '[data-id*="BasicInformation"] input[data-id*="Title"]'
+    )
     abstract = SiteElement(By.ID, "#/properties/abstract-input")
-    subject_keyword_container = SiteElement(By.CSS_SELECTOR, '[data-id="group-BasicInformation"] .v-select__selections')
+    subject_keyword_container = SiteElement(
+        By.CSS_SELECTOR, '[data-id="group-BasicInformation"] .v-select__selections'
+    )
 
     # Temporal
-    temporal_name_input = SiteElement(By.CSS_SELECTOR, ':is(fieldset, div)[data-id*="Temporalcoverage"] input[data-id*="Name"]')
-    start_input = SiteElement(By.CSS_SELECTOR, '[data-id*="Temporalcoverage"] input[data-id*="Start"]')
-    end_input = SiteElement(By.CSS_SELECTOR, '[data-id*="Temporalcoverage"] input[data-id*="End"]')
+    temporal_name_input = SiteElement(
+        By.CSS_SELECTOR,
+        ':is(fieldset, div)[data-id*="Temporalcoverage"] input[data-id*="Name"]',
+    )
+    start_input = SiteElement(
+        By.CSS_SELECTOR, '[data-id*="Temporalcoverage"] input[data-id*="Start"]'
+    )
+    end_input = SiteElement(
+        By.CSS_SELECTOR, '[data-id*="Temporalcoverage"] input[data-id*="End"]'
+    )
 
     # Funding agency
     agency_name = SiteElement(By.ID, "#/properties/funding_agency_name-input")
@@ -652,47 +711,55 @@ class SubmitHydroshare(GeneralSubmitToRepo):
 
 
 class SubmitExternal(GeneralSubmitToRepo):
-    """ Page containing forms for submitting data with EXTERNAL backend"""
+    """Page containing forms for submitting data with EXTERNAL backend"""
+
     pass
 
 
 class SubmitZenodo(GeneralSubmitToRepo):
-    """ Page containing forms for submitting data with Zenodo backend"""
+    """Page containing forms for submitting data with Zenodo backend"""
+
     pass
 
 
 class EditExternalSubmission(SubmitHydroshare, GeneralEditSubmission):
-    """ Page containing forms for editing existing submission with Zenodo backend"""
+    """Page containing forms for editing existing submission with Zenodo backend"""
+
     pass
 
 
 class EditZenodoSubmission(SubmitHydroshare, GeneralEditSubmission):
-    """ Page containing forms for editing existing submission with Zenodo backend"""
+    """Page containing forms for editing existing submission with Zenodo backend"""
+
     pass
 
 
 class SubmitEarthchem(GeneralSubmitToRepo):
-    """ Page containing forms for submitting data with Earthchem backend"""
+    """Page containing forms for submitting data with Earthchem backend"""
+
     pass
 
 
 class EditEarthchemSubmission(SubmitHydroshare, GeneralEditSubmission):
-    """ Page containing forms for editing existing submission with Earthchem backend"""
+    """Page containing forms for editing existing submission with Earthchem backend"""
+
     pass
 
 
 class EditHSSubmission(SubmitHydroshare, GeneralEditSubmission):
-    """ Page containing forms for editing existing submission with Hydroshare backend"""
+    """Page containing forms for editing existing submission with Hydroshare backend"""
 
     @classmethod
     def get_nth_relation_type(self, driver, n):
         sel = f':is(fieldset, div)[data-id*="Relatedresources"] .array-list-item:nth-of-type({n+1}) input[data-id*="RelationType"]'
         relation_type_input = SiteElement(By.CSS_SELECTOR, sel)
-        return relation_type_input.get_texts_from_xpath(driver, './preceding::div[1]')
+        return relation_type_input.get_texts_from_xpath(driver, "./preceding::div[1]")
 
     @classmethod
     def get_keywords(self, driver):
-        return self.get_v_multi_select_vals(driver, "BasicInformation", "Subjectkeywords")
+        return self.get_v_multi_select_vals(
+            driver, "BasicInformation", "Subjectkeywords"
+        )
 
     @classmethod
     def check_keywords(self, driver, keywords=None):
