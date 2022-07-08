@@ -86,7 +86,7 @@ $ ./hydrotest hydroclient HydroclientTestSuite.test_A_000002 --base https://www.
 
 To run headless (currently supported in Chrome or Firefox), add the `--headless` argument:
 ```
-$ ./hydrotest hydroclient --base https://www.hydroshare.org
+$ ./hydrotest hydroclient --headless
 $ ./hydrotest hydroclient HydroclientTestSuite.test_A_000002 --headless
 ```
 
