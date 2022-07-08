@@ -75,7 +75,9 @@ jobs:
 
       - name: Check whether passing
         working-directory: output
-        run: if grep -rl "FAILED (" . >/dev/null; then grep -rh "FAIL:" . && exit 1; else grep -rh "^Ran [0-9]* test in [0-9]*\.*[0-9]*s$\n\n^OK" .; fi
+        run: |
+          grep -rh "ERROR:" .
+          if grep -rl "FAILED (" . >/dev/null; then grep -rh "FAIL:" . && exit 1; else grep -rh "^Ran [0-9]* test in [0-9]*\.*[0-9]*s$\n\n^OK" .; fi
 
       - name: Archive test results
         uses: actions/upload-artifact@v3
