@@ -1,5 +1,4 @@
 """ Runs various smoke tests for the data submission portal """
-import inspect
 import time
 import unittest
 
