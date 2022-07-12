@@ -894,7 +894,6 @@ class DspZenodoTestSuite(DspTestSuite):
             self.driver, self.required_elements_template(auto_text)
         )
 
-    @unittest.skip("Fails pending https://github.com/cznethub/dspfront/issues/57")
     def test_ze_000001_orcid_then_submit(self):
         """Check authentication with Orcid, then navigate to submit page"""
         self.login_orcid_to_submit()
@@ -954,11 +953,17 @@ class DspEarthchemTestSuite(DspTestSuite):
             "DataTypes": ["Chemistry"],
             "Keywords": [auto_text + " Keywords"],
         }
+        lead_author = {
+            "FirstName": auto_text + "FirstName",
+            "LastName": auto_text + "LastName",
+            "Email": f"{auto_text}@gmail.com",
+        }
         spatial = {"SpatialCoverage": ["Global"]}
 
         required_elements = {
             "group-BasicInformation": basic_info,
             "SpatialCoverageInformation": spatial,
+            "LeadAuthor": lead_author
         }
         return required_elements
 
@@ -1070,6 +1075,7 @@ class DspEarthchemTestSuite(DspTestSuite):
         check = EditEarthchemSubmission.check_required_elements(self.driver, template)
         self.assertTrue(check)
 
+    @unittest.skip("Lead Author became a required field so is tested elsewhere")
     def test_ec_000005_lead_author_persists(self):
         """Confirm that Lead Author info persists from submit to edit"""
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
