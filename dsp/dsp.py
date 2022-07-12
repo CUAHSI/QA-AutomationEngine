@@ -140,6 +140,7 @@ class DspHydroshareTestSuite(DspTestSuite):
     def submit(self, sort_text):
         SubmitHydroshare.finish_submission(self.driver)
 
+        self.assertEqual("My Submissions", MySubmissions.get_title(self.driver))
         MySubmissions.enter_text_in_search(self.driver, sort_text)
         MySubmissions.edit_top_submission(self.driver)
 
@@ -158,10 +159,7 @@ class DspHydroshareTestSuite(DspTestSuite):
                 except AssertionError:
                     reversed = True
                     ns.insert(0, nth)
-                    print(
-                        "\n Array items were reversed during this test"
-                        f" {inspect.stack()[0][3]}"
-                    )
+                    print("\n Array items were reversed during this test")
             else:
                 self.check(section, nth, dicts.pop(), array)
 
@@ -197,8 +195,8 @@ class DspHydroshareTestSuite(DspTestSuite):
         SubmitHydroshare.autofill_required_elements(self.driver, template)
         self.assertTrue(SubmitHydroshare.is_finishable(self.driver))
         SubmitHydroshare.finish_submission(self.driver)
-        self.assertEqual("My Submissions", MySubmissions.get_title(self.driver))
 
+        self.assertEqual("My Submissions", MySubmissions.get_title(self.driver))
         MySubmissions.enter_text_in_search(self.driver, auto_text)
 
         MySubmissions.edit_top_submission(self.driver)
@@ -240,6 +238,7 @@ class DspHydroshareTestSuite(DspTestSuite):
         self.login_and_autofill_hs_required(auto_text)
         SubmitHydroshare.finish_submission(self.driver)
 
+        self.assertEqual("My Submissions", MySubmissions.get_title(self.driver))
         MySubmissions.enter_text_in_search(self.driver, auto_text)
         MySubmissions.edit_top_submission(self.driver)
         section = "Creators"
@@ -265,6 +264,7 @@ class DspHydroshareTestSuite(DspTestSuite):
         self.assertTrue(SubmitHydroshare.is_finishable(self.driver))
         SubmitHydroshare.finish_submission(self.driver)
 
+        self.assertEqual("My Submissions", MySubmissions.get_title(self.driver))
         MySubmissions.enter_text_in_search(self.driver, auto_text)
         MySubmissions.edit_top_submission(self.driver)
         self.assertEqual(
@@ -290,6 +290,7 @@ class DspHydroshareTestSuite(DspTestSuite):
         self.assertTrue(success_filling)
         SubmitHydroshare.finish_submission(self.driver)
 
+        self.assertEqual("My Submissions", MySubmissions.get_title(self.driver))
         MySubmissions.enter_text_in_search(self.driver, auto_text)
         MySubmissions.edit_top_submission(self.driver)
 
@@ -364,6 +365,7 @@ class DspHydroshareTestSuite(DspTestSuite):
         )
         SubmitHydroshare.finish_submission(self.driver)
 
+        self.assertEqual("My Submissions", MySubmissions.get_title(self.driver))
         MySubmissions.enter_text_in_search(self.driver, auto_text)
         MySubmissions.edit_top_submission(self.driver)
 
@@ -395,6 +397,7 @@ class DspHydroshareTestSuite(DspTestSuite):
         self.assertTrue(success_filling)
         SubmitHydroshare.finish_submission(self.driver)
 
+        self.assertEqual("My Submissions", MySubmissions.get_title(self.driver))
         MySubmissions.enter_text_in_search(self.driver, auto_text)
         MySubmissions.edit_top_submission(self.driver)
 
@@ -446,8 +449,8 @@ class DspHydroshareTestSuite(DspTestSuite):
         SubmitHydroshare.autofill_required_elements(self.driver, template)
         self.assertTrue(SubmitHydroshare.is_finishable(self.driver))
         SubmitHydroshare.finish_submission(self.driver)
-        self.assertEqual("My Submissions", MySubmissions.get_title(self.driver))
 
+        self.assertEqual("My Submissions", MySubmissions.get_title(self.driver))
         MySubmissions.edit_top_submission(self.driver)
 
         self.assertEqual(
