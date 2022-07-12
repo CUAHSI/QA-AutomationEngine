@@ -100,6 +100,19 @@ class DspTestSuite(BaseTestSuite):
         )
         self.assertTrue(match)
 
+    def check_array_fieldset_unknown_order(self, section, ns, dicts, array):
+        reversed = False
+        for nth in ns:
+            if not reversed:
+                try:
+                    self.check(section, nth, dicts[nth], array)
+                except AssertionError:
+                    reversed = True
+                    ns.insert(0, nth)
+                    print("\n Array items were reversed during this test")
+            else:
+                self.check(section, nth, dicts.pop(), array)
+
 
 class DspHydroshareTestSuite(DspTestSuite):
     """DSP tests for the Hydroshare repository"""
@@ -150,48 +163,6 @@ class DspHydroshareTestSuite(DspTestSuite):
         self.login_orcid_and_hs()
         template = self.required_elements_template(auto_text)
         SubmitHydroshare.autofill_required_elements(self.driver, template)
-
-    # TODO: remove these once verify general class version work
-    # def fill_ids_submit_and_check(self, sort_text, section, nth, dict, array=False):
-    #     """Fill additional fields of HS submit page based on 'data-id'
-    #     Then submit the form, search in 'My Submissions',
-    #     and check that all of the fields match what was entered
-    #     """
-    #     success_filling = SubmitHydroshare.fill_inputs_by_data_ids(
-    #         self.driver, dict, section, nth
-    #     )
-    #     self.assertTrue(success_filling)
-    #     self.submit_and_check(sort_text, section, nth, dict, array)
-
-    # def submit_and_check(self, sort_text, section, nth, dict, array=False):
-    #     self.submit(sort_text)
-    #     self.check(section, nth, dict, array)
-
-    # def submit(self, sort_text):
-    #     SubmitHydroshare.finish_submission(self.driver)
-
-    #     self.assertEqual("My Submissions", MySubmissions.get_title(self.driver))
-    #     MySubmissions.enter_text_in_search(self.driver, sort_text)
-    #     MySubmissions.edit_top_submission(self.driver)
-
-    # def check(self, section, nth, dict, array=False):
-    #     match = EditHSSubmission.check_inputs_by_data_ids(
-    #         self.driver, dict, section, nth, array
-    #     )
-    #     self.assertTrue(match)
-
-    def check_array_fieldset_unknown_order(self, section, ns, dicts, array):
-        reversed = False
-        for nth in ns:
-            if not reversed:
-                try:
-                    self.check(section, nth, dicts[nth], array)
-                except AssertionError:
-                    reversed = True
-                    ns.insert(0, nth)
-                    print("\n Array items were reversed during this test")
-            else:
-                self.check(section, nth, dicts.pop(), array)
 
     def test_hs_000001_anon_nav_my_sumissions_shows_orcid(self):
         """Ensure anonymous navigation to my submissions shows orcid login modal"""
