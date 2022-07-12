@@ -449,7 +449,7 @@ class DspHydroshareTestSuite(DspTestSuite):
         SubmitHydroshare.autofill_required_elements(self.driver, template)
         self.assertTrue(SubmitHydroshare.is_finishable(self.driver))
         SubmitHydroshare.finish_submission(self.driver)
-        
+
         self.assertEqual("My Submissions", MySubmissions.get_title(self.driver))
         MySubmissions.edit_top_submission(self.driver)
 

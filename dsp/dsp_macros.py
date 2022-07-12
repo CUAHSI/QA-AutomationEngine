@@ -499,7 +499,9 @@ class GeneralSubmitToRepo(Dsp, RepoAuthWindow):
             input.submit(driver)
         else:
             for value in values:
-                checklist_item = SiteElement(By.XPATH, f"//*[@class='v-list-item__title' and text()='{value}']")
+                checklist_item = SiteElement(
+                    By.XPATH, f"//*[@class='v-list-item__title' and text()='{value}']"
+                )
                 if checklist_item.exists(driver):
                     checklist_item.click(driver)
                 else:
@@ -780,7 +782,10 @@ class EditZenodoSubmission(SubmitHydroshare, GeneralEditSubmission):
 
 class SubmitEarthchem(GeneralSubmitToRepo):
     """Page containing forms for submitting data with Earthchem backend"""
-    finish_later = SiteElement(By.XPATH, "//*[@class='v-btn__content' and contains(text(),'later')]")
+
+    finish_later = SiteElement(
+        By.XPATH, "//*[@class='v-btn__content' and contains(text(),'later')]"
+    )
 
     @classmethod
     def finish_submission_later(self, driver):
