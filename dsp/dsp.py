@@ -100,6 +100,19 @@ class DspTestSuite(BaseTestSuite):
         )
         self.assertTrue(match)
 
+    def check_array_fieldset_unknown_order(self, section, ns, dicts, array):
+        reversed = False
+        for nth in ns:
+            if not reversed:
+                try:
+                    self.check(section, nth, dicts[nth], array)
+                except AssertionError:
+                    reversed = True
+                    ns.insert(0, nth)
+                    print("\n Array items were reversed during this test")
+            else:
+                self.check(section, nth, dicts.pop(), array)
+
 
 class DspHydroshareTestSuite(DspTestSuite):
     """DSP tests for the Hydroshare repository"""
@@ -150,48 +163,6 @@ class DspHydroshareTestSuite(DspTestSuite):
         self.login_orcid_and_hs()
         template = self.required_elements_template(auto_text)
         SubmitHydroshare.autofill_required_elements(self.driver, template)
-
-    # TODO: remove these once verify general class version work
-    # def fill_ids_submit_and_check(self, sort_text, section, nth, dict, array=False):
-    #     """Fill additional fields of HS submit page based on 'data-id'
-    #     Then submit the form, search in 'My Submissions',
-    #     and check that all of the fields match what was entered
-    #     """
-    #     success_filling = SubmitHydroshare.fill_inputs_by_data_ids(
-    #         self.driver, dict, section, nth
-    #     )
-    #     self.assertTrue(success_filling)
-    #     self.submit_and_check(sort_text, section, nth, dict, array)
-
-    # def submit_and_check(self, sort_text, section, nth, dict, array=False):
-    #     self.submit(sort_text)
-    #     self.check(section, nth, dict, array)
-
-    # def submit(self, sort_text):
-    #     SubmitHydroshare.finish_submission(self.driver)
-
-    #     self.assertEqual("My Submissions", MySubmissions.get_title(self.driver))
-    #     MySubmissions.enter_text_in_search(self.driver, sort_text)
-    #     MySubmissions.edit_top_submission(self.driver)
-
-    # def check(self, section, nth, dict, array=False):
-    #     match = EditHSSubmission.check_inputs_by_data_ids(
-    #         self.driver, dict, section, nth, array
-    #     )
-    #     self.assertTrue(match)
-
-    def check_array_fieldset_unknown_order(self, section, ns, dicts, array):
-        reversed = False
-        for nth in ns:
-            if not reversed:
-                try:
-                    self.check(section, nth, dicts[nth], array)
-                except AssertionError:
-                    reversed = True
-                    ns.insert(0, nth)
-                    print("\n Array items were reversed during this test")
-            else:
-                self.check(section, nth, dicts.pop(), array)
 
     def test_hs_000001_anon_nav_my_sumissions_shows_orcid(self):
         """Ensure anonymous navigation to my submissions shows orcid login modal"""
@@ -729,6 +700,117 @@ class DspExternalTestSuite(DspTestSuite):
             EditExternalSubmission.check_required_elements(self.driver, template)
         )
 
+    def test_ex_000004_contributors_info_persists(self):
+        """Confirm that Contributors info persists from submit to edit"""
+        auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
+        self.login_and_autofill_external_required(auto_text)
+        section = "Contributors"
+        nth = 0
+        dict = {
+            "Name": auto_text + "Contributor name2-input",
+            # "Phone": "1234567890",
+            # "Address": "contributor address " + auto_text,
+            "Organization": "contributor org " + auto_text,
+            "Email": auto_text + "@gmail.com",
+            # "Homepage": "http://contibutor-homepage.com/" + auto_text,
+        }
+        SubmitExternal.expand_section_by_did(self.driver, data_id=section)
+        self.fill_ids_submit_and_check(auto_text, section, nth, dict)
+
+    def test_ex_000005_temporal_coverage_persists(self):
+        """Confirm that Temporal coverage persists from submit to edit"""
+        auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
+        self.login_and_autofill_external_required(auto_text)
+        section = "Temporalcoverage"
+        nth = 0
+        dict = {
+            "Start": "2022-03-25T01:00",
+            "End": "2022-04-25T02:00",
+            "Name": auto_text + "Meister, Jim",
+        }
+        success_filling = SubmitExternal.fill_inputs_by_data_ids(
+            self.driver, dict, section, nth
+        )
+        self.assertTrue(success_filling)
+        SubmitExternal.finish_submission(self.driver)
+
+        self.assertEqual("My Submissions", MySubmissions.get_title(self.driver))
+        MySubmissions.enter_text_in_search(self.driver, auto_text)
+        MySubmissions.edit_top_submission(self.driver)
+
+        match = EditExternalSubmission.check_inputs_by_data_ids(
+            self.driver, dict, section, nth
+        )
+        self.assertTrue(match)
+
+    def test_ex_000006_spatial_coverage_persists(self):
+        """Confirm that Spatial Point Coverage info persists from submit to edit"""
+        auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
+        self.login_and_autofill_external_required(auto_text)
+        section = "Spatialcoverage"
+        nth = 0
+        dict = {
+            "Name": auto_text + "Contributor name2-input",
+            "East": "20",
+            "North": "-20",
+        }
+        SubmitExternal.expand_section_by_did(self.driver, data_id=section)
+        self.fill_ids_submit_and_check(auto_text, section, nth, dict)
+
+    @unittest.expectedFailure
+    def test_ex_000007_related_resources_persists(self):
+        """Confirm that Related Resources info persists from submit to edit"""
+        # TODO: fix this test
+        auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
+        self.login_and_autofill_external_required(auto_text)
+        dict = {"RelationType": "This resource requires", "Value": auto_text + " value"}
+        nth = 0
+        section = "Relatedresources"
+        SubmitExternal.fill_related_resources(
+            self.driver, dict["RelationType"], dict["Value"], nth
+        )
+        SubmitExternal.finish_submission(self.driver)
+
+        self.assertEqual("My Submissions", MySubmissions.get_title(self.driver))
+        MySubmissions.enter_text_in_search(self.driver, auto_text)
+        MySubmissions.edit_top_submission(self.driver)
+
+        relation = EditExternalSubmission.get_nth_relation_type(self.driver, nth)
+
+        self.assertEqual(relation.pop(), dict.pop("RelationType"))
+        match = EditExternalSubmission.check_inputs_by_data_ids(
+            self.driver, dict, section, nth
+        )
+        self.assertTrue(match)
+
+    @unittest.expectedFailure
+    def test_ex_000008_multiple_related_resources_persist(self):
+        """Confirm that multiple Related Resources info persists from submit to edit"""
+        # TODO: fix this test
+        auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
+        self.login_and_autofill_external_required(auto_text)
+        section = "Relatedresources"
+        ns = [0, 1]
+        array = True
+        dicts = [None] * len(ns)
+        for nth in ns:
+            dicts[nth] = {
+                "RelationType": "This resource requires",
+                "Value": f"{auto_text} value {nth}",
+            }
+            SubmitExternal.add_form_array_item_by_did(self.driver, data_id=section)
+            success_filling = SubmitExternal.fill_inputs_by_data_ids(
+                self.driver, dicts[nth], section, nth, array
+            )
+            self.assertTrue(success_filling)
+        self.submit(auto_text)
+
+        for nth in ns:
+            relation = EditExternalSubmission.get_nth_relation_type(self.driver, nth)
+            self.assertEqual(relation.pop(), dicts[nth].pop("RelationType"))
+
+        self.check_array_fieldset_unknown_order(section, ns, dicts, array)
+
 
 class DspZenodoTestSuite(DspTestSuite):
     """DSP tests for Zenodo backend"""
@@ -1024,9 +1106,7 @@ class DspEarthchemTestSuite(DspTestSuite):
         self.login_and_autofill_earthchem_required(auto_text)
         section = "RelatedResources"
         nth = 0
-        dict = {
-            "AwardNumber": auto_text + "AwardNumber"
-        }
+        dict = {"AwardNumber": auto_text + "AwardNumber"}
         SubmitEarthchem.expand_section_by_did(self.driver, data_id=section)
         self.fill_ids_submit_and_check(auto_text, section, nth, dict)
 
@@ -1038,7 +1118,8 @@ class DspEarthchemTestSuite(DspTestSuite):
         nth = 0
         dict = {
             # "Selectone": "U.S. Department of Energy",
-            "AwardNumber": auto_text + "AwardNumber"
+            "AwardNumber": auto_text
+            + "AwardNumber"
         }
         SubmitEarthchem.expand_section_by_did(self.driver, data_id=section)
         self.fill_ids_submit_and_check(auto_text, section, nth, dict)
@@ -1051,9 +1132,7 @@ class DspEarthchemTestSuite(DspTestSuite):
         self.login_and_autofill_earthchem_required(auto_text)
         section = "License"
         nth = 0
-        dict = {
-            "License": "(CC0-1.0) - Creative Commons No Rights Reserved"
-        }
+        dict = {"License": "(CC0-1.0) - Creative Commons No Rights Reserved"}
         SubmitEarthchem.expand_section_by_did(self.driver, data_id=section)
         self.fill_ids_submit_and_check(auto_text, section, nth, dict)
 

@@ -579,9 +579,45 @@ class GeneralSubmitToRepo(Dsp, RepoAuthWindow):
             self.expand_section_by_did(driver, section)
             self.fill_inputs_by_data_ids(driver, dict, section, nth=0)
 
+    @classmethod
+    def fill_related_resources(self, driver, relation_type, value, n):
+        self.expand_section_by_did(driver, "Relatedresources")
+
+        sel = (
+            ':is(fieldset, div)[data-id*="Relatedresources"]'
+            f' input[data-id*="RelationType"]:nth-of-type({n+1})'
+        )
+        relation_type_input = SiteElement(By.CSS_SELECTOR, sel)
+        sel = (
+            ':is(fieldset, div)[data-id*="Relatedresources"]'
+            f' input[data-id*="Value"]:nth-of-type({n+1})'
+        )
+        related_resources_value = SiteElement(By.CSS_SELECTOR, sel)
+        sel = (
+            ':is(fieldset, div)[data-id*="Relatedresources"]'
+            f" div.v-select:nth-of-type({n+1})"
+        )
+        relation_type_container = SiteElement(By.CSS_SELECTOR, sel)
+
+        relation_type_container.scroll_to(driver)
+        relation_type_container.javascript_click(driver)
+        relation_type_input.inject_text(driver, relation_type)
+        relation_type_input.submit(driver)
+        related_resources_value.inject_text(driver, value)
+        related_resources_value.submit(driver)
+
 
 class GeneralEditSubmission(Dsp):
     header_title = SiteElement(By.CSS_SELECTOR, ".text-h4")
+
+    @classmethod
+    def get_nth_relation_type(self, driver, n):
+        sel = (
+            ':is(fieldset, div)[data-id*="Relatedresources"]'
+            f' .array-list-item:nth-of-type({n+1}) input[data-id*="RelationType"]'
+        )
+        relation_type_input = SiteElement(By.CSS_SELECTOR, sel)
+        return relation_type_input.get_texts_from_xpath(driver, "./preceding::div[1]")
 
     @classmethod
     def get_header_title(self, driver):
@@ -728,33 +764,6 @@ class SubmitHydroshare(GeneralSubmitToRepo):
     rights_statement = SiteElement(By.ID, "#/properties/statement-input")
     rights_url = SiteElement(By.ID, "#/properties/url-input")
 
-    @classmethod
-    def fill_related_resources(self, driver, relation_type, value, n):
-        self.expand_section_by_did(driver, "Relatedresources")
-
-        sel = (
-            ':is(fieldset, div)[data-id*="Relatedresources"]'
-            f' input[data-id*="RelationType"]:nth-of-type({n+1})'
-        )
-        relation_type_input = SiteElement(By.CSS_SELECTOR, sel)
-        sel = (
-            ':is(fieldset, div)[data-id*="Relatedresources"]'
-            f' input[data-id*="Value"]:nth-of-type({n+1})'
-        )
-        related_resources_value = SiteElement(By.CSS_SELECTOR, sel)
-        sel = (
-            ':is(fieldset, div)[data-id*="Relatedresources"]'
-            f" div.v-select:nth-of-type({n+1})"
-        )
-        relation_type_container = SiteElement(By.CSS_SELECTOR, sel)
-
-        relation_type_container.scroll_to(driver)
-        relation_type_container.javascript_click(driver)
-        relation_type_input.inject_text(driver, relation_type)
-        relation_type_input.submit(driver)
-        related_resources_value.inject_text(driver, value)
-        related_resources_value.submit(driver)
-
 
 class SubmitExternal(GeneralSubmitToRepo):
     """Page containing forms for submitting data with EXTERNAL backend"""
@@ -803,15 +812,6 @@ class EditEarthchemSubmission(SubmitHydroshare, GeneralEditSubmission):
 
 class EditHSSubmission(SubmitHydroshare, GeneralEditSubmission):
     """Page containing forms for editing existing submission with Hydroshare backend"""
-
-    @classmethod
-    def get_nth_relation_type(self, driver, n):
-        sel = (
-            ':is(fieldset, div)[data-id*="Relatedresources"]'
-            f' .array-list-item:nth-of-type({n+1}) input[data-id*="RelationType"]'
-        )
-        relation_type_input = SiteElement(By.CSS_SELECTOR, sel)
-        return relation_type_input.get_texts_from_xpath(driver, "./preceding::div[1]")
 
     @classmethod
     def get_keywords(self, driver):
