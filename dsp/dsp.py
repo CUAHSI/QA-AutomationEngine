@@ -1,6 +1,5 @@
 """ Runs various smoke tests for the data submission portal """
 import inspect
-import textwrap
 import time
 import unittest
 
@@ -837,10 +836,10 @@ class DspEarthchemTestSuite(DspTestSuite):
         basic_info = {
             "DatasetTitle": auto_text + " Title",
             "AbstractorDescription": auto_text + " Description/Abstract",
-            "DataTypes": "Collection",
+            "DataTypes": ["Chemistry"],
             "Keywords": [auto_text + " Keywords"],
         }
-        spatial = {"SpatialCoverage": "Global"}
+        spatial = {"SpatialCoverage": ["Global"]}
 
         required_elements = {
             "group-BasicInformation": basic_info,
@@ -925,23 +924,21 @@ class DspEarthchemTestSuite(DspTestSuite):
         header = SubmitEarthchem.get_header_text(self.driver)
         self.assertIn(self.repo_name, header)
 
-    @unittest.skip("Not implemented")
-    def zest_ec_000003_submit_required_fields(self):
+    def test_ec_000003_submit_required_fields(self):
         """Confirm successful submit of required fields for Earthchem Repo"""
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
         self.login_and_autofill_earthchem_required(auto_text)
         self.assertTrue(SubmitEarthchem.is_finishable(self.driver))
-        SubmitEarthchem.finish_submission(self.driver)
+        SubmitEarthchem.finish_submission_later(self.driver)
         self.assertEqual("My Submissions", MySubmissions.get_title(self.driver))
 
-    @unittest.skip("Not implemented")
-    def zest_ec_000004_required_fields_persist(self):
+    def test_ec_000004_required_fields_persist(self):
         """Check that required fields persist after submit"""
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
         template = self.required_elements_template(auto_text)
         self.login_and_autofill_earthchem_required(auto_text)
         self.assertTrue(SubmitEarthchem.is_finishable(self.driver))
-        SubmitEarthchem.finish_submission(self.driver)
+        SubmitEarthchem.finish_submission_later(self.driver)
 
         MySubmissions.enter_text_in_search(self.driver, auto_text)
         MySubmissions.edit_top_submission(self.driver)

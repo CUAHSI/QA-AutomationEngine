@@ -491,19 +491,26 @@ class GeneralSubmitToRepo(Dsp, RepoAuthWindow):
     def fill_v_multi_select(
         self, driver, container_id, input_id, values=["default_value"]
     ):
-        input = SiteElement(
-            By.CSS_SELECTOR,
-            f'fieldset[data-id*="{container_id}"] .v-select__selections'
-            f' input[data-id*="{input_id}"]',
-        )
+        selector = f'fieldset[data-id*="{container_id}"] .v-select__selections input[data-id*="{input_id}"]'
+        input = SiteElement(By.CSS_SELECTOR, selector)
         input.javascript_click_hidden(driver)
         if isinstance(values, str):
             input.inject_text(driver, values)
             input.submit(driver)
         else:
             for value in values:
-                input.inject_text(driver, value)
-                input.submit(driver)
+                checklist_item = SiteElement(By.XPATH, f"//*[@class='v-list-item__title' and text()='{value}']")
+                if checklist_item.exists(driver):
+                    checklist_item.click(driver)
+                else:
+                    input.inject_text(driver, value)
+                    input.submit(driver)
+
+    @classmethod
+    def click_a_safe_place(self, driver):
+        footer = SiteElement(By.XPATH, "//*[contains(text(),'2012893')]")
+        footer.scroll_to(driver)
+        footer.click(driver)
 
     @classmethod
     def unfill_v_multi_select(self, driver, container_id, input_id):
@@ -773,8 +780,14 @@ class EditZenodoSubmission(SubmitHydroshare, GeneralEditSubmission):
 
 class SubmitEarthchem(GeneralSubmitToRepo):
     """Page containing forms for submitting data with Earthchem backend"""
+    finish_later = SiteElement(By.XPATH, "//*[@class='v-btn__content' and contains(text(),'later')]")
 
-    pass
+    @classmethod
+    def finish_submission_later(self, driver):
+        self.bottom_finish.scroll_to(driver)
+        self.bottom_finish.click(driver)
+        self.finish_later.click(driver)
+        self.wait_until_element_not_exist(driver, self.is_saving, NEW_SUBMISSION_SAVE)
 
 
 class EditEarthchemSubmission(SubmitHydroshare, GeneralEditSubmission):
