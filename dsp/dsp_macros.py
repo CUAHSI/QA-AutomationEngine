@@ -784,7 +784,7 @@ class SubmitEarthchem(GeneralSubmitToRepo):
     """Page containing forms for submitting data with Earthchem backend"""
 
     finish_later = SiteElement(
-        By.XPATH, "//*[@class='v-btn__content' and contains(text(),'later')]"
+        By.XPATH, "//*[@class='v-btn__content' and contains(text(),'later')]/.."
     )
 
     @classmethod

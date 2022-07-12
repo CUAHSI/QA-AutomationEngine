@@ -12,6 +12,8 @@ from dsp_macros import (
     MySubmissions,
     OrcidWindow,
     HydroshareAuthWindow,
+    GeneralSubmitToRepo,
+    GeneralEditSubmission,
     SubmitHydroshare,
     EditHSSubmission,
     SubmitExternal,
@@ -70,6 +72,34 @@ class DspTestSuite(BaseTestSuite):
         Dsp.drawer_to_submit(self.driver)
         SubmitLandingPage.select_repo_by_id(self.driver, repo)
 
+    def fill_ids_submit_and_check(self, sort_text, section, nth, dict, array=False):
+        """Fill additional fields of submit page based on 'data-id'
+        Then submit the form, search in 'My Submissions',
+        and check that all of the fields match what was entered
+        """
+        success_filling = GeneralSubmitToRepo.fill_inputs_by_data_ids(
+            self.driver, dict, section, nth
+        )
+        self.assertTrue(success_filling)
+        self.submit_and_check(sort_text, section, nth, dict, array)
+
+    def submit_and_check(self, sort_text, section, nth, dict, array=False):
+        self.submit(sort_text)
+        self.check(section, nth, dict, array)
+
+    def submit(self, sort_text):
+        GeneralSubmitToRepo.finish_submission(self.driver)
+
+        self.assertEqual("My Submissions", MySubmissions.get_title(self.driver))
+        MySubmissions.enter_text_in_search(self.driver, sort_text)
+        MySubmissions.edit_top_submission(self.driver)
+
+    def check(self, section, nth, dict, array=False):
+        match = GeneralEditSubmission.check_inputs_by_data_ids(
+            self.driver, dict, section, nth, array
+        )
+        self.assertTrue(match)
+
 
 class DspHydroshareTestSuite(DspTestSuite):
     """DSP tests for the Hydroshare repository"""
@@ -121,33 +151,34 @@ class DspHydroshareTestSuite(DspTestSuite):
         template = self.required_elements_template(auto_text)
         SubmitHydroshare.autofill_required_elements(self.driver, template)
 
-    def fill_ids_submit_and_check(self, sort_text, section, nth, dict, array=False):
-        """Fill additional fields of HS submit page based on 'data-id'
-        Then submit the form, search in 'My Submissions',
-        and check that all of the fields match what was entered
-        """
-        success_filling = SubmitHydroshare.fill_inputs_by_data_ids(
-            self.driver, dict, section, nth
-        )
-        self.assertTrue(success_filling)
-        self.submit_and_check(sort_text, section, nth, dict, array)
+    # TODO: remove these once verify general class version work
+    # def fill_ids_submit_and_check(self, sort_text, section, nth, dict, array=False):
+    #     """Fill additional fields of HS submit page based on 'data-id'
+    #     Then submit the form, search in 'My Submissions',
+    #     and check that all of the fields match what was entered
+    #     """
+    #     success_filling = SubmitHydroshare.fill_inputs_by_data_ids(
+    #         self.driver, dict, section, nth
+    #     )
+    #     self.assertTrue(success_filling)
+    #     self.submit_and_check(sort_text, section, nth, dict, array)
 
-    def submit_and_check(self, sort_text, section, nth, dict, array=False):
-        self.submit(sort_text)
-        self.check(section, nth, dict, array)
+    # def submit_and_check(self, sort_text, section, nth, dict, array=False):
+    #     self.submit(sort_text)
+    #     self.check(section, nth, dict, array)
 
-    def submit(self, sort_text):
-        SubmitHydroshare.finish_submission(self.driver)
+    # def submit(self, sort_text):
+    #     SubmitHydroshare.finish_submission(self.driver)
 
-        self.assertEqual("My Submissions", MySubmissions.get_title(self.driver))
-        MySubmissions.enter_text_in_search(self.driver, sort_text)
-        MySubmissions.edit_top_submission(self.driver)
+    #     self.assertEqual("My Submissions", MySubmissions.get_title(self.driver))
+    #     MySubmissions.enter_text_in_search(self.driver, sort_text)
+    #     MySubmissions.edit_top_submission(self.driver)
 
-    def check(self, section, nth, dict, array=False):
-        match = EditHSSubmission.check_inputs_by_data_ids(
-            self.driver, dict, section, nth, array
-        )
-        self.assertTrue(match)
+    # def check(self, section, nth, dict, array=False):
+    #     match = EditHSSubmission.check_inputs_by_data_ids(
+    #         self.driver, dict, section, nth, array
+    #     )
+    #     self.assertTrue(match)
 
     def check_array_fieldset_unknown_order(self, section, ns, dicts, array):
         reversed = False
@@ -912,6 +943,13 @@ class DspEarthchemTestSuite(DspTestSuite):
             self.driver, self.required_elements_template(auto_text)
         )
 
+    def submit(self, sort_text):
+        SubmitEarthchem.finish_submission_later(self.driver)
+
+        self.assertEqual("My Submissions", MySubmissions.get_title(self.driver))
+        MySubmissions.enter_text_in_search(self.driver, sort_text)
+        MySubmissions.edit_top_submission(self.driver)
+
     def test_ec_000001_orcid_auth_then_submit(self):
         """Authenticate with Orcid, then navigate to Earthchem submit page"""
         self.login_orcid_to_submit()
@@ -949,6 +987,75 @@ class DspEarthchemTestSuite(DspTestSuite):
         )
         check = EditEarthchemSubmission.check_required_elements(self.driver, template)
         self.assertTrue(check)
+
+    def test_ec_000005_lead_author_persists(self):
+        """Confirm that Lead Author info persists from submit to edit"""
+        auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
+        self.login_and_autofill_earthchem_required(auto_text)
+        section = "LeadAuthor"
+        nth = 0
+        dict = {
+            "FirstName": auto_text + "FirstName",
+            "LastName": auto_text + "LastName",
+            "Email": f"{auto_text}@gmail.com",
+        }
+        SubmitEarthchem.expand_section_by_did(self.driver, data_id=section)
+        self.fill_ids_submit_and_check(auto_text, section, nth, dict)
+
+    def test_ec_000006_co_author_persist(self):
+        """Confirm that Co-Authorinfo persists from submit to edit"""
+        auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
+        self.login_and_autofill_earthchem_required(auto_text)
+        section = "Co-Authors"
+        nth = 0
+        dict = {
+            "FirstName": auto_text + "FirstName",
+            "LastName": auto_text + "LastName",
+            "Email": f"{auto_text}@gmail.com",
+        }
+        SubmitEarthchem.expand_section_by_did(self.driver, data_id=section)
+        self.fill_ids_submit_and_check(auto_text, section, nth, dict)
+
+    @unittest.skip("Not implemented yet")
+    def test_ec_000007_related_resource_persists(self):
+        """Confirm that Related Resource Info persists from submit to edit"""
+        # TODO: fix this test
+        auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
+        self.login_and_autofill_earthchem_required(auto_text)
+        section = "RelatedResources"
+        nth = 0
+        dict = {
+            "AwardNumber": auto_text + "AwardNumber"
+        }
+        SubmitEarthchem.expand_section_by_did(self.driver, data_id=section)
+        self.fill_ids_submit_and_check(auto_text, section, nth, dict)
+
+    def test_ec_000008_funding_source_persists(self):
+        """Confirm that Funding Source Info persists from submit to edit"""
+        auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
+        self.login_and_autofill_earthchem_required(auto_text)
+        section = "FundingSource"
+        nth = 0
+        dict = {
+            # "Selectone": "U.S. Department of Energy",
+            "AwardNumber": auto_text + "AwardNumber"
+        }
+        SubmitEarthchem.expand_section_by_did(self.driver, data_id=section)
+        self.fill_ids_submit_and_check(auto_text, section, nth, dict)
+
+    @unittest.skip("Not implemented yet")
+    def test_ec_000009_license_persists(self):
+        """Confirm that Funding Source Info persists from submit to edit"""
+        # TODO: fix this test
+        auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
+        self.login_and_autofill_earthchem_required(auto_text)
+        section = "License"
+        nth = 0
+        dict = {
+            "License": "(CC0-1.0) - Creative Commons No Rights Reserved"
+        }
+        SubmitEarthchem.expand_section_by_did(self.driver, data_id=section)
+        self.fill_ids_submit_and_check(auto_text, section, nth, dict)
 
 
 if __name__ == "__main__":
