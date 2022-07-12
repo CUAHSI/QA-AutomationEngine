@@ -634,12 +634,14 @@ class GeneralEditSubmission(Dsp):
                 value = elem.get_value(driver)
                 if value != v:
                     if value.strip() == v:
-                        print(
-                            f"\nWARNING: while checking field: |{k}|.\nExpected:"
-                            f" |{v}|\nBut got : |{value}|                        "
-                            " \nWhitespace will be ignored and this field considered"
-                            " valid"
-                        )
+                        # Allow additional whitespace padding
+                        # print(
+                        #     f"\nWARNING: while checking field: |{k}|.\nExpected:"
+                        #     f" |{v}|\nBut got : |{value}|                        "
+                        #     " \nWhitespace will be ignored and this field considered"
+                        #     " valid"
+                        # )
+                        pass
                     else:
                         print(
                             f"\nMismatch when checking field: |{k}|.\nExpected |{v}|"
