@@ -757,7 +757,7 @@ class DspExternalTestSuite(DspTestSuite):
         SubmitExternal.expand_section_by_did(self.driver, data_id=section)
         self.fill_ids_submit_and_check(auto_text, section, nth, dict)
 
-    @unittest.expectedFailure
+    @unittest.skip("Test needs to be fixed")
     def test_ex_000007_related_resources_persists(self):
         """Confirm that Related Resources info persists from submit to edit"""
         # TODO: fix this test
@@ -783,7 +783,7 @@ class DspExternalTestSuite(DspTestSuite):
         )
         self.assertTrue(match)
 
-    @unittest.expectedFailure
+    @unittest.skip("Test needs to be fixed")
     def test_ex_000008_multiple_related_resources_persist(self):
         """Confirm that multiple Related Resources info persists from submit to edit"""
         # TODO: fix this test
