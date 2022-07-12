@@ -1024,9 +1024,7 @@ class DspEarthchemTestSuite(DspTestSuite):
         self.login_and_autofill_earthchem_required(auto_text)
         section = "RelatedResources"
         nth = 0
-        dict = {
-            "AwardNumber": auto_text + "AwardNumber"
-        }
+        dict = {"AwardNumber": auto_text + "AwardNumber"}
         SubmitEarthchem.expand_section_by_did(self.driver, data_id=section)
         self.fill_ids_submit_and_check(auto_text, section, nth, dict)
 
@@ -1038,7 +1036,8 @@ class DspEarthchemTestSuite(DspTestSuite):
         nth = 0
         dict = {
             # "Selectone": "U.S. Department of Energy",
-            "AwardNumber": auto_text + "AwardNumber"
+            "AwardNumber": auto_text
+            + "AwardNumber"
         }
         SubmitEarthchem.expand_section_by_did(self.driver, data_id=section)
         self.fill_ids_submit_and_check(auto_text, section, nth, dict)
@@ -1051,9 +1050,7 @@ class DspEarthchemTestSuite(DspTestSuite):
         self.login_and_autofill_earthchem_required(auto_text)
         section = "License"
         nth = 0
-        dict = {
-            "License": "(CC0-1.0) - Creative Commons No Rights Reserved"
-        }
+        dict = {"License": "(CC0-1.0) - Creative Commons No Rights Reserved"}
         SubmitEarthchem.expand_section_by_did(self.driver, data_id=section)
         self.fill_ids_submit_and_check(auto_text, section, nth, dict)
 
