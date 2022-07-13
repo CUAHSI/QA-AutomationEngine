@@ -819,6 +819,10 @@ class SubmitEarthchem(GeneralSubmitToRepo):
     finish_later = SiteElement(
         By.XPATH, "//*[@class='v-btn__content' and contains(text(),'later')]/.."
     )
+    submit_review = SiteElement(
+        By.XPATH, "//*[@class='v-btn__content' and contains(text(),'Submit for review')]/.."
+    )
+    license = SiteElement(By.CSS_SELECTOR, '[data-id*="License"] .v-select__selection')
 
     @classmethod
     def finish_submission_later(self, driver):
@@ -826,6 +830,17 @@ class SubmitEarthchem(GeneralSubmitToRepo):
         self.bottom_finish.click(driver)
         self.finish_later.click(driver)
         self.wait_until_element_not_exist(driver, self.is_saving, NEW_SUBMISSION_SAVE)
+
+    @classmethod
+    def submit_for_review(self, driver):
+        self.bottom_finish.scroll_to(driver)
+        self.bottom_finish.click(driver)
+        self.submit_review.click(driver)
+        self.wait_until_element_not_exist(driver, self.is_saving, NEW_SUBMISSION_SAVE)
+
+    @classmethod
+    def get_license(self, driver):
+        return self.license.get_text(driver)
 
 
 class EditEarthchemSubmission(SubmitHydroshare, GeneralEditSubmission):
@@ -881,8 +896,7 @@ class EarthchemResourcePage(WebPage):
     """Landing page for an ECL resource"""
 
     logo = By.CSS_SELECTOR, "#main-logo"
-    # TODO: this title hasn't been verified
-    title = SiteElement(By.CSS_SELECTOR, "#title")
+    title = SiteElement(By.CSS_SELECTOR, "#title_display")
 
     @classmethod
     def get_title(self, driver):
