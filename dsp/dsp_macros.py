@@ -13,6 +13,7 @@ from timing import (
     NEW_SUBMISSION_SAVE,
     DEFAULT_TIMEOUT,
     PAUSE_AFTER_FILL_BEFORE_SUBMIT,
+    REPO_LOAD,
 )
 
 
@@ -116,6 +117,24 @@ class Dsp(WebPage):
         self.wait_until_css_dissapear(driver, ".v-card__actions", AUTH_WINDOW)
         self.orcid_login_continue.click(driver)
         External.switch_new_page(driver, num_windows_now, self.body_locator)
+
+    @classmethod
+    def to_hs_repo(self, driver):
+        External.switch_last_page(
+            driver, new_tab_locator=HSResourcePage.logo, time=REPO_LOAD
+        )
+
+    @classmethod
+    def to_zenodo_repo(self, driver):
+        External.switch_last_page(
+            driver, new_tab_locator=ZenodoResourcePage.logo, time=REPO_LOAD
+        )
+
+    @classmethod
+    def to_earthchem_repo(self, driver):
+        External.switch_last_page(
+            driver, new_tab_locator=EarthchemResourcePage.logo, time=REPO_LOAD
+        )
 
     @classmethod
     def wait_until_css_visible(self, driver, css_selector, timeout=DEFAULT_TIMEOUT):
@@ -260,6 +279,7 @@ class MySubmissions(Dsp):
     sort_order_select = SiteElement(By.ID, "sort-order")
     my_submissions_search = SiteElement(By.ID, "my_submissions_search")
     top_submission_edit = SiteElement(By.ID, "sub-0-edit")
+    top_submission_view_repo = SiteElement(By.ID, "sub-0-view")
 
     @classmethod
     def get_title(self, driver):
@@ -285,6 +305,10 @@ class MySubmissions(Dsp):
     @classmethod
     def edit_top_submission(self, driver):
         self.top_submission_edit.click(driver)
+
+    @classmethod
+    def view_top_submission(self, driver):
+        self.top_submission_view_repo.click(driver)
 
 
 class RepoAuthWindow(WebPage):
@@ -829,6 +853,40 @@ class EditHSSubmission(SubmitHydroshare, GeneralEditSubmission):
             if not all(elem in saved_keywords for elem in keywords):
                 return False
         return True
+
+
+class HSResourcePage(WebPage):
+    """Landing page for a HS resource"""
+
+    logo = By.CSS_SELECTOR, "#img-brand-logo"
+    title = SiteElement(By.CSS_SELECTOR, "#resource-title")
+
+    @classmethod
+    def get_title(self, driver):
+        return self.title.get_text(driver)
+
+
+class ZenodoResourcePage(WebPage):
+    """Landing page for a Zenodo resource"""
+
+    logo = By.CSS_SELECTOR, "img.navbar-brand"
+    title = SiteElement(By.CSS_SELECTOR, "#title")
+
+    @classmethod
+    def get_title(self, driver):
+        return self.title.get_value(driver)
+
+
+class EarthchemResourcePage(WebPage):
+    """Landing page for an ECL resource"""
+
+    logo = By.CSS_SELECTOR, "#main-logo"
+    # TODO: this title hasn't been verified
+    title = SiteElement(By.CSS_SELECTOR, "#title")
+
+    @classmethod
+    def get_title(self, driver):
+        return self.title.get_text(driver)
 
 
 class Utilities:
