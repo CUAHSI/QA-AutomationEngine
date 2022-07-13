@@ -24,6 +24,9 @@ from dsp_macros import (
     SubmitEarthchem,
     EditEarthchemSubmission,
     EarthchemAuthWindow,
+    ZenodoResourcePage,
+    HSResourcePage,
+    EarthchemResourcePage
 )
 
 from cuahsi_base.cuahsi_base import BaseTestSuite, parse_args_run_tests
@@ -597,6 +600,24 @@ class DspHydroshareTestSuite(DspTestSuite):
 
         self.check_array_fieldset_unknown_order(section, ns, dicts, array)
 
+    def test_hs_000022_able_to_view_in_repository(self):
+        """
+        From My Submissions, confirm that we can "view in repository" HS submission
+        """
+        auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
+        template = self.required_elements_template(auto_text)
+        self.login_orcid_and_hs()
+        SubmitHydroshare.autofill_required_elements(self.driver, template)
+        self.assertTrue(SubmitHydroshare.is_finishable(self.driver))
+        SubmitHydroshare.finish_submission(self.driver)
+
+        self.assertEqual("My Submissions", MySubmissions.get_title(self.driver))
+        MySubmissions.view_top_submission(self.driver)
+        MySubmissions.to_hs_repo(self.driver)
+        self.assertEqual(
+            HSResourcePage.get_title(self.driver), template["BasicInformation"]["Title"]
+        )
+
 
 class DspExternalTestSuite(DspTestSuite):
     """DSP tests for External (No Repo)"""
@@ -939,6 +960,23 @@ class DspZenodoTestSuite(DspTestSuite):
         check = EditZenodoSubmission.check_required_elements(self.driver, template)
         self.assertTrue(check)
 
+    def test_ze_000006_able_to_view_in_repository(self):
+        """
+        From My Submissions, confirm that we can "view in repository" zenodo submission
+        """
+        auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
+        template = self.required_elements_template(auto_text)
+        self.login_and_autofill_zenodo_required(auto_text)
+        self.assertTrue(SubmitZenodo.is_finishable(self.driver))
+        SubmitZenodo.finish_submission(self.driver)
+
+        MySubmissions.enter_text_in_search(self.driver, auto_text)
+        MySubmissions.view_top_submission(self.driver)
+        MySubmissions.to_zenodo_repo(self.driver)
+        self.assertEqual(
+            ZenodoResourcePage.get_title(self.driver), template["BasicInformation"]["Title"]
+        )
+
 
 class DspEarthchemTestSuite(DspTestSuite):
     """DSP tests for Earthchem backend"""
@@ -963,7 +1001,7 @@ class DspEarthchemTestSuite(DspTestSuite):
         required_elements = {
             "group-BasicInformation": basic_info,
             "SpatialCoverageInformation": spatial,
-            "LeadAuthor": lead_author
+            "LeadAuthor": lead_author,
         }
         return required_elements
 
@@ -1141,6 +1179,25 @@ class DspEarthchemTestSuite(DspTestSuite):
         dict = {"License": "(CC0-1.0) - Creative Commons No Rights Reserved"}
         SubmitEarthchem.expand_section_by_did(self.driver, data_id=section)
         self.fill_ids_submit_and_check(auto_text, section, nth, dict)
+
+    @unittest.skip("Not implemented yet")
+    def test_ec_000010_able_to_view_in_repository(self):
+        """
+        From My Submissions, confirm that we can "view in repository" ECL submission
+        """
+        # TODO: update the earthchem page with title elem so this test works
+        auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
+        template = self.required_elements_template(auto_text)
+        self.login_and_autofill_earthchem_required(auto_text)
+        self.assertTrue(SubmitEarthchem.is_finishable(self.driver))
+        SubmitEarthchem.finish_submission(self.driver)
+
+        MySubmissions.enter_text_in_search(self.driver, auto_text)
+        MySubmissions.view_top_submission(self.driver)
+        MySubmissions.to_earthchem_repo(self.driver)
+        self.assertEqual(
+            EarthchemResourcePage.get_title(self.driver), template["group-BasicInformation"]["DatasetTitle"]
+        )
 
 
 if __name__ == "__main__":
