@@ -1069,6 +1069,12 @@ class DspEarthchemTestSuite(DspTestSuite):
         )
 
     def submit(self, sort_text):
+        """
+        Save an EarthChem record
+
+        ECL is unique in that it has multiple options for submit vs finish_later. This funtions name is confusing...here we are overriding the default TestSuite submit()
+        This would be more aptly named 'finish_later()'
+        """
         SubmitEarthchem.finish_submission_later(self.driver)
 
         self.assertEqual("My Submissions", MySubmissions.get_title(self.driver))
@@ -1089,8 +1095,8 @@ class DspEarthchemTestSuite(DspTestSuite):
         header = SubmitEarthchem.get_header_text(self.driver)
         self.assertIn(self.repo_name, header)
 
-    def test_ec_000003_submit_required_fields(self):
-        """Confirm successful submit of required fields for Earthchem Repo"""
+    def test_ec_000003_save_required_fields(self):
+        """Confirm successful save of required fields for Earthchem Repo"""
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
         self.login_and_autofill_earthchem_required(auto_text)
         self.assertTrue(SubmitEarthchem.is_finishable(self.driver))
@@ -1098,7 +1104,7 @@ class DspEarthchemTestSuite(DspTestSuite):
         self.assertEqual("My Submissions", MySubmissions.get_title(self.driver))
 
     def test_ec_000004_required_fields_persist(self):
-        """Check that required fields persist after submit"""
+        """Check that required fields persist after save"""
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
         template = self.required_elements_template(auto_text)
         self.login_and_autofill_earthchem_required(auto_text)
@@ -1115,7 +1121,7 @@ class DspEarthchemTestSuite(DspTestSuite):
 
     @unittest.skip("Lead Author became a required field so is tested elsewhere")
     def test_ec_000005_lead_author_persists(self):
-        """Confirm that Lead Author info persists from submit to edit"""
+        """Confirm that Lead Author info persists from save to edit"""
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
         self.login_and_autofill_earthchem_required(auto_text)
         section = "LeadAuthor"
@@ -1129,7 +1135,7 @@ class DspEarthchemTestSuite(DspTestSuite):
         self.fill_ids_submit_and_check(auto_text, section, nth, dict)
 
     def test_ec_000006_co_author_persist(self):
-        """Confirm that Co-Authorinfo persists from submit to edit"""
+        """Confirm that Co-Author info persists from save to edit"""
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
         self.login_and_autofill_earthchem_required(auto_text)
         section = "Co-Authors"
@@ -1142,20 +1148,24 @@ class DspEarthchemTestSuite(DspTestSuite):
         SubmitEarthchem.expand_section_by_did(self.driver, data_id=section)
         self.fill_ids_submit_and_check(auto_text, section, nth, dict)
 
-    @unittest.skip("Not implemented yet")
     def test_ec_000007_related_resource_persists(self):
-        """Confirm that Related Resource Info persists from submit to edit"""
-        # TODO: fix this test
+        """Confirm that Related Resource Info persists from save to edit"""
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
         self.login_and_autofill_earthchem_required(auto_text)
-        section = "RelatedResources"
+        section = "RelatedInformation"
         nth = 0
-        dict = {"AwardNumber": auto_text + "AwardNumber"}
+        dict = {
+            "PublicationDOI": auto_text + "PublicationDOI",
+            # "RelatedInformation": "(R2R) - Cruise DOI"
+            }
+
+        # This section is nested...
+        SubmitEarthchem.expand_section_by_did(self.driver, data_id="RelatedResources")
         SubmitEarthchem.expand_section_by_did(self.driver, data_id=section)
         self.fill_ids_submit_and_check(auto_text, section, nth, dict)
 
     def test_ec_000008_funding_source_persists(self):
-        """Confirm that Funding Source Info persists from submit to edit"""
+        """Confirm that Funding Source Info persists from save to edit"""
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
         self.login_and_autofill_earthchem_required(auto_text)
         section = "FundingSource"
@@ -1168,24 +1178,25 @@ class DspEarthchemTestSuite(DspTestSuite):
         SubmitEarthchem.expand_section_by_did(self.driver, data_id=section)
         self.fill_ids_submit_and_check(auto_text, section, nth, dict)
 
-    @unittest.skip("Not implemented yet")
     def test_ec_000009_license_persists(self):
-        """Confirm that Funding Source Info persists from submit to edit"""
-        # TODO: fix this test
+        """Confirm that License Info persists from save to edit"""
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
         self.login_and_autofill_earthchem_required(auto_text)
         section = "License"
         nth = 0
         dict = {"License": "(CC0-1.0) - Creative Commons No Rights Reserved"}
         SubmitEarthchem.expand_section_by_did(self.driver, data_id=section)
-        self.fill_ids_submit_and_check(auto_text, section, nth, dict)
+        try:
+            self.fill_ids_submit_and_check(auto_text, section, nth, dict)
+        except AssertionError:
+            license = SubmitEarthchem.get_license(self.driver)
+            self.assertEqual(license, dict['License'])
 
-    @unittest.skip("Not implemented yet")
     def test_ec_000010_able_to_view_in_repository(self):
         """
-        From My Submissions, confirm that we can "view in repository" ECL submission
+        From My Submissions, confirm that we can "view in repository" ECL submission, after saving
         """
-        # TODO: update the earthchem page with title elem so this test works
+        # https://github.com/cznethub/dsp/issues/61
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
         template = self.required_elements_template(auto_text)
         self.login_and_autofill_earthchem_required(auto_text)
@@ -1198,6 +1209,16 @@ class DspEarthchemTestSuite(DspTestSuite):
         self.assertEqual(
             EarthchemResourcePage.get_title(self.driver), template["group-BasicInformation"]["DatasetTitle"]
         )
+
+    @unittest.expectedFailure
+    def test_ec_000011_submit_for_review_required_fields(self):
+        """Confirm successful submit of required fields for Earthchem Repo"""
+        # https://github.com/cznethub/dsp/issues/61
+        auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
+        self.login_and_autofill_earthchem_required(auto_text)
+        self.assertTrue(SubmitEarthchem.is_finishable(self.driver))
+        SubmitEarthchem.submit_for_review(self.driver)
+        self.assertEqual("My Submissions", MySubmissions.get_title(self.driver))
 
 
 if __name__ == "__main__":
