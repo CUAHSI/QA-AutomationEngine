@@ -1,0 +1,41 @@
+
+
+
+======================================================================
+ERROR: test_ec_000010_able_to_view_in_repository (__main__.DspEarthchemTestSuite)
+From My Submissions, confirm that we can "view in repository" ECL submission, after saving
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/dcowan/repos/QA-AutomationEngine/dsp/dsp.py", line 1208, in test_ec_000010_able_to_view_in_repository
+    MySubmissions.enter_text_in_search(self.driver, auto_text)
+  File "/Users/dcowan/repos/QA-AutomationEngine/dsp/dsp_macros.py", line 303, in enter_text_in_search
+    self.my_submissions_search.inject_text(driver, field_text)
+  File "/Users/dcowan/repos/QA-AutomationEngine/cuahsi_base/site_element.py", line 245, in inject_text
+    target_el = self.loc_it(driver)
+  File "/Users/dcowan/repos/QA-AutomationEngine/cuahsi_base/site_element.py", line 42, in loc_it
+    raise e
+  File "/Users/dcowan/repos/QA-AutomationEngine/cuahsi_base/site_element.py", line 35, in loc_it
+    wait.until(EC.visibility_of_element_located((self.by, self.locator)))
+  File "/usr/local/lib/python3.9/site-packages/selenium/webdriver/support/wait.py", line 80, in until
+    raise TimeoutException(message, screen, stacktrace)
+selenium.common.exceptions.TimeoutException: Message: 
+
+
+======================================================================
+ERROR: test_ze_000001_orcid_then_submit (__main__.DspZenodoTestSuite)
+Check authentication with Orcid, then navigate to submit page
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/dcowan/repos/QA-AutomationEngine/dsp/dsp.py", line 922, in test_ze_000001_orcid_then_submit
+    header = SubmitZenodo.get_header_text(self.driver)
+  File "/Users/dcowan/repos/QA-AutomationEngine/dsp/dsp_macros.py", line 371, in get_header_text
+    return self.header.get_text(driver)
+  File "/Users/dcowan/repos/QA-AutomationEngine/cuahsi_base/site_element.py", line 297, in get_text
+    target_el = self.loc_it(driver)
+  File "/Users/dcowan/repos/QA-AutomationEngine/cuahsi_base/site_element.py", line 42, in loc_it
+    raise e
+  File "/Users/dcowan/repos/QA-AutomationEngine/cuahsi_base/site_element.py", line 35, in loc_it
+    wait.until(EC.visibility_of_element_located((self.by, self.locator)))
+  File "/usr/local/lib/python3.9/site-packages/selenium/webdriver/support/wait.py", line 80, in until
+    raise TimeoutException(message, screen, stacktrace)
+selenium.common.exceptions.TimeoutException: Message: 
