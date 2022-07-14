@@ -26,7 +26,7 @@ from dsp_macros import (
     EarthchemAuthWindow,
     ZenodoResourcePage,
     HSResourcePage,
-    EarthchemResourcePage
+    EarthchemResourcePage,
 )
 
 from cuahsi_base.cuahsi_base import BaseTestSuite, parse_args_run_tests
@@ -974,7 +974,8 @@ class DspZenodoTestSuite(DspTestSuite):
         MySubmissions.view_top_submission(self.driver)
         MySubmissions.to_zenodo_repo(self.driver)
         self.assertEqual(
-            ZenodoResourcePage.get_title(self.driver), template["BasicInformation"]["Title"]
+            ZenodoResourcePage.get_title(self.driver),
+            template["BasicInformation"]["Title"],
         )
 
 
@@ -1157,7 +1158,7 @@ class DspEarthchemTestSuite(DspTestSuite):
         dict = {
             "PublicationDOI": auto_text + "PublicationDOI",
             # "RelatedInformation": "(R2R) - Cruise DOI"
-            }
+        }
 
         # This section is nested...
         SubmitEarthchem.expand_section_by_did(self.driver, data_id="RelatedResources")
@@ -1190,35 +1191,44 @@ class DspEarthchemTestSuite(DspTestSuite):
             self.fill_ids_submit_and_check(auto_text, section, nth, dict)
         except AssertionError:
             license = SubmitEarthchem.get_license(self.driver)
-            self.assertEqual(license, dict['License'])
+            self.assertEqual(license, dict["License"])
 
     def test_ec_000010_able_to_view_in_repository(self):
         """
         From My Submissions, confirm that we can "view in repository" ECL submission, after saving
         """
-        # https://github.com/cznethub/dsp/issues/61
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
         template = self.required_elements_template(auto_text)
         self.login_and_autofill_earthchem_required(auto_text)
         self.assertTrue(SubmitEarthchem.is_finishable(self.driver))
-        SubmitEarthchem.finish_submission(self.driver)
+        SubmitEarthchem.finish_submission_later(self.driver)
 
         MySubmissions.enter_text_in_search(self.driver, auto_text)
         MySubmissions.view_top_submission(self.driver)
         MySubmissions.to_earthchem_repo(self.driver)
+        EarthchemResourcePage.authenticate_if_needed(self.driver)
+
         self.assertEqual(
-            EarthchemResourcePage.get_title(self.driver), template["group-BasicInformation"]["DatasetTitle"]
+            EarthchemResourcePage.get_title(self.driver),
+            template["group-BasicInformation"]["DatasetTitle"],
         )
 
-    @unittest.expectedFailure
     def test_ec_000011_submit_for_review_required_fields(self):
-        """Confirm successful submit of required fields for Earthchem Repo"""
-        # https://github.com/cznethub/dsp/issues/61
+        """
+        From My Submissions, confirm that we can "view in repository" ECL submission, after SUBMITTING FOR REVIEW
+        """
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
         self.login_and_autofill_earthchem_required(auto_text)
         self.assertTrue(SubmitEarthchem.is_finishable(self.driver))
         SubmitEarthchem.submit_for_review(self.driver)
+
         self.assertEqual("My Submissions", MySubmissions.get_title(self.driver))
+        MySubmissions.enter_text_in_search(self.driver, auto_text)
+        MySubmissions.view_top_submission(self.driver)
+        MySubmissions.to_earthchem_repo(self.driver)
+
+        EarthchemResourcePage.authenticate_if_needed(self.driver)
+        self.assertIn(auto_text, EarthchemResourcePage.get_title(self.driver))
 
 
 if __name__ == "__main__":

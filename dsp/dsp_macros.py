@@ -515,7 +515,10 @@ class GeneralSubmitToRepo(Dsp, RepoAuthWindow):
     def fill_v_multi_select(
         self, driver, container_id, input_id, values=["default_value"]
     ):
-        selector = f'fieldset[data-id*="{container_id}"] .v-select__selections input[data-id*="{input_id}"]'
+        selector = (
+            f'fieldset[data-id*="{container_id}"] .v-select__selections'
+            f' input[data-id*="{input_id}"]'
+        )
         input = SiteElement(By.CSS_SELECTOR, selector)
         input.javascript_click_hidden(driver)
         if isinstance(values, str):
@@ -820,7 +823,8 @@ class SubmitEarthchem(GeneralSubmitToRepo):
         By.XPATH, "//*[@class='v-btn__content' and contains(text(),'later')]/.."
     )
     submit_review = SiteElement(
-        By.XPATH, "//*[@class='v-btn__content' and contains(text(),'Submit for review')]/.."
+        By.XPATH,
+        "//*[@class='v-btn__content' and contains(text(),'Submit for review')]/..",
     )
     license = SiteElement(By.CSS_SELECTOR, '[data-id*="License"] .v-select__selection')
 
@@ -895,12 +899,20 @@ class ZenodoResourcePage(WebPage):
 class EarthchemResourcePage(WebPage):
     """Landing page for an ECL resource"""
 
-    logo = By.CSS_SELECTOR, "#main-logo"
-    title = SiteElement(By.CSS_SELECTOR, "#title_display")
+    logo = By.CSS_SELECTOR, "#navbarBrand"
+    page_title = SiteElement(By.CSS_SELECTOR, "#page-title h1")
+    resource_title = SiteElement(By.CSS_SELECTOR, "#title_display")
+    login_orcid = SiteElement(By.XPATH, "//*[@id='connect-button' and contains(.,'ORCID')]/..")
 
     @classmethod
     def get_title(self, driver):
-        return self.title.get_text(driver)
+        return self.resource_title.get_text(driver)
+
+    @classmethod
+    def authenticate_if_needed(self, driver):
+        if "Login" in self.page_title.get_text(driver):
+            self.login_orcid.click(driver)
+            self.resource_title.wait_on_visibility(driver, REPO_LOAD)
 
 
 class Utilities:
