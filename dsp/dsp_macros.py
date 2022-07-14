@@ -902,7 +902,9 @@ class EarthchemResourcePage(WebPage):
     logo = By.CSS_SELECTOR, "#navbarBrand"
     page_title = SiteElement(By.CSS_SELECTOR, "#page-title h1")
     resource_title = SiteElement(By.CSS_SELECTOR, "#title_display")
-    login_orcid = SiteElement(By.XPATH, "//*[@id='connect-button' and contains(.,'ORCID')]/..")
+    login_orcid = SiteElement(
+        By.XPATH, "//*[@id='connect-button' and contains(.,'ORCID')]/.."
+    )
 
     @classmethod
     def get_title(self, driver):
