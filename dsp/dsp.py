@@ -116,6 +116,13 @@ class DspTestSuite(BaseTestSuite):
             else:
                 self.check(section, nth, dicts.pop(), array)
 
+    def test_base_000001_home_page(self):
+        """
+        Check home page load
+        """
+
+        self.assertTrue(Dsp.app_contains_text("Critical Zone Collaborative Network"))
+
 
 class DspHydroshareTestSuite(DspTestSuite):
     """DSP tests for the Hydroshare repository"""

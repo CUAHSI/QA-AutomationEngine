@@ -60,6 +60,16 @@ class Dsp(WebPage):
     orcid_login_continue = SiteElement(By.ID, "orcid_login_continue")
 
     @classmethod
+    def app_contains_text(self, text):
+        try:
+            _ = SiteElement(
+                    By.XPATH, f"//*[@id='app' and text()='{text}']"
+                )
+            return True
+        except TimeoutException:
+            return False
+
+    @classmethod
     def logo_to_home(self, driver):
         self.navigation_logo.click(driver)
 
@@ -902,7 +912,9 @@ class EarthchemResourcePage(WebPage):
     logo = By.CSS_SELECTOR, "#navbarBrand"
     page_title = SiteElement(By.CSS_SELECTOR, "#page-title h1")
     resource_title = SiteElement(By.CSS_SELECTOR, "#title_display")
-    login_orcid = SiteElement(By.XPATH, "//*[@id='connect-button' and contains(.,'ORCID')]/..")
+    login_orcid = SiteElement(
+        By.XPATH, "//*[@id='connect-button' and contains(.,'ORCID')]/.."
+    )
 
     @classmethod
     def get_title(self, driver):
