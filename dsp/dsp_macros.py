@@ -60,6 +60,16 @@ class Dsp(WebPage):
     orcid_login_continue = SiteElement(By.ID, "orcid_login_continue")
 
     @classmethod
+    def app_contains_text(self, text):
+        try:
+            _ = SiteElement(
+                    By.XPATH, f"//*[@id='app' and text()='{text}']"
+                )
+            return True
+        except TimeoutException:
+            return False
+
+    @classmethod
     def logo_to_home(self, driver):
         self.navigation_logo.click(driver)
 
