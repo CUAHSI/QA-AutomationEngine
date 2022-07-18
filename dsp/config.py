@@ -19,6 +19,3 @@ GITHUB_REPO = config['CZ_GITHUB_REPO']
 
 EARTHCHEM_USERNAME = config['CZ_EARTHCHEM_USERNAME']
 EARTHCHEM_PASSWORD = config['CZ_EARTHCHEM_PASSWORD']
-
-print(os.getenv('DEVIN'))
-print(os.getenv('devin'))
