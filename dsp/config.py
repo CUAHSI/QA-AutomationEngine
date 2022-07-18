@@ -1,14 +1,24 @@
-# Target for tests can also be passed via "--base" command line arg at runtime
-BASE_URL = "https://dsp-beta.criticalzone.org/"
+import os
+from dotenv import dotenv_values
+config = {
+    **dotenv_values(".env.default"),
+    **dotenv_values(".env"),  # load shared development variables
+    **os.environ,  # override loaded values with environment variables
+}
 
-USERNAME = "jmcuahsi@gmail.com"
-PASSWORD = "62meister"
+BASE_URL = config['CZ_BASE_URL']
 
-HS_USERNAME = "jim"
-HS_PASSWORD = "62meister"
+USERNAME = config['CZ_USERNAME']
+PASSWORD = config['CZ_PASSWORD']
 
-GITHUB_ORG = "cznethub"
-GITHUB_REPO = "dspfront"
+HS_USERNAME = config['HS_USERNAME']
+HS_PASSWORD = config['HS_PASSWORD']
 
-EARTHCHEM_USERNAME = "jmcuahsi@gmail.com"
-EARTHCHEM_PASSWORD = "62meister"
+GITHUB_ORG = config['CZ_GITHUB_ORG']
+GITHUB_REPO = config['CZ_GITHUB_REPO']
+
+EARTHCHEM_USERNAME = config['CZ_EARTHCHEM_USERNAME']
+EARTHCHEM_PASSWORD = config['CZ_EARTHCHEM_PASSWORD']
+
+print(os.getenv('DEVIN'))
+print(os.getenv('devin'))

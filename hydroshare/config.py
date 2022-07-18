@@ -1,6 +1,14 @@
-BASE_URL = "https://beta.hydroshare.org/"
-USERNAME = "jim"
-PASSWORD = "62meister"
+import os
+from dotenv import dotenv_values
+config = {
+    **dotenv_values(".env"),  # load shared development variables
+    **os.environ,  # override loaded values with environment variables
+}
 
-GITHUB_ORG = "hydroshare"
-GITHUB_REPO = "hydroshare"
+BASE_URL = config['HS_BASE_URL']
+
+USERNAME = config['HS_USERNAME']
+PASSWORD = config['HS_PASSWORD']
+
+GITHUB_ORG = config['HS_GITHUB_ORG']
+GITHUB_REPO = config['HS_GITHUB_REPO']
