@@ -1,4 +1,4 @@
-name: Run DSP Tests Against dsp-test.criticalzone.org
+name: Run DSP Tests
 
 on:
   pull_request:
@@ -7,6 +7,11 @@ on:
       - "dsp/**"
       - ".github/workflows/**"
   workflow_dispatch:
+    inputs:
+      dsp-front-ref:
+        description: 'Ref from DSP front'
+      dsp-back-ref:
+        description: 'Ref from DSP back'
 
 jobs:
   build-test:
@@ -67,12 +72,78 @@ jobs:
       - name: Create Output Dir
         run: mkdir output
 
-      - name: Run Tests
+      - name: Run Tests against dsp-test
+        if: github.event.inputs.dsp-front-ref == '' ||  github.event.inputs.dsp-back-ref == ''
+        env:
+          HS_USERNAME: ${{ secrets.HS_USERNAME }}
+          HS_PASSWORD: ${{ secrets.HS_PASSWORD }}
+          CZ_USERNAME: ${{ secrets.CZ_USERNAME }}
+          CZ_PASSWORD: ${{ secrets.CZ_PASSWORD }}
+          CZ_EARTHCHEM_USERNAME: ${{ secrets.CZ_EARTHCHEM_USERNAME }}
+          CZ_EARTHCHEM_PASSWORD: ${{ secrets.CZ_EARTHCHEM_PASSWORD }}
         run: |
-          ./hydrotest dsp DspHydroshareTestSuite --headless --browser chrome --base https://dsp-test.criticalzone.org/ 2>&1 | tee -a output/hydroshare-browser-test-coverage.txt
-          ./hydrotest dsp DspExternalTestSuite --headless --browser chrome --base https://dsp-test.criticalzone.org/ 2>&1 | tee -a output/external-browser-test-coverage.txt
-          ./hydrotest dsp DspZenodoTestSuite --headless --browser chrome --base https://dsp-test.criticalzone.org/ 2>&1 | tee -a output/zenodo-browser-test-coverage.txt
-          ./hydrotest dsp DspEarthchemTestSuite --headless --browser chrome --base https://dsp-test.criticalzone.org/ 2>&1 | tee -a output/earthchem-browser-test-coverage.txt
+          ./hydrotest dsp DspHydroshareTestSuite --headless --browser chrome --base https://dsp-test.criticalzone.org/ 2>&1 | tee -a output/hydroshare-browser-test.txt
+          ./hydrotest dsp DspExternalTestSuite --headless --browser chrome --base https://dsp-test.criticalzone.org/ 2>&1 | tee -a output/external-browser-test.txt
+          ./hydrotest dsp DspZenodoTestSuite --headless --browser chrome --base https://dsp-test.criticalzone.org/ 2>&1 | tee -a output/zenodo-browser-test.txt
+          ./hydrotest dsp DspEarthchemTestSuite --headless --browser chrome --base https://dsp-test.criticalzone.org/ 2>&1 | tee -a output/earthchem-browser-test.txt
+      
+      - name: Clone DSP Back, ref = ${{ github.event.inputs.dsp-back-ref }}
+        uses: actions/checkout@v2
+        if: github.event.inputs.dsp-front-ref != '' &&  github.event.inputs.dsp-back-ref != ''
+        with:
+          repository: cznethub/dspback
+          path: dspback
+          ref: ${{ github.event.inputs.dsp-back-ref }}
+      
+      - name: Build DSPBack
+        working-directory: dspback
+        if: github.event.inputs.dsp-front-ref != '' &&  github.event.inputs.dsp-back-ref != ''
+        run: make build
+      
+      - name: Clone DSP Front, ref = ${{ github.event.inputs.dsp-front-ref }}
+        uses: actions/checkout@v2
+        if: github.event.inputs.dsp-front-ref != '' &&  github.event.inputs.dsp-back-ref != ''
+        with:
+          repository: cznethub/dspfront
+          path: dspfront
+          ref: ${{ github.event.inputs.dsp-front-ref }}
+      
+      - name: Build DSPFront
+        working-directory: dspfront
+        if: github.event.inputs.dsp-front-ref != '' &&  github.event.inputs.dsp-back-ref != ''
+        run: docker build -t dspfront .
+      
+       - name: Startup containers
+        if: github.event.inputs.dsp-front-ref != '' &&  github.event.inputs.dsp-back-ref != ''
+        working-directory: dspback
+        run: make up-all-d
+
+      - name: Sleep for 10 seconds
+        if: github.event.inputs.dsp-front-ref != '' &&  github.event.inputs.dsp-back-ref != ''
+        run: sleep 10s
+        shell: bash
+      
+      - name: Check 200 from DSP
+        # Fail fast if dsp isn't up
+        if: github.event.inputs.dsp-front-ref != '' &&  github.event.inputs.dsp-back-ref != ''
+        run: |
+          ./hydrotest dsp DspTestSuite.test_base_000001_home_page --headless --browser chrome --base https://localhost 2>&1 | tee -a output/home_page_check.txt
+          if grep -rl "FAILED (" ./output >/dev/null; then echo "Failed to connect" && exit 1; fi
+
+      - name: Run Tests against localhost
+        if: github.event.inputs.dsp-front-ref != '' &&  github.event.inputs.dsp-back-ref != ''
+        env:
+          HS_USERNAME: ${{ secrets.HS_USERNAME }}
+          HS_PASSWORD: ${{ secrets.HS_PASSWORD }}
+          CZ_USERNAME: ${{ secrets.CZ_USERNAME }}
+          CZ_PASSWORD: ${{ secrets.CZ_PASSWORD }}
+          CZ_EARTHCHEM_USERNAME: ${{ secrets.CZ_EARTHCHEM_USERNAME }}
+          CZ_EARTHCHEM_PASSWORD: ${{ secrets.CZ_EARTHCHEM_PASSWORD }}
+        run: |
+          ./hydrotest dsp DspHydroshareTestSuite --headless --browser chrome --base https://localhost 2>&1 | tee -a output/hydroshare-browser-test.txt
+          ./hydrotest dsp DspExternalTestSuite --headless --browser chrome --base https://localhost 2>&1 | tee -a output/external-browser-test.txt
+          ./hydrotest dsp DspZenodoTestSuite --headless --browser chrome --base https://localhost 2>&1 | tee -a output/zenodo-browser-test.txt
+          ./hydrotest dsp DspEarthchemTestSuite --headless --browser chrome --base https://localhost 2>&1 | tee -a output/earthchem-browser-test.txt
 
       - name: Archive test results
         uses: actions/upload-artifact@v3
