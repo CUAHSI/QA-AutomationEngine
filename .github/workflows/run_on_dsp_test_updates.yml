@@ -1,6 +1,9 @@
 name: Run DSP Tests
 
 on:
+  push:
+    branches:
+      - env-test
   pull_request:
     branches: [master]
     paths:
@@ -113,7 +116,7 @@ jobs:
         if: github.event.inputs.dsp-front-ref != '' &&  github.event.inputs.dsp-back-ref != ''
         run: docker build -t dspfront .
       
-       - name: Startup containers
+      - name: Startup containers
         if: github.event.inputs.dsp-front-ref != '' &&  github.event.inputs.dsp-back-ref != ''
         working-directory: dspback
         run: make up-all-d
