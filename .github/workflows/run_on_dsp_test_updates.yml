@@ -1,9 +1,6 @@
 name: Run DSP Tests
 
 on:
-  push:
-    branches:
-      - env-test
   pull_request:
     branches: [master]
     paths:
