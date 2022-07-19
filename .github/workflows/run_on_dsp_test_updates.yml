@@ -1,8 +1,11 @@
 name: Run DSP Tests
 
 on:
+  push:
+    branches:
+      - env-test
   pull_request:
-    branches: [env-test]
+    branches: [master]
     paths:
       - "dsp/**"
       - ".github/workflows/**"
