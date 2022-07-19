@@ -70,7 +70,7 @@ The test suite can be ran standalone - without the Jenkins and Selenium Grid inf
 
 Before running, it is recommended that you copy the [env.default](env.default) file into `.env` and edit the values accordingly. Alternatively, you can export the environment variables in your shell before running the QA tests. For example, to override the value in the .env file:
 ```
-export HS_GITHUB_ORG=hydroshare
+$ export HS_GITHUB_ORG=hydroshare
 ```
 
 
