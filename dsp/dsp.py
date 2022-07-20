@@ -255,12 +255,12 @@ class DspHydroshareTestSuite(DspTestSuite):
         section = "Creators"
         nth = 0
         dict = {
-            "Name": "Meister, Jim",
+            "Name": "test, czhub",
             # "Phone": "4444444444", phone is no longer showing up on beta HS
             "Organization": (
-                "Freie Universität Berlin;Agricultural University of Warsaw"
+                "test"
             ),
-            "Email": "concretejackbill@gmail.com",
+            "Email": "czhub.test@gmail.com",
         }
         match = EditHSSubmission.check_inputs_by_data_ids(
             self.driver, dict, section, nth
