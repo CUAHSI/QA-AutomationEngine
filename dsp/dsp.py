@@ -27,6 +27,7 @@ from dsp_macros import (
     ZenodoResourcePage,
     HSResourcePage,
     EarthchemResourcePage,
+    RepoAuthWindow
 )
 
 from cuahsi_base.cuahsi_base import BaseTestSuite, parse_args_run_tests
@@ -1060,11 +1061,12 @@ class DspEarthchemTestSuite(DspTestSuite):
         """Authenticate with orcid then select repo"""
         super().login_orcid_to_submit(self.repo_name)
 
-        # TODO: believe Earthchem team is updating their API
-        # SubmitLandingPage.to_repo_auth_window(self.driver)
-        # self.assertIn("ecl-realm", TestSystem.title(self.driver))
-        # EarthchemAuthWindow.authorize_via_orcid(self.driver)
-        OrcidWindow.to_origin_window(self.driver, wait=True)
+        # first time that a user auths to ECL, there is an extra window
+        if RepoAuthWindow.submit_to_repo_authorize.exists(self.driver):
+            SubmitLandingPage.to_repo_auth_window(self.driver)
+            self.assertIn("Sign in to EarthChem Library (ECL)", TestSystem.title(self.driver))
+            EarthchemAuthWindow.authorize_via_orcid(self.driver)
+            OrcidWindow.to_origin_window(self.driver, wait=True)
 
     def login_and_autofill_earthchem_required(self, auto_text):
         """A shortcut to fill required fields of submit page
