@@ -913,6 +913,12 @@ class DspZenodoTestSuite(DspTestSuite):
     def login_orcid_to_submit(self):
         """Authenticate with orcid the select repo"""
         super().login_orcid_to_submit(self.repo_name)
+        if RepoAuthWindow.submit_to_repo_authorize.exists(self.driver):
+            SubmitLandingPage.to_repo_auth_window(self.driver)
+            ZenodoAuthWindow.authorize_email_password(
+                self.driver, email=USERNAME, password=PASSWORD
+            )
+            ZenodoAuthWindow.to_origin_window(self.driver, wait=True)
 
     def login_and_autofill_zenodo_required(self, auto_text):
         """A shortcut to fill required fields of submit page
