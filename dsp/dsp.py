@@ -1036,10 +1036,14 @@ class DspEarthchemTestSuite(DspTestSuite):
         OrcidWindow.to_origin_window(self.driver)
 
         # new Earthchem auth window
-        SubmitLandingPage.to_repo_auth_window(self.driver)
-
-        EarthchemAuthWindow.authorize_via_orcid(self.driver)
-        OrcidWindow.to_origin_window(self.driver)
+        if RepoAuthWindow.submit_to_repo_authorize.exists(self.driver):
+            SubmitLandingPage.to_repo_auth_window(self.driver)
+            self.assertIn("Sign in", TestSystem.title(self.driver))
+            EarthchemAuthWindow.authorize_via_orcid(self.driver)
+            OrcidWindow.fill_credentials(
+                self.driver, EARTHCHEM_USERNAME, EARTHCHEM_PASSWORD
+            )
+            OrcidWindow.to_origin_window(self.driver, wait=True)
 
     def earthchem_then_login_username_password(self):
         """Select Earthchem repo then authenticate with orcid"""
