@@ -413,6 +413,7 @@ class GeneralSubmitToRepo(Dsp, RepoAuthWindow):
     def finish_submission(self, driver):
         self.bottom_finish.scroll_to(driver)
         self.bottom_finish.click(driver)
+        self.wait_until_element_visible(driver, self.is_saving, DEFAULT_TIMEOUT)
         self.wait_until_element_not_exist(driver, self.is_saving, NEW_SUBMISSION_SAVE)
 
     @classmethod
