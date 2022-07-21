@@ -1,7 +1,7 @@
 import time
 
 from selenium.webdriver.common.by import By
-from selenium.common.exceptions import TimeoutException
+from selenium.common.exceptions import TimeoutException, NoSuchElementException
 
 from cuahsi_base.site_element import SiteElement
 from cuahsi_base.utils import External, TestSystem
@@ -62,9 +62,7 @@ class Dsp(WebPage):
     @classmethod
     def app_contains_text(self, text):
         try:
-            _ = SiteElement(
-                    By.XPATH, f"//*[@id='app' and text()='{text}']"
-                )
+            _ = SiteElement(By.XPATH, f"//*[@id='app' and text()='{text}']")
             return True
         except TimeoutException:
             return False
@@ -413,7 +411,12 @@ class GeneralSubmitToRepo(Dsp, RepoAuthWindow):
     def finish_submission(self, driver):
         self.bottom_finish.scroll_to(driver)
         self.bottom_finish.click(driver)
-        self.wait_until_element_visible(driver, self.is_saving, DEFAULT_TIMEOUT)
+        try:
+            self.wait_until_element_visible(
+                driver, self.is_saving, PAUSE_AFTER_FILL_BEFORE_SUBMIT
+            )
+        except NoSuchElementException as e:
+            print(f"\n{e}... \nThis exception is ignored")
         self.wait_until_element_not_exist(driver, self.is_saving, NEW_SUBMISSION_SAVE)
 
     @classmethod

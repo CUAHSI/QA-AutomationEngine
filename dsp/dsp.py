@@ -27,7 +27,7 @@ from dsp_macros import (
     ZenodoResourcePage,
     HSResourcePage,
     EarthchemResourcePage,
-    RepoAuthWindow
+    RepoAuthWindow,
 )
 
 from cuahsi_base.cuahsi_base import BaseTestSuite, parse_args_run_tests
@@ -258,9 +258,7 @@ class DspHydroshareTestSuite(DspTestSuite):
         dict = {
             "Name": "test, czhub",
             # "Phone": "4444444444", phone is no longer showing up on beta HS
-            "Organization": (
-                "test"
-            ),
+            "Organization": ("test"),
             "Email": "czhub.test@gmail.com",
         }
         match = EditHSSubmission.check_inputs_by_data_ids(
