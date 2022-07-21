@@ -1070,8 +1070,11 @@ class DspEarthchemTestSuite(DspTestSuite):
         # first time that a user auths to ECL, there is an extra window
         if RepoAuthWindow.submit_to_repo_authorize.exists(self.driver):
             SubmitLandingPage.to_repo_auth_window(self.driver)
-            self.assertIn("Sign in to EarthChem Library (ECL)", TestSystem.title(self.driver))
+            self.assertIn("Sign in", TestSystem.title(self.driver))
             EarthchemAuthWindow.authorize_via_orcid(self.driver)
+            OrcidWindow.fill_credentials(
+                self.driver, EARTHCHEM_USERNAME, EARTHCHEM_PASSWORD
+            )
             OrcidWindow.to_origin_window(self.driver, wait=True)
 
     def login_and_autofill_earthchem_required(self, auto_text):
