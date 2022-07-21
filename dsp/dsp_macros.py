@@ -117,7 +117,7 @@ class Dsp(WebPage):
 
     @classmethod
     def is_visible_orcid_modal(self, driver):
-        return self.orcid_login_modal.is_visible(driver)
+        return self.orcid_login_modal.exists(driver)
 
     @classmethod
     def to_orcid_window(self, driver):
