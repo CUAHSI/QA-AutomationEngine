@@ -158,4 +158,4 @@ jobs:
         working-directory: output
         run: |
           grep -rh "ERROR:" .
-          if grep -rl "FAILED (" . >/dev/null; then grep -rh "FAIL:" . && exit 1; else grep -rh "^Ran [0-9]* test in [0-9]*\.*[0-9]*s$\n\n^OK" .; fi
+          if grep -rl "FAILED (" . >/dev/null; then grep -rh "FAIL:" . && exit 1; else grep -rh "OK (" .; fi
