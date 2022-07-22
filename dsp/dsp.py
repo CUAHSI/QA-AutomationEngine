@@ -1216,15 +1216,14 @@ class DspEarthchemTestSuite(DspTestSuite):
             license = SubmitEarthchem.get_license(self.driver)
             self.assertEqual(license, dict["License"])
 
-    @unittest.skipIf(
-        "localhost" in BASE_URL or "test" in BASE_URL,
-        "Viewing ECL submissions not supported in test environment",
-    )
     def test_ec_000010_able_to_view_in_repository(self):
         """
         From My Submissions, confirm that we can "view in repository" ECL submission, after saving
         """
         # TODO: set production ECL env via GH workflow
+        # https://github.com/cznethub/dspback/issues/118
+        if "localhost" in self.base_url_arg or "test" in self.base_url_arg:
+            self.skipTest("Viewing ECL submissions not supported in test environment")
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
         template = self.required_elements_template(auto_text)
         self.login_and_autofill_earthchem_required(auto_text)
@@ -1241,15 +1240,14 @@ class DspEarthchemTestSuite(DspTestSuite):
             template["group-BasicInformation"]["DatasetTitle"],
         )
 
-    @unittest.skipIf(
-        "localhost" in BASE_URL or "test" in BASE_URL,
-        "Viewing ECL submissions not supported in test environment",
-    )
     def test_ec_000011_submit_for_review_required_fields(self):
         """
         From My Submissions, confirm that we can "view in repository" ECL submission, after SUBMITTING FOR REVIEW
         """
         # TODO: set production ECL env via GH workflow
+        # https://github.com/cznethub/dspback/issues/118
+        if "localhost" in self.base_url_arg or "test" in self.base_url_arg:
+            self.skipTest("Viewing ECL submissions not supported in test environment")
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
         self.login_and_autofill_earthchem_required(auto_text)
         self.assertTrue(SubmitEarthchem.is_finishable(self.driver))
