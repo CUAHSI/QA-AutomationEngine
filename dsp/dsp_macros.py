@@ -14,6 +14,7 @@ from timing import (
     DEFAULT_TIMEOUT,
     PAUSE_AFTER_FILL_BEFORE_SUBMIT,
     REPO_LOAD,
+    SUBMIT_LANDING_PAGE_LOAD,
 )
 
 
@@ -62,7 +63,7 @@ class Dsp(WebPage):
     @classmethod
     def app_contains_text(self, text):
         try:
-            _ = SiteElement(By.XPATH, f"//*[@id='app' and text()='{text}']")
+            _ = SiteElement(By.XPATH, f"//*[@id='app']/child::*[contains(., '{text}')]")
             return True
         except TimeoutException:
             return False
@@ -197,6 +198,19 @@ class Dsp(WebPage):
             else:
                 time.sleep(1)
                 waited += 1
+
+    @classmethod
+    def wait_until_element_exist(
+        self, driver, element, timeout=SUBMIT_LANDING_PAGE_LOAD
+    ):
+        waited = 0
+        while waited < timeout:
+            if element.exists(driver):
+                return
+            else:
+                time.sleep(1)
+                waited += 1
+        raise Exception(element.locator)
 
 
 class OrcidWindow(WebPage):
@@ -335,6 +349,10 @@ class RepoAuthWindow(WebPage):
 
 class SubmitLandingPage(Dsp, RepoAuthWindow):
     """Page containing options for submitting data"""
+
+    repositories_header = SiteElement(
+        By.XPATH, "//*[@id='app']/child::*[contains(., 'Repositories')]"
+    )
 
     @classmethod
     def select_repo_by_id(self, driver, id):

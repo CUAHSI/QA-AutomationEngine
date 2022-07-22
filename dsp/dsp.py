@@ -152,6 +152,9 @@ class DspHydroshareTestSuite(DspTestSuite):
         """Authenticate with orcid and then HS credentials"""
         Dsp.show_mobile_nav(self.driver)
         Dsp.drawer_to_submit(self.driver)
+        SubmitLandingPage.wait_until_element_exist(
+            self.driver, SubmitLandingPage.repositories_header
+        )
         SubmitLandingPage.select_repo_by_id(self.driver, self.repo_name)
 
         # new ORCID window
