@@ -27,7 +27,7 @@ from dsp_macros import (
     ZenodoResourcePage,
     HSResourcePage,
     EarthchemResourcePage,
-    RepoAuthWindow
+    RepoAuthWindow,
 )
 
 from cuahsi_base.cuahsi_base import BaseTestSuite, parse_args_run_tests
@@ -152,6 +152,9 @@ class DspHydroshareTestSuite(DspTestSuite):
         """Authenticate with orcid and then HS credentials"""
         Dsp.show_mobile_nav(self.driver)
         Dsp.drawer_to_submit(self.driver)
+        SubmitLandingPage.wait_until_element_exist(
+            self.driver, SubmitLandingPage.repositories_header
+        )
         SubmitLandingPage.select_repo_by_id(self.driver, self.repo_name)
 
         # new ORCID window
@@ -258,9 +261,7 @@ class DspHydroshareTestSuite(DspTestSuite):
         dict = {
             "Name": "test, czhub",
             # "Phone": "4444444444", phone is no longer showing up on beta HS
-            "Organization": (
-                "test"
-            ),
+            "Organization": ("test"),
             "Email": "czhub.test@gmail.com",
         }
         match = EditHSSubmission.check_inputs_by_data_ids(
@@ -1036,10 +1037,14 @@ class DspEarthchemTestSuite(DspTestSuite):
         OrcidWindow.to_origin_window(self.driver)
 
         # new Earthchem auth window
-        SubmitLandingPage.to_repo_auth_window(self.driver)
-
-        EarthchemAuthWindow.authorize_via_orcid(self.driver)
-        OrcidWindow.to_origin_window(self.driver)
+        if RepoAuthWindow.submit_to_repo_authorize.exists(self.driver):
+            SubmitLandingPage.to_repo_auth_window(self.driver)
+            self.assertIn("Sign in", TestSystem.title(self.driver))
+            EarthchemAuthWindow.authorize_via_orcid(self.driver)
+            OrcidWindow.fill_credentials(
+                self.driver, EARTHCHEM_USERNAME, EARTHCHEM_PASSWORD
+            )
+            OrcidWindow.to_origin_window(self.driver, wait=True)
 
     def earthchem_then_login_username_password(self):
         """Select Earthchem repo then authenticate with orcid"""
@@ -1070,8 +1075,11 @@ class DspEarthchemTestSuite(DspTestSuite):
         # first time that a user auths to ECL, there is an extra window
         if RepoAuthWindow.submit_to_repo_authorize.exists(self.driver):
             SubmitLandingPage.to_repo_auth_window(self.driver)
-            self.assertIn("Sign in to EarthChem Library (ECL)", TestSystem.title(self.driver))
+            self.assertIn("Sign in", TestSystem.title(self.driver))
             EarthchemAuthWindow.authorize_via_orcid(self.driver)
+            OrcidWindow.fill_credentials(
+                self.driver, EARTHCHEM_USERNAME, EARTHCHEM_PASSWORD
+            )
             OrcidWindow.to_origin_window(self.driver, wait=True)
 
     def login_and_autofill_earthchem_required(self, auto_text):
@@ -1208,10 +1216,15 @@ class DspEarthchemTestSuite(DspTestSuite):
             license = SubmitEarthchem.get_license(self.driver)
             self.assertEqual(license, dict["License"])
 
+    @unittest.skipIf(
+        "localhost" in BASE_URL or "test" in BASE_URL,
+        "Viewing ECL submissions not supported in test environment",
+    )
     def test_ec_000010_able_to_view_in_repository(self):
         """
         From My Submissions, confirm that we can "view in repository" ECL submission, after saving
         """
+        # TODO: set production ECL env via GH workflow
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
         template = self.required_elements_template(auto_text)
         self.login_and_autofill_earthchem_required(auto_text)
@@ -1228,10 +1241,15 @@ class DspEarthchemTestSuite(DspTestSuite):
             template["group-BasicInformation"]["DatasetTitle"],
         )
 
+    @unittest.skipIf(
+        "localhost" in BASE_URL or "test" in BASE_URL,
+        "Viewing ECL submissions not supported in test environment",
+    )
     def test_ec_000011_submit_for_review_required_fields(self):
         """
         From My Submissions, confirm that we can "view in repository" ECL submission, after SUBMITTING FOR REVIEW
         """
+        # TODO: set production ECL env via GH workflow
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
         self.login_and_autofill_earthchem_required(auto_text)
         self.assertTrue(SubmitEarthchem.is_finishable(self.driver))

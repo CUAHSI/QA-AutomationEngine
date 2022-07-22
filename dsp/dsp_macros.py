@@ -1,7 +1,7 @@
 import time
 
 from selenium.webdriver.common.by import By
-from selenium.common.exceptions import TimeoutException
+from selenium.common.exceptions import TimeoutException, NoSuchElementException
 
 from cuahsi_base.site_element import SiteElement
 from cuahsi_base.utils import External, TestSystem
@@ -14,6 +14,7 @@ from timing import (
     DEFAULT_TIMEOUT,
     PAUSE_AFTER_FILL_BEFORE_SUBMIT,
     REPO_LOAD,
+    SUBMIT_LANDING_PAGE_LOAD,
 )
 
 
@@ -62,9 +63,7 @@ class Dsp(WebPage):
     @classmethod
     def app_contains_text(self, text):
         try:
-            _ = SiteElement(
-                    By.XPATH, f"//*[@id='app' and text()='{text}']"
-                )
+            _ = SiteElement(By.XPATH, f"//*[@id='app']/child::*[contains(., '{text}')]")
             return True
         except TimeoutException:
             return False
@@ -117,7 +116,7 @@ class Dsp(WebPage):
 
     @classmethod
     def is_visible_orcid_modal(self, driver):
-        return self.orcid_login_modal.is_visible(driver)
+        return self.orcid_login_modal.exists(driver)
 
     @classmethod
     def to_orcid_window(self, driver):
@@ -199,6 +198,19 @@ class Dsp(WebPage):
             else:
                 time.sleep(1)
                 waited += 1
+
+    @classmethod
+    def wait_until_element_exist(
+        self, driver, element, timeout=SUBMIT_LANDING_PAGE_LOAD
+    ):
+        waited = 0
+        while waited < timeout:
+            if element.exists(driver):
+                return
+            else:
+                time.sleep(1)
+                waited += 1
+        raise Exception(element.locator)
 
 
 class OrcidWindow(WebPage):
@@ -338,6 +350,10 @@ class RepoAuthWindow(WebPage):
 class SubmitLandingPage(Dsp, RepoAuthWindow):
     """Page containing options for submitting data"""
 
+    repositories_header = SiteElement(
+        By.XPATH, "//*[@id='app']/child::*[contains(., 'Repositories')]"
+    )
+
     @classmethod
     def select_repo_by_id(self, driver, id):
         repo_card = SiteElement(By.CSS_SELECTOR, f'div[id*="{id}"]')
@@ -413,6 +429,12 @@ class GeneralSubmitToRepo(Dsp, RepoAuthWindow):
     def finish_submission(self, driver):
         self.bottom_finish.scroll_to(driver)
         self.bottom_finish.click(driver)
+        try:
+            self.wait_until_element_visible(
+                driver, self.is_saving, PAUSE_AFTER_FILL_BEFORE_SUBMIT
+            )
+        except NoSuchElementException as e:
+            print(f"\n{e}... \nThis exception is ignored")
         self.wait_until_element_not_exist(driver, self.is_saving, NEW_SUBMISSION_SAVE)
 
     @classmethod
