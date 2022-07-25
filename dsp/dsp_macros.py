@@ -191,7 +191,9 @@ class Dsp(WebPage):
     @classmethod
     def wait_until_app_contains_text(self, driver, text, timeout=DEFAULT_TIMEOUT):
         try:
-            element = SiteElement(By.XPATH, f"//*[@id='app']/child::*[contains(., '{text}')]")
+            element = SiteElement(
+                By.XPATH, f"//*[@id='app']/child::*[contains(., '{text}')]"
+            )
             self.wait_until_element_exist(driver, element, timeout)
             return True
         except TimeoutException:
@@ -842,7 +844,25 @@ class SubmitExternal(GeneralSubmitToRepo):
 class SubmitZenodo(GeneralSubmitToRepo):
     """Page containing forms for submitting data with Zenodo backend"""
 
-    pass
+    @classmethod
+    def finish_submission(self, driver, uname, pw):
+        """Override general finish submission to account for extra Zenodo auth window"""
+        self.bottom_finish.scroll_to(driver)
+        self.bottom_finish.click(driver)
+
+        SubmitZenodo.to_repo_auth_window(self.driver)
+        ZenodoAuthWindow.authorize_via_orcid(self.driver)
+        self.assertIn("ORCID", TestSystem.title(self.driver))
+        OrcidWindow.fill_credentials(self.driver, uname, pw)
+        OrcidWindow.to_origin_window(self.driver)
+
+        try:
+            self.wait_until_element_visible(
+                driver, self.is_saving, PAUSE_AFTER_FILL_BEFORE_SUBMIT
+            )
+        except NoSuchElementException as e:
+            print(f"\n{e}... \nThis exception is ignored")
+        self.wait_until_element_not_exist(driver, self.is_saving, NEW_SUBMISSION_SAVE)
 
 
 class EditExternalSubmission(SubmitHydroshare, GeneralEditSubmission):

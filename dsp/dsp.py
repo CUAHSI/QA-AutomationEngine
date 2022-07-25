@@ -60,29 +60,35 @@ def catch_exception(f):
         try:
             return f(*args, **kwargs)
         except Exception:
-            print(f'\nCaught an exception in: {f.__name__}')
+            print(f"\nCaught an exception in: {f.__name__}")
 
             # attempt to figure out what page we are on
             test = args[0]
             Path("debug").mkdir(parents=True, exist_ok=True)
-            file_name = "debug/" + f.__name__ + " " + datetime.datetime.now().strftime("%I%M_%p_%B_%d_%Y")
+            file_name = (
+                "debug/"
+                + f.__name__
+                + " "
+                + datetime.datetime.now().strftime("%I%M_%p_%B_%d_%Y")
+            )
             test.driver.save_screenshot(file_name + ".png")
             soup = BeautifulSoup(test.driver.page_source, "html.parser")
-            app = soup.find('div', id="main-container")
-            with open(file_name+".txt", "w") as o:
+            app = soup.find("div", id="main-container")
+            with open(file_name + ".txt", "w") as o:
                 with contextlib.redirect_stdout(o):
                     print(f"Page source for {f.__name__}\n" + "*" * 100)
                     for node in app.find_all("div"):
                         print(node.text)
                     print("*" * 100 + f"\nEnd page source for {f.__name__}")
             raise
+
     return func
 
 
 class ErrorCatcher(type):
     def __new__(cls, name, bases, dct):
         for m in dct:
-            if hasattr(dct[m], '__call__'):
+            if hasattr(dct[m], "__call__"):
                 dct[m] = catch_exception(dct[m])
         return type.__new__(cls, name, bases, dct)
 
@@ -163,6 +169,7 @@ class DspTestSuite(BaseTestSuite, metaclass=ErrorCatcher):
         """
 
         self.assertTrue(Dsp.app_contains_text("Critical Zone Collaborative Network"))
+
 
 class DspHydroshareTestSuite(DspTestSuite):
     """DSP tests for the Hydroshare repository"""
@@ -1017,7 +1024,7 @@ class DspZenodoTestSuite(DspTestSuite):
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
         self.login_and_autofill_zenodo_required(auto_text)
         self.assertTrue(SubmitZenodo.is_finishable(self.driver))
-        SubmitZenodo.finish_submission(self.driver)
+        SubmitZenodo.finish_submission(self.driver, USERNAME, PASSWORD)
         # self.assertEqual("My Submissions", MySubmissions.get_title(self.driver))
         MySubmissions.wait_until_app_contains_text(self.driver, "My Submissions")
 
@@ -1189,7 +1196,7 @@ class DspEarthchemTestSuite(DspTestSuite):
         self.login_and_autofill_earthchem_required(auto_text)
         self.assertTrue(SubmitEarthchem.is_finishable(self.driver))
         SubmitEarthchem.finish_submission_later(self.driver)
-        
+
         # self.assertEqual("My Submissions", MySubmissions.get_title(self.driver))
         MySubmissions.wait_until_app_contains_text(self.driver, "My Submissions")
 
