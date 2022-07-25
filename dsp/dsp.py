@@ -139,9 +139,8 @@ class DspTestSuite(BaseTestSuite, metaclass=ErrorCatcher):
     def submit(self, sort_text):
         GeneralSubmitToRepo.finish_submission(self.driver)
 
-        # self.assertEqual("My Submissions", MySubmissions.get_title(self.driver))
-        # MySubmissions.enter_text_in_search(self.driver, sort_text)
         MySubmissions.wait_until_app_contains_text(self.driver, "My Submissions")
+        MySubmissions.enter_text_in_search(self.driver, sort_text)
         MySubmissions.edit_top_submission(self.driver)
 
     def check(self, section, nth, dict, array=False):
@@ -257,11 +256,10 @@ class DspHydroshareTestSuite(DspTestSuite):
         self.assertTrue(SubmitHydroshare.is_finishable(self.driver))
         SubmitHydroshare.finish_submission(self.driver)
 
-        # self.assertEqual("My Submissions", MySubmissions.get_title(self.driver))
-        # MySubmissions.enter_text_in_search(self.driver, auto_text)
         MySubmissions.wait_until_app_contains_text(self.driver, "My Submissions")
-
+        MySubmissions.enter_text_in_search(self.driver, auto_text)
         MySubmissions.edit_top_submission(self.driver)
+
         self.assertEqual(
             "Edit Submission", EditHSSubmission.get_header_title(self.driver)
         )
@@ -300,11 +298,10 @@ class DspHydroshareTestSuite(DspTestSuite):
         self.login_and_autofill_hs_required(auto_text)
         SubmitHydroshare.finish_submission(self.driver)
 
-        # self.assertEqual("My Submissions", MySubmissions.get_title(self.driver))
-        # MySubmissions.enter_text_in_search(self.driver, auto_text)
         MySubmissions.wait_until_app_contains_text(self.driver, "My Submissions")
-
+        MySubmissions.enter_text_in_search(self.driver, auto_text)
         MySubmissions.edit_top_submission(self.driver)
+
         section = "Creators"
         nth = 0
         dict = {
@@ -326,11 +323,10 @@ class DspHydroshareTestSuite(DspTestSuite):
         self.assertTrue(SubmitHydroshare.is_finishable(self.driver))
         SubmitHydroshare.finish_submission(self.driver)
 
-        # self.assertEqual("My Submissions", MySubmissions.get_title(self.driver))
-        # MySubmissions.enter_text_in_search(self.driver, auto_text)
         MySubmissions.wait_until_app_contains_text(self.driver, "My Submissions")
-
+        MySubmissions.enter_text_in_search(self.driver, auto_text)
         MySubmissions.edit_top_submission(self.driver)
+
         self.assertEqual(
             "Edit Submission", EditHSSubmission.get_header_title(self.driver)
         )
@@ -354,10 +350,8 @@ class DspHydroshareTestSuite(DspTestSuite):
         self.assertTrue(success_filling)
         SubmitHydroshare.finish_submission(self.driver)
 
-        # self.assertEqual("My Submissions", MySubmissions.get_title(self.driver))
-        # MySubmissions.enter_text_in_search(self.driver, auto_text)
         MySubmissions.wait_until_app_contains_text(self.driver, "My Submissions")
-
+        MySubmissions.enter_text_in_search(self.driver, auto_text)
         MySubmissions.edit_top_submission(self.driver)
 
         match = EditHSSubmission.check_inputs_by_data_ids(
@@ -431,10 +425,8 @@ class DspHydroshareTestSuite(DspTestSuite):
         )
         SubmitHydroshare.finish_submission(self.driver)
 
-        # self.assertEqual("My Submissions", MySubmissions.get_title(self.driver))
-        # MySubmissions.enter_text_in_search(self.driver, auto_text)
         MySubmissions.wait_until_app_contains_text(self.driver, "My Submissions")
-
+        MySubmissions.enter_text_in_search(self.driver, auto_text)
         MySubmissions.edit_top_submission(self.driver)
 
         relation = EditHSSubmission.get_nth_relation_type(self.driver, nth)
@@ -465,10 +457,8 @@ class DspHydroshareTestSuite(DspTestSuite):
         self.assertTrue(success_filling)
         SubmitHydroshare.finish_submission(self.driver)
 
-        # self.assertEqual("My Submissions", MySubmissions.get_title(self.driver))
-        # MySubmissions.enter_text_in_search(self.driver, auto_text)
         MySubmissions.wait_until_app_contains_text(self.driver, "My Submissions")
-
+        MySubmissions.enter_text_in_search(self.driver, auto_text)
         MySubmissions.edit_top_submission(self.driver)
 
         SubmitHydroshare.expand_section_by_did(self.driver, data_id=section)
@@ -520,9 +510,8 @@ class DspHydroshareTestSuite(DspTestSuite):
         self.assertTrue(SubmitHydroshare.is_finishable(self.driver))
         SubmitHydroshare.finish_submission(self.driver)
 
-        # self.assertEqual("My Submissions", MySubmissions.get_title(self.driver))
         MySubmissions.wait_until_app_contains_text(self.driver, "My Submissions")
-
+        MySubmissions.enter_text_in_search(self.driver, auto_text)
         MySubmissions.edit_top_submission(self.driver)
 
         self.assertEqual(
@@ -679,10 +668,10 @@ class DspHydroshareTestSuite(DspTestSuite):
         self.assertTrue(SubmitHydroshare.is_finishable(self.driver))
         SubmitHydroshare.finish_submission(self.driver)
 
-        # self.assertEqual("My Submissions", MySubmissions.get_title(self.driver))
         MySubmissions.wait_until_app_contains_text(self.driver, "My Submissions")
-
+        MySubmissions.enter_text_in_search(self.driver, auto_text)
         MySubmissions.view_top_submission(self.driver)
+
         MySubmissions.to_hs_repo(self.driver)
         self.assertEqual(
             HSResourcePage.get_title(self.driver), template["BasicInformation"]["Title"]
@@ -777,9 +766,8 @@ class DspExternalTestSuite(DspTestSuite):
         self.assertTrue(SubmitExternal.is_finishable(self.driver))
         SubmitExternal.finish_submission(self.driver)
 
-        # self.assertEqual("My Submissions", MySubmissions.get_title(self.driver))
-        # MySubmissions.enter_text_in_search(self.driver, auto_text)
         MySubmissions.wait_until_app_contains_text(self.driver, "My Submissions")
+        MySubmissions.enter_text_in_search(self.driver, auto_text)
 
         top_name = MySubmissions.get_top_submission_name(self.driver)
 
@@ -828,10 +816,8 @@ class DspExternalTestSuite(DspTestSuite):
         self.assertTrue(success_filling)
         SubmitExternal.finish_submission(self.driver)
 
-        # self.assertEqual("My Submissions", MySubmissions.get_title(self.driver))
-        # MySubmissions.enter_text_in_search(self.driver, auto_text)
         MySubmissions.wait_until_app_contains_text(self.driver, "My Submissions")
-
+        MySubmissions.enter_text_in_search(self.driver, auto_text)
         MySubmissions.edit_top_submission(self.driver)
 
         match = EditExternalSubmission.check_inputs_by_data_ids(
@@ -867,10 +853,8 @@ class DspExternalTestSuite(DspTestSuite):
         )
         SubmitExternal.finish_submission(self.driver)
 
-        # self.assertEqual("My Submissions", MySubmissions.get_title(self.driver))
-        # MySubmissions.enter_text_in_search(self.driver, auto_text)
         MySubmissions.wait_until_app_contains_text(self.driver, "My Submissions")
-
+        MySubmissions.enter_text_in_search(self.driver, auto_text)
         MySubmissions.edit_top_submission(self.driver)
 
         relation = EditExternalSubmission.get_nth_relation_type(self.driver, nth)
@@ -1025,7 +1009,7 @@ class DspZenodoTestSuite(DspTestSuite):
         self.login_and_autofill_zenodo_required(auto_text)
         self.assertTrue(SubmitZenodo.is_finishable(self.driver))
         SubmitZenodo.finish_submission(self.driver, USERNAME, PASSWORD)
-        # self.assertEqual("My Submissions", MySubmissions.get_title(self.driver))
+        self.assertEqual("My Submissions", MySubmissions.get_title(self.driver))
         MySubmissions.wait_until_app_contains_text(self.driver, "My Submissions")
 
     def test_ze_000005_required_fields_persist(self):
@@ -1036,7 +1020,7 @@ class DspZenodoTestSuite(DspTestSuite):
         self.assertTrue(SubmitZenodo.is_finishable(self.driver))
         SubmitZenodo.finish_submission(self.driver, USERNAME, PASSWORD)
 
-        # MySubmissions.enter_text_in_search(self.driver, auto_text)
+        MySubmissions.enter_text_in_search(self.driver, auto_text)
         MySubmissions.edit_top_submission(self.driver)
         self.assertEqual(
             "Edit Submission", EditZenodoSubmission.get_header_title(self.driver)
@@ -1054,7 +1038,7 @@ class DspZenodoTestSuite(DspTestSuite):
         self.assertTrue(SubmitZenodo.is_finishable(self.driver))
         SubmitZenodo.finish_submission(self.driver, USERNAME, PASSWORD)
 
-        # MySubmissions.enter_text_in_search(self.driver, auto_text)
+        MySubmissions.enter_text_in_search(self.driver, auto_text)
         MySubmissions.view_top_submission(self.driver)
         MySubmissions.to_zenodo_repo(self.driver)
         self.assertEqual(
@@ -1170,8 +1154,8 @@ class DspEarthchemTestSuite(DspTestSuite):
         """
         SubmitEarthchem.finish_submission_later(self.driver)
 
-        # self.assertEqual("My Submissions", MySubmissions.get_title(self.driver))
-        # MySubmissions.enter_text_in_search(self.driver, sort_text)
+        self.assertEqual("My Submissions", MySubmissions.get_title(self.driver))
+        MySubmissions.enter_text_in_search(self.driver, sort_text)
         MySubmissions.wait_until_app_contains_text(self.driver, "My Submissions")
 
         MySubmissions.edit_top_submission(self.driver)
@@ -1197,7 +1181,7 @@ class DspEarthchemTestSuite(DspTestSuite):
         self.assertTrue(SubmitEarthchem.is_finishable(self.driver))
         SubmitEarthchem.finish_submission_later(self.driver)
 
-        # self.assertEqual("My Submissions", MySubmissions.get_title(self.driver))
+        self.assertEqual("My Submissions", MySubmissions.get_title(self.driver))
         MySubmissions.wait_until_app_contains_text(self.driver, "My Submissions")
 
     def test_ec_000004_required_fields_persist(self):
@@ -1208,7 +1192,7 @@ class DspEarthchemTestSuite(DspTestSuite):
         self.assertTrue(SubmitEarthchem.is_finishable(self.driver))
         SubmitEarthchem.finish_submission_later(self.driver)
 
-        # MySubmissions.enter_text_in_search(self.driver, auto_text)
+        MySubmissions.enter_text_in_search(self.driver, auto_text)
         MySubmissions.edit_top_submission(self.driver)
         self.assertEqual(
             "Edit Submission", EditEarthchemSubmission.get_header_title(self.driver)
@@ -1303,7 +1287,7 @@ class DspEarthchemTestSuite(DspTestSuite):
         self.assertTrue(SubmitEarthchem.is_finishable(self.driver))
         SubmitEarthchem.finish_submission_later(self.driver)
 
-        # MySubmissions.enter_text_in_search(self.driver, auto_text)
+        MySubmissions.enter_text_in_search(self.driver, auto_text)
         MySubmissions.view_top_submission(self.driver)
         MySubmissions.to_earthchem_repo(self.driver)
         EarthchemResourcePage.authenticate_if_needed(self.driver)
@@ -1326,8 +1310,8 @@ class DspEarthchemTestSuite(DspTestSuite):
         self.assertTrue(SubmitEarthchem.is_finishable(self.driver))
         SubmitEarthchem.submit_for_review(self.driver)
 
-        # self.assertEqual("My Submissions", MySubmissions.get_title(self.driver))
-        # MySubmissions.enter_text_in_search(self.driver, auto_text)
+        self.assertEqual("My Submissions", MySubmissions.get_title(self.driver))
+        MySubmissions.enter_text_in_search(self.driver, auto_text)
         MySubmissions.wait_until_app_contains_text(self.driver, "My Submissions")
 
         MySubmissions.view_top_submission(self.driver)
