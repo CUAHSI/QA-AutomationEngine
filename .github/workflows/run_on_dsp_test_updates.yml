@@ -75,9 +75,6 @@ jobs:
       - name: Create Output Dir
         run: mkdir output
       
-      - name: Create Screenshots Dir
-        run: mkdir screenshots
-      
       - name: Retrieve base64 from secrets and decode to .env file
         env:
           DSP_QA_ENGINE_ENV_BASE64: ${{ secrets.DSP_QA_ENGINE_ENV_BASE64 }}
