@@ -101,9 +101,9 @@ jobs:
         working-directory: dspback
         if: github.event.inputs.dsp-front-ref != '' &&  github.event.inputs.dsp-back-ref != '' && github.event.inputs.use-gh-env == 'true'
         env:
-          DSP_TEST_ENV_BASE64: ${{ secrets.DSP_TEST_ENV_BASE64 }}
+          DSP_BACK_ENV_BASE64: ${{ secrets.DSP_BACK_ENV_BASE64 }}
         run: |
-          echo $DSP_TEST_ENV_BASE64 | base64 --decode > .env
+          echo $DSP_BACK_ENV_BASE64 | base64 --decode > .env
       
       - name: Build DSPBack
         working-directory: dspback
