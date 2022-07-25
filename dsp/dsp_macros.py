@@ -850,14 +850,14 @@ class SubmitZenodo(GeneralSubmitToRepo):
         self.bottom_finish.scroll_to(driver)
         self.bottom_finish.click(driver)
 
-        if ZenodoAuthWindow.authorize_czhub_button.exists(driver):
-            print("\nAttempting to auth to zenodo AGAIN...")
+        try:
             SubmitLandingPage.to_repo_auth_window(driver)
             ZenodoAuthWindow.authorize_email_password(
                 driver, email=uname, password=pw
             )
             ZenodoAuthWindow.to_origin_window(driver, wait=True)
-
+        except NoSuchElementException as e:
+            print(f"\n{e}... \nThis exception is ignored")
         try:
             self.wait_until_element_visible(
                 driver, self.is_saving, PAUSE_AFTER_FILL_BEFORE_SUBMIT
