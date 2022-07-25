@@ -9,3 +9,4 @@ selenium>=3.0.0,<4.0.0
 boto3>=1.24.21,<2.0.0
 python-dotenv>=0.20.0<=0.21.0
 beautifulsoup4>=4.11.1<=4.12.0
+webdriver-manager>=3.8.2<=3.9.0
