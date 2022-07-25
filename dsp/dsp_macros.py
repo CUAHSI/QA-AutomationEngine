@@ -852,9 +852,7 @@ class SubmitZenodo(GeneralSubmitToRepo):
 
         try:
             SubmitLandingPage.to_repo_auth_window(driver)
-            ZenodoAuthWindow.authorize_email_password(
-                driver, email=uname, password=pw
-            )
+            ZenodoAuthWindow.authorize_email_password(driver, email=uname, password=pw)
             ZenodoAuthWindow.to_origin_window(driver, wait=True)
         except TimeoutException as e:
             print(f"\n{e}... \nThis exception is ignored")
