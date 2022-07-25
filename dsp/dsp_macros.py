@@ -856,7 +856,7 @@ class SubmitZenodo(GeneralSubmitToRepo):
                 driver, email=uname, password=pw
             )
             ZenodoAuthWindow.to_origin_window(driver, wait=True)
-        except NoSuchElementException as e:
+        except TimeoutException as e:
             print(f"\n{e}... \nThis exception is ignored")
         try:
             self.wait_until_element_visible(
