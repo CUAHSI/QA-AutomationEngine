@@ -1034,7 +1034,7 @@ class DspZenodoTestSuite(DspTestSuite):
         template = self.required_elements_template(auto_text)
         self.login_and_autofill_zenodo_required(auto_text)
         self.assertTrue(SubmitZenodo.is_finishable(self.driver))
-        SubmitZenodo.finish_submission(self.driver)
+        SubmitZenodo.finish_submission(self.driver, USERNAME, PASSWORD)
 
         # MySubmissions.enter_text_in_search(self.driver, auto_text)
         MySubmissions.edit_top_submission(self.driver)
@@ -1052,7 +1052,7 @@ class DspZenodoTestSuite(DspTestSuite):
         template = self.required_elements_template(auto_text)
         self.login_and_autofill_zenodo_required(auto_text)
         self.assertTrue(SubmitZenodo.is_finishable(self.driver))
-        SubmitZenodo.finish_submission(self.driver)
+        SubmitZenodo.finish_submission(self.driver, USERNAME, PASSWORD)
 
         # MySubmissions.enter_text_in_search(self.driver, auto_text)
         MySubmissions.view_top_submission(self.driver)

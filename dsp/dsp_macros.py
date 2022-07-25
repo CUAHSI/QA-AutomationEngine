@@ -850,11 +850,13 @@ class SubmitZenodo(GeneralSubmitToRepo):
         self.bottom_finish.scroll_to(driver)
         self.bottom_finish.click(driver)
 
-        SubmitZenodo.to_repo_auth_window(self.driver)
-        ZenodoAuthWindow.authorize_via_orcid(self.driver)
-        self.assertIn("ORCID", TestSystem.title(self.driver))
-        OrcidWindow.fill_credentials(self.driver, uname, pw)
-        OrcidWindow.to_origin_window(self.driver)
+        if ZenodoAuthWindow.authorize_czhub_button.exists(driver):
+            print("\nAttempting to auth to zenodo AGAIN...")
+            SubmitLandingPage.to_repo_auth_window(driver)
+            ZenodoAuthWindow.authorize_email_password(
+                driver, email=uname, password=pw
+            )
+            ZenodoAuthWindow.to_origin_window(driver, wait=True)
 
         try:
             self.wait_until_element_visible(
