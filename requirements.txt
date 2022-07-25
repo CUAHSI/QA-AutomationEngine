@@ -8,3 +8,4 @@ requests>=2.22.0,<3.0.0
 selenium>=3.0.0,<4.0.0
 boto3>=1.24.21,<2.0.0
 python-dotenv>=0.20.0<=0.21.0
+beautifulsoup4

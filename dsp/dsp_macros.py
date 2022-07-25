@@ -189,6 +189,15 @@ class Dsp(WebPage):
                 waited += 1
 
     @classmethod
+    def wait_until_app_contains_text(self, driver, text, timeout=DEFAULT_TIMEOUT):
+        try:
+            element = SiteElement(By.XPATH, f"//*[@id='app']/child::*[contains(., '{text}')]")
+            self.wait_until_element_exist(driver, element, timeout)
+            return True
+        except TimeoutException:
+            return False
+
+    @classmethod
     def wait_until_element_not_exist(self, driver, element, timeout=DEFAULT_TIMEOUT):
         waited = 0
         while waited < timeout:

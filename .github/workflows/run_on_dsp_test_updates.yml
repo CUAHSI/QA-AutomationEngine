@@ -75,6 +75,9 @@ jobs:
       - name: Create Output Dir
         run: mkdir output
       
+      - name: Create Screenshots Dir
+        run: mkdir screenshots
+      
       - name: Retrieve base64 from secrets and decode to .env file
         env:
           DSP_QA_ENGINE_ENV_BASE64: ${{ secrets.DSP_QA_ENGINE_ENV_BASE64 }}
@@ -153,9 +156,14 @@ jobs:
         with:
           name: DSP-ARTIFACTS
           path: output
+      
+      - name: Archive debug
+        uses: actions/upload-artifact@v3
+        with:
+          name: DSP-DEBUG
+          path: debug
 
       - name: Check whether passing
         working-directory: output
         run: |
-          grep -rh "ERROR:" .
-          if grep -rl "FAILED (" . >/dev/null; then grep -rh "FAIL:" . && exit 1; else grep -rh "OK (" .; fi
+          if grep -rl -e "FAILED (" -e "ERROR:" . >/dev/null; then grep -rh -e "FAIL:" -e "ERROR:" . && exit 1; else grep -rh "OK (" .; fi
