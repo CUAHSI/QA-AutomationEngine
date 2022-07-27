@@ -899,6 +899,12 @@ class SubmitEarthchem(GeneralSubmitToRepo):
         self.bottom_finish.scroll_to(driver)
         self.bottom_finish.click(driver)
         self.finish_later.click(driver)
+        try:
+            self.wait_until_element_visible(
+                driver, self.is_saving, PAUSE_AFTER_FILL_BEFORE_SUBMIT
+            )
+        except NoSuchElementException as e:
+            print(f"\n{e}... \nThis exception is ignored")
         self.wait_until_element_not_exist(driver, self.is_saving, NEW_SUBMISSION_SAVE)
 
     @classmethod
@@ -906,6 +912,12 @@ class SubmitEarthchem(GeneralSubmitToRepo):
         self.bottom_finish.scroll_to(driver)
         self.bottom_finish.click(driver)
         self.submit_review.click(driver)
+        try:
+            self.wait_until_element_visible(
+                driver, self.is_saving, PAUSE_AFTER_FILL_BEFORE_SUBMIT
+            )
+        except NoSuchElementException as e:
+            print(f"\n{e}... \nThis exception is ignored")
         self.wait_until_element_not_exist(driver, self.is_saving, NEW_SUBMISSION_SAVE)
 
     @classmethod
