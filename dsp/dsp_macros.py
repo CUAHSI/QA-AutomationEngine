@@ -1,4 +1,5 @@
 import time
+import datetime
 
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import TimeoutException, NoSuchElementException
@@ -439,14 +440,18 @@ class GeneralSubmitToRepo(Dsp, RepoAuthWindow):
     @classmethod
     def finish_submission(self, driver):
         self.bottom_finish.scroll_to(driver)
+        driver.save_screenshot("debug/pre-finish-"+datetime.datetime.now().strftime("%I%M_%p_%B_%d_%Y") + ".png")
         self.bottom_finish.click(driver)
+        driver.save_screenshot("debug/post-finish-"+datetime.datetime.now().strftime("%I%M_%p_%B_%d_%Y") + ".png")
         try:
             self.wait_until_element_visible(
                 driver, self.is_saving, PAUSE_AFTER_FILL_BEFORE_SUBMIT
             )
         except NoSuchElementException as e:
             print(f"\n{e}... \nThis exception is ignored")
+        driver.save_screenshot("debug/pre-wait-"+datetime.datetime.now().strftime("%I%M_%p_%B_%d_%Y") + ".png")
         self.wait_until_element_not_exist(driver, self.is_saving, NEW_SUBMISSION_SAVE)
+        driver.save_screenshot("debug/post-wait-"+datetime.datetime.now().strftime("%I%M_%p_%B_%d_%Y") + ".png")
 
     @classmethod
     def get_did_in_section(self, section=None, data_id="", nth=0):
