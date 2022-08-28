@@ -406,24 +406,27 @@ class Apps(Hydroshare):
     def info(self, num):
         return SiteElement(
             By.CSS_SELECTOR,
-            "#body > div.main-container > div.container.apps-container > div "
-            "div:nth-of-type({}) a.app-info-toggle".format(num),
+            "#body > div.main-container > div.container.apps-container > div:nth-child({}) > div > a.app-info-toggle".format(
+                num
+            ),
         )
 
     @classmethod
     def resource(self, num):
         return SiteElement(
             By.CSS_SELECTOR,
-            "#body > div.main-container > div.container.apps-container > div "
-            "div:nth-of-type({}) p.app-description a".format(num),
+            "#body > div.main-container > div.container.apps-container > div:nth-child({}) > div > p > a".format(
+                num
+            ),
         )
 
     @classmethod
     def title(self, num):
         return SiteElement(
             By.CSS_SELECTOR,
-            "#body > div.main-container > div.container.apps-container > div "
-            "div:nth-of-type({}) h3".format(num),
+            "#body > div.main-container > div.container.apps-container > div:nth-child({}) > div > a.webapp-link > h3".format(
+                num
+            ),
         )
 
     @classmethod
@@ -1085,16 +1088,37 @@ class Resource(Hydroshare):
     authors_locator = By.CSS_SELECTOR, ".authors-wrapper"
     add_author_button = SiteElement(By.CSS_SELECTOR, "#btn-add-new-author")
     # TODO: HS fix duplicate id in user-autocomplete
+    add_author_other_person = SiteElement(
+        By.CSS_SELECTOR,
+        "#add-author-modal > div > div > div.modal-body > div > button:nth-child(2)",
+    )
+    add_author_other_person_input = SiteElement(
+        By.XPATH, '(//input[@id="creator-name"])[2]'
+    )
     add_author_input = SiteElement(
         By.CSS_SELECTOR,
         '#add-author-modal input[placeholder="Search by name or username"]',
     )
+    add_author_input_clear = SiteElement(
+        By.CSS_SELECTOR, "#add-author-modal span.remove"
+    )
     add_author_select = SiteElement(
         By.CSS_SELECTOR, "#add-author-modal .yourlabs-autocomplete span:nth-child(1)"
     )
-    author_remove = SiteElement(By.CSS_SELECTOR, "#add-author-modal span.remove")
+    author_remove = SiteElement(
+        By.CSS_SELECTOR,
+        "#edit-author-modal > div > div > div:nth-child(2) > div > span",
+    )
+    author_remove_confirm = SiteElement(
+        By.CSS_SELECTOR,
+        "#edit-author-modal > div > div > div:nth-child(2) > div > div > div.space-top > a",
+    )
     add_author_save = SiteElement(
         By.CSS_SELECTOR, "#add-author-modal .modal-footer button.btn-primary"
+    )
+    add_author_other_person_save = SiteElement(
+        By.CSS_SELECTOR,
+        "#add-author-modal > div > div > div:nth-child(4) > div:nth-child(2) > div.modal-footer > button.btn.btn-primary",
     )
     author_warning = SiteElement(By.CSS_SELECTOR, "#add-author-modal .alert-danger")
     download_status = SiteElement(By.ID, "download-status-info")
@@ -1147,7 +1171,7 @@ class Resource(Hydroshare):
     @classmethod
     def author(self, index):
         return SiteElement(
-            By.CSS_SELECTOR, ".authors-wrapper > a:nth-of-type({})".format(index)
+            By.CSS_SELECTOR, ".authors-wrapper a:nth-of-type({})".format(index)
         )
 
     @classmethod
@@ -1259,7 +1283,16 @@ class Resource(Hydroshare):
     def add_reference(self, driver, reference_text):
         self.new_relation.click(driver)
         self.relation_type.select_option_text(driver, "This resource is referenced by")
-        self.relation_value.inject_text(driver, "https://google.com")
+        self.relation_value.inject_text(driver, reference_text)
+        self.relation_submit.click(driver)
+
+    @classmethod
+    def add_similar_to(self, driver, similar_to_text):
+        self.new_relation.click(driver)
+        self.relation_type.select_option_text(
+            driver, "The content of this resource is similar to"
+        )
+        self.relation_value.inject_text(driver, similar_to_text)
         self.relation_submit.click(driver)
 
     @classmethod
@@ -1487,12 +1520,27 @@ class Resource(Hydroshare):
         return self.sharing_status.get_text(driver)
 
     @classmethod
+    def add_other_author(self, driver, name):
+        self.add_author_button.click(driver)
+        self.add_author_other_person.click(driver)
+        self.add_author_other_person_input.click(driver)
+        self.add_author_other_person_input.inject_text(driver, name)
+        self.add_author_other_person_save.click(driver)
+        self.wait_on_author_save(driver, 3)
+
+    @classmethod
+    def delete_author(self, driver, index):
+        self.author(index).click(driver)
+        self.author_remove.click(driver)
+        self.author_remove_confirm.click(driver)
+
+    @classmethod
     def add_dup_authors(self, driver, username):
         for _ in range(2):
             self.add_author_button.click(driver)
             # if self.author_remove.is_visible(driver):
-            if self.author_remove.exists(driver):
-                self.author_remove.click(driver)
+            if self.add_author_input_clear.exists(driver):
+                self.add_author_input_clear.click(driver)
             self.add_author_input.click(driver)
             self.add_author_input.inject_text(driver, username)
             self.add_author_select.click(driver)
@@ -1512,6 +1560,16 @@ class Resource(Hydroshare):
     @classmethod
     def check_author_warning(self, driver):
         return self.author_warning.get_text(driver)
+
+    @classmethod
+    def has_visible_forms(self, driver):
+        if self.title.exists(driver):
+            return True
+        if self.abstract.exists(driver):
+            return True
+        if self.subject_keywords.exists(driver):
+            return True
+        return False
 
 
 class WebApp(Resource):
