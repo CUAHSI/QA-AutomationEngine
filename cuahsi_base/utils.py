@@ -37,6 +37,18 @@ class External:
         win_handle = driver.window_handles[-2]
         driver.switch_to.window(win_handle)
 
+    def switch_first_page(self, driver):
+        win_handle = driver.window_handles[0]
+        driver.switch_to.window(win_handle)
+
+    def switch_last_page(self, driver, new_tab_locator=None, time=NEW_PAGE_LOAD):
+        win_handle = driver.window_handles[-1]
+        driver.switch_to.window(win_handle)
+        if new_tab_locator is not None:
+            WebDriverWait(driver, time).until(
+                EC.visibility_of_element_located(new_tab_locator)
+            )
+
     def close_new_page(self, driver):
         orig_handle = driver.current_window_handle
         new_handle = driver.window_handles[-1]

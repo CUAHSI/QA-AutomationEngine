@@ -20,13 +20,26 @@ The test suites are designed to run within a [Jenkins](https://jenkins.io/) plus
 
 ## Table of Contents
 
-- [Background](#background)
-- [Install](#install)
-- [Usage](#usage)
-- [Creating Test Cases](#creating-test-cases)
-- [Maintainers](#maintainers)
-- [Contribute](#contribute)
-- [License](#license)
+- [QA Automation Engine](#qa-automation-engine)
+  - [Table of Contents](#table-of-contents)
+  - [Background](#background)
+    - [Jenkins](#jenkins)
+    - [Selenium Grid](#selenium-grid)
+  - [Install](#install)
+    - [Infrastructure](#infrastructure)
+    - [Python Packages](#python-packages)
+    - [Browser Driver](#browser-driver)
+  - [Usage](#usage)
+    - [Test Execution](#test-execution)
+    - [Jenkins Deployments](#jenkins-deployments)
+    - [Flake8 Compliance](#flake8-compliance)
+    - [Combinatorial Design of Experiments](#combinatorial-design-of-experiments)
+    - [Test Assets Generation](#test-assets-generation)
+  - [Creating Test Cases](#creating-test-cases)
+  - [Maintainers](#maintainers)
+  - [Aditional documentation](#aditional-documentation)
+  - [Contribute](#contribute)
+  - [License](#license)
 
 ## Background
 
@@ -53,7 +66,15 @@ For standalone executions, a browser driver must be downloaded into a system dir
 ## Usage
 
 ### Test Execution
-The test suite can be ran standalone - without the Jenkins and Selenium Grid infrastructure - for test script development and test suite debugging purposes.  To run all test cases (not just those defined in the configuration file):
+The test suite can be ran standalone - without the Jenkins and Selenium Grid infrastructure - for test script development and test suite debugging purposes.  
+
+Before running, it is recommended that you copy the [env.default](env.default) file into `.env` and edit the values accordingly. Alternatively, you can export the environment variables in your shell before running the QA tests. For example, to override the value in the .env file:
+```
+$ export HS_GITHUB_ORG=hydroshare
+```
+
+
+To run all test cases (not just those defined in the configuration file):
 ```
 $ ./hydrotest hydroclient
 ```
@@ -78,10 +99,23 @@ $ ./hydrotest hydroclient --records aws
 $ ./hydrotest hydroclient --records aws HydroclientTestSuite.test_A_000002
 ```
 
+To set the target against which tests will be run at runtime, add the `--base` argument:
+```
+$ ./hydrotest hydroclient --base https://www.hydroshare.org
+$ ./hydrotest hydroclient HydroclientTestSuite.test_A_000002 --base https://www.hydroshare.org
+```
+
+To run headless (currently supported in Chrome or Firefox), add the `--headless` argument:
+```
+$ ./hydrotest hydroclient --headless
+$ ./hydrotest hydroclient HydroclientTestSuite.test_A_000002 --headless
+```
+
 ### Jenkins Deployments
 After following the README in [docker/continuous-integration/](https://github.com/CUAHSI/QA-AutomationEngine/blob/master/docker/continuous-integration/) to setup a QA automation server, the tests to run can be configured using the following configuration files:
 1) [hydroclient.conf](hydroclient/hydroclient.conf)
 2) [hydroshare.conf](hydroshare/hydroshare.conf)
+3) [dsp.conf](dsp/dsp.conf)
 
 ### Flake8 Compliance
 To confirm Flake8 compliance, use:
@@ -133,7 +167,13 @@ The [utilities](cuahsi_base/utils.py) are also common to all CUAHSI test suites.
 
 [@cuahsi](https://github.com/cuahsi).
 [@hydroshare](https://github.com/hydroshare).
+[@CZNet](https://github.com/cznethub).
 [@ndebuhr](https://github.com/ndebuhr).
+
+## Aditional documentation
+
+[MkDocs](https://www.mkdocs.org/) is used to generate test-level documentation. The configuration lives in [mkdocs.yml](mkdocs.yml) and [/docs](docs).
+You can serve a local instance of the static documentation site with `mkdocs serve` or deploy it to https://cuahsi.github.io/QA-AutomationEngine/ using `mkdocs gh-deploy`
 
 ## Contribute
 

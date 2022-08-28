@@ -43,6 +43,22 @@ class SiteElement:
 
         return target_el
 
+    def loc_hidden(self, driver):
+        """
+        Identifies potentially hidden element on page, based on an element locator.
+        """
+        wait = WebDriverWait(driver, 10)
+        try:
+            target_el = wait.until(EC.presence_of_element_located((self.by, self.locator)))
+        except TimeoutException as e:
+            print(
+                "\nUnable to locate element by {}, "
+                "locator: '{}'".format(self.by, self.locator)
+            )
+            raise e
+
+        return target_el
+
     def exists(self, driver):
         """
         Checks if element is visible on the page.
@@ -52,7 +68,18 @@ class SiteElement:
             wait.until(EC.visibility_of_element_located((self.by, self.locator)))
             target_el = wait.until(EC.element_to_be_clickable((self.by, self.locator)))
             return True
-        except TimeoutException as e:
+        except TimeoutException:
+            return False
+
+    def exists_in_dom(self, driver):
+        """
+        Checks if element exists within the DOM.
+        """
+        wait = WebDriverWait(driver, 3)
+        try:
+            wait.until(EC.presence_of_element_located((self.by, self.locator)))
+            return True
+        except TimeoutException:
             return False
 
     def is_visible(self, driver):
@@ -91,10 +118,33 @@ class SiteElement:
         target_el = self.loc_it(driver)
         driver.execute_script("arguments[0].click();", target_el)
 
+    def javascript_click_hidden(self, driver):
+        """
+        Simulate click on a hidden element using JavaScript
+        """
+        target_el = self.loc_hidden(driver)
+        driver.execute_script("arguments[0].click();", target_el)
+
+    def javascript_fill_hidden_text(self, driver, text):
+        """
+        Set text using JavaScript for a potentially hidden element
+        """
+        target_el = self.loc_hidden(driver)
+        driver.execute_script(f'arguments[0].value="{text}";', target_el)
+
     def submit(self, driver):
         """Send ENTER to element, simulates submit"""
         target_el = self.loc_it(driver)
         target_el.send_keys(Keys.ENTER)
+
+    def submit_hidden(self, driver):
+        """Send ENTER to element that is perhaps hidden,
+        simulates submit
+        """
+        actions = ActionChains(driver)
+        actions.key_down(Keys.ENTER)
+        actions.key_up(Keys.ENTER)
+        actions.perform()
 
     def multi_click(self, driver):
         """Clicks an element while holding the control key, as to enable
@@ -160,6 +210,13 @@ class SiteElement:
         select_el = Select(target_el)
         select_el.select_by_visible_text(select_choice)
 
+    def scroll_to_hidden(self, driver):
+        """After element identification, the window is scrolled
+        such that the element becomes visible in the window
+        """
+        target_el = self.loc_hidden(driver)
+        target_el.location_once_scrolled_into_view
+
     def scroll_to(self, driver):
         """After element identification, the window is scrolled
         such that the element becomes visible in the window
@@ -189,9 +246,17 @@ class SiteElement:
         for i in range(0, len(field_text)):
             target_el.send_keys(field_text[i])
 
-    def send_caps(self, driver, field_text):
+    def hidden_inject_text(self, driver, field_text):
         """Enters text into a field or other input-capable html
-        element using send_keys_to_element
+        element that is hidden using send keys
+        """
+        target_el = self.loc_hidden(driver)
+        for i in range(0, len(field_text)):
+            target_el.send_keys(field_text[i])
+
+    def send_caps(self, driver, field_text):
+        """Enters capitalized text into a field or other input-capable
+        html element using send_keys_to_element
         """
         actionchains = ActionChains(driver)
         target_el = self.loc_it(driver)
@@ -220,6 +285,11 @@ class SiteElement:
     def get_attribute(self, driver, attribute):
         """Returns any attribute of website element"""
         target_el = self.loc_it(driver)
+        return target_el.get_attribute(attribute)
+
+    def get_attribute_hidden(self, driver, attribute):
+        """Returns any attribute of website element"""
+        target_el = self.loc_hidden(driver)
         return target_el.get_attribute(attribute)
 
     def get_text(self, driver):
@@ -258,6 +328,29 @@ class SiteElement:
         """
         target_el = self.loc_it(driver)
         return len(target_el.find_elements_by_xpath(".//*"))
+
+    def get_relatives_by_xpath(self, driver, xpath):
+        """Returns the relatives by xpath, given a parent
+        element specification
+        """
+        target_el = self.loc_hidden(driver)
+        return target_el.find_elements_by_xpath(xpath)
+
+    def get_texts_from_xpath(self, driver, xpath):
+        """Returns the text in relatives matching xpath, given a parent
+        element specification
+        """
+        web_elements = self.get_relatives_by_xpath(driver, xpath)
+        keywords = []
+        for el in web_elements:
+            keywords.append(el.text)
+        return keywords
+
+    def get_parent(self, driver):
+        """Returns the parent element
+        """
+        target_el = self.loc_hidden(driver)
+        return target_el.find_element_by_xpath("..")
 
     def get_immediate_child_count(self, driver):
         """Returns the number of immediate child elements, given a parent
