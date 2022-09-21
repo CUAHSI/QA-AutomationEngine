@@ -59,9 +59,9 @@ def catch_exception(f):
     def func(*args, **kwargs):
         try:
             return f(*args, **kwargs)
-        except Exception:
+        except Exception as error:
             print(f"\nCaught an exception in: {f.__name__}")
-
+            print(f"{error=}, {type(error)=}")
             # attempt to figure out what page we are on
             test = args[0]
             Path("debug").mkdir(parents=True, exist_ok=True)
