@@ -12,6 +12,8 @@ on:
         description: 'Ref from DSP front'
       dsp-back-ref:
         description: 'Ref from DSP back'
+      target:
+        description: 'Alternative to Refs above, URL to target tests (ex: https://dsp-beta.criticalzone.org/). If all inputs blank, will run against dsp-test'
       use-gh-env:
         type: boolean
         description: Use dspback .env file stored in GH secrets (vs default in dspback repo)
@@ -53,9 +55,17 @@ jobs:
           DSP_QA_ENGINE_ENV_BASE64: ${{ secrets.DSP_QA_ENGINE_ENV_BASE64 }}
         run: |
           echo $DSP_QA_ENGINE_ENV_BASE64 | base64 --decode > .env
+      
+      - name: Run Tests against target = ${{ github.event.inputs.dsp-back-ref }}
+        if: (github.event.inputs.dsp-front-ref == '' ||  github.event.inputs.dsp-back-ref == '') && github.event.inputs.target != ''
+        run: |
+          ./hydrotest dsp DspHydroshareTestSuite --headless --browser chrome --base ${{ github.event.inputs.target }} 2>&1 | tee -a output/hydroshare-browser-test.txt
+          ./hydrotest dsp DspExternalTestSuite --headless --browser chrome --base ${{ github.event.inputs.target }} 2>&1 | tee -a output/external-browser-test.txt
+          ./hydrotest dsp DspZenodoTestSuite --headless --browser chrome --base ${{ github.event.inputs.target }} 2>&1 | tee -a output/zenodo-browser-test.txt
+          ./hydrotest dsp DspEarthchemTestSuite --headless --browser chrome --base ${{ github.event.inputs.target }} 2>&1 | tee -a output/earthchem-browser-test.txt
 
       - name: Run Tests against dsp-test
-        if: github.event.inputs.dsp-front-ref == '' ||  github.event.inputs.dsp-back-ref == ''
+        if: (github.event.inputs.dsp-front-ref == '' ||  github.event.inputs.dsp-back-ref == '') && github.event.inputs.target == ''
         run: |
           ./hydrotest dsp DspHydroshareTestSuite --headless --browser chrome --base https://dsp-test.criticalzone.org/ 2>&1 | tee -a output/hydroshare-browser-test.txt
           ./hydrotest dsp DspExternalTestSuite --headless --browser chrome --base https://dsp-test.criticalzone.org/ 2>&1 | tee -a output/external-browser-test.txt
