@@ -713,6 +713,8 @@ class DspExternalTestSuite(DspTestSuite):
         Dsp.drawer_to_submit(self.driver)
         SubmitLandingPage.select_repo_by_id(self.driver, "RegisterDataset")
 
+        SubmitLandingPage.select_external_dataset(self.driver)
+
         # new ORCID window
         SubmitLandingPage.to_orcid_window(self.driver)
 
