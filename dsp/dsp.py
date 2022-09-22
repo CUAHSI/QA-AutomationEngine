@@ -110,7 +110,6 @@ class DspTestSuite(BaseTestSuite, metaclass=ErrorCatcher):
         Dsp.show_mobile_nav(self.driver)
         Dsp.drawer_nav_login.click(self.driver)
         Dsp.to_orcid_window(self.driver)
-        self.assertIn("ORCID", TestSystem.title(self.driver))
 
         OrcidWindow.fill_credentials(self.driver, USERNAME, PASSWORD)
         OrcidWindow.to_origin_window(self.driver, wait=True)
@@ -204,14 +203,12 @@ class DspHydroshareTestSuite(DspTestSuite):
 
         # new ORCID window
         SubmitLandingPage.to_orcid_window(self.driver)
-        self.assertIn("ORCID", TestSystem.title(self.driver))
 
         OrcidWindow.fill_credentials(self.driver, USERNAME, PASSWORD)
         OrcidWindow.to_origin_window(self.driver)
 
         # new HS auth window
         SubmitLandingPage.to_repo_auth_window(self.driver)
-        self.assertIn(self.repo_name, TestSystem.title(self.driver))
         HydroshareAuthWindow.authorize_repo(self.driver, HS_USERNAME, HS_PASSWORD)
         HydroshareAuthWindow.to_origin_window(self.driver)
 
@@ -320,16 +317,12 @@ class DspHydroshareTestSuite(DspTestSuite):
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
         template = self.required_elements_template(auto_text)
         self.login_and_autofill_hs_required(auto_text)
-        self.assertTrue(SubmitHydroshare.is_finishable(self.driver))
         SubmitHydroshare.finish_submission(self.driver)
 
         MySubmissions.wait_until_app_contains_text(self.driver, "My Submissions")
         MySubmissions.enter_text_in_search(self.driver, auto_text)
         MySubmissions.edit_top_submission(self.driver)
 
-        self.assertEqual(
-            "Edit Submission", EditHSSubmission.get_header_title(self.driver)
-        )
         check = EditHSSubmission.check_required_elements(self.driver, template)
         self.assertTrue(check)
 
@@ -514,9 +507,6 @@ class DspHydroshareTestSuite(DspTestSuite):
         MySubmissions.enter_text_in_search(self.driver, auto_text)
         MySubmissions.edit_top_submission(self.driver)
 
-        self.assertEqual(
-            "Edit Submission", EditHSSubmission.get_header_title(self.driver)
-        )
         check = EditHSSubmission.check_required_elements(self.driver, template)
         self.assertTrue(check)
 
@@ -725,7 +715,6 @@ class DspExternalTestSuite(DspTestSuite):
 
         # new ORCID window
         SubmitLandingPage.to_orcid_window(self.driver)
-        self.assertIn("ORCID", TestSystem.title(self.driver))
 
         OrcidWindow.fill_credentials(self.driver, USERNAME, PASSWORD)
         OrcidWindow.to_origin_window(self.driver)
@@ -930,7 +919,6 @@ class DspZenodoTestSuite(DspTestSuite):
 
         # new ORCID window
         SubmitLandingPage.to_orcid_window(self.driver)
-        self.assertIn("ORCID", TestSystem.title(self.driver))
 
         OrcidWindow.fill_credentials(self.driver, USERNAME, PASSWORD)
         OrcidWindow.to_origin_window(self.driver)
@@ -939,7 +927,6 @@ class DspZenodoTestSuite(DspTestSuite):
         SubmitLandingPage.to_repo_auth_window(self.driver)
 
         ZenodoAuthWindow.authorize_via_orcid(self.driver)
-        self.assertIn("ORCID", TestSystem.title(self.driver))
         OrcidWindow.fill_credentials(self.driver, USERNAME, PASSWORD)
         OrcidWindow.to_origin_window(self.driver)
 
@@ -951,7 +938,6 @@ class DspZenodoTestSuite(DspTestSuite):
 
         # new ORCID window
         SubmitLandingPage.to_orcid_window(self.driver)
-        self.assertIn("ORCID", TestSystem.title(self.driver))
 
         OrcidWindow.fill_credentials(self.driver, USERNAME, PASSWORD)
         OrcidWindow.to_origin_window(self.driver)
@@ -1017,7 +1003,6 @@ class DspZenodoTestSuite(DspTestSuite):
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
         template = self.required_elements_template(auto_text)
         self.login_and_autofill_zenodo_required(auto_text)
-        self.assertTrue(SubmitZenodo.is_finishable(self.driver))
         SubmitZenodo.finish_submission(self.driver, USERNAME, PASSWORD)
 
         MySubmissions.enter_text_in_search(self.driver, auto_text)
@@ -1035,7 +1020,6 @@ class DspZenodoTestSuite(DspTestSuite):
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
         template = self.required_elements_template(auto_text)
         self.login_and_autofill_zenodo_required(auto_text)
-        self.assertTrue(SubmitZenodo.is_finishable(self.driver))
         SubmitZenodo.finish_submission(self.driver, USERNAME, PASSWORD)
 
         MySubmissions.enter_text_in_search(self.driver, auto_text)
@@ -1082,7 +1066,6 @@ class DspEarthchemTestSuite(DspTestSuite):
 
         # new ORCID window
         SubmitLandingPage.to_orcid_window(self.driver)
-        self.assertIn("ORCID", TestSystem.title(self.driver))
 
         OrcidWindow.fill_credentials(
             self.driver, EARTHCHEM_USERNAME, EARTHCHEM_PASSWORD
@@ -1092,7 +1075,6 @@ class DspEarthchemTestSuite(DspTestSuite):
         # new Earthchem auth window
         if RepoAuthWindow.submit_to_repo_authorize.exists(self.driver):
             SubmitLandingPage.to_repo_auth_window(self.driver)
-            self.assertIn("Sign in", TestSystem.title(self.driver))
             EarthchemAuthWindow.authorize_via_orcid(self.driver)
             OrcidWindow.fill_credentials(
                 self.driver, EARTHCHEM_USERNAME, EARTHCHEM_PASSWORD
@@ -1107,7 +1089,6 @@ class DspEarthchemTestSuite(DspTestSuite):
 
         # new ORCID window
         SubmitLandingPage.to_orcid_window(self.driver)
-        self.assertIn("ORCID", TestSystem.title(self.driver))
 
         OrcidWindow.fill_credentials(
             self.driver, EARTHCHEM_USERNAME, EARTHCHEM_PASSWORD
@@ -1128,7 +1109,6 @@ class DspEarthchemTestSuite(DspTestSuite):
         # first time that a user auths to ECL, there is an extra window
         if RepoAuthWindow.submit_to_repo_authorize.exists(self.driver):
             SubmitLandingPage.to_repo_auth_window(self.driver)
-            self.assertIn("Sign in", TestSystem.title(self.driver))
             EarthchemAuthWindow.authorize_via_orcid(self.driver)
             OrcidWindow.fill_credentials(
                 self.driver, EARTHCHEM_USERNAME, EARTHCHEM_PASSWORD
@@ -1154,7 +1134,6 @@ class DspEarthchemTestSuite(DspTestSuite):
         """
         SubmitEarthchem.finish_submission_later(self.driver)
 
-        self.assertEqual("My Submissions", MySubmissions.get_title(self.driver))
         MySubmissions.enter_text_in_search(self.driver, sort_text)
         MySubmissions.wait_until_app_contains_text(self.driver, "My Submissions")
 
@@ -1180,7 +1159,6 @@ class DspEarthchemTestSuite(DspTestSuite):
         self.login_and_autofill_earthchem_required(auto_text)
         self.assertTrue(SubmitEarthchem.is_finishable(self.driver))
         SubmitEarthchem.finish_submission_later(self.driver)
-
         self.assertEqual("My Submissions", MySubmissions.get_title(self.driver))
         MySubmissions.wait_until_app_contains_text(self.driver, "My Submissions")
 
@@ -1189,14 +1167,9 @@ class DspEarthchemTestSuite(DspTestSuite):
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
         template = self.required_elements_template(auto_text)
         self.login_and_autofill_earthchem_required(auto_text)
-        self.assertTrue(SubmitEarthchem.is_finishable(self.driver))
         SubmitEarthchem.finish_submission_later(self.driver)
-
         MySubmissions.enter_text_in_search(self.driver, auto_text)
         MySubmissions.edit_top_submission(self.driver)
-        self.assertEqual(
-            "Edit Submission", EditEarthchemSubmission.get_header_title(self.driver)
-        )
         check = EditEarthchemSubmission.check_required_elements(self.driver, template)
         self.assertTrue(check)
 
@@ -1284,7 +1257,6 @@ class DspEarthchemTestSuite(DspTestSuite):
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
         template = self.required_elements_template(auto_text)
         self.login_and_autofill_earthchem_required(auto_text)
-        self.assertTrue(SubmitEarthchem.is_finishable(self.driver))
         SubmitEarthchem.finish_submission_later(self.driver)
 
         MySubmissions.enter_text_in_search(self.driver, auto_text)
@@ -1307,10 +1279,8 @@ class DspEarthchemTestSuite(DspTestSuite):
             self.skipTest("Viewing ECL submissions not supported in test environment")
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
         self.login_and_autofill_earthchem_required(auto_text)
-        self.assertTrue(SubmitEarthchem.is_finishable(self.driver))
         SubmitEarthchem.submit_for_review(self.driver)
 
-        self.assertEqual("My Submissions", MySubmissions.get_title(self.driver))
         MySubmissions.enter_text_in_search(self.driver, auto_text)
         MySubmissions.wait_until_app_contains_text(self.driver, "My Submissions")
 
