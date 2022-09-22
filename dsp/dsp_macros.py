@@ -365,6 +365,20 @@ class SubmitLandingPage(Dsp, RepoAuthWindow):
         By.XPATH, "//*[@id='app']/child::*[contains(., 'Repositories')]"
     )
 
+    register_dataset_other = SiteElement(
+        By.XPATH, "//*[contains(text(),'Register a dataset from a different repository')]/.."
+    )
+
+    @classmethod
+    def select_external_dataset(self, driver):
+        self.register_dataset_other.click(driver)
+
+    @classmethod
+    def select_nth_dialog_choice(self, driver, n):
+        dialog_item = SiteElement(By.CSS_SELECTOR, f".v-dialog--active .choice-container .v-card:nth-of-type({n+1})")
+        dialog_item.scroll_to(driver)
+        dialog_item.click(driver)
+
     @classmethod
     def select_repo_by_id(self, driver, id):
         repo_card = SiteElement(By.CSS_SELECTOR, f'div[id*="{id}"]')
