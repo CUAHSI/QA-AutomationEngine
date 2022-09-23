@@ -401,7 +401,7 @@ class SubmitLandingPage(Dsp, RepoAuthWindow):
 
 
 class GeneralSubmitToRepo(Dsp, RepoAuthWindow):
-    header = SiteElement(By.CSS_SELECTOR, ".text-h4")
+    header = SiteElement(By.CSS_SELECTOR, ".text-heading-4")
     alert = SiteElement(By.CSS_SELECTOR, ".v-alert .v-alert__content")
     top_save = SiteElement(
         By.CSS_SELECTOR, "#cz-new-submission-actions-top button.submission-save"

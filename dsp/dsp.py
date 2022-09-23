@@ -738,7 +738,7 @@ class DspExternalTestSuite(DspTestSuite):
         """
         self.login_orcid_and_external()
         header = SubmitExternal.get_header_text(self.driver)
-        self.assertIn("External", header)
+        self.assertIn("Register Dataset", header)
 
     def test_ex_000002_submit_instructions_shown(self):
         """Check that instructions are shown on the Submit page"""
