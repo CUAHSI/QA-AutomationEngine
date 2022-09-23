@@ -56,7 +56,7 @@ jobs:
         run: |
           echo $DSP_QA_ENGINE_ENV_BASE64 | base64 --decode > .env
       
-      - name: Run Tests against target = ${{ github.event.inputs.dsp-back-ref }}
+      - name: Run Tests against target = ${{ github.event.inputs.target }}
         if: (github.event.inputs.dsp-front-ref == '' ||  github.event.inputs.dsp-back-ref == '') && github.event.inputs.target != ''
         run: |
           ./hydrotest dsp DspHydroshareTestSuite --headless --browser chrome --base ${{ github.event.inputs.target }} 2>&1 | tee -a output/hydroshare-browser-test.txt
