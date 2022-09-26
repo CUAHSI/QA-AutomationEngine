@@ -721,6 +721,7 @@ class DspExternalTestSuite(DspTestSuite):
 
         OrcidWindow.fill_credentials(self.driver, USERNAME, PASSWORD)
         OrcidWindow.to_origin_window(self.driver)
+        SubmitExternal.wait_until_loaded(self.driver)
 
     def login_and_autofill_external_required(self, auto_text):
         """A shortcut to fill required fields of submit page
