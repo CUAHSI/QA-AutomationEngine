@@ -211,6 +211,7 @@ class DspHydroshareTestSuite(DspTestSuite):
         SubmitLandingPage.to_repo_auth_window(self.driver)
         HydroshareAuthWindow.authorize_repo(self.driver, HS_USERNAME, HS_PASSWORD)
         HydroshareAuthWindow.to_origin_window(self.driver)
+        SubmitHydroshare.wait_until_loaded(self.driver)
 
     def login_and_autofill_hs_required(self, auto_text):
         """A shortcut to fill required fields of HS submit page

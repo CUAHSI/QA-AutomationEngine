@@ -2,6 +2,8 @@ import time
 
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import TimeoutException, NoSuchElementException
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 from cuahsi_base.site_element import SiteElement
 from cuahsi_base.utils import External, TestSystem
@@ -416,6 +418,11 @@ class GeneralSubmitToRepo(Dsp, RepoAuthWindow):
     bottom_finish = SiteElement(
         By.CSS_SELECTOR, "#cz-new-submission-actions-bottom button.submission-finish"
     )
+
+    @classmethod
+    def wait_until_loaded(self, driver):
+        submision_loaded = EC.presence_of_element_located((By.ID, 'cz-new-submission'))
+        WebDriverWait(driver, DEFAULT_TIMEOUT).until(submision_loaded)
 
     @classmethod
     def get_header_text(self, driver):
