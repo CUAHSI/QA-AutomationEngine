@@ -521,18 +521,18 @@ class GeneralSubmitToRepo(Dsp, RepoAuthWindow):
             if section and nth is not None:
                 if array:
                     selector = (
-                        f'[data-id*="{section}"] .array-list-item:nth-of-type({nth+1})'
-                        f' [data-id*="{data_id}"]'
+                        f'[data-id*="{section}"] .array-list-item:nth-of-type({nth+1}) [data-id="{data_id}"],'
+                        f' [data-id*="{section}"] .array-list-item:nth-of-type({nth+1}) [data-id="{data_id}*"]'
                     )
                 else:
                     selector = (
-                        f'[data-id*="{section}"]'
-                        f' [data-id*="{data_id}"]:nth-of-type({nth+1})'
+                        f'[data-id*="{section}"] [data-id="{data_id}"]:nth-of-type({nth+1}),'
+                        f'[data-id*="{section}"] [data-id="{data_id}*"]:nth-of-type({nth+1})'
                     )
                 element = SiteElement(By.CSS_SELECTOR, selector)
             else:
                 element = SiteElement(
-                    By.CSS_SELECTOR, f'[data-id*="{data_id}"]:nth-of-type(1)'
+                    By.CSS_SELECTOR, f'[data-id="{data_id}"]:nth-of-type(1), [data-id="{data_id}*"]:nth-of-type(1)'
                 )
         except TimeoutException as e:
             print(f"{e}\nElement not found for key: {data_id}")
@@ -550,7 +550,7 @@ class GeneralSubmitToRepo(Dsp, RepoAuthWindow):
         else:
             print(
                 f"\nAttempt to fill element {data_id} in section {section} failed. Not"
-                f' in DOM                 \nSelector used="{selector}"'
+                f' in DOM\nSelector used="{selector}"'
             )
             return False
         return True
@@ -753,18 +753,18 @@ class GeneralEditSubmission(Dsp):
                 if section and nth is not None:
                     if array:
                         selector = (
-                            f':is(fieldset, div)[data-id*="{section}"]'
-                            f' .array-list-item:nth-of-type({nth+1}) [data-id*="{k}"]'
+                            f':is(fieldset, div)[data-id*="{section}"] .array-list-item:nth-of-type({nth+1}) [data-id="{k}"],'
+                            f' :is(fieldset, div)[data-id*="{section}"] .array-list-item:nth-of-type({nth+1}) [data-id="{k}*"]'
                         )
                         elem = SiteElement(By.CSS_SELECTOR, selector)
                     else:
                         selector = (
-                            f':is(fieldset, div)[data-id*="{section}"]'
-                            f' [data-id*="{k}"]:nth-of-type({nth+1})'
+                            f':is(fieldset, div)[data-id*="{section}"] [data-id="{k}"]:nth-of-type({nth+1}),'
+                            f' :is(fieldset, div)[data-id*="{section}"] [data-id="{k}*"]:nth-of-type({nth+1})'
                         )
                         elem = SiteElement(By.CSS_SELECTOR, selector)
                 else:
-                    selector = f'[data-id*="{k}"]:nth-of-type(1)'
+                    selector = f'[data-id="{k}"]:nth-of-type(1), [data-id="{k}*"]:nth-of-type(1)'
                     elem = SiteElement(By.CSS_SELECTOR, selector)
                 elem.scroll_to(driver)
                 value = elem.get_value(driver)
