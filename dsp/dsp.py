@@ -677,7 +677,7 @@ class DspExternalTestSuite(DspTestSuite):
         basic_info = {
             "Nameortitle": auto_text + " Nameortitle",
             "Url": "http://basicinfourl.com/" + auto_text,
-            "Datepublished": "2022-04-05T00:04",
+            "Date": "2022-04-05T00:04",
             "Descriptionorabstract": auto_text + " Descriptionorabstract",
             "SubjectKeywords": [auto_text + " SubjectKeywords"],
         }
@@ -728,6 +728,7 @@ class DspExternalTestSuite(DspTestSuite):
         So that additional non-required fields can easily be checked
         """
         self.login_orcid_and_external()
+        SubmitExternal.open_tab(self.driver, 'Datepublished', tab_number=2)
         SubmitExternal.autofill_required_elements(
             self.driver, self.required_elements_template(auto_text)
         )
@@ -753,6 +754,8 @@ class DspExternalTestSuite(DspTestSuite):
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
         # self.login_and_autofill_external_required(auto_text)
         self.login_orcid_and_external()
+
+        SubmitExternal.open_tab(self.driver, 'Datepublished', tab_number=2)
         template = self.required_elements_template(auto_text)
         SubmitExternal.autofill_required_elements(self.driver, template)
 
