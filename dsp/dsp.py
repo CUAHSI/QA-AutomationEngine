@@ -1059,11 +1059,15 @@ class DspEarthchemTestSuite(DspTestSuite):
             "Email": f"{auto_text}@gmail.com",
         }
         spatial = {"SpatialCoverage": ["Global"]}
+        funding_source = {
+            "AwardNumber": auto_text + "AwardNumber",
+        }
 
         required_elements = {
             "group-BasicInformation": basic_info,
             "SpatialCoverageInformation": spatial,
             "LeadAuthor": lead_author,
+            "FundingSource": funding_source
         }
         return required_elements
 
