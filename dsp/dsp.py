@@ -1238,7 +1238,7 @@ class DspEarthchemTestSuite(DspTestSuite):
             + "AwardNumber"
         }
         SubmitEarthchem.expand_section_by_did(self.driver, data_id=section)
-        self.fill_ids_submit_and_check(auto_text, section, nth, dict)
+        self.check(section, nth, dict)
 
     def test_ec_000009_license_persists(self):
         """Confirm that License Info persists from save to edit"""
