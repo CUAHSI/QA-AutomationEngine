@@ -362,8 +362,6 @@ class DspHydroshareTestSuite(DspTestSuite):
         section = "Fundingagencyinformation"
         nth = 0
         dict = {
-            "Awardtitle": auto_text + "Funding Agency title2-input",
-            "Awardnumber": "5",
             "FundingAgencyUrl": "http://funding-agency.com/" + auto_text,
         }
         self.fill_ids_submit_and_check(auto_text, section, nth, dict)
