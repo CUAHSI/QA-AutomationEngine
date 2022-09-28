@@ -183,6 +183,8 @@ class DspHydroshareTestSuite(DspTestSuite):
         }
         funding_agency = {
             "Agencyname": auto_text + " Agencyname",
+            "Awardtitle": auto_text + " Awardtitle",
+            "Awardnumber": auto_text + " Awardnumber",
         }
 
         # created separately so that we can check individually if needed
