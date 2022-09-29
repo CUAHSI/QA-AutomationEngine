@@ -334,7 +334,7 @@ class MySubmissions(Dsp):
             except TimeoutException:
                 # sometimes the "checkbox to delete in repo is not present"
                 pass
-            self.confirm_in_dialog.javascript_click_hidden(driver)
+            self.confirm_in_dialog.javascript_click_hidden(driver, silent)
             total_submissions = self.get_total_submissions(driver)
 
     @classmethod
