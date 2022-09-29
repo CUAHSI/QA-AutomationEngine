@@ -43,7 +43,7 @@ class SiteElement:
 
         return target_el
 
-    def loc_hidden(self, driver):
+    def loc_hidden(self, driver, silent=False):
         """
         Identifies potentially hidden element on page, based on an element locator.
         """
@@ -51,10 +51,11 @@ class SiteElement:
         try:
             target_el = wait.until(EC.presence_of_element_located((self.by, self.locator)))
         except TimeoutException as e:
-            print(
-                "\nUnable to locate element by {}, "
-                "locator: '{}'".format(self.by, self.locator)
-            )
+            if not silent:
+                print(
+                    "\nUnable to locate element by {}, "
+                    "locator: '{}'".format(self.by, self.locator)
+                )
             raise e
 
         return target_el
@@ -118,11 +119,11 @@ class SiteElement:
         target_el = self.loc_it(driver)
         driver.execute_script("arguments[0].click();", target_el)
 
-    def javascript_click_hidden(self, driver):
+    def javascript_click_hidden(self, driver, silent=False):
         """
         Simulate click on a hidden element using JavaScript
         """
-        target_el = self.loc_hidden(driver)
+        target_el = self.loc_hidden(driver, silent)
         driver.execute_script("arguments[0].click();", target_el)
 
     def javascript_fill_hidden_text(self, driver, text):

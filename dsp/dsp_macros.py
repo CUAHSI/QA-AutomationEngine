@@ -315,6 +315,27 @@ class MySubmissions(Dsp):
     my_submissions_search = SiteElement(By.ID, "my_submissions_search")
     top_submission_edit = SiteElement(By.ID, "sub-0-edit")
     top_submission_view_repo = SiteElement(By.ID, "sub-0-view")
+    check_in_dialog = SiteElement(By.CSS_SELECTOR, '.v-dialog input[type="checkbox"]')
+    confirm_in_dialog = SiteElement(By.CSS_SELECTOR, '.v-dialog button.dialog-confirm')
+
+    @classmethod
+    def delete_submissions(self, driver, silent=False):
+        total_submissions = self.get_total_submissions(driver)
+        current_active = 0
+        while total_submissions > current_active:
+            try:
+                delete_button = SiteElement(By.ID, f'sub-{current_active}-delete')
+                delete_button.javascript_click_hidden(driver, silent)
+            except TimeoutException:
+                current_active = current_active + 1
+                continue
+            try:
+                self.check_in_dialog.javascript_click_hidden(driver, silent)
+            except TimeoutException:
+                # sometimes the "checkbox to delete in repo is not present"
+                pass
+            self.confirm_in_dialog.javascript_click_hidden(driver)
+            total_submissions = self.get_total_submissions(driver)
 
     @classmethod
     def get_title(self, driver):

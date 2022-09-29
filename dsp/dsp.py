@@ -105,6 +105,16 @@ class DspTestSuite(BaseTestSuite, metaclass=ErrorCatcher):
         else:
             self.driver.get(self.base_url_arg)
 
+    def tearDown(self):
+        try:
+            Dsp.show_mobile_nav(self.driver)
+            Dsp.drawer_to_my_submissions(self.driver)
+            MySubmissions.delete_submissions(self.driver, silent=True)
+        except Exception:
+            # Allow exceptions during attempted submissions cleaning
+            pass
+        super(DspTestSuite, self).tearDown()
+
     def login_orcid(self):
         """Authenticate with orcid"""
         Dsp.show_mobile_nav(self.driver)
