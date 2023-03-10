@@ -323,18 +323,24 @@ class MySubmissions(Dsp):
         total_submissions = self.get_total_submissions(driver)
         current_active = 0
         while total_submissions > current_active:
-            try:
-                delete_button = SiteElement(By.ID, f'sub-{current_active}-delete')
+            delete_button = SiteElement(By.ID, f'sub-{total_submissions - current_active -1}-delete')
+            delete_button.scroll_to_hidden(driver)
+            claz = delete_button.get_class(driver)
+            is_disabled = False
+            for cl in claz.split(" "):
+                if cl == 'v-btn--disabled':
+                    is_disabled = True
+                    break
+            if not is_disabled:
                 delete_button.javascript_click_hidden(driver, silent)
-            except TimeoutException:
+                try:
+                    self.check_in_dialog.javascript_click_hidden(driver, silent)
+                    self.confirm_in_dialog.javascript_click_hidden(driver, silent)
+                except TimeoutException:
+                    # sometimes the "checkbox to delete in repo is not present"
+                    pass
+            else:
                 current_active = current_active + 1
-                continue
-            try:
-                self.check_in_dialog.javascript_click_hidden(driver, silent)
-            except TimeoutException:
-                # sometimes the "checkbox to delete in repo is not present"
-                pass
-            self.confirm_in_dialog.javascript_click_hidden(driver, silent)
             total_submissions = self.get_total_submissions(driver)
 
     @classmethod
