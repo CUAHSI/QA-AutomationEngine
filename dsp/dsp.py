@@ -529,6 +529,7 @@ class DspHydroshareTestSuite(DspTestSuite):
         self.login_and_autofill_hs_required(auto_text)
         section = "Creators"
         ns = [0, 1]
+        reversed = False
         dicts = [None] * len(ns)
         array = True
         for nth in ns:
@@ -548,7 +549,11 @@ class DspHydroshareTestSuite(DspTestSuite):
 
         self.submit(auto_text)
         for nth in ns:
-            self.check(section, nth, dicts[nth], array)
+            # Shift creators by 1: HS inserts the submitter as a creator
+            if reversed:
+                self.check(section, nth+1, dicts.pop(), array)
+            else:
+                self.check(section, nth+1, dicts[nth], array)
 
     def test_hs_000018_multiple_contributors_persist(self):
         """Confirm that multiple Contributors info persists from submit to edit"""
