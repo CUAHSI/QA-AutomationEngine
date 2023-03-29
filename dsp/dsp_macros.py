@@ -316,19 +316,21 @@ class MySubmissions(Dsp):
     top_submission_edit = SiteElement(By.ID, "sub-0-edit")
     top_submission_view_repo = SiteElement(By.ID, "sub-0-view")
     check_in_dialog = SiteElement(By.CSS_SELECTOR, '.v-dialog input[type="checkbox"]')
-    confirm_in_dialog = SiteElement(By.CSS_SELECTOR, '.v-dialog button.dialog-confirm')
+    confirm_in_dialog = SiteElement(By.CSS_SELECTOR, ".v-dialog button.dialog-confirm")
 
     @classmethod
     def delete_submissions(self, driver, silent=False):
         total_submissions = self.get_total_submissions(driver)
         current_active = 0
         while total_submissions > current_active:
-            delete_button = SiteElement(By.ID, f'sub-{total_submissions - current_active -1}-delete')
+            delete_button = SiteElement(
+                By.ID, f"sub-{total_submissions - current_active -1}-delete"
+            )
             delete_button.scroll_to_hidden(driver)
             claz = delete_button.get_class(driver)
             is_disabled = False
             for cl in claz.split(" "):
-                if cl == 'v-btn--disabled':
+                if cl == "v-btn--disabled":
                     is_disabled = True
                     break
             if not is_disabled:
@@ -395,7 +397,8 @@ class SubmitLandingPage(Dsp, RepoAuthWindow):
     )
 
     register_dataset_other = SiteElement(
-        By.XPATH, "//*[contains(text(),'Register a dataset from a different repository')]/.."
+        By.XPATH,
+        "//*[contains(text(),'Register a dataset from a different repository')]/..",
     )
 
     @classmethod
@@ -404,7 +407,10 @@ class SubmitLandingPage(Dsp, RepoAuthWindow):
 
     @classmethod
     def select_nth_dialog_choice(self, driver, n):
-        dialog_item = SiteElement(By.CSS_SELECTOR, f".v-dialog--active .choice-container .v-card:nth-of-type({n+1})")
+        dialog_item = SiteElement(
+            By.CSS_SELECTOR,
+            f".v-dialog--active .choice-container .v-card:nth-of-type({n+1})",
+        )
         dialog_item.scroll_to(driver)
         dialog_item.click(driver)
 
@@ -448,7 +454,7 @@ class GeneralSubmitToRepo(Dsp, RepoAuthWindow):
 
     @classmethod
     def wait_until_loaded(self, driver):
-        submision_loaded = EC.presence_of_element_located((By.ID, 'cz-new-submission'))
+        submision_loaded = EC.presence_of_element_located((By.ID, "cz-new-submission"))
         WebDriverWait(driver, DEFAULT_TIMEOUT).until(submision_loaded)
 
     @classmethod
@@ -543,9 +549,7 @@ class GeneralSubmitToRepo(Dsp, RepoAuthWindow):
         return True
 
     @classmethod
-    def fill_first_input_in_section(
-        self, driver, value, section=None, array=False
-    ):
+    def fill_first_input_in_section(self, driver, value, section=None, array=False):
         try:
             if array:
                 selector = (
@@ -577,6 +581,7 @@ class GeneralSubmitToRepo(Dsp, RepoAuthWindow):
             )
             return False
         return True
+
     @classmethod
     def fill_input_by_id(
         self, driver, data_id, value, section=None, nth=0, array=False
@@ -596,7 +601,8 @@ class GeneralSubmitToRepo(Dsp, RepoAuthWindow):
                 element = SiteElement(By.CSS_SELECTOR, selector)
             else:
                 element = SiteElement(
-                    By.CSS_SELECTOR, f'[data-id="{data_id}"]:nth-of-type(1), [id*="{data_id}*"]:nth-of-type(1)'
+                    By.CSS_SELECTOR,
+                    f'[data-id="{data_id}"]:nth-of-type(1), [id*="{data_id}*"]:nth-of-type(1)',
                 )
         except TimeoutException as e:
             print(f"{e}\nElement not found for key: {data_id}")
@@ -637,7 +643,8 @@ class GeneralSubmitToRepo(Dsp, RepoAuthWindow):
                 element = SiteElement(By.CSS_SELECTOR, selector)
             else:
                 element = SiteElement(
-                    By.CSS_SELECTOR, f'[data-id="{data_id}"]:nth-of-type(1), [data-id="{data_id}*"]:nth-of-type(1)'
+                    By.CSS_SELECTOR,
+                    f'[data-id="{data_id}"]:nth-of-type(1), [data-id="{data_id}*"]:nth-of-type(1)',
                 )
         except TimeoutException as e:
             print(f"{e}\nElement not found for key: {data_id}")
@@ -978,9 +985,7 @@ class SubmitZenodo(GeneralSubmitToRepo):
 
         try:
             SubmitLandingPage.to_repo_auth_window(driver)
-            ZenodoAuthWindow.authorize_email_password(
-                driver, email=uname, password=pw
-            )
+            ZenodoAuthWindow.authorize_email_password(driver, email=uname, password=pw)
             ZenodoAuthWindow.to_origin_window(driver, wait=True)
         except TimeoutException as e:
             print(f"\n{e}... \nThis exception is ignored")

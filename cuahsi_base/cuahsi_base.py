@@ -9,6 +9,7 @@ import warnings
 from botocore.config import Config
 from google.cloud import pubsub_v1
 from selenium import webdriver
+import chromedriver_autoinstaller
 
 from .browser import USER_AGENT
 from .utils import kinesis_record
@@ -43,6 +44,8 @@ class BaseTestSuite(unittest.TestCase):
 
     def setUp(self):
         """Setup driver for use in automation tests"""
+        # or use https://pypi.org/project/webdriver-manager/
+        chromedriver_autoinstaller.install()
 
         if self.records is not None:
             self.data["test"] = self._testMethodName
@@ -64,7 +67,9 @@ class BaseTestSuite(unittest.TestCase):
             driver = webdriver.Remote(**remote_args)
         else:
             # Ignore resource warning about unclosed sockets
-            warnings.filterwarnings(action="ignore", message="unclosed", category=ResourceWarning)
+            warnings.filterwarnings(
+                action="ignore", message="unclosed", category=ResourceWarning
+            )
             if self.browser == "firefox":
                 options = webdriver.FirefoxOptions()
                 if self.headless:

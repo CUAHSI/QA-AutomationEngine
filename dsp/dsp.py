@@ -687,13 +687,10 @@ class DspExternalTestSuite(DspTestSuite):
         basic_info = {
             "Nameortitle": auto_text + " Nameortitle",
             "Url": "http://basicinfourl.com/" + auto_text,
-            "Date": "2022-04-05T00:04",
             "Descriptionorabstract": auto_text + " Descriptionorabstract",
             "SubjectKeywords": [auto_text + " SubjectKeywords"],
         }
-        date_published = {
-            "Date": "2022-04-05T00:04"
-        }
+        date_published = {"Date": "2022-04-05T00:04"}
         creator = {
             "Name": "Meister, Jim",
             "Organization": (
@@ -742,7 +739,7 @@ class DspExternalTestSuite(DspTestSuite):
         So that additional non-required fields can easily be checked
         """
         self.login_orcid_and_external()
-        SubmitExternal.open_tab(self.driver, 'Datepublished', tab_number=2)
+        SubmitExternal.open_tab(self.driver, "Datepublished", tab_number=2)
         SubmitExternal.autofill_required_elements(
             self.driver, self.required_elements_template(auto_text)
         )
@@ -769,7 +766,7 @@ class DspExternalTestSuite(DspTestSuite):
         # self.login_and_autofill_external_required(auto_text)
         self.login_orcid_and_external()
 
-        SubmitExternal.open_tab(self.driver, 'Datepublished', tab_number=2)
+        SubmitExternal.open_tab(self.driver, "Datepublished", tab_number=2)
         template = self.required_elements_template(auto_text)
         SubmitExternal.autofill_required_elements(self.driver, template)
 
@@ -1060,7 +1057,7 @@ class DspEarthchemTestSuite(DspTestSuite):
     @classmethod
     def required_elements_template(self, auto_text):
         data_file_release = {
-            "datePublished": datetime.datetime.today().strftime('%Y-%m-%d'),
+            "datePublished": datetime.datetime.today().strftime("%Y-%m-%d"),
         }
         basic_info = {
             "DatasetTitle": auto_text + " Title",
@@ -1083,7 +1080,7 @@ class DspEarthchemTestSuite(DspTestSuite):
             "group-BasicInformation": basic_info,
             "SpatialCoverageInformation": spatial,
             "LeadAuthor": lead_author,
-            "FundingSource": funding_source
+            "FundingSource": funding_source,
         }
         return required_elements
 
