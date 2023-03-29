@@ -1,0 +1,2774 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-8.5.10">
+    
+    
+      
+        <title>DSP Macros - CUAHSI QA Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.975780f9.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.2505c338.min.css">
+        
+      
+      
+
+    
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="None" data-md-color-accent="None">
+  
+    
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#dsp.dsp_macros" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="CUAHSI QA Documentation" class="md-header__button md-logo" aria-label="CUAHSI QA Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            CUAHSI QA Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              DSP Macros
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="CUAHSI QA Documentation" class="md-nav__button md-logo" aria-label="CUAHSI QA Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    CUAHSI QA Documentation
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        About
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2" type="checkbox" id="__nav_2" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_2">
+          Base
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Base" data-md-level="1">
+        <label class="md-nav__title" for="__nav_2">
+          <span class="md-nav__icon md-icon"></span>
+          Base
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cuahsi_base/cuahsi_base/" class="md-nav__link">
+        Cuahsi Base
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cuahsi_base/site_element/" class="md-nav__link">
+        Site Element
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cuahsi_base/utils/" class="md-nav__link">
+        Utils
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" type="checkbox" id="__nav_3" checked>
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_3">
+          DSP
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="DSP" data-md-level="1">
+        <label class="md-nav__title" for="__nav_3">
+          <span class="md-nav__icon md-icon"></span>
+          DSP
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dsp_tests/" class="md-nav__link">
+        DSP Tests
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          DSP Macros
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        DSP Macros
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#dsp.dsp_macros" class="md-nav__link">
+    dsp.dsp_macros
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dsp.dsp_macros.EarthchemAuthWindow" class="md-nav__link">
+    EarthchemAuthWindow
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dsp.dsp_macros.EarthchemResourcePage" class="md-nav__link">
+    EarthchemResourcePage
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dsp.dsp_macros.EditEarthchemSubmission" class="md-nav__link">
+    EditEarthchemSubmission
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dsp.dsp_macros.EditExternalSubmission" class="md-nav__link">
+    EditExternalSubmission
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dsp.dsp_macros.EditHSSubmission" class="md-nav__link">
+    EditHSSubmission
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dsp.dsp_macros.EditZenodoSubmission" class="md-nav__link">
+    EditZenodoSubmission
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dsp.dsp_macros.GeneralEditSubmission" class="md-nav__link">
+    GeneralEditSubmission
+  </a>
+  
+    <nav class="md-nav" aria-label="GeneralEditSubmission">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dsp.dsp_macros.GeneralEditSubmission.check_required_elements" class="md-nav__link">
+    check_required_elements()
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dsp.dsp_macros.HSResourcePage" class="md-nav__link">
+    HSResourcePage
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dsp.dsp_macros.HydroshareAuthWindow" class="md-nav__link">
+    HydroshareAuthWindow
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dsp.dsp_macros.MySubmissions" class="md-nav__link">
+    MySubmissions
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dsp.dsp_macros.OrcidWindow" class="md-nav__link">
+    OrcidWindow
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dsp.dsp_macros.SubmitEarthchem" class="md-nav__link">
+    SubmitEarthchem
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dsp.dsp_macros.SubmitExternal" class="md-nav__link">
+    SubmitExternal
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dsp.dsp_macros.SubmitHydroshare" class="md-nav__link">
+    SubmitHydroshare
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dsp.dsp_macros.SubmitLandingPage" class="md-nav__link">
+    SubmitLandingPage
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dsp.dsp_macros.SubmitZenodo" class="md-nav__link">
+    SubmitZenodo
+  </a>
+  
+    <nav class="md-nav" aria-label="SubmitZenodo">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dsp.dsp_macros.SubmitZenodo.finish_submission" class="md-nav__link">
+    finish_submission()
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dsp.dsp_macros.ZenodoAuthWindow" class="md-nav__link">
+    ZenodoAuthWindow
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dsp.dsp_macros.ZenodoResourcePage" class="md-nav__link">
+    ZenodoResourcePage
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4" type="checkbox" id="__nav_4" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_4">
+          Hydroshare
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Hydroshare" data-md-level="1">
+        <label class="md-nav__title" for="__nav_4">
+          <span class="md-nav__icon md-icon"></span>
+          Hydroshare
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hydroshare/hydroshare_tests/" class="md-nav__link">
+        Hydroshare Tests
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hydroshare/hs_macros/" class="md-nav__link">
+        Hydroshare Macros
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5" type="checkbox" id="__nav_5" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_5">
+          Hydroclient
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Hydroclient" data-md-level="1">
+        <label class="md-nav__title" for="__nav_5">
+          <span class="md-nav__icon md-icon"></span>
+          Hydroclient
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hydroclient/hydroclient_tests/" class="md-nav__link">
+        Hydroclient Tests
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hydroclient/hc_macros/" class="md-nav__link">
+        Hydroclient Macros
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#dsp.dsp_macros" class="md-nav__link">
+    dsp.dsp_macros
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dsp.dsp_macros.EarthchemAuthWindow" class="md-nav__link">
+    EarthchemAuthWindow
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dsp.dsp_macros.EarthchemResourcePage" class="md-nav__link">
+    EarthchemResourcePage
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dsp.dsp_macros.EditEarthchemSubmission" class="md-nav__link">
+    EditEarthchemSubmission
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dsp.dsp_macros.EditExternalSubmission" class="md-nav__link">
+    EditExternalSubmission
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dsp.dsp_macros.EditHSSubmission" class="md-nav__link">
+    EditHSSubmission
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dsp.dsp_macros.EditZenodoSubmission" class="md-nav__link">
+    EditZenodoSubmission
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dsp.dsp_macros.GeneralEditSubmission" class="md-nav__link">
+    GeneralEditSubmission
+  </a>
+  
+    <nav class="md-nav" aria-label="GeneralEditSubmission">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dsp.dsp_macros.GeneralEditSubmission.check_required_elements" class="md-nav__link">
+    check_required_elements()
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dsp.dsp_macros.HSResourcePage" class="md-nav__link">
+    HSResourcePage
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dsp.dsp_macros.HydroshareAuthWindow" class="md-nav__link">
+    HydroshareAuthWindow
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dsp.dsp_macros.MySubmissions" class="md-nav__link">
+    MySubmissions
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dsp.dsp_macros.OrcidWindow" class="md-nav__link">
+    OrcidWindow
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dsp.dsp_macros.SubmitEarthchem" class="md-nav__link">
+    SubmitEarthchem
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dsp.dsp_macros.SubmitExternal" class="md-nav__link">
+    SubmitExternal
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dsp.dsp_macros.SubmitHydroshare" class="md-nav__link">
+    SubmitHydroshare
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dsp.dsp_macros.SubmitLandingPage" class="md-nav__link">
+    SubmitLandingPage
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dsp.dsp_macros.SubmitZenodo" class="md-nav__link">
+    SubmitZenodo
+  </a>
+  
+    <nav class="md-nav" aria-label="SubmitZenodo">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dsp.dsp_macros.SubmitZenodo.finish_submission" class="md-nav__link">
+    finish_submission()
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dsp.dsp_macros.ZenodoAuthWindow" class="md-nav__link">
+    ZenodoAuthWindow
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dsp.dsp_macros.ZenodoResourcePage" class="md-nav__link">
+    ZenodoResourcePage
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  <h1>DSP Macros</h1>
+
+<div class="doc doc-object doc-module">
+
+
+<a id="dsp.dsp_macros"></a>
+  <div class="doc doc-contents first">
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="dsp.dsp_macros.EarthchemAuthWindow" class="doc doc-heading">
+        <code>EarthchemAuthWindow</code>
+
+
+</h2>
+
+
+  <div class="doc doc-contents ">
+      <p class="doc doc-class-bases">
+        Bases: <code><span title="dsp.dsp_macros.WebPage">WebPage</span></code></p>
+
+  
+      <p>Authentication window to use Earthchem as Backend</p>
+
+
+        <details class="quote">
+          <summary>Source code in <code>dsp/dsp_macros.py</code></summary>
+          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">285</span>
+<span class="normal">286</span>
+<span class="normal">287</span>
+<span class="normal">288</span>
+<span class="normal">289</span>
+<span class="normal">290</span>
+<span class="normal">291</span>
+<span class="normal">292</span>
+<span class="normal">293</span>
+<span class="normal">294</span>
+<span class="normal">295</span>
+<span class="normal">296</span>
+<span class="normal">297</span>
+<span class="normal">298</span>
+<span class="normal">299</span>
+<span class="normal">300</span>
+<span class="normal">301</span>
+<span class="normal">302</span>
+<span class="normal">303</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">EarthchemAuthWindow</span><span class="p">(</span><span class="n">WebPage</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Authentication window to use Earthchem as Backend&quot;&quot;&quot;</span>
+
+    <span class="n">github_button</span> <span class="o">=</span> <span class="n">SiteElement</span><span class="p">(</span><span class="n">By</span><span class="o">.</span><span class="n">CSS_SELECTOR</span><span class="p">,</span> <span class="s1">&#39;.social-signup .btn[href*=&quot;github&quot;]&#39;</span><span class="p">)</span>
+    <span class="n">orcid_button</span> <span class="o">=</span> <span class="n">SiteElement</span><span class="p">(</span><span class="n">By</span><span class="o">.</span><span class="n">ID</span><span class="p">,</span> <span class="s2">&quot;social-orcid&quot;</span><span class="p">)</span>
+    <span class="n">username</span> <span class="o">=</span> <span class="n">SiteElement</span><span class="p">(</span><span class="n">By</span><span class="o">.</span><span class="n">ID</span><span class="p">,</span> <span class="s2">&quot;username&quot;</span><span class="p">)</span>
+    <span class="n">password</span> <span class="o">=</span> <span class="n">SiteElement</span><span class="p">(</span><span class="n">By</span><span class="o">.</span><span class="n">ID</span><span class="p">,</span> <span class="s2">&quot;password&quot;</span><span class="p">)</span>
+    <span class="n">login_button</span> <span class="o">=</span> <span class="n">SiteElement</span><span class="p">(</span><span class="n">By</span><span class="o">.</span><span class="n">ID</span><span class="p">,</span> <span class="s2">&quot;kc-login&quot;</span><span class="p">)</span>
+    <span class="n">authorize_czhub_button</span> <span class="o">=</span> <span class="n">SiteElement</span><span class="p">(</span><span class="n">By</span><span class="o">.</span><span class="n">CSS_SELECTOR</span><span class="p">,</span> <span class="s1">&#39;form button[value=&quot;yes&quot;]&#39;</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">authorize_via_orcid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">orcid_button</span><span class="o">.</span><span class="n">click</span><span class="p">(</span><span class="n">driver</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">authorize_username_password</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">username</span><span class="o">.</span><span class="n">inject_text</span><span class="p">(</span><span class="n">driver</span><span class="p">,</span> <span class="n">username</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">password</span><span class="o">.</span><span class="n">inject_text</span><span class="p">(</span><span class="n">driver</span><span class="p">,</span> <span class="n">password</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">login_button</span><span class="o">.</span><span class="n">click</span><span class="p">(</span><span class="n">driver</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+        </details>
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="dsp.dsp_macros.EarthchemResourcePage" class="doc doc-heading">
+        <code>EarthchemResourcePage</code>
+
+
+</h2>
+
+
+  <div class="doc doc-contents ">
+      <p class="doc doc-class-bases">
+        Bases: <code><span title="dsp.dsp_macros.WebPage">WebPage</span></code></p>
+
+  
+      <p>Landing page for an ECL resource</p>
+
+
+        <details class="quote">
+          <summary>Source code in <code>dsp/dsp_macros.py</code></summary>
+          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1149</span>
+<span class="normal">1150</span>
+<span class="normal">1151</span>
+<span class="normal">1152</span>
+<span class="normal">1153</span>
+<span class="normal">1154</span>
+<span class="normal">1155</span>
+<span class="normal">1156</span>
+<span class="normal">1157</span>
+<span class="normal">1158</span>
+<span class="normal">1159</span>
+<span class="normal">1160</span>
+<span class="normal">1161</span>
+<span class="normal">1162</span>
+<span class="normal">1163</span>
+<span class="normal">1164</span>
+<span class="normal">1165</span>
+<span class="normal">1166</span>
+<span class="normal">1167</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">EarthchemResourcePage</span><span class="p">(</span><span class="n">WebPage</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Landing page for an ECL resource&quot;&quot;&quot;</span>
+
+    <span class="n">logo</span> <span class="o">=</span> <span class="n">By</span><span class="o">.</span><span class="n">CSS_SELECTOR</span><span class="p">,</span> <span class="s2">&quot;#navbarBrand&quot;</span>
+    <span class="n">page_title</span> <span class="o">=</span> <span class="n">SiteElement</span><span class="p">(</span><span class="n">By</span><span class="o">.</span><span class="n">CSS_SELECTOR</span><span class="p">,</span> <span class="s2">&quot;#page-title h1&quot;</span><span class="p">)</span>
+    <span class="n">resource_title</span> <span class="o">=</span> <span class="n">SiteElement</span><span class="p">(</span><span class="n">By</span><span class="o">.</span><span class="n">CSS_SELECTOR</span><span class="p">,</span> <span class="s2">&quot;#title_display&quot;</span><span class="p">)</span>
+    <span class="n">login_orcid</span> <span class="o">=</span> <span class="n">SiteElement</span><span class="p">(</span>
+        <span class="n">By</span><span class="o">.</span><span class="n">XPATH</span><span class="p">,</span> <span class="s2">&quot;//*[@id=&#39;connect-button&#39; and contains(.,&#39;ORCID&#39;)]/..&quot;</span>
+    <span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_title</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">resource_title</span><span class="o">.</span><span class="n">get_text</span><span class="p">(</span><span class="n">driver</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">authenticate_if_needed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="p">):</span>
+        <span class="k">if</span> <span class="s2">&quot;Login&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">page_title</span><span class="o">.</span><span class="n">get_text</span><span class="p">(</span><span class="n">driver</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">login_orcid</span><span class="o">.</span><span class="n">click</span><span class="p">(</span><span class="n">driver</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">resource_title</span><span class="o">.</span><span class="n">wait_on_visibility</span><span class="p">(</span><span class="n">driver</span><span class="p">,</span> <span class="n">REPO_LOAD</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+        </details>
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="dsp.dsp_macros.EditEarthchemSubmission" class="doc doc-heading">
+        <code>EditEarthchemSubmission</code>
+
+
+</h2>
+
+
+  <div class="doc doc-contents ">
+      <p class="doc doc-class-bases">
+        Bases: <code><a class="autorefs autorefs-internal" title="dsp.dsp_macros.SubmitHydroshare" href="#dsp.dsp_macros.SubmitHydroshare">SubmitHydroshare</a></code>, <code><a class="autorefs autorefs-internal" title="dsp.dsp_macros.GeneralEditSubmission" href="#dsp.dsp_macros.GeneralEditSubmission">GeneralEditSubmission</a></code></p>
+
+  
+      <p>Page containing forms for editing existing submission with Earthchem backend</p>
+
+
+        <details class="quote">
+          <summary>Source code in <code>dsp/dsp_macros.py</code></summary>
+          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1100</span>
+<span class="normal">1101</span>
+<span class="normal">1102</span>
+<span class="normal">1103</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">EditEarthchemSubmission</span><span class="p">(</span><span class="n">SubmitHydroshare</span><span class="p">,</span> <span class="n">GeneralEditSubmission</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Page containing forms for editing existing submission with Earthchem backend&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span>
+</code></pre></div></td></tr></table></div>
+        </details>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="dsp.dsp_macros.EditExternalSubmission" class="doc doc-heading">
+        <code>EditExternalSubmission</code>
+
+
+</h2>
+
+
+  <div class="doc doc-contents ">
+      <p class="doc doc-class-bases">
+        Bases: <code><a class="autorefs autorefs-internal" title="dsp.dsp_macros.SubmitHydroshare" href="#dsp.dsp_macros.SubmitHydroshare">SubmitHydroshare</a></code>, <code><a class="autorefs autorefs-internal" title="dsp.dsp_macros.GeneralEditSubmission" href="#dsp.dsp_macros.GeneralEditSubmission">GeneralEditSubmission</a></code></p>
+
+  
+      <p>Page containing forms for editing existing submission with Zenodo backend</p>
+
+
+        <details class="quote">
+          <summary>Source code in <code>dsp/dsp_macros.py</code></summary>
+          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1057</span>
+<span class="normal">1058</span>
+<span class="normal">1059</span>
+<span class="normal">1060</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">EditExternalSubmission</span><span class="p">(</span><span class="n">SubmitHydroshare</span><span class="p">,</span> <span class="n">GeneralEditSubmission</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Page containing forms for editing existing submission with Zenodo backend&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span>
+</code></pre></div></td></tr></table></div>
+        </details>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="dsp.dsp_macros.EditHSSubmission" class="doc doc-heading">
+        <code>EditHSSubmission</code>
+
+
+</h2>
+
+
+  <div class="doc doc-contents ">
+      <p class="doc doc-class-bases">
+        Bases: <code><a class="autorefs autorefs-internal" title="dsp.dsp_macros.SubmitHydroshare" href="#dsp.dsp_macros.SubmitHydroshare">SubmitHydroshare</a></code>, <code><a class="autorefs autorefs-internal" title="dsp.dsp_macros.GeneralEditSubmission" href="#dsp.dsp_macros.GeneralEditSubmission">GeneralEditSubmission</a></code></p>
+
+  
+      <p>Page containing forms for editing existing submission with Hydroshare backend</p>
+
+
+        <details class="quote">
+          <summary>Source code in <code>dsp/dsp_macros.py</code></summary>
+          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1106</span>
+<span class="normal">1107</span>
+<span class="normal">1108</span>
+<span class="normal">1109</span>
+<span class="normal">1110</span>
+<span class="normal">1111</span>
+<span class="normal">1112</span>
+<span class="normal">1113</span>
+<span class="normal">1114</span>
+<span class="normal">1115</span>
+<span class="normal">1116</span>
+<span class="normal">1117</span>
+<span class="normal">1118</span>
+<span class="normal">1119</span>
+<span class="normal">1120</span>
+<span class="normal">1121</span>
+<span class="normal">1122</span>
+<span class="normal">1123</span>
+<span class="normal">1124</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">EditHSSubmission</span><span class="p">(</span><span class="n">SubmitHydroshare</span><span class="p">,</span> <span class="n">GeneralEditSubmission</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Page containing forms for editing existing submission with Hydroshare backend&quot;&quot;&quot;</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_keywords</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_v_multi_select_vals</span><span class="p">(</span>
+            <span class="n">driver</span><span class="p">,</span> <span class="s2">&quot;BasicInformation&quot;</span><span class="p">,</span> <span class="s2">&quot;Subjectkeywords&quot;</span>
+        <span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">check_keywords</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="p">,</span> <span class="n">keywords</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">saved_keywords</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_keywords</span><span class="p">(</span><span class="n">driver</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">keywords</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">keywords</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">saved_keywords</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="n">elem</span> <span class="ow">in</span> <span class="n">saved_keywords</span> <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">keywords</span><span class="p">):</span>
+                <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span>
+</code></pre></div></td></tr></table></div>
+        </details>
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="dsp.dsp_macros.EditZenodoSubmission" class="doc doc-heading">
+        <code>EditZenodoSubmission</code>
+
+
+</h2>
+
+
+  <div class="doc doc-contents ">
+      <p class="doc doc-class-bases">
+        Bases: <code><a class="autorefs autorefs-internal" title="dsp.dsp_macros.SubmitHydroshare" href="#dsp.dsp_macros.SubmitHydroshare">SubmitHydroshare</a></code>, <code><a class="autorefs autorefs-internal" title="dsp.dsp_macros.GeneralEditSubmission" href="#dsp.dsp_macros.GeneralEditSubmission">GeneralEditSubmission</a></code></p>
+
+  
+      <p>Page containing forms for editing existing submission with Zenodo backend</p>
+
+
+        <details class="quote">
+          <summary>Source code in <code>dsp/dsp_macros.py</code></summary>
+          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1063</span>
+<span class="normal">1064</span>
+<span class="normal">1065</span>
+<span class="normal">1066</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">EditZenodoSubmission</span><span class="p">(</span><span class="n">SubmitHydroshare</span><span class="p">,</span> <span class="n">GeneralEditSubmission</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Page containing forms for editing existing submission with Zenodo backend&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span>
+</code></pre></div></td></tr></table></div>
+        </details>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="dsp.dsp_macros.GeneralEditSubmission" class="doc doc-heading">
+        <code>GeneralEditSubmission</code>
+
+
+</h2>
+
+
+  <div class="doc doc-contents ">
+      <p class="doc doc-class-bases">
+        Bases: <code><span title="dsp.dsp_macros.Dsp">Dsp</span></code></p>
+
+
+
+        <details class="quote">
+          <summary>Source code in <code>dsp/dsp_macros.py</code></summary>
+          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">814</span>
+<span class="normal">815</span>
+<span class="normal">816</span>
+<span class="normal">817</span>
+<span class="normal">818</span>
+<span class="normal">819</span>
+<span class="normal">820</span>
+<span class="normal">821</span>
+<span class="normal">822</span>
+<span class="normal">823</span>
+<span class="normal">824</span>
+<span class="normal">825</span>
+<span class="normal">826</span>
+<span class="normal">827</span>
+<span class="normal">828</span>
+<span class="normal">829</span>
+<span class="normal">830</span>
+<span class="normal">831</span>
+<span class="normal">832</span>
+<span class="normal">833</span>
+<span class="normal">834</span>
+<span class="normal">835</span>
+<span class="normal">836</span>
+<span class="normal">837</span>
+<span class="normal">838</span>
+<span class="normal">839</span>
+<span class="normal">840</span>
+<span class="normal">841</span>
+<span class="normal">842</span>
+<span class="normal">843</span>
+<span class="normal">844</span>
+<span class="normal">845</span>
+<span class="normal">846</span>
+<span class="normal">847</span>
+<span class="normal">848</span>
+<span class="normal">849</span>
+<span class="normal">850</span>
+<span class="normal">851</span>
+<span class="normal">852</span>
+<span class="normal">853</span>
+<span class="normal">854</span>
+<span class="normal">855</span>
+<span class="normal">856</span>
+<span class="normal">857</span>
+<span class="normal">858</span>
+<span class="normal">859</span>
+<span class="normal">860</span>
+<span class="normal">861</span>
+<span class="normal">862</span>
+<span class="normal">863</span>
+<span class="normal">864</span>
+<span class="normal">865</span>
+<span class="normal">866</span>
+<span class="normal">867</span>
+<span class="normal">868</span>
+<span class="normal">869</span>
+<span class="normal">870</span>
+<span class="normal">871</span>
+<span class="normal">872</span>
+<span class="normal">873</span>
+<span class="normal">874</span>
+<span class="normal">875</span>
+<span class="normal">876</span>
+<span class="normal">877</span>
+<span class="normal">878</span>
+<span class="normal">879</span>
+<span class="normal">880</span>
+<span class="normal">881</span>
+<span class="normal">882</span>
+<span class="normal">883</span>
+<span class="normal">884</span>
+<span class="normal">885</span>
+<span class="normal">886</span>
+<span class="normal">887</span>
+<span class="normal">888</span>
+<span class="normal">889</span>
+<span class="normal">890</span>
+<span class="normal">891</span>
+<span class="normal">892</span>
+<span class="normal">893</span>
+<span class="normal">894</span>
+<span class="normal">895</span>
+<span class="normal">896</span>
+<span class="normal">897</span>
+<span class="normal">898</span>
+<span class="normal">899</span>
+<span class="normal">900</span>
+<span class="normal">901</span>
+<span class="normal">902</span>
+<span class="normal">903</span>
+<span class="normal">904</span>
+<span class="normal">905</span>
+<span class="normal">906</span>
+<span class="normal">907</span>
+<span class="normal">908</span>
+<span class="normal">909</span>
+<span class="normal">910</span>
+<span class="normal">911</span>
+<span class="normal">912</span>
+<span class="normal">913</span>
+<span class="normal">914</span>
+<span class="normal">915</span>
+<span class="normal">916</span>
+<span class="normal">917</span>
+<span class="normal">918</span>
+<span class="normal">919</span>
+<span class="normal">920</span>
+<span class="normal">921</span>
+<span class="normal">922</span>
+<span class="normal">923</span>
+<span class="normal">924</span>
+<span class="normal">925</span>
+<span class="normal">926</span>
+<span class="normal">927</span>
+<span class="normal">928</span>
+<span class="normal">929</span>
+<span class="normal">930</span>
+<span class="normal">931</span>
+<span class="normal">932</span>
+<span class="normal">933</span>
+<span class="normal">934</span>
+<span class="normal">935</span>
+<span class="normal">936</span>
+<span class="normal">937</span>
+<span class="normal">938</span>
+<span class="normal">939</span>
+<span class="normal">940</span>
+<span class="normal">941</span>
+<span class="normal">942</span>
+<span class="normal">943</span>
+<span class="normal">944</span>
+<span class="normal">945</span>
+<span class="normal">946</span>
+<span class="normal">947</span>
+<span class="normal">948</span>
+<span class="normal">949</span>
+<span class="normal">950</span>
+<span class="normal">951</span>
+<span class="normal">952</span>
+<span class="normal">953</span>
+<span class="normal">954</span>
+<span class="normal">955</span>
+<span class="normal">956</span>
+<span class="normal">957</span>
+<span class="normal">958</span>
+<span class="normal">959</span>
+<span class="normal">960</span>
+<span class="normal">961</span>
+<span class="normal">962</span>
+<span class="normal">963</span>
+<span class="normal">964</span>
+<span class="normal">965</span>
+<span class="normal">966</span>
+<span class="normal">967</span>
+<span class="normal">968</span>
+<span class="normal">969</span>
+<span class="normal">970</span>
+<span class="normal">971</span>
+<span class="normal">972</span>
+<span class="normal">973</span>
+<span class="normal">974</span>
+<span class="normal">975</span>
+<span class="normal">976</span>
+<span class="normal">977</span>
+<span class="normal">978</span>
+<span class="normal">979</span>
+<span class="normal">980</span>
+<span class="normal">981</span>
+<span class="normal">982</span>
+<span class="normal">983</span>
+<span class="normal">984</span>
+<span class="normal">985</span>
+<span class="normal">986</span>
+<span class="normal">987</span>
+<span class="normal">988</span>
+<span class="normal">989</span>
+<span class="normal">990</span>
+<span class="normal">991</span>
+<span class="normal">992</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">GeneralEditSubmission</span><span class="p">(</span><span class="n">Dsp</span><span class="p">):</span>
+    <span class="n">header_title</span> <span class="o">=</span> <span class="n">SiteElement</span><span class="p">(</span><span class="n">By</span><span class="o">.</span><span class="n">CSS_SELECTOR</span><span class="p">,</span> <span class="s2">&quot;.text-h4&quot;</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_nth_relation_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+        <span class="n">sel</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s1">&#39;:is(fieldset, div)[data-id*=&quot;Relatedresources&quot;]&#39;</span>
+            <span class="sa">f</span><span class="s1">&#39; .array-list-item:nth-of-type(</span><span class="si">{</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s1">) input[data-id*=&quot;RelationType&quot;]&#39;</span>
+        <span class="p">)</span>
+        <span class="n">relation_type_input</span> <span class="o">=</span> <span class="n">SiteElement</span><span class="p">(</span><span class="n">By</span><span class="o">.</span><span class="n">CSS_SELECTOR</span><span class="p">,</span> <span class="n">sel</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">relation_type_input</span><span class="o">.</span><span class="n">get_texts_from_xpath</span><span class="p">(</span><span class="n">driver</span><span class="p">,</span> <span class="s2">&quot;./preceding::div[1]&quot;</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_header_title</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">header_title</span><span class="o">.</span><span class="n">get_text</span><span class="p">(</span><span class="n">driver</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">check_fields_by_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">element</span> <span class="o">=</span> <span class="n">SiteElement</span><span class="p">(</span><span class="n">By</span><span class="o">.</span><span class="n">ID</span><span class="p">,</span> <span class="s2">&quot;#/properties/&quot;</span> <span class="o">+</span> <span class="n">k</span><span class="p">)</span>
+            <span class="n">element</span><span class="o">.</span><span class="n">scroll_to</span><span class="p">(</span><span class="n">driver</span><span class="p">)</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">element</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="n">driver</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">value</span> <span class="o">!=</span> <span class="n">v</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Mismatch when checking field: </span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">. Expected </span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2"> got </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">expand_section_by_did</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="p">,</span> <span class="n">data_id</span><span class="p">):</span>
+        <span class="n">element</span> <span class="o">=</span> <span class="n">SiteElement</span><span class="p">(</span>
+            <span class="n">By</span><span class="o">.</span><span class="n">CSS_SELECTOR</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;:is(fieldset, div)[data-id*=&quot;</span><span class="si">{</span><span class="n">data_id</span><span class="si">}</span><span class="s1">&quot;] legend&#39;</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">element</span><span class="o">.</span><span class="n">exists_in_dom</span><span class="p">(</span><span class="n">driver</span><span class="p">):</span>
+            <span class="c1"># print(f&quot;\n Ignoring attempt to expand static section: {data_id}&quot;)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="n">element</span><span class="o">.</span><span class="n">scroll_to</span><span class="p">(</span><span class="n">driver</span><span class="p">)</span>
+        <span class="n">element</span><span class="o">.</span><span class="n">javascript_click</span><span class="p">(</span><span class="n">driver</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">check_inputs_by_data_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="p">,</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">section</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">nth</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">array</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">expand_section_by_did</span><span class="p">(</span><span class="n">driver</span><span class="p">,</span> <span class="n">data_id</span><span class="o">=</span><span class="n">section</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                <span class="c1"># assume this is a v-multi-select</span>
+                <span class="n">check</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_v_multi_select</span><span class="p">(</span>
+                    <span class="n">driver</span><span class="p">,</span> <span class="n">container_id</span><span class="o">=</span><span class="n">section</span><span class="p">,</span> <span class="n">input_id</span><span class="o">=</span><span class="n">k</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="n">v</span>
+                <span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">check</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Mismatch when checking field: |</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">|. Expected |</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">|.&quot;</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="kc">False</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># not a v-multi-select</span>
+                <span class="k">if</span> <span class="n">section</span> <span class="ow">and</span> <span class="n">nth</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">array</span><span class="p">:</span>
+                        <span class="n">selector</span> <span class="o">=</span> <span class="p">(</span>
+                            <span class="sa">f</span><span class="s1">&#39;:is(fieldset, div)[data-id*=&quot;</span><span class="si">{</span><span class="n">section</span><span class="si">}</span><span class="s1">&quot;] .array-list-item:nth-of-type(</span><span class="si">{</span><span class="n">nth</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s1">) [data-id=&quot;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s1">&quot;],&#39;</span>
+                            <span class="sa">f</span><span class="s1">&#39; :is(fieldset, div)[data-id*=&quot;</span><span class="si">{</span><span class="n">section</span><span class="si">}</span><span class="s1">&quot;] .array-list-item:nth-of-type(</span><span class="si">{</span><span class="n">nth</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s1">) [data-id=&quot;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s1">*&quot;]&#39;</span>
+                        <span class="p">)</span>
+                        <span class="n">elem</span> <span class="o">=</span> <span class="n">SiteElement</span><span class="p">(</span><span class="n">By</span><span class="o">.</span><span class="n">CSS_SELECTOR</span><span class="p">,</span> <span class="n">selector</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">selector</span> <span class="o">=</span> <span class="p">(</span>
+                            <span class="sa">f</span><span class="s1">&#39;:is(fieldset, div)[data-id*=&quot;</span><span class="si">{</span><span class="n">section</span><span class="si">}</span><span class="s1">&quot;] [data-id=&quot;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s1">&quot;]:nth-of-type(</span><span class="si">{</span><span class="n">nth</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s1">),&#39;</span>
+                            <span class="sa">f</span><span class="s1">&#39; :is(fieldset, div)[data-id*=&quot;</span><span class="si">{</span><span class="n">section</span><span class="si">}</span><span class="s1">&quot;] [data-id=&quot;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s1">*&quot;]:nth-of-type(</span><span class="si">{</span><span class="n">nth</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s1">)&#39;</span>
+                        <span class="p">)</span>
+                        <span class="n">elem</span> <span class="o">=</span> <span class="n">SiteElement</span><span class="p">(</span><span class="n">By</span><span class="o">.</span><span class="n">CSS_SELECTOR</span><span class="p">,</span> <span class="n">selector</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">selector</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;[data-id=&quot;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s1">&quot;]:nth-of-type(1), [data-id=&quot;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s1">*&quot;]:nth-of-type(1)&#39;</span>
+                    <span class="n">elem</span> <span class="o">=</span> <span class="n">SiteElement</span><span class="p">(</span><span class="n">By</span><span class="o">.</span><span class="n">CSS_SELECTOR</span><span class="p">,</span> <span class="n">selector</span><span class="p">)</span>
+                <span class="n">elem</span><span class="o">.</span><span class="n">scroll_to</span><span class="p">(</span><span class="n">driver</span><span class="p">)</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="n">elem</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="n">driver</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">value</span> <span class="o">!=</span> <span class="n">v</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">value</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="n">v</span><span class="p">:</span>
+                        <span class="c1"># Allow additional whitespace padding</span>
+                        <span class="c1"># print(</span>
+                        <span class="c1">#     f&quot;\nWARNING: while checking field: |{k}|.\nExpected:&quot;</span>
+                        <span class="c1">#     f&quot; |{v}|\nBut got : |{value}|                        &quot;</span>
+                        <span class="c1">#     &quot; \nWhitespace will be ignored and this field considered&quot;</span>
+                        <span class="c1">#     &quot; valid&quot;</span>
+                        <span class="c1"># )</span>
+                        <span class="k">pass</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span>
+                            <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Mismatch when checking field: |</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">|.</span><span class="se">\n</span><span class="s2">Expected |</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">|&quot;</span>
+                            <span class="sa">f</span><span class="s2">&quot; got |</span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">|&quot;</span>
+                        <span class="p">)</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Selector used: </span><span class="si">{</span><span class="n">selector</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                        <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">check_first_input_in_section</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="p">,</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">section</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">array</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">expand_section_by_did</span><span class="p">(</span><span class="n">driver</span><span class="p">,</span> <span class="n">data_id</span><span class="o">=</span><span class="n">section</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                <span class="c1"># assume this is a v-multi-select</span>
+                <span class="n">check</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_v_multi_select</span><span class="p">(</span>
+                    <span class="n">driver</span><span class="p">,</span> <span class="n">container_id</span><span class="o">=</span><span class="n">section</span><span class="p">,</span> <span class="n">input_id</span><span class="o">=</span><span class="n">k</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="n">v</span>
+                <span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">check</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Mismatch when checking field: |</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">|. Expected |</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">|.&quot;</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="kc">False</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># not a v-multi-select</span>
+                <span class="k">if</span> <span class="n">section</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">array</span><span class="p">:</span>
+                        <span class="n">selector</span> <span class="o">=</span> <span class="p">(</span>
+                            <span class="sa">f</span><span class="s1">&#39;:is(fieldset, div)[data-id*=&quot;</span><span class="si">{</span><span class="n">section</span><span class="si">}</span><span class="s1">&quot;] .array-list-item:first-of-type input&#39;</span>
+                        <span class="p">)</span>
+                        <span class="n">elem</span> <span class="o">=</span> <span class="n">SiteElement</span><span class="p">(</span><span class="n">By</span><span class="o">.</span><span class="n">CSS_SELECTOR</span><span class="p">,</span> <span class="n">selector</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">selector</span> <span class="o">=</span> <span class="p">(</span>
+                            <span class="sa">f</span><span class="s1">&#39;:is(fieldset, div)[data-id*=&quot;</span><span class="si">{</span><span class="n">section</span><span class="si">}</span><span class="s1">&quot;] input:first-of-type&#39;</span>
+                        <span class="p">)</span>
+                        <span class="n">elem</span> <span class="o">=</span> <span class="n">SiteElement</span><span class="p">(</span><span class="n">By</span><span class="o">.</span><span class="n">CSS_SELECTOR</span><span class="p">,</span> <span class="n">selector</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">selector</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;[data-id=&quot;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s1">&quot;]:first-of-type, [data-id=&quot;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s1">*&quot;]:first-of-type&#39;</span>
+                    <span class="n">elem</span> <span class="o">=</span> <span class="n">SiteElement</span><span class="p">(</span><span class="n">By</span><span class="o">.</span><span class="n">CSS_SELECTOR</span><span class="p">,</span> <span class="n">selector</span><span class="p">)</span>
+                <span class="n">elem</span><span class="o">.</span><span class="n">scroll_to</span><span class="p">(</span><span class="n">driver</span><span class="p">)</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="n">elem</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="n">driver</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">value</span> <span class="o">!=</span> <span class="n">v</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">value</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="n">v</span><span class="p">:</span>
+                        <span class="c1"># Allow additional whitespace padding</span>
+                        <span class="c1"># print(</span>
+                        <span class="c1">#     f&quot;\nWARNING: while checking field: |{k}|.\nExpected:&quot;</span>
+                        <span class="c1">#     f&quot; |{v}|\nBut got : |{value}|                        &quot;</span>
+                        <span class="c1">#     &quot; \nWhitespace will be ignored and this field considered&quot;</span>
+                        <span class="c1">#     &quot; valid&quot;</span>
+                        <span class="c1"># )</span>
+                        <span class="k">pass</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span>
+                            <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Mismatch when checking first input in section. Field: |</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">|.</span><span class="se">\n</span><span class="s2">Expected |</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">|&quot;</span>
+                            <span class="sa">f</span><span class="s2">&quot; got |</span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">|&quot;</span>
+                        <span class="p">)</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Selector used: </span><span class="si">{</span><span class="n">selector</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                        <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">check_required_elements</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="p">,</span> <span class="n">required_elements</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Unless otherwise defined, Editsubmission pages should check required fields</span>
+<span class="sd">        by dict&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">section</span><span class="p">,</span> <span class="n">dict_to_check</span> <span class="ow">in</span> <span class="n">required_elements</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_inputs_by_data_ids</span><span class="p">(</span>
+                    <span class="n">driver</span><span class="p">,</span> <span class="nb">dict</span><span class="o">=</span><span class="n">dict_to_check</span><span class="p">,</span> <span class="n">section</span><span class="o">=</span><span class="n">section</span><span class="p">,</span> <span class="n">nth</span><span class="o">=</span><span class="mi">0</span>
+                <span class="p">)</span>
+            <span class="k">except</span> <span class="n">TimeoutException</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Unable to check required element. Defaulting to first in section&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_first_input_in_section</span><span class="p">(</span>
+                    <span class="n">driver</span><span class="p">,</span> <span class="nb">dict</span><span class="o">=</span><span class="n">dict_to_check</span><span class="p">,</span> <span class="n">section</span><span class="o">=</span><span class="n">section</span>
+                <span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_v_multi_select_vals</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="p">,</span> <span class="n">container_id</span><span class="p">,</span> <span class="n">input_id</span><span class="p">):</span>
+        <span class="nb">input</span> <span class="o">=</span> <span class="n">SiteElement</span><span class="p">(</span>
+            <span class="n">By</span><span class="o">.</span><span class="n">CSS_SELECTOR</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s1">&#39;fieldset[data-id*=&quot;</span><span class="si">{</span><span class="n">container_id</span><span class="si">}</span><span class="s1">&quot;] input[data-id*=&quot;</span><span class="si">{</span><span class="n">input_id</span><span class="si">}</span><span class="s1">&quot;]&#39;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">get_texts_from_xpath</span><span class="p">(</span>
+            <span class="n">driver</span><span class="p">,</span> <span class="s1">&#39;./preceding-sibling::*/span[contains(@class, &quot;v-chip__content&quot;)]&#39;</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">values</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">check_v_multi_select</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="p">,</span> <span class="n">container_id</span><span class="p">,</span> <span class="n">input_id</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">saved_values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_v_multi_select_vals</span><span class="p">(</span><span class="n">driver</span><span class="p">,</span> <span class="n">container_id</span><span class="p">,</span> <span class="n">input_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">values</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">saved_values</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="n">elem</span> <span class="ow">in</span> <span class="n">saved_values</span> <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">values</span><span class="p">):</span>
+                <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_nth_v_multi_select</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="p">,</span> <span class="n">container_id</span><span class="p">,</span> <span class="n">input_id</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+        <span class="n">saved_values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_v_multi_select_vals</span><span class="p">(</span><span class="n">driver</span><span class="p">,</span> <span class="n">container_id</span><span class="p">,</span> <span class="n">input_id</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">saved_values</span><span class="p">[</span><span class="n">n</span><span class="p">]</span>
+</code></pre></div></td></tr></table></div>
+        </details>
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h3 id="dsp.dsp_macros.GeneralEditSubmission.check_required_elements" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">check_required_elements</span><span class="p">(</span><span class="n">driver</span><span class="p">,</span> <span class="n">required_elements</span><span class="p">)</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
+  </span>
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Unless otherwise defined, Editsubmission pages should check required fields
+by dict</p>
+
+      <details class="quote">
+        <summary>Source code in <code>dsp/dsp_macros.py</code></summary>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">952</span>
+<span class="normal">953</span>
+<span class="normal">954</span>
+<span class="normal">955</span>
+<span class="normal">956</span>
+<span class="normal">957</span>
+<span class="normal">958</span>
+<span class="normal">959</span>
+<span class="normal">960</span>
+<span class="normal">961</span>
+<span class="normal">962</span>
+<span class="normal">963</span>
+<span class="normal">964</span>
+<span class="normal">965</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@classmethod</span>
+<span class="k">def</span> <span class="nf">check_required_elements</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="p">,</span> <span class="n">required_elements</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Unless otherwise defined, Editsubmission pages should check required fields</span>
+<span class="sd">    by dict&quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">section</span><span class="p">,</span> <span class="n">dict_to_check</span> <span class="ow">in</span> <span class="n">required_elements</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_inputs_by_data_ids</span><span class="p">(</span>
+                <span class="n">driver</span><span class="p">,</span> <span class="nb">dict</span><span class="o">=</span><span class="n">dict_to_check</span><span class="p">,</span> <span class="n">section</span><span class="o">=</span><span class="n">section</span><span class="p">,</span> <span class="n">nth</span><span class="o">=</span><span class="mi">0</span>
+            <span class="p">)</span>
+        <span class="k">except</span> <span class="n">TimeoutException</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Unable to check required element. Defaulting to first in section&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_first_input_in_section</span><span class="p">(</span>
+                <span class="n">driver</span><span class="p">,</span> <span class="nb">dict</span><span class="o">=</span><span class="n">dict_to_check</span><span class="p">,</span> <span class="n">section</span><span class="o">=</span><span class="n">section</span>
+            <span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+      </details>
+  </div>
+
+</div>
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="dsp.dsp_macros.HSResourcePage" class="doc doc-heading">
+        <code>HSResourcePage</code>
+
+
+</h2>
+
+
+  <div class="doc doc-contents ">
+      <p class="doc doc-class-bases">
+        Bases: <code><span title="dsp.dsp_macros.WebPage">WebPage</span></code></p>
+
+  
+      <p>Landing page for a HS resource</p>
+
+
+        <details class="quote">
+          <summary>Source code in <code>dsp/dsp_macros.py</code></summary>
+          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1127</span>
+<span class="normal">1128</span>
+<span class="normal">1129</span>
+<span class="normal">1130</span>
+<span class="normal">1131</span>
+<span class="normal">1132</span>
+<span class="normal">1133</span>
+<span class="normal">1134</span>
+<span class="normal">1135</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">HSResourcePage</span><span class="p">(</span><span class="n">WebPage</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Landing page for a HS resource&quot;&quot;&quot;</span>
+
+    <span class="n">logo</span> <span class="o">=</span> <span class="n">By</span><span class="o">.</span><span class="n">CSS_SELECTOR</span><span class="p">,</span> <span class="s2">&quot;#img-brand-logo&quot;</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">SiteElement</span><span class="p">(</span><span class="n">By</span><span class="o">.</span><span class="n">CSS_SELECTOR</span><span class="p">,</span> <span class="s2">&quot;#resource-title&quot;</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_title</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">title</span><span class="o">.</span><span class="n">get_text</span><span class="p">(</span><span class="n">driver</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+        </details>
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="dsp.dsp_macros.HydroshareAuthWindow" class="doc doc-heading">
+        <code>HydroshareAuthWindow</code>
+
+
+</h2>
+
+
+  <div class="doc doc-contents ">
+      <p class="doc doc-class-bases">
+        Bases: <code><span title="dsp.dsp_macros.WebPage">WebPage</span></code></p>
+
+  
+      <p>Authentication window to use Hydroshare as Backend</p>
+
+
+        <details class="quote">
+          <summary>Source code in <code>dsp/dsp_macros.py</code></summary>
+          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">243</span>
+<span class="normal">244</span>
+<span class="normal">245</span>
+<span class="normal">246</span>
+<span class="normal">247</span>
+<span class="normal">248</span>
+<span class="normal">249</span>
+<span class="normal">250</span>
+<span class="normal">251</span>
+<span class="normal">252</span>
+<span class="normal">253</span>
+<span class="normal">254</span>
+<span class="normal">255</span>
+<span class="normal">256</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">HydroshareAuthWindow</span><span class="p">(</span><span class="n">WebPage</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Authentication window to use Hydroshare as Backend&quot;&quot;&quot;</span>
+
+    <span class="n">username</span> <span class="o">=</span> <span class="n">SiteElement</span><span class="p">(</span><span class="n">By</span><span class="o">.</span><span class="n">ID</span><span class="p">,</span> <span class="s2">&quot;id_username&quot;</span><span class="p">)</span>
+    <span class="n">password</span> <span class="o">=</span> <span class="n">SiteElement</span><span class="p">(</span><span class="n">By</span><span class="o">.</span><span class="n">ID</span><span class="p">,</span> <span class="s2">&quot;id_password&quot;</span><span class="p">)</span>
+    <span class="n">submit</span> <span class="o">=</span> <span class="n">SiteElement</span><span class="p">(</span><span class="n">By</span><span class="o">.</span><span class="n">CSS_SELECTOR</span><span class="p">,</span> <span class="s2">&quot;.account-form .btn-primary&quot;</span><span class="p">)</span>
+    <span class="n">authorize</span> <span class="o">=</span> <span class="n">SiteElement</span><span class="p">(</span><span class="n">By</span><span class="o">.</span><span class="n">CSS_SELECTOR</span><span class="p">,</span> <span class="s1">&#39;#authorizationForm input[name=&quot;allow&quot;]&#39;</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">authorize_repo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">username</span><span class="o">.</span><span class="n">inject_text</span><span class="p">(</span><span class="n">driver</span><span class="p">,</span> <span class="n">username</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">password</span><span class="o">.</span><span class="n">inject_text</span><span class="p">(</span><span class="n">driver</span><span class="p">,</span> <span class="n">password</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">submit</span><span class="o">.</span><span class="n">click</span><span class="p">(</span><span class="n">driver</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">authorize</span><span class="o">.</span><span class="n">click</span><span class="p">(</span><span class="n">driver</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+        </details>
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="dsp.dsp_macros.MySubmissions" class="doc doc-heading">
+        <code>MySubmissions</code>
+
+
+</h2>
+
+
+  <div class="doc doc-contents ">
+      <p class="doc doc-class-bases">
+        Bases: <code><span title="dsp.dsp_macros.Dsp">Dsp</span></code></p>
+
+  
+      <p>Page displaying users submissions</p>
+
+
+        <details class="quote">
+          <summary>Source code in <code>dsp/dsp_macros.py</code></summary>
+          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">306</span>
+<span class="normal">307</span>
+<span class="normal">308</span>
+<span class="normal">309</span>
+<span class="normal">310</span>
+<span class="normal">311</span>
+<span class="normal">312</span>
+<span class="normal">313</span>
+<span class="normal">314</span>
+<span class="normal">315</span>
+<span class="normal">316</span>
+<span class="normal">317</span>
+<span class="normal">318</span>
+<span class="normal">319</span>
+<span class="normal">320</span>
+<span class="normal">321</span>
+<span class="normal">322</span>
+<span class="normal">323</span>
+<span class="normal">324</span>
+<span class="normal">325</span>
+<span class="normal">326</span>
+<span class="normal">327</span>
+<span class="normal">328</span>
+<span class="normal">329</span>
+<span class="normal">330</span>
+<span class="normal">331</span>
+<span class="normal">332</span>
+<span class="normal">333</span>
+<span class="normal">334</span>
+<span class="normal">335</span>
+<span class="normal">336</span>
+<span class="normal">337</span>
+<span class="normal">338</span>
+<span class="normal">339</span>
+<span class="normal">340</span>
+<span class="normal">341</span>
+<span class="normal">342</span>
+<span class="normal">343</span>
+<span class="normal">344</span>
+<span class="normal">345</span>
+<span class="normal">346</span>
+<span class="normal">347</span>
+<span class="normal">348</span>
+<span class="normal">349</span>
+<span class="normal">350</span>
+<span class="normal">351</span>
+<span class="normal">352</span>
+<span class="normal">353</span>
+<span class="normal">354</span>
+<span class="normal">355</span>
+<span class="normal">356</span>
+<span class="normal">357</span>
+<span class="normal">358</span>
+<span class="normal">359</span>
+<span class="normal">360</span>
+<span class="normal">361</span>
+<span class="normal">362</span>
+<span class="normal">363</span>
+<span class="normal">364</span>
+<span class="normal">365</span>
+<span class="normal">366</span>
+<span class="normal">367</span>
+<span class="normal">368</span>
+<span class="normal">369</span>
+<span class="normal">370</span>
+<span class="normal">371</span>
+<span class="normal">372</span>
+<span class="normal">373</span>
+<span class="normal">374</span>
+<span class="normal">375</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">MySubmissions</span><span class="p">(</span><span class="n">Dsp</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Page displaying users submissions&quot;&quot;&quot;</span>
+
+    <span class="n">title</span> <span class="o">=</span> <span class="n">SiteElement</span><span class="p">(</span><span class="n">By</span><span class="o">.</span><span class="n">CSS_SELECTOR</span><span class="p">,</span> <span class="s2">&quot;.text-h4:nth-of-type(1)&quot;</span><span class="p">)</span>
+    <span class="n">total_submissions</span> <span class="o">=</span> <span class="n">SiteElement</span><span class="p">(</span><span class="n">By</span><span class="o">.</span><span class="n">ID</span><span class="p">,</span> <span class="s2">&quot;total_submissions&quot;</span><span class="p">)</span>
+    <span class="n">top_submission</span> <span class="o">=</span> <span class="n">SiteElement</span><span class="p">(</span><span class="n">By</span><span class="o">.</span><span class="n">ID</span><span class="p">,</span> <span class="s2">&quot;submission-0&quot;</span><span class="p">)</span>
+    <span class="n">top_submission_name</span> <span class="o">=</span> <span class="n">SiteElement</span><span class="p">(</span><span class="n">By</span><span class="o">.</span><span class="n">ID</span><span class="p">,</span> <span class="s2">&quot;sub-0-title&quot;</span><span class="p">)</span>
+    <span class="n">top_submission_date</span> <span class="o">=</span> <span class="n">SiteElement</span><span class="p">(</span><span class="n">By</span><span class="o">.</span><span class="n">ID</span><span class="p">,</span> <span class="s2">&quot;sub-0-date&quot;</span><span class="p">)</span>
+    <span class="n">sort_order_select</span> <span class="o">=</span> <span class="n">SiteElement</span><span class="p">(</span><span class="n">By</span><span class="o">.</span><span class="n">ID</span><span class="p">,</span> <span class="s2">&quot;sort-order&quot;</span><span class="p">)</span>
+    <span class="n">my_submissions_search</span> <span class="o">=</span> <span class="n">SiteElement</span><span class="p">(</span><span class="n">By</span><span class="o">.</span><span class="n">ID</span><span class="p">,</span> <span class="s2">&quot;my_submissions_search&quot;</span><span class="p">)</span>
+    <span class="n">top_submission_edit</span> <span class="o">=</span> <span class="n">SiteElement</span><span class="p">(</span><span class="n">By</span><span class="o">.</span><span class="n">ID</span><span class="p">,</span> <span class="s2">&quot;sub-0-edit&quot;</span><span class="p">)</span>
+    <span class="n">top_submission_view_repo</span> <span class="o">=</span> <span class="n">SiteElement</span><span class="p">(</span><span class="n">By</span><span class="o">.</span><span class="n">ID</span><span class="p">,</span> <span class="s2">&quot;sub-0-view&quot;</span><span class="p">)</span>
+    <span class="n">check_in_dialog</span> <span class="o">=</span> <span class="n">SiteElement</span><span class="p">(</span><span class="n">By</span><span class="o">.</span><span class="n">CSS_SELECTOR</span><span class="p">,</span> <span class="s1">&#39;.v-dialog input[type=&quot;checkbox&quot;]&#39;</span><span class="p">)</span>
+    <span class="n">confirm_in_dialog</span> <span class="o">=</span> <span class="n">SiteElement</span><span class="p">(</span><span class="n">By</span><span class="o">.</span><span class="n">CSS_SELECTOR</span><span class="p">,</span> <span class="s2">&quot;.v-dialog button.dialog-confirm&quot;</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">delete_submissions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="p">,</span> <span class="n">silent</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="n">total_submissions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_total_submissions</span><span class="p">(</span><span class="n">driver</span><span class="p">)</span>
+        <span class="n">current_active</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="n">total_submissions</span> <span class="o">&gt;</span> <span class="n">current_active</span><span class="p">:</span>
+            <span class="n">delete_button</span> <span class="o">=</span> <span class="n">SiteElement</span><span class="p">(</span>
+                <span class="n">By</span><span class="o">.</span><span class="n">ID</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;sub-</span><span class="si">{</span><span class="n">total_submissions</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">current_active</span><span class="w"> </span><span class="o">-</span><span class="mi">1</span><span class="si">}</span><span class="s2">-delete&quot;</span>
+            <span class="p">)</span>
+            <span class="n">delete_button</span><span class="o">.</span><span class="n">scroll_to_hidden</span><span class="p">(</span><span class="n">driver</span><span class="p">)</span>
+            <span class="n">claz</span> <span class="o">=</span> <span class="n">delete_button</span><span class="o">.</span><span class="n">get_class</span><span class="p">(</span><span class="n">driver</span><span class="p">)</span>
+            <span class="n">is_disabled</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">for</span> <span class="n">cl</span> <span class="ow">in</span> <span class="n">claz</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">cl</span> <span class="o">==</span> <span class="s2">&quot;v-btn--disabled&quot;</span><span class="p">:</span>
+                    <span class="n">is_disabled</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="k">break</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">is_disabled</span><span class="p">:</span>
+                <span class="n">delete_button</span><span class="o">.</span><span class="n">javascript_click_hidden</span><span class="p">(</span><span class="n">driver</span><span class="p">,</span> <span class="n">silent</span><span class="p">)</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">check_in_dialog</span><span class="o">.</span><span class="n">javascript_click_hidden</span><span class="p">(</span><span class="n">driver</span><span class="p">,</span> <span class="n">silent</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">confirm_in_dialog</span><span class="o">.</span><span class="n">javascript_click_hidden</span><span class="p">(</span><span class="n">driver</span><span class="p">,</span> <span class="n">silent</span><span class="p">)</span>
+                <span class="k">except</span> <span class="n">TimeoutException</span><span class="p">:</span>
+                    <span class="c1"># sometimes the &quot;checkbox to delete in repo is not present&quot;</span>
+                    <span class="k">pass</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">current_active</span> <span class="o">=</span> <span class="n">current_active</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="n">total_submissions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_total_submissions</span><span class="p">(</span><span class="n">driver</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_title</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">title</span><span class="o">.</span><span class="n">get_text</span><span class="p">(</span><span class="n">driver</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_total_submissions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="p">):</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">total_submissions</span><span class="o">.</span><span class="n">get_text</span><span class="p">(</span><span class="n">driver</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">text</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_top_submission_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">top_submission_name</span><span class="o">.</span><span class="n">get_text</span><span class="p">(</span><span class="n">driver</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_top_submission_date</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">top_submission_date</span><span class="o">.</span><span class="n">get_text</span><span class="p">(</span><span class="n">driver</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">enter_text_in_search</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="p">,</span> <span class="n">field_text</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">my_submissions_search</span><span class="o">.</span><span class="n">inject_text</span><span class="p">(</span><span class="n">driver</span><span class="p">,</span> <span class="n">field_text</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">edit_top_submission</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">top_submission_edit</span><span class="o">.</span><span class="n">click</span><span class="p">(</span><span class="n">driver</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">view_top_submission</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">top_submission_view_repo</span><span class="o">.</span><span class="n">click</span><span class="p">(</span><span class="n">driver</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+        </details>
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="dsp.dsp_macros.OrcidWindow" class="doc doc-heading">
+        <code>OrcidWindow</code>
+
+
+</h2>
+
+
+  <div class="doc doc-contents ">
+      <p class="doc doc-class-bases">
+        Bases: <code><span title="dsp.dsp_macros.WebPage">WebPage</span></code></p>
+
+  
+      <p>Orcid window</p>
+
+
+        <details class="quote">
+          <summary>Source code in <code>dsp/dsp_macros.py</code></summary>
+          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">229</span>
+<span class="normal">230</span>
+<span class="normal">231</span>
+<span class="normal">232</span>
+<span class="normal">233</span>
+<span class="normal">234</span>
+<span class="normal">235</span>
+<span class="normal">236</span>
+<span class="normal">237</span>
+<span class="normal">238</span>
+<span class="normal">239</span>
+<span class="normal">240</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">OrcidWindow</span><span class="p">(</span><span class="n">WebPage</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Orcid window&quot;&quot;&quot;</span>
+
+    <span class="n">username</span> <span class="o">=</span> <span class="n">SiteElement</span><span class="p">(</span><span class="n">By</span><span class="o">.</span><span class="n">ID</span><span class="p">,</span> <span class="s2">&quot;username&quot;</span><span class="p">)</span>
+    <span class="n">password</span> <span class="o">=</span> <span class="n">SiteElement</span><span class="p">(</span><span class="n">By</span><span class="o">.</span><span class="n">ID</span><span class="p">,</span> <span class="s2">&quot;password&quot;</span><span class="p">)</span>
+    <span class="n">submit</span> <span class="o">=</span> <span class="n">SiteElement</span><span class="p">(</span><span class="n">By</span><span class="o">.</span><span class="n">ID</span><span class="p">,</span> <span class="s2">&quot;signin-button&quot;</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">fill_credentials</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">username</span><span class="o">.</span><span class="n">inject_text</span><span class="p">(</span><span class="n">driver</span><span class="p">,</span> <span class="n">username</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">password</span><span class="o">.</span><span class="n">inject_text</span><span class="p">(</span><span class="n">driver</span><span class="p">,</span> <span class="n">password</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">submit</span><span class="o">.</span><span class="n">click</span><span class="p">(</span><span class="n">driver</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+        </details>
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="dsp.dsp_macros.SubmitEarthchem" class="doc doc-heading">
+        <code>SubmitEarthchem</code>
+
+
+</h2>
+
+
+  <div class="doc doc-contents ">
+      <p class="doc doc-class-bases">
+        Bases: <code><span title="dsp.dsp_macros.GeneralSubmitToRepo">GeneralSubmitToRepo</span></code></p>
+
+  
+      <p>Page containing forms for submitting data with Earthchem backend</p>
+
+
+        <details class="quote">
+          <summary>Source code in <code>dsp/dsp_macros.py</code></summary>
+          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1069</span>
+<span class="normal">1070</span>
+<span class="normal">1071</span>
+<span class="normal">1072</span>
+<span class="normal">1073</span>
+<span class="normal">1074</span>
+<span class="normal">1075</span>
+<span class="normal">1076</span>
+<span class="normal">1077</span>
+<span class="normal">1078</span>
+<span class="normal">1079</span>
+<span class="normal">1080</span>
+<span class="normal">1081</span>
+<span class="normal">1082</span>
+<span class="normal">1083</span>
+<span class="normal">1084</span>
+<span class="normal">1085</span>
+<span class="normal">1086</span>
+<span class="normal">1087</span>
+<span class="normal">1088</span>
+<span class="normal">1089</span>
+<span class="normal">1090</span>
+<span class="normal">1091</span>
+<span class="normal">1092</span>
+<span class="normal">1093</span>
+<span class="normal">1094</span>
+<span class="normal">1095</span>
+<span class="normal">1096</span>
+<span class="normal">1097</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">SubmitEarthchem</span><span class="p">(</span><span class="n">GeneralSubmitToRepo</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Page containing forms for submitting data with Earthchem backend&quot;&quot;&quot;</span>
+
+    <span class="n">finish_later</span> <span class="o">=</span> <span class="n">SiteElement</span><span class="p">(</span>
+        <span class="n">By</span><span class="o">.</span><span class="n">XPATH</span><span class="p">,</span> <span class="s2">&quot;//*[@class=&#39;v-btn__content&#39; and contains(text(),&#39;later&#39;)]/..&quot;</span>
+    <span class="p">)</span>
+    <span class="n">submit_review</span> <span class="o">=</span> <span class="n">SiteElement</span><span class="p">(</span>
+        <span class="n">By</span><span class="o">.</span><span class="n">XPATH</span><span class="p">,</span>
+        <span class="s2">&quot;//*[@class=&#39;v-btn__content&#39; and contains(text(),&#39;Submit for review&#39;)]/..&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">license</span> <span class="o">=</span> <span class="n">SiteElement</span><span class="p">(</span><span class="n">By</span><span class="o">.</span><span class="n">CSS_SELECTOR</span><span class="p">,</span> <span class="s1">&#39;[data-id*=&quot;License&quot;] .v-select__selection&#39;</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">finish_submission_later</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bottom_finish</span><span class="o">.</span><span class="n">scroll_to</span><span class="p">(</span><span class="n">driver</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bottom_finish</span><span class="o">.</span><span class="n">click</span><span class="p">(</span><span class="n">driver</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">finish_later</span><span class="o">.</span><span class="n">click</span><span class="p">(</span><span class="n">driver</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">wait_until_element_not_exist</span><span class="p">(</span><span class="n">driver</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_saving</span><span class="p">,</span> <span class="n">NEW_SUBMISSION_SAVE</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">submit_for_review</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bottom_finish</span><span class="o">.</span><span class="n">scroll_to</span><span class="p">(</span><span class="n">driver</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bottom_finish</span><span class="o">.</span><span class="n">click</span><span class="p">(</span><span class="n">driver</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">submit_review</span><span class="o">.</span><span class="n">click</span><span class="p">(</span><span class="n">driver</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">wait_until_element_not_exist</span><span class="p">(</span><span class="n">driver</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_saving</span><span class="p">,</span> <span class="n">NEW_SUBMISSION_SAVE</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_license</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">license</span><span class="o">.</span><span class="n">get_text</span><span class="p">(</span><span class="n">driver</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+        </details>
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="dsp.dsp_macros.SubmitExternal" class="doc doc-heading">
+        <code>SubmitExternal</code>
+
+
+</h2>
+
+
+  <div class="doc doc-contents ">
+      <p class="doc doc-class-bases">
+        Bases: <code><span title="dsp.dsp_macros.GeneralSubmitToRepo">GeneralSubmitToRepo</span></code></p>
+
+  
+      <p>Page containing forms for submitting data with EXTERNAL backend</p>
+
+
+        <details class="quote">
+          <summary>Source code in <code>dsp/dsp_macros.py</code></summary>
+          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1027</span>
+<span class="normal">1028</span>
+<span class="normal">1029</span>
+<span class="normal">1030</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">SubmitExternal</span><span class="p">(</span><span class="n">GeneralSubmitToRepo</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Page containing forms for submitting data with EXTERNAL backend&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span>
+</code></pre></div></td></tr></table></div>
+        </details>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="dsp.dsp_macros.SubmitHydroshare" class="doc doc-heading">
+        <code>SubmitHydroshare</code>
+
+
+</h2>
+
+
+  <div class="doc doc-contents ">
+      <p class="doc doc-class-bases">
+        Bases: <code><span title="dsp.dsp_macros.GeneralSubmitToRepo">GeneralSubmitToRepo</span></code></p>
+
+  
+      <p>Page containing forms for submitting data with HS backend</p>
+
+
+        <details class="quote">
+          <summary>Source code in <code>dsp/dsp_macros.py</code></summary>
+          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 995</span>
+<span class="normal"> 996</span>
+<span class="normal"> 997</span>
+<span class="normal"> 998</span>
+<span class="normal"> 999</span>
+<span class="normal">1000</span>
+<span class="normal">1001</span>
+<span class="normal">1002</span>
+<span class="normal">1003</span>
+<span class="normal">1004</span>
+<span class="normal">1005</span>
+<span class="normal">1006</span>
+<span class="normal">1007</span>
+<span class="normal">1008</span>
+<span class="normal">1009</span>
+<span class="normal">1010</span>
+<span class="normal">1011</span>
+<span class="normal">1012</span>
+<span class="normal">1013</span>
+<span class="normal">1014</span>
+<span class="normal">1015</span>
+<span class="normal">1016</span>
+<span class="normal">1017</span>
+<span class="normal">1018</span>
+<span class="normal">1019</span>
+<span class="normal">1020</span>
+<span class="normal">1021</span>
+<span class="normal">1022</span>
+<span class="normal">1023</span>
+<span class="normal">1024</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">SubmitHydroshare</span><span class="p">(</span><span class="n">GeneralSubmitToRepo</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Page containing forms for submitting data with HS backend&quot;&quot;&quot;</span>
+
+    <span class="c1"># Basic info</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">SiteElement</span><span class="p">(</span>
+        <span class="n">By</span><span class="o">.</span><span class="n">CSS_SELECTOR</span><span class="p">,</span> <span class="s1">&#39;[data-id*=&quot;BasicInformation&quot;] input[data-id*=&quot;Title&quot;]&#39;</span>
+    <span class="p">)</span>
+    <span class="n">abstract</span> <span class="o">=</span> <span class="n">SiteElement</span><span class="p">(</span><span class="n">By</span><span class="o">.</span><span class="n">ID</span><span class="p">,</span> <span class="s2">&quot;#/properties/abstract-input&quot;</span><span class="p">)</span>
+    <span class="n">subject_keyword_container</span> <span class="o">=</span> <span class="n">SiteElement</span><span class="p">(</span>
+        <span class="n">By</span><span class="o">.</span><span class="n">CSS_SELECTOR</span><span class="p">,</span> <span class="s1">&#39;[data-id=&quot;group-BasicInformation&quot;] .v-select__selections&#39;</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Temporal</span>
+    <span class="n">temporal_name_input</span> <span class="o">=</span> <span class="n">SiteElement</span><span class="p">(</span>
+        <span class="n">By</span><span class="o">.</span><span class="n">CSS_SELECTOR</span><span class="p">,</span>
+        <span class="s1">&#39;:is(fieldset, div)[data-id*=&quot;Temporalcoverage&quot;] input[data-id*=&quot;Name&quot;]&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">start_input</span> <span class="o">=</span> <span class="n">SiteElement</span><span class="p">(</span>
+        <span class="n">By</span><span class="o">.</span><span class="n">CSS_SELECTOR</span><span class="p">,</span> <span class="s1">&#39;[data-id*=&quot;Temporalcoverage&quot;] input[data-id*=&quot;Start&quot;]&#39;</span>
+    <span class="p">)</span>
+    <span class="n">end_input</span> <span class="o">=</span> <span class="n">SiteElement</span><span class="p">(</span>
+        <span class="n">By</span><span class="o">.</span><span class="n">CSS_SELECTOR</span><span class="p">,</span> <span class="s1">&#39;[data-id*=&quot;Temporalcoverage&quot;] input[data-id*=&quot;End&quot;]&#39;</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Funding agency</span>
+    <span class="n">agency_name</span> <span class="o">=</span> <span class="n">SiteElement</span><span class="p">(</span><span class="n">By</span><span class="o">.</span><span class="n">ID</span><span class="p">,</span> <span class="s2">&quot;#/properties/funding_agency_name-input&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Rights</span>
+    <span class="n">rights_statement</span> <span class="o">=</span> <span class="n">SiteElement</span><span class="p">(</span><span class="n">By</span><span class="o">.</span><span class="n">ID</span><span class="p">,</span> <span class="s2">&quot;#/properties/statement-input&quot;</span><span class="p">)</span>
+    <span class="n">rights_url</span> <span class="o">=</span> <span class="n">SiteElement</span><span class="p">(</span><span class="n">By</span><span class="o">.</span><span class="n">ID</span><span class="p">,</span> <span class="s2">&quot;#/properties/url-input&quot;</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+        </details>
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="dsp.dsp_macros.SubmitLandingPage" class="doc doc-heading">
+        <code>SubmitLandingPage</code>
+
+
+</h2>
+
+
+  <div class="doc doc-contents ">
+      <p class="doc doc-class-bases">
+        Bases: <code><span title="dsp.dsp_macros.Dsp">Dsp</span></code>, <code><span title="dsp.dsp_macros.RepoAuthWindow">RepoAuthWindow</span></code></p>
+
+  
+      <p>Page containing options for submitting data</p>
+
+
+        <details class="quote">
+          <summary>Source code in <code>dsp/dsp_macros.py</code></summary>
+          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">392</span>
+<span class="normal">393</span>
+<span class="normal">394</span>
+<span class="normal">395</span>
+<span class="normal">396</span>
+<span class="normal">397</span>
+<span class="normal">398</span>
+<span class="normal">399</span>
+<span class="normal">400</span>
+<span class="normal">401</span>
+<span class="normal">402</span>
+<span class="normal">403</span>
+<span class="normal">404</span>
+<span class="normal">405</span>
+<span class="normal">406</span>
+<span class="normal">407</span>
+<span class="normal">408</span>
+<span class="normal">409</span>
+<span class="normal">410</span>
+<span class="normal">411</span>
+<span class="normal">412</span>
+<span class="normal">413</span>
+<span class="normal">414</span>
+<span class="normal">415</span>
+<span class="normal">416</span>
+<span class="normal">417</span>
+<span class="normal">418</span>
+<span class="normal">419</span>
+<span class="normal">420</span>
+<span class="normal">421</span>
+<span class="normal">422</span>
+<span class="normal">423</span>
+<span class="normal">424</span>
+<span class="normal">425</span>
+<span class="normal">426</span>
+<span class="normal">427</span>
+<span class="normal">428</span>
+<span class="normal">429</span>
+<span class="normal">430</span>
+<span class="normal">431</span>
+<span class="normal">432</span>
+<span class="normal">433</span>
+<span class="normal">434</span>
+<span class="normal">435</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">SubmitLandingPage</span><span class="p">(</span><span class="n">Dsp</span><span class="p">,</span> <span class="n">RepoAuthWindow</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Page containing options for submitting data&quot;&quot;&quot;</span>
+
+    <span class="n">repositories_header</span> <span class="o">=</span> <span class="n">SiteElement</span><span class="p">(</span>
+        <span class="n">By</span><span class="o">.</span><span class="n">XPATH</span><span class="p">,</span> <span class="s2">&quot;//*[@id=&#39;app&#39;]/child::*[contains(., &#39;Repositories&#39;)]&quot;</span>
+    <span class="p">)</span>
+
+    <span class="n">register_dataset_other</span> <span class="o">=</span> <span class="n">SiteElement</span><span class="p">(</span>
+        <span class="n">By</span><span class="o">.</span><span class="n">XPATH</span><span class="p">,</span>
+        <span class="s2">&quot;//*[contains(text(),&#39;Register a dataset from a different repository&#39;)]/..&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">select_external_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">register_dataset_other</span><span class="o">.</span><span class="n">click</span><span class="p">(</span><span class="n">driver</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">select_nth_dialog_choice</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+        <span class="n">dialog_item</span> <span class="o">=</span> <span class="n">SiteElement</span><span class="p">(</span>
+            <span class="n">By</span><span class="o">.</span><span class="n">CSS_SELECTOR</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">&quot;.v-dialog--active .choice-container .v-card:nth-of-type(</span><span class="si">{</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">dialog_item</span><span class="o">.</span><span class="n">scroll_to</span><span class="p">(</span><span class="n">driver</span><span class="p">)</span>
+        <span class="n">dialog_item</span><span class="o">.</span><span class="n">click</span><span class="p">(</span><span class="n">driver</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">select_repo_by_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+        <span class="n">repo_card</span> <span class="o">=</span> <span class="n">SiteElement</span><span class="p">(</span><span class="n">By</span><span class="o">.</span><span class="n">CSS_SELECTOR</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;div[id*=&quot;</span><span class="si">{</span><span class="nb">id</span><span class="si">}</span><span class="s1">&quot;]&#39;</span><span class="p">)</span>
+        <span class="n">repo_card</span><span class="o">.</span><span class="n">scroll_to</span><span class="p">(</span><span class="n">driver</span><span class="p">)</span>
+        <span class="n">repo_card</span><span class="o">.</span><span class="n">click</span><span class="p">(</span><span class="n">driver</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">select_nth_repo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+        <span class="n">repo_card</span> <span class="o">=</span> <span class="n">SiteElement</span><span class="p">(</span>
+            <span class="n">By</span><span class="o">.</span><span class="n">CSS_SELECTOR</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;div.repositories div.v-card:nth-of-type(</span><span class="si">{</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">)&quot;</span>
+        <span class="p">)</span>
+        <span class="n">repo_card</span><span class="o">.</span><span class="n">scroll_to</span><span class="p">(</span><span class="n">driver</span><span class="p">)</span>
+        <span class="n">repo_card</span><span class="o">.</span><span class="n">click</span><span class="p">(</span><span class="n">driver</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">to_repo_form</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+        <span class="n">Dsp</span><span class="o">.</span><span class="n">show_mobile_nav</span><span class="p">(</span><span class="n">driver</span><span class="p">)</span>
+        <span class="n">Dsp</span><span class="o">.</span><span class="n">drawer_to_submit</span><span class="p">(</span><span class="n">driver</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">select_repo_by_id</span><span class="p">(</span><span class="n">driver</span><span class="p">,</span> <span class="nb">id</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+        </details>
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="dsp.dsp_macros.SubmitZenodo" class="doc doc-heading">
+        <code>SubmitZenodo</code>
+
+
+</h2>
+
+
+  <div class="doc doc-contents ">
+      <p class="doc doc-class-bases">
+        Bases: <code><span title="dsp.dsp_macros.GeneralSubmitToRepo">GeneralSubmitToRepo</span></code></p>
+
+  
+      <p>Page containing forms for submitting data with Zenodo backend</p>
+
+
+        <details class="quote">
+          <summary>Source code in <code>dsp/dsp_macros.py</code></summary>
+          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1033</span>
+<span class="normal">1034</span>
+<span class="normal">1035</span>
+<span class="normal">1036</span>
+<span class="normal">1037</span>
+<span class="normal">1038</span>
+<span class="normal">1039</span>
+<span class="normal">1040</span>
+<span class="normal">1041</span>
+<span class="normal">1042</span>
+<span class="normal">1043</span>
+<span class="normal">1044</span>
+<span class="normal">1045</span>
+<span class="normal">1046</span>
+<span class="normal">1047</span>
+<span class="normal">1048</span>
+<span class="normal">1049</span>
+<span class="normal">1050</span>
+<span class="normal">1051</span>
+<span class="normal">1052</span>
+<span class="normal">1053</span>
+<span class="normal">1054</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">SubmitZenodo</span><span class="p">(</span><span class="n">GeneralSubmitToRepo</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Page containing forms for submitting data with Zenodo backend&quot;&quot;&quot;</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">finish_submission</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="p">,</span> <span class="n">uname</span><span class="p">,</span> <span class="n">pw</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Override general finish submission to account for extra Zenodo auth window&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bottom_finish</span><span class="o">.</span><span class="n">scroll_to</span><span class="p">(</span><span class="n">driver</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bottom_finish</span><span class="o">.</span><span class="n">click</span><span class="p">(</span><span class="n">driver</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">SubmitLandingPage</span><span class="o">.</span><span class="n">to_repo_auth_window</span><span class="p">(</span><span class="n">driver</span><span class="p">)</span>
+            <span class="n">ZenodoAuthWindow</span><span class="o">.</span><span class="n">authorize_email_password</span><span class="p">(</span><span class="n">driver</span><span class="p">,</span> <span class="n">email</span><span class="o">=</span><span class="n">uname</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="n">pw</span><span class="p">)</span>
+            <span class="n">ZenodoAuthWindow</span><span class="o">.</span><span class="n">to_origin_window</span><span class="p">(</span><span class="n">driver</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">TimeoutException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">... </span><span class="se">\n</span><span class="s2">This exception is ignored&quot;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">wait_until_element_visible</span><span class="p">(</span>
+                <span class="n">driver</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_saving</span><span class="p">,</span> <span class="n">PAUSE_AFTER_FILL_BEFORE_SUBMIT</span>
+            <span class="p">)</span>
+        <span class="k">except</span> <span class="n">NoSuchElementException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">... </span><span class="se">\n</span><span class="s2">This exception is ignored&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">wait_until_element_not_exist</span><span class="p">(</span><span class="n">driver</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_saving</span><span class="p">,</span> <span class="n">NEW_SUBMISSION_SAVE</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+        </details>
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h3 id="dsp.dsp_macros.SubmitZenodo.finish_submission" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">finish_submission</span><span class="p">(</span><span class="n">driver</span><span class="p">,</span> <span class="n">uname</span><span class="p">,</span> <span class="n">pw</span><span class="p">)</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
+  </span>
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Override general finish submission to account for extra Zenodo auth window</p>
+
+      <details class="quote">
+        <summary>Source code in <code>dsp/dsp_macros.py</code></summary>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1036</span>
+<span class="normal">1037</span>
+<span class="normal">1038</span>
+<span class="normal">1039</span>
+<span class="normal">1040</span>
+<span class="normal">1041</span>
+<span class="normal">1042</span>
+<span class="normal">1043</span>
+<span class="normal">1044</span>
+<span class="normal">1045</span>
+<span class="normal">1046</span>
+<span class="normal">1047</span>
+<span class="normal">1048</span>
+<span class="normal">1049</span>
+<span class="normal">1050</span>
+<span class="normal">1051</span>
+<span class="normal">1052</span>
+<span class="normal">1053</span>
+<span class="normal">1054</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@classmethod</span>
+<span class="k">def</span> <span class="nf">finish_submission</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="p">,</span> <span class="n">uname</span><span class="p">,</span> <span class="n">pw</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Override general finish submission to account for extra Zenodo auth window&quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">bottom_finish</span><span class="o">.</span><span class="n">scroll_to</span><span class="p">(</span><span class="n">driver</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">bottom_finish</span><span class="o">.</span><span class="n">click</span><span class="p">(</span><span class="n">driver</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">SubmitLandingPage</span><span class="o">.</span><span class="n">to_repo_auth_window</span><span class="p">(</span><span class="n">driver</span><span class="p">)</span>
+        <span class="n">ZenodoAuthWindow</span><span class="o">.</span><span class="n">authorize_email_password</span><span class="p">(</span><span class="n">driver</span><span class="p">,</span> <span class="n">email</span><span class="o">=</span><span class="n">uname</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="n">pw</span><span class="p">)</span>
+        <span class="n">ZenodoAuthWindow</span><span class="o">.</span><span class="n">to_origin_window</span><span class="p">(</span><span class="n">driver</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">TimeoutException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">... </span><span class="se">\n</span><span class="s2">This exception is ignored&quot;</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">wait_until_element_visible</span><span class="p">(</span>
+            <span class="n">driver</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_saving</span><span class="p">,</span> <span class="n">PAUSE_AFTER_FILL_BEFORE_SUBMIT</span>
+        <span class="p">)</span>
+    <span class="k">except</span> <span class="n">NoSuchElementException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">... </span><span class="se">\n</span><span class="s2">This exception is ignored&quot;</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">wait_until_element_not_exist</span><span class="p">(</span><span class="n">driver</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_saving</span><span class="p">,</span> <span class="n">NEW_SUBMISSION_SAVE</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+      </details>
+  </div>
+
+</div>
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="dsp.dsp_macros.ZenodoAuthWindow" class="doc doc-heading">
+        <code>ZenodoAuthWindow</code>
+
+
+</h2>
+
+
+  <div class="doc doc-contents ">
+      <p class="doc doc-class-bases">
+        Bases: <code><span title="dsp.dsp_macros.WebPage">WebPage</span></code></p>
+
+  
+      <p>Authentication window to use Zenodo as Backend</p>
+
+
+        <details class="quote">
+          <summary>Source code in <code>dsp/dsp_macros.py</code></summary>
+          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">259</span>
+<span class="normal">260</span>
+<span class="normal">261</span>
+<span class="normal">262</span>
+<span class="normal">263</span>
+<span class="normal">264</span>
+<span class="normal">265</span>
+<span class="normal">266</span>
+<span class="normal">267</span>
+<span class="normal">268</span>
+<span class="normal">269</span>
+<span class="normal">270</span>
+<span class="normal">271</span>
+<span class="normal">272</span>
+<span class="normal">273</span>
+<span class="normal">274</span>
+<span class="normal">275</span>
+<span class="normal">276</span>
+<span class="normal">277</span>
+<span class="normal">278</span>
+<span class="normal">279</span>
+<span class="normal">280</span>
+<span class="normal">281</span>
+<span class="normal">282</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">ZenodoAuthWindow</span><span class="p">(</span><span class="n">WebPage</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Authentication window to use Zenodo as Backend&quot;&quot;&quot;</span>
+
+    <span class="n">github_button</span> <span class="o">=</span> <span class="n">SiteElement</span><span class="p">(</span><span class="n">By</span><span class="o">.</span><span class="n">CSS_SELECTOR</span><span class="p">,</span> <span class="s1">&#39;.social-signup .btn[href*=&quot;github&quot;]&#39;</span><span class="p">)</span>
+    <span class="n">orcid_button</span> <span class="o">=</span> <span class="n">SiteElement</span><span class="p">(</span><span class="n">By</span><span class="o">.</span><span class="n">CSS_SELECTOR</span><span class="p">,</span> <span class="s1">&#39;.social-signup .btn[href*=&quot;orcid&quot;]&#39;</span><span class="p">)</span>
+    <span class="n">email</span> <span class="o">=</span> <span class="n">SiteElement</span><span class="p">(</span><span class="n">By</span><span class="o">.</span><span class="n">ID</span><span class="p">,</span> <span class="s2">&quot;email&quot;</span><span class="p">)</span>
+    <span class="n">password</span> <span class="o">=</span> <span class="n">SiteElement</span><span class="p">(</span><span class="n">By</span><span class="o">.</span><span class="n">ID</span><span class="p">,</span> <span class="s2">&quot;password&quot;</span><span class="p">)</span>
+    <span class="n">login_button</span> <span class="o">=</span> <span class="n">SiteElement</span><span class="p">(</span><span class="n">By</span><span class="o">.</span><span class="n">CSS_SELECTOR</span><span class="p">,</span> <span class="s1">&#39;button[type=&quot;submit&quot;]&#39;</span><span class="p">)</span>
+    <span class="n">authorize_czhub_button</span> <span class="o">=</span> <span class="n">SiteElement</span><span class="p">(</span><span class="n">By</span><span class="o">.</span><span class="n">CSS_SELECTOR</span><span class="p">,</span> <span class="s1">&#39;form button[value=&quot;yes&quot;]&#39;</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">authorize_via_orcid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">orcid_button</span><span class="o">.</span><span class="n">click</span><span class="p">(</span><span class="n">driver</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">authorize_via_github</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">github_button</span><span class="o">.</span><span class="n">click</span><span class="p">(</span><span class="n">driver</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">authorize_email_password</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="p">,</span> <span class="n">email</span><span class="p">,</span> <span class="n">password</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">email</span><span class="o">.</span><span class="n">inject_text</span><span class="p">(</span><span class="n">driver</span><span class="p">,</span> <span class="n">email</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">password</span><span class="o">.</span><span class="n">inject_text</span><span class="p">(</span><span class="n">driver</span><span class="p">,</span> <span class="n">password</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">login_button</span><span class="o">.</span><span class="n">click</span><span class="p">(</span><span class="n">driver</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">authorize_czhub_button</span><span class="o">.</span><span class="n">click</span><span class="p">(</span><span class="n">driver</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+        </details>
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="dsp.dsp_macros.ZenodoResourcePage" class="doc doc-heading">
+        <code>ZenodoResourcePage</code>
+
+
+</h2>
+
+
+  <div class="doc doc-contents ">
+      <p class="doc doc-class-bases">
+        Bases: <code><span title="dsp.dsp_macros.WebPage">WebPage</span></code></p>
+
+  
+      <p>Landing page for a Zenodo resource</p>
+
+
+        <details class="quote">
+          <summary>Source code in <code>dsp/dsp_macros.py</code></summary>
+          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1138</span>
+<span class="normal">1139</span>
+<span class="normal">1140</span>
+<span class="normal">1141</span>
+<span class="normal">1142</span>
+<span class="normal">1143</span>
+<span class="normal">1144</span>
+<span class="normal">1145</span>
+<span class="normal">1146</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">ZenodoResourcePage</span><span class="p">(</span><span class="n">WebPage</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Landing page for a Zenodo resource&quot;&quot;&quot;</span>
+
+    <span class="n">logo</span> <span class="o">=</span> <span class="n">By</span><span class="o">.</span><span class="n">CSS_SELECTOR</span><span class="p">,</span> <span class="s2">&quot;img.navbar-brand&quot;</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">SiteElement</span><span class="p">(</span><span class="n">By</span><span class="o">.</span><span class="n">CSS_SELECTOR</span><span class="p">,</span> <span class="s2">&quot;#title&quot;</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_title</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">title</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="n">driver</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+        </details>
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+    <nav class="md-footer__inner md-grid" aria-label="Footer" >
+      
+        
+        <a href="../dsp_tests/" class="md-footer__link md-footer__link--prev" aria-label="Previous: DSP Tests" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              DSP Tests
+            </div>
+          </div>
+        </a>
+      
+      
+        
+        <a href="../../hydroshare/hydroshare_tests/" class="md-footer__link md-footer__link--next" aria-label="Next: Hydroshare Tests" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              Hydroshare Tests
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    <script id="__config" type="application/json">{"base": "../..", "features": [], "search": "../../assets/javascripts/workers/search.16e2a7d4.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.5a2dcb6a.min.js"></script>
+      
+    
+    
+  </body>
+</html>
