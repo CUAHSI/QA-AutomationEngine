@@ -536,8 +536,49 @@ class GeneralSubmitToRepo(Dsp, RepoAuthWindow):
         self.expand_section_by_did(driver, data_id=section)
         for k, v in dict.items():
             if not self.fill_input_by_data_id(driver, k, v, section, nth, array):
-                return False
+                return self.fill_input_by_id(driver, k, v, section, nth, array)
         TestSystem.wait(PAUSE_AFTER_FILL_BEFORE_SUBMIT)
+        return True
+
+    @classmethod
+    def fill_input_by_id(
+        self, driver, data_id, value, section=None, nth=0, array=False
+    ):
+        try:
+            if section and nth is not None:
+                if array:
+                    selector = (
+                        f'[data-id*="{section}"] .array-list-item:nth-of-type({nth+1}) [id*="{data_id}"],'
+                        f' [data-id*="{section}"] .array-list-item:nth-of-type({nth+1}) [id*="{data_id}*"]'
+                    )
+                else:
+                    selector = (
+                        f'[data-id*="{section}"] [id*="{data_id}"]:nth-of-type({nth+1}),'
+                        f'[data-id*="{section}"] [id*="{data_id}*"]:nth-of-type({nth+1})'
+                    )
+                element = SiteElement(By.CSS_SELECTOR, selector)
+            else:
+                element = SiteElement(
+                    By.CSS_SELECTOR, f'[data-id="{data_id}"]:nth-of-type(1), [id*="{data_id}*"]:nth-of-type(1)'
+                )
+        except TimeoutException as e:
+            print(f"{e}\nElement not found for key: {data_id}")
+            return False
+        if element.exists_in_dom(driver):
+            if isinstance(value, list):
+                # assume this is a v-multi-select
+                self.fill_v_multi_select(
+                    driver, container_id=section, input_id=data_id, values=value
+                )
+            else:
+                element.hidden_inject_text(driver, value)
+                element.submit(driver)
+        else:
+            print(
+                f"\nAttempt to fill element {data_id} in section {section} failed. Not"
+                f' in DOM\nSelector used="{selector}"'
+            )
+            return False
         return True
 
     @classmethod

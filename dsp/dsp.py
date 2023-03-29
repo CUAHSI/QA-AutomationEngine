@@ -1055,6 +1055,9 @@ class DspEarthchemTestSuite(DspTestSuite):
 
     @classmethod
     def required_elements_template(self, auto_text):
+        data_file_release = {
+            "datePublished": datetime.datetime.today().strftime('%Y-%m-%d'),
+        }
         basic_info = {
             "DatasetTitle": auto_text + " Title",
             "AbstractorDescription": auto_text + " Description/Abstract",
@@ -1072,6 +1075,7 @@ class DspEarthchemTestSuite(DspTestSuite):
         }
 
         required_elements = {
+            "DataFileReleaseInformation": data_file_release,
             "group-BasicInformation": basic_info,
             "SpatialCoverageInformation": spatial,
             "LeadAuthor": lead_author,
