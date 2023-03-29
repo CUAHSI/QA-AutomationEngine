@@ -49,7 +49,9 @@ class SiteElement:
         """
         wait = WebDriverWait(driver, 10)
         try:
-            target_el = wait.until(EC.presence_of_element_located((self.by, self.locator)))
+            target_el = wait.until(
+                EC.presence_of_element_located((self.by, self.locator))
+            )
         except TimeoutException as e:
             if not silent:
                 print(
@@ -348,8 +350,7 @@ class SiteElement:
         return keywords
 
     def get_parent(self, driver):
-        """Returns the parent element
-        """
+        """Returns the parent element"""
         target_el = self.loc_hidden(driver)
         return target_el.find_element_by_xpath("..")
 
