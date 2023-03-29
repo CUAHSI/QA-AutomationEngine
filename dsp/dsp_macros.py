@@ -535,11 +535,48 @@ class GeneralSubmitToRepo(Dsp, RepoAuthWindow):
     def fill_inputs_by_data_ids(self, driver, dict, section=None, nth=0, array=False):
         self.expand_section_by_did(driver, data_id=section)
         for k, v in dict.items():
+            # First try to fill by data+_id, then by id, then last resort = first input available
             if not self.fill_input_by_data_id(driver, k, v, section, nth, array):
-                return self.fill_input_by_id(driver, k, v, section, nth, array)
+                if not self.fill_input_by_id(driver, k, v, section, nth, array):
+                    return self.fill_first_input_in_section(driver, v, section, array)
         TestSystem.wait(PAUSE_AFTER_FILL_BEFORE_SUBMIT)
         return True
 
+    @classmethod
+    def fill_first_input_in_section(
+        self, driver, value, section=None, array=False
+    ):
+        try:
+            if array:
+                selector = (
+                    f'[data-id*="{section}"] .array-list-item:first-of-type input,'
+                    f' [data-id*="{section}"] .array-list-item:first-of-type input'
+                )
+            else:
+                selector = (
+                    f'[data-id*="{section}"] input:first-of-type,'
+                    f'[data-id*="{section}"] input:first-of-type'
+                )
+            element = SiteElement(By.CSS_SELECTOR, selector)
+        except TimeoutException as e:
+            print(f"{e}\nElement not found for selector: {selector}")
+            return False
+        if element.exists_in_dom(driver):
+            if isinstance(value, list):
+                # assume this is a v-multi-select
+                self.fill_v_multi_select(
+                    driver, container_id=section, input_id="", values=value
+                )
+            else:
+                element.hidden_inject_text(driver, value)
+                element.submit(driver)
+        else:
+            print(
+                f"\nAttempt to fill first input input in section {section} failed. Not"
+                f' in DOM\nSelector used="{selector}"'
+            )
+            return False
+        return True
     @classmethod
     def fill_input_by_id(
         self, driver, data_id, value, section=None, nth=0, array=False
@@ -575,7 +612,7 @@ class GeneralSubmitToRepo(Dsp, RepoAuthWindow):
                 element.submit(driver)
         else:
             print(
-                f"\nAttempt to fill element {data_id} in section {section} failed. Not"
+                f"\nAttempt to fill element {data_id} in section {section} by id failed. Not"
                 f' in DOM\nSelector used="{selector}"'
             )
             return False
@@ -617,7 +654,7 @@ class GeneralSubmitToRepo(Dsp, RepoAuthWindow):
                 element.submit_hidden(driver)
         else:
             print(
-                f"\nAttempt to fill element {data_id} in section {section} failed. Not"
+                f"\nAttempt to fill element {data_id} in section {section} using data_id failed. Not"
                 f' in DOM\nSelector used="{selector}"'
             )
             return False

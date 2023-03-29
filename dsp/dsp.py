@@ -691,6 +691,9 @@ class DspExternalTestSuite(DspTestSuite):
             "Descriptionorabstract": auto_text + " Descriptionorabstract",
             "SubjectKeywords": [auto_text + " SubjectKeywords"],
         }
+        date_published = {
+            "Date": "2022-04-05T00:04"
+        }
         creator = {
             "Name": "Meister, Jim",
             "Organization": (
@@ -712,6 +715,7 @@ class DspExternalTestSuite(DspTestSuite):
         # created separately so that we can check individually if needed
         required_elements = {
             "BasicInformation": basic_info,
+            "Datepublished": date_published,
             "Creators": creator,
             "Fundingagencyinformation": funding_agency,
             "Provider": provider,
