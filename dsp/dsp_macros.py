@@ -576,10 +576,11 @@ class GeneralSubmitToRepo(Dsp, RepoAuthWindow):
                 element.submit(driver)
         else:
             print(
-                f"\nAttempt to fill first input input in section {section} failed. Not"
+                f"\nAttempt to fill first input in section {section} failed. Not"
                 f' in DOM\nSelector used="{selector}"'
             )
             return False
+        print(f"Filled first input in {section}\n")
         return True
 
     @classmethod
@@ -900,13 +901,68 @@ class GeneralEditSubmission(Dsp):
         return True
 
     @classmethod
+    def check_first_input_in_section(self, driver, dict, section=None, array=False):
+        self.expand_section_by_did(driver, data_id=section)
+        for k, v in dict.items():
+            if isinstance(v, list):
+                # assume this is a v-multi-select
+                check = self.check_v_multi_select(
+                    driver, container_id=section, input_id=k, values=v
+                )
+                if not check:
+                    print(f"\nMismatch when checking field: |{k}|. Expected |{v}|.")
+                    return False
+            else:
+                # not a v-multi-select
+                if section:
+                    if array:
+                        selector = (
+                            f':is(fieldset, div)[data-id*="{section}"] .array-list-item:first-of-type input'
+                        )
+                        elem = SiteElement(By.CSS_SELECTOR, selector)
+                    else:
+                        selector = (
+                            f':is(fieldset, div)[data-id*="{section}"] input:first-of-type'
+                        )
+                        elem = SiteElement(By.CSS_SELECTOR, selector)
+                else:
+                    selector = f'[data-id="{k}"]:first-of-type, [data-id="{k}*"]:first-of-type'
+                    elem = SiteElement(By.CSS_SELECTOR, selector)
+                elem.scroll_to(driver)
+                value = elem.get_value(driver)
+                if value != v:
+                    if value.strip() == v:
+                        # Allow additional whitespace padding
+                        # print(
+                        #     f"\nWARNING: while checking field: |{k}|.\nExpected:"
+                        #     f" |{v}|\nBut got : |{value}|                        "
+                        #     " \nWhitespace will be ignored and this field considered"
+                        #     " valid"
+                        # )
+                        pass
+                    else:
+                        print(
+                            f"\nMismatch when checking first input in section. Field: |{k}|.\nExpected |{v}|"
+                            f" got |{value}|"
+                        )
+                        print(f"\nSelector used: {selector}")
+                        return False
+        return True
+
+    @classmethod
     def check_required_elements(self, driver, required_elements):
         """Unless otherwise defined, Editsubmission pages should check required fields
         by dict"""
         for section, dict_to_check in required_elements.items():
-            return self.check_inputs_by_data_ids(
-                driver, dict=dict_to_check, section=section, nth=0
-            )
+            try:
+                return self.check_inputs_by_data_ids(
+                    driver, dict=dict_to_check, section=section, nth=0
+                )
+            except TimeoutException:
+                print("Unable to check required element. Defaulting to first in section")
+                return self.check_first_input_in_section(
+                    driver, dict=dict_to_check, section=section
+                )
 
     @classmethod
     def get_v_multi_select_vals(self, driver, container_id, input_id):
