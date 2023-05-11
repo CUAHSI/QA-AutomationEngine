@@ -89,6 +89,11 @@ jobs:
         run: |
           echo $DSP_BACK_ENV_BASE64 | base64 --decode > .env
       
+      - name: Use default .env file
+        working-directory: dspback
+        if: github.event.inputs.dsp-front-ref != '' &&  github.event.inputs.dsp-back-ref != '' && ${{ github.event.inputs.use-gh-env == 'false' }}
+        run: make default-env
+      
       - name: Build DSPBack
         working-directory: dspback
         if: github.event.inputs.dsp-front-ref != '' &&  github.event.inputs.dsp-back-ref != ''
