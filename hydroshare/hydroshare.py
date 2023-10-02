@@ -52,7 +52,7 @@ from config import (
     GITHUB_ORG,
     GITHUB_REPO,
 )
-from spam_patterns.patterns_re import patterns as spam_patterns
+from spam_patterns.patterns_re import patterns
 
 SPAM_DATA_STREAM_NAME = "cuahsi-quality-spam-data-stream"
 SPAM_DATA_STREAM_CONFIG = Config(
@@ -1815,7 +1815,7 @@ class HydroshareSpamSuite(BaseTestSuite):
             f"\nThere are {len(links)} resources at HydroShare " f'"Site Map" page.\n'
         )
 
-        spam_resources = check_links_against_patterns(links, spam_patterns)
+        spam_resources = check_links_against_patterns(links, patterns)
         print_formatted_result(spam_resources, classification="potential spam")
 
         # Not related to spam, but these are potentially useless resources.
