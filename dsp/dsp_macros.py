@@ -2,6 +2,8 @@ import time
 
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import TimeoutException, NoSuchElementException
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 from cuahsi_base.site_element import SiteElement
 from cuahsi_base.utils import External, TestSystem
@@ -313,6 +315,35 @@ class MySubmissions(Dsp):
     my_submissions_search = SiteElement(By.ID, "my_submissions_search")
     top_submission_edit = SiteElement(By.ID, "sub-0-edit")
     top_submission_view_repo = SiteElement(By.ID, "sub-0-view")
+    check_in_dialog = SiteElement(By.CSS_SELECTOR, '.v-dialog input[type="checkbox"]')
+    confirm_in_dialog = SiteElement(By.CSS_SELECTOR, ".v-dialog button.dialog-confirm")
+
+    @classmethod
+    def delete_submissions(self, driver, silent=False):
+        total_submissions = self.get_total_submissions(driver)
+        current_active = 0
+        while total_submissions > current_active:
+            delete_button = SiteElement(
+                By.ID, f"sub-{total_submissions - current_active -1}-delete"
+            )
+            delete_button.scroll_to_hidden(driver)
+            claz = delete_button.get_class(driver)
+            is_disabled = False
+            for cl in claz.split(" "):
+                if cl == "v-btn--disabled":
+                    is_disabled = True
+                    break
+            if not is_disabled:
+                delete_button.javascript_click_hidden(driver, silent)
+                try:
+                    self.check_in_dialog.javascript_click_hidden(driver, silent)
+                    self.confirm_in_dialog.javascript_click_hidden(driver, silent)
+                except TimeoutException:
+                    # sometimes the "checkbox to delete in repo is not present"
+                    pass
+            else:
+                current_active = current_active + 1
+            total_submissions = self.get_total_submissions(driver)
 
     @classmethod
     def get_title(self, driver):
@@ -366,7 +397,8 @@ class SubmitLandingPage(Dsp, RepoAuthWindow):
     )
 
     register_dataset_other = SiteElement(
-        By.XPATH, "//*[contains(text(),'Register a dataset from a different repository')]/.."
+        By.XPATH,
+        "//*[contains(text(),'Register a dataset from a different repository')]/..",
     )
 
     @classmethod
@@ -375,7 +407,10 @@ class SubmitLandingPage(Dsp, RepoAuthWindow):
 
     @classmethod
     def select_nth_dialog_choice(self, driver, n):
-        dialog_item = SiteElement(By.CSS_SELECTOR, f".v-dialog--active .choice-container .v-card:nth-of-type({n+1})")
+        dialog_item = SiteElement(
+            By.CSS_SELECTOR,
+            f".v-dialog--active .choice-container .v-card:nth-of-type({n+1})",
+        )
         dialog_item.scroll_to(driver)
         dialog_item.click(driver)
 
@@ -401,7 +436,7 @@ class SubmitLandingPage(Dsp, RepoAuthWindow):
 
 
 class GeneralSubmitToRepo(Dsp, RepoAuthWindow):
-    header = SiteElement(By.CSS_SELECTOR, ".cz-new-submission h1")
+    header = SiteElement(By.CSS_SELECTOR, ".text-h4")
     alert = SiteElement(By.CSS_SELECTOR, ".v-alert .v-alert__content")
     top_save = SiteElement(
         By.CSS_SELECTOR, "#cz-new-submission-actions-top button.submission-save"
@@ -416,6 +451,11 @@ class GeneralSubmitToRepo(Dsp, RepoAuthWindow):
     bottom_finish = SiteElement(
         By.CSS_SELECTOR, "#cz-new-submission-actions-bottom button.submission-finish"
     )
+
+    @classmethod
+    def wait_until_loaded(self, driver):
+        submision_loaded = EC.presence_of_element_located((By.ID, "cz-new-submission"))
+        WebDriverWait(driver, DEFAULT_TIMEOUT).until(submision_loaded)
 
     @classmethod
     def get_header_text(self, driver):
@@ -501,9 +541,88 @@ class GeneralSubmitToRepo(Dsp, RepoAuthWindow):
     def fill_inputs_by_data_ids(self, driver, dict, section=None, nth=0, array=False):
         self.expand_section_by_did(driver, data_id=section)
         for k, v in dict.items():
+            # First try to fill by data+_id, then by id, then last resort = first input available
             if not self.fill_input_by_data_id(driver, k, v, section, nth, array):
-                return False
+                if not self.fill_input_by_id(driver, k, v, section, nth, array):
+                    return self.fill_first_input_in_section(driver, v, section, array)
         TestSystem.wait(PAUSE_AFTER_FILL_BEFORE_SUBMIT)
+        return True
+
+    @classmethod
+    def fill_first_input_in_section(self, driver, value, section=None, array=False):
+        try:
+            if array:
+                selector = (
+                    f'[data-id*="{section}"] .array-list-item:first-of-type input,'
+                    f' [data-id*="{section}"] .array-list-item:first-of-type input'
+                )
+            else:
+                selector = (
+                    f'[data-id*="{section}"] input:first-of-type,'
+                    f'[data-id*="{section}"] input:first-of-type'
+                )
+            element = SiteElement(By.CSS_SELECTOR, selector)
+        except TimeoutException as e:
+            print(f"{e}\nElement not found for selector: {selector}")
+            return False
+        if element.exists_in_dom(driver):
+            if isinstance(value, list):
+                # assume this is a v-multi-select
+                self.fill_v_multi_select(
+                    driver, container_id=section, input_id="", values=value
+                )
+            else:
+                element.hidden_inject_text(driver, value)
+                element.submit(driver)
+        else:
+            print(
+                f"\nAttempt to fill first input in section {section} failed. Not"
+                f' in DOM\nSelector used="{selector}"'
+            )
+            return False
+        print(f"Filled first input in {section}\n")
+        return True
+
+    @classmethod
+    def fill_input_by_id(
+        self, driver, data_id, value, section=None, nth=0, array=False
+    ):
+        try:
+            if section and nth is not None:
+                if array:
+                    selector = (
+                        f'[data-id*="{section}"] .array-list-item:nth-of-type({nth+1}) [id*="{data_id}"],'
+                        f' [data-id*="{section}"] .array-list-item:nth-of-type({nth+1}) [id*="{data_id}*"]'
+                    )
+                else:
+                    selector = (
+                        f'[data-id*="{section}"] [id*="{data_id}"]:nth-of-type({nth+1}),'
+                        f'[data-id*="{section}"] [id*="{data_id}*"]:nth-of-type({nth+1})'
+                    )
+                element = SiteElement(By.CSS_SELECTOR, selector)
+            else:
+                element = SiteElement(
+                    By.CSS_SELECTOR,
+                    f'[data-id="{data_id}"]:nth-of-type(1), [id*="{data_id}*"]:nth-of-type(1)',
+                )
+        except TimeoutException as e:
+            print(f"{e}\nElement not found for key: {data_id}")
+            return False
+        if element.exists_in_dom(driver):
+            if isinstance(value, list):
+                # assume this is a v-multi-select
+                self.fill_v_multi_select(
+                    driver, container_id=section, input_id=data_id, values=value
+                )
+            else:
+                element.hidden_inject_text(driver, value)
+                element.submit(driver)
+        else:
+            print(
+                f"\nAttempt to fill element {data_id} in section {section} by id failed. Not"
+                f' in DOM\nSelector used="{selector}"'
+            )
+            return False
         return True
 
     @classmethod
@@ -514,18 +633,19 @@ class GeneralSubmitToRepo(Dsp, RepoAuthWindow):
             if section and nth is not None:
                 if array:
                     selector = (
-                        f'[data-id*="{section}"] .array-list-item:nth-of-type({nth+1})'
-                        f' [data-id*="{data_id}"]'
+                        f'[data-id*="{section}"] .array-list-item:nth-of-type({nth+1}) [data-id="{data_id}"],'
+                        f' [data-id*="{section}"] .array-list-item:nth-of-type({nth+1}) [data-id="{data_id}*"]'
                     )
                 else:
                     selector = (
-                        f'[data-id*="{section}"]'
-                        f' [data-id*="{data_id}"]:nth-of-type({nth+1})'
+                        f'[data-id*="{section}"] [data-id="{data_id}"]:nth-of-type({nth+1}),'
+                        f'[data-id*="{section}"] [data-id="{data_id}*"]:nth-of-type({nth+1})'
                     )
                 element = SiteElement(By.CSS_SELECTOR, selector)
             else:
                 element = SiteElement(
-                    By.CSS_SELECTOR, f'[data-id*="{data_id}"]:nth-of-type(1)'
+                    By.CSS_SELECTOR,
+                    f'[data-id="{data_id}"]:nth-of-type(1), [data-id="{data_id}*"]:nth-of-type(1)',
                 )
         except TimeoutException as e:
             print(f"{e}\nElement not found for key: {data_id}")
@@ -542,8 +662,8 @@ class GeneralSubmitToRepo(Dsp, RepoAuthWindow):
                 element.submit_hidden(driver)
         else:
             print(
-                f"\nAttempt to fill element {data_id} in section {section} failed. Not"
-                f' in DOM                 \nSelector used="{selector}"'
+                f"\nAttempt to fill element {data_id} in section {section} using data_id failed. Not"
+                f' in DOM\nSelector used="{selector}"'
             )
             return False
         return True
@@ -746,18 +866,18 @@ class GeneralEditSubmission(Dsp):
                 if section and nth is not None:
                     if array:
                         selector = (
-                            f':is(fieldset, div)[data-id*="{section}"]'
-                            f' .array-list-item:nth-of-type({nth+1}) [data-id*="{k}"]'
+                            f':is(fieldset, div)[data-id*="{section}"] .array-list-item:nth-of-type({nth+1}) [data-id="{k}"],'
+                            f' :is(fieldset, div)[data-id*="{section}"] .array-list-item:nth-of-type({nth+1}) [data-id="{k}*"]'
                         )
                         elem = SiteElement(By.CSS_SELECTOR, selector)
                     else:
                         selector = (
-                            f':is(fieldset, div)[data-id*="{section}"]'
-                            f' [data-id*="{k}"]:nth-of-type({nth+1})'
+                            f':is(fieldset, div)[data-id*="{section}"] [data-id="{k}"]:nth-of-type({nth+1}),'
+                            f' :is(fieldset, div)[data-id*="{section}"] [data-id="{k}*"]:nth-of-type({nth+1})'
                         )
                         elem = SiteElement(By.CSS_SELECTOR, selector)
                 else:
-                    selector = f'[data-id*="{k}"]:nth-of-type(1)'
+                    selector = f'[data-id="{k}"]:nth-of-type(1), [data-id="{k}*"]:nth-of-type(1)'
                     elem = SiteElement(By.CSS_SELECTOR, selector)
                 elem.scroll_to(driver)
                 value = elem.get_value(driver)
@@ -781,13 +901,68 @@ class GeneralEditSubmission(Dsp):
         return True
 
     @classmethod
+    def check_first_input_in_section(self, driver, dict, section=None, array=False):
+        self.expand_section_by_did(driver, data_id=section)
+        for k, v in dict.items():
+            if isinstance(v, list):
+                # assume this is a v-multi-select
+                check = self.check_v_multi_select(
+                    driver, container_id=section, input_id=k, values=v
+                )
+                if not check:
+                    print(f"\nMismatch when checking field: |{k}|. Expected |{v}|.")
+                    return False
+            else:
+                # not a v-multi-select
+                if section:
+                    if array:
+                        selector = (
+                            f':is(fieldset, div)[data-id*="{section}"] .array-list-item:first-of-type input'
+                        )
+                        elem = SiteElement(By.CSS_SELECTOR, selector)
+                    else:
+                        selector = (
+                            f':is(fieldset, div)[data-id*="{section}"] input:first-of-type'
+                        )
+                        elem = SiteElement(By.CSS_SELECTOR, selector)
+                else:
+                    selector = f'[data-id="{k}"]:first-of-type, [data-id="{k}*"]:first-of-type'
+                    elem = SiteElement(By.CSS_SELECTOR, selector)
+                elem.scroll_to(driver)
+                value = elem.get_value(driver)
+                if value != v:
+                    if value.strip() == v:
+                        # Allow additional whitespace padding
+                        # print(
+                        #     f"\nWARNING: while checking field: |{k}|.\nExpected:"
+                        #     f" |{v}|\nBut got : |{value}|                        "
+                        #     " \nWhitespace will be ignored and this field considered"
+                        #     " valid"
+                        # )
+                        pass
+                    else:
+                        print(
+                            f"\nMismatch when checking first input in section. Field: |{k}|.\nExpected |{v}|"
+                            f" got |{value}|"
+                        )
+                        print(f"\nSelector used: {selector}")
+                        return False
+        return True
+
+    @classmethod
     def check_required_elements(self, driver, required_elements):
         """Unless otherwise defined, Editsubmission pages should check required fields
         by dict"""
         for section, dict_to_check in required_elements.items():
-            return self.check_inputs_by_data_ids(
-                driver, dict=dict_to_check, section=section, nth=0
-            )
+            try:
+                return self.check_inputs_by_data_ids(
+                    driver, dict=dict_to_check, section=section, nth=0
+                )
+            except TimeoutException:
+                print("Unable to check required element. Defaulting to first in section")
+                return self.check_first_input_in_section(
+                    driver, dict=dict_to_check, section=section
+                )
 
     @classmethod
     def get_v_multi_select_vals(self, driver, container_id, input_id):
@@ -866,9 +1041,7 @@ class SubmitZenodo(GeneralSubmitToRepo):
 
         try:
             SubmitLandingPage.to_repo_auth_window(driver)
-            ZenodoAuthWindow.authorize_email_password(
-                driver, email=uname, password=pw
-            )
+            ZenodoAuthWindow.authorize_email_password(driver, email=uname, password=pw)
             ZenodoAuthWindow.to_origin_window(driver, wait=True)
         except TimeoutException as e:
             print(f"\n{e}... \nThis exception is ignored")

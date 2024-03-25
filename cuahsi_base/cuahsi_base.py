@@ -67,7 +67,9 @@ class BaseTestSuite(unittest.TestCase):
             driver = webdriver.Remote(**remote_args)
         else:
             # Ignore resource warning about unclosed sockets
-            warnings.filterwarnings(action="ignore", message="unclosed", category=ResourceWarning)
+            warnings.filterwarnings(
+                action="ignore", message="unclosed", category=ResourceWarning
+            )
             if self.browser == "firefox":
                 options = webdriver.FirefoxOptions()
                 if self.headless:

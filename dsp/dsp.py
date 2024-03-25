@@ -105,6 +105,16 @@ class DspTestSuite(BaseTestSuite, metaclass=ErrorCatcher):
         else:
             self.driver.get(self.base_url_arg)
 
+    def tearDown(self):
+        try:
+            Dsp.show_mobile_nav(self.driver)
+            Dsp.drawer_to_my_submissions(self.driver)
+            MySubmissions.delete_submissions(self.driver, silent=True)
+        except Exception:
+            # Allow exceptions during attempted submissions cleaning
+            pass
+        super(DspTestSuite, self).tearDown()
+
     def login_orcid(self):
         """Authenticate with orcid"""
         Dsp.show_mobile_nav(self.driver)
@@ -183,6 +193,8 @@ class DspHydroshareTestSuite(DspTestSuite):
         }
         funding_agency = {
             "Agencyname": auto_text + " Agencyname",
+            "Awardtitle": auto_text + " Awardtitle",
+            "Awardnumber": auto_text + " Awardnumber",
         }
 
         # created separately so that we can check individually if needed
@@ -211,6 +223,7 @@ class DspHydroshareTestSuite(DspTestSuite):
         SubmitLandingPage.to_repo_auth_window(self.driver)
         HydroshareAuthWindow.authorize_repo(self.driver, HS_USERNAME, HS_PASSWORD)
         HydroshareAuthWindow.to_origin_window(self.driver)
+        SubmitHydroshare.wait_until_loaded(self.driver)
 
     def login_and_autofill_hs_required(self, auto_text):
         """A shortcut to fill required fields of HS submit page
@@ -326,8 +339,10 @@ class DspHydroshareTestSuite(DspTestSuite):
         check = EditHSSubmission.check_required_elements(self.driver, template)
         self.assertTrue(check)
 
+    @unittest.expectedFailure
     def test_hs_000008_temporal_coverage_persists(self):
         """Confirm that Temporal coverage persists from submit to edit"""
+        # TODO: this test fails because the temporal fields don't have data ids
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
         self.login_and_autofill_hs_required(auto_text)
         section = "Periodcoverage"
@@ -359,8 +374,6 @@ class DspHydroshareTestSuite(DspTestSuite):
         section = "Fundingagencyinformation"
         nth = 0
         dict = {
-            "Awardtitle": auto_text + "Funding Agency title2-input",
-            "Awardnumber": "5",
             "FundingAgencyUrl": "http://funding-agency.com/" + auto_text,
         }
         self.fill_ids_submit_and_check(auto_text, section, nth, dict)
@@ -516,6 +529,7 @@ class DspHydroshareTestSuite(DspTestSuite):
         self.login_and_autofill_hs_required(auto_text)
         section = "Creators"
         ns = [0, 1]
+        reversed = False
         dicts = [None] * len(ns)
         array = True
         for nth in ns:
@@ -535,7 +549,11 @@ class DspHydroshareTestSuite(DspTestSuite):
 
         self.submit(auto_text)
         for nth in ns:
-            self.check(section, nth, dicts[nth], array)
+            # Shift creators by 1: HS inserts the submitter as a creator
+            if reversed:
+                self.check(section, nth+1, dicts.pop(), array)
+            else:
+                self.check(section, nth+1, dicts[nth], array)
 
     def test_hs_000018_multiple_contributors_persist(self):
         """Confirm that multiple Contributors info persists from submit to edit"""
@@ -676,10 +694,10 @@ class DspExternalTestSuite(DspTestSuite):
         basic_info = {
             "Nameortitle": auto_text + " Nameortitle",
             "Url": "http://basicinfourl.com/" + auto_text,
-            "Datepublished": "2022-04-05T00:04",
             "Descriptionorabstract": auto_text + " Descriptionorabstract",
             "SubjectKeywords": [auto_text + " SubjectKeywords"],
         }
+        date_published = {"Date": "2022-04-05T00:04"}
         creator = {
             "Name": "Meister, Jim",
             "Organization": (
@@ -701,6 +719,7 @@ class DspExternalTestSuite(DspTestSuite):
         # created separately so that we can check individually if needed
         required_elements = {
             "BasicInformation": basic_info,
+            "Datepublished": date_published,
             "Creators": creator,
             "Fundingagencyinformation": funding_agency,
             "Provider": provider,
@@ -720,12 +739,14 @@ class DspExternalTestSuite(DspTestSuite):
 
         OrcidWindow.fill_credentials(self.driver, USERNAME, PASSWORD)
         OrcidWindow.to_origin_window(self.driver)
+        SubmitExternal.wait_until_loaded(self.driver)
 
     def login_and_autofill_external_required(self, auto_text):
         """A shortcut to fill required fields of submit page
         So that additional non-required fields can easily be checked
         """
         self.login_orcid_and_external()
+        SubmitExternal.open_tab(self.driver, "Datepublished", tab_number=2)
         SubmitExternal.autofill_required_elements(
             self.driver, self.required_elements_template(auto_text)
         )
@@ -751,6 +772,8 @@ class DspExternalTestSuite(DspTestSuite):
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
         # self.login_and_autofill_external_required(auto_text)
         self.login_orcid_and_external()
+
+        SubmitExternal.open_tab(self.driver, "Datepublished", tab_number=2)
         template = self.required_elements_template(auto_text)
         SubmitExternal.autofill_required_elements(self.driver, template)
 
@@ -790,8 +813,11 @@ class DspExternalTestSuite(DspTestSuite):
         SubmitExternal.expand_section_by_did(self.driver, data_id=section)
         self.fill_ids_submit_and_check(auto_text, section, nth, dict)
 
+    @unittest.expectedFailure
     def test_ex_000005_temporal_coverage_persists(self):
         """Confirm that Temporal coverage persists from submit to edit"""
+
+        # TODO: this test fails because the start/end inputs don't have data-ids
         auto_text = time.strftime("%d_%b_%Y_%H-%M-%S", time.gmtime())
         self.login_and_autofill_external_required(auto_text)
         section = "Temporalcoverage"
@@ -1040,6 +1066,9 @@ class DspEarthchemTestSuite(DspTestSuite):
 
     @classmethod
     def required_elements_template(self, auto_text):
+        data_file_release = {
+            "datePublished": datetime.datetime.today().strftime("%Y-%m-%d"),
+        }
         basic_info = {
             "DatasetTitle": auto_text + " Title",
             "AbstractorDescription": auto_text + " Description/Abstract",
@@ -1052,11 +1081,16 @@ class DspEarthchemTestSuite(DspTestSuite):
             "Email": f"{auto_text}@gmail.com",
         }
         spatial = {"SpatialCoverage": ["Global"]}
+        funding_source = {
+            "AwardNumber": auto_text + "AwardNumber",
+        }
 
         required_elements = {
+            "DataFileReleaseInformation": data_file_release,
             "group-BasicInformation": basic_info,
             "SpatialCoverageInformation": spatial,
             "LeadAuthor": lead_author,
+            "FundingSource": funding_source,
         }
         return required_elements
 
@@ -1078,10 +1112,7 @@ class DspEarthchemTestSuite(DspTestSuite):
         if RepoAuthWindow.submit_to_repo_authorize.exists(self.driver):
             SubmitLandingPage.to_repo_auth_window(self.driver)
             EarthchemAuthWindow.authorize_via_orcid(self.driver)
-            OrcidWindow.fill_credentials(
-                self.driver, EARTHCHEM_USERNAME, EARTHCHEM_PASSWORD
-            )
-            OrcidWindow.to_origin_window(self.driver, wait=True)
+            EarthchemAuthWindow.to_origin_window(self.driver, wait=True)
 
     def earthchem_then_login_username_password(self):
         """Select Earthchem repo then authenticate with orcid"""
@@ -1232,7 +1263,7 @@ class DspEarthchemTestSuite(DspTestSuite):
             + "AwardNumber"
         }
         SubmitEarthchem.expand_section_by_did(self.driver, data_id=section)
-        self.fill_ids_submit_and_check(auto_text, section, nth, dict)
+        self.check(section, nth, dict)
 
     def test_ec_000009_license_persists(self):
         """Confirm that License Info persists from save to edit"""

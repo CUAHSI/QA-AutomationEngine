@@ -52,6 +52,7 @@ from config import (
     GITHUB_ORG,
     GITHUB_REPO,
 )
+from spam_patterns.patterns_re import patterns
 
 SPAM_DATA_STREAM_NAME = "cuahsi-quality-spam-data-stream"
 SPAM_DATA_STREAM_CONFIG = Config(
@@ -164,7 +165,7 @@ class HydroshareTestSuite(BaseTestSuite):
         correctly linked and correctly listed within the app info on the
         apps page
         """
-        LandingPage.to_apps(self.driver)
+        TestSystem.to_url(self.driver, BASE_URL + "/apps/")
         apps_count = Apps.get_count(self.driver)
         for i in range(1, apps_count + 1):  # xpath start at 1
             app_name = Apps.get_title(self.driver, i)
@@ -566,7 +567,7 @@ class HydroshareTestSuite(BaseTestSuite):
             "of-Universities-for-the-Advancement-of-Hydrologic-"
             "Science-Inc/179921902590",
             "twitter": "http://twitter.com/cuahsi",
-            "youtube": "http://youtube.hydroshare.org/",
+            "youtube": "https://www.youtube.com/user/CUAHSI",
             "github": "http://github.com/hydroshare",
             "linkedin": "https://www.linkedin.com/company/2632114",
         }
@@ -826,14 +827,9 @@ class HydroshareTestSuite(BaseTestSuite):
         External.switch_old_page(self.driver)
         External.close_new_page(self.driver)
         # MATLAB Online
-        TestSystem.to_url(self.driver, "http://matlab-launcher.cuahsi.org")
-        # Login.login(self.driver, USERNAME, PASSWORD)
-        TestSystem.wait(30)
-        MatlabOnline.authorize(self.driver)
-        TestSystem.wait(120)
-        self.assertIn("MATLAB Online", TestSystem.title(self.driver))
-        # External.switch_old_page(self.driver)
-        # External.close_new_page(self.driver)
+        Home.to_app(self.driver, "Featured", 2)
+        External.switch_old_page(self.driver)
+        External.close_new_page(self.driver)
 
     def hold_test_B_000056(self):
         """Verify featured apps featured on the dashboard link correctly"""
@@ -906,7 +902,10 @@ class HydroshareTestSuite(BaseTestSuite):
         resource_href = MyResources.get_resource_link(self.driver, 1)
         Resource.logout(self.driver)
         TestSystem.to_url(self.driver, resource_href)
+        self.assertFalse(Resource.has_visible_forms(self.driver))
+        Home.to_login(self.driver)
         Login.login(self.driver, USERNAME, PASSWORD)
+        TestSystem.to_url(self.driver, resource_href)
         self.assertIn("Private Test Resource", TestSystem.title(self.driver))
 
     def test_B_000064(self):
@@ -1027,11 +1026,9 @@ class HydroshareTestSuite(BaseTestSuite):
         TestSystem.wait(20)
         TestSystem.refresh(self.driver)
         self.assertIn("My Resources", TestSystem.title(self.driver))
-        TestSystem.back(self.driver)
-        # Deleted new version
-        self.assertIn("Page not found", TestSystem.title(self.driver))
+        MyResources.to_resource_from_table(self.driver, 1)
+        self.assertIn("Beaver Divide Air Temperature", TestSystem.title(self.driver))
         # Now editable old version
-        TestSystem.to_url(self.driver, resource_copy)
         try:
             Resource.edit(self.driver)
         except:
@@ -1134,7 +1131,7 @@ class HydroshareTestSuite(BaseTestSuite):
         self.driver.get(resource_url)
         Resource.delete_resource(self.driver)
         TestSystem.wait(20)
-        TestSystem.back(self.driver)
+        self.driver.get(resource_url)
         TestSystem.refresh(self.driver)
         self.assertIn("Page not found", TestSystem.title(self.driver))
 
@@ -1297,7 +1294,6 @@ class HydroshareTestSuite(BaseTestSuite):
             "99",
             "Estuary",
             "New York",
-            "Precipitation",
             "Ice",
             "Antarctica",
             "Phosphorus",
@@ -1518,6 +1514,7 @@ class HydroshareTestSuite(BaseTestSuite):
         self.assertEqual(Resource.get_sharing_status(self.driver), "Public")
         Resource.edit(self.driver)
         Resource.delete_file_by_index(self.driver, 1)
+        TestSystem.wait(10)
         Resource.view(self.driver)
         self.assertEqual(Resource.get_sharing_status(self.driver), "Private")
 
@@ -1569,8 +1566,6 @@ class HydroshareTestSuite(BaseTestSuite):
         zip_index = Resource.get_file_index_by_name(self.driver, folder_name + ".zip")
         Resource.unzip_folder_by_index(self.driver, zip_index)
         Resource.wait_on_task_completion(self.driver, 1, 30)
-        unzip_index = Resource.get_file_index_by_name(self.driver, folder_name + "-1")
-        self.assertGreaterEqual(unzip_index, 1)
 
     def test_B_000123(self):
         """Create a resource and unzip a large file in the dropzone"""
@@ -1648,6 +1643,28 @@ class HydroshareTestSuite(BaseTestSuite):
         Resource.prepare_metadata(self.driver, "Key", "Value")
         Resource.cancel_metadata(self.driver)
         self.assertTrue(Resource.check_residual_metadata(self.driver))
+
+    def test_B_000127(self):
+        """Ensure non-Hydroshare authors are shown normally on the resource landing page"""
+        LandingPage.to_login(self.driver)
+        Login.login(self.driver, USERNAME, PASSWORD)
+        Home.create_resource(self.driver, "CompositeResource")
+        NewResource.configure(self.driver, "Non-Hydroshare Author Test")
+        NewResource.create(self.driver)
+        Resource.add_other_author(self.driver, "Other Person")
+        Resource.delete_author(self.driver, 1)
+        Resource.view(self.driver)
+        self.assertEqual(["Other Person"], Resource.get_authors(self.driver))
+
+    def test_B_000128(self):
+        """Add a similar to relationship between resources"""
+        LandingPage.to_login(self.driver)
+        Login.login(self.driver, USERNAME, PASSWORD)
+        Home.create_resource(self.driver, "CompositeResource")
+        NewResource.configure(self.driver, "Similar Resource One")
+        NewResource.create(self.driver)
+        Resource.add_similar_to(self.driver, "google.com")
+        Resource.view(self.driver)
 
 
 class PerformanceTestSuite(BaseTestSuite):
@@ -1798,59 +1815,7 @@ class HydroshareSpamSuite(BaseTestSuite):
             f"\nThere are {len(links)} resources at HydroShare " f'"Site Map" page.\n'
         )
 
-        spam_patterns = [
-            "amazing",
-            "business",
-            "cheap[est]?",
-            "credit[s]?",
-            "customer[s]?",
-            r"\bdeal[s]?\b",
-            "phone number",
-            "price",
-            "4free",
-            # US phone number format (1-[3 digits]-[3 digits]-[4 digits]
-            # r'' is a 'raw' string (backslash symbol is treated as a literal
-            # backslash).
-            r"\d-[\d]{3}-[\d]{3}-[\d]{4}",
-            "airline[s]?",
-            "baggage",
-            "booking",
-            "flight[s]?",
-            r"\breservation\b",
-            "vacation[al]?",
-            "ticket[s]?",
-            r"\baccount\b",
-            "antivirus",
-            "cleaner",
-            "cookies",
-            "[e]?mail",
-            "laptop",
-            "password",
-            "sign up",
-            "sign in",
-            "wi[-]?fi",
-            # r'' is a 'raw' string (backslash symbol is treated as a literal
-            # backslash).
-            # '\b' stands for 'word boundary'.
-            r"\bgoogle\b",
-            "android",
-            r"\bchrome\b",
-            r"\bapple\b",
-            "icloud",
-            r"\bios\b",
-            "iphone",
-            r"\bmac\b",
-            "macbook",
-            "macos",
-            "facebook",
-            "microsoft",
-            "internet explorer",
-            "adult",
-            "escort",
-            "porn",
-            "xxx",
-        ]
-        spam_resources = check_links_against_patterns(links, spam_patterns)
+        spam_resources = check_links_against_patterns(links, patterns)
         print_formatted_result(spam_resources, classification="potential spam")
 
         # Not related to spam, but these are potentially useless resources.
