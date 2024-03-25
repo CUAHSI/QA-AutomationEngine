@@ -1,0 +1,72 @@
+name: Run QA Tests Beta
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: 'Alternative to Refs above, URL to target tests (ex: https://beta.hydroshare.org).'
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v3
+        with:
+          python-version: 3.9
+
+      - name: Install dependencies
+        run: pip3 install -r requirements.txt
+
+      - name: Prepare Selenium
+        run: sudo apt-get install -y chromium-browser
+
+      # - name: Prepare Firefox
+      # TODO: enable browser selection via GH dispatch
+      #   # uses: browser-actions/setup-firefox@latest
+      #   run: sudo apt install firefox
+
+      # - name: Firefox version
+      #   run: firefox --version
+
+      # - name: Geckodriver
+      #   run: sudo apt install firefox-geckodriver
+
+      - name: Create Output Dir
+        run: mkdir output
+      
+      - name: Retrieve base64 from secrets and decode to .env file
+        env:
+          DSP_QA_ENGINE_ENV_BASE64: ${{ secrets.DSP_QA_ENGINE_ENV_BASE64 }}
+        run: |
+          echo $DSP_QA_ENGINE_ENV_BASE64 | base64 --decode > .env
+      
+      - name: Run Tests against target = ${{ github.event.inputs.target }}
+        if: github.event.inputs.target != ''
+        run: |
+          ./hydrotest hydroshare HydroshareTestSuite --headless --browser chrome --base ${{ github.event.inputs.target }} 2>&1 | tee -a output/hydroshare-browser-test.txt
+
+      - name: Run Tests against beta
+        if: github.event.inputs.target == ''
+        run: |
+          ./hydrotest hydroshare HydroshareTestSuite --headless --browser chrome --base https://beta.hydroshare.org/ 2>&1 | tee -a output/hydroshare-browser-test.txt
+
+      - name: Archive test results
+        uses: actions/upload-artifact@v3
+        with:
+          name: DSP-ARTIFACTS
+          path: output
+      
+      - name: Archive debug
+        uses: actions/upload-artifact@v3
+        with:
+          name: HS-BETA-DEBUG
+          path: debug
+
+      - name: Check whether passing
+        working-directory: output
+        run: |
+          if grep -rl -e "FAILED (" -e "ERROR:" . >/dev/null; then grep -rh -e "FAIL:" -e "ERROR:" . && exit 1; else grep -rh "OK (" .; fi
