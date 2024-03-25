@@ -11,3 +11,4 @@ python-dotenv>=0.20.0<=0.21.0
 beautifulsoup4>=4.11.1<=4.12.0
 webdriver-manager>=3.8.2<=3.9.0
 chromedriver-autoinstaller>=0.4.0<=1.0.0
+spam_patterns @ git+https://github.com/CUAHSI/spam_patterns.git@0.0.1

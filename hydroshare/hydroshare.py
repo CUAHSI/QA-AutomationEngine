@@ -52,6 +52,7 @@ from config import (
     GITHUB_ORG,
     GITHUB_REPO,
 )
+from spam_patterns.patterns_re import patterns
 
 SPAM_DATA_STREAM_NAME = "cuahsi-quality-spam-data-stream"
 SPAM_DATA_STREAM_CONFIG = Config(
@@ -1814,59 +1815,7 @@ class HydroshareSpamSuite(BaseTestSuite):
             f"\nThere are {len(links)} resources at HydroShare " f'"Site Map" page.\n'
         )
 
-        spam_patterns = [
-            "amazing",
-            "business",
-            "cheap[est]?",
-            "credit[s]?",
-            "customer[s]?",
-            r"\bdeal[s]?\b",
-            "phone number",
-            "price",
-            "4free",
-            # US phone number format (1-[3 digits]-[3 digits]-[4 digits]
-            # r'' is a 'raw' string (backslash symbol is treated as a literal
-            # backslash).
-            r"\d-[\d]{3}-[\d]{3}-[\d]{4}",
-            "airline[s]?",
-            "baggage",
-            "booking",
-            "flight[s]?",
-            r"\breservation\b",
-            "vacation[al]?",
-            "ticket[s]?",
-            r"\baccount\b",
-            "antivirus",
-            "cleaner",
-            "cookies",
-            "[e]?mail",
-            "laptop",
-            "password",
-            "sign up",
-            "sign in",
-            "wi[-]?fi",
-            # r'' is a 'raw' string (backslash symbol is treated as a literal
-            # backslash).
-            # '\b' stands for 'word boundary'.
-            r"\bgoogle\b",
-            "android",
-            r"\bchrome\b",
-            r"\bapple\b",
-            "icloud",
-            r"\bios\b",
-            "iphone",
-            r"\bmac\b",
-            "macbook",
-            "macos",
-            "facebook",
-            "microsoft",
-            "internet explorer",
-            "adult",
-            "escort",
-            "porn",
-            "xxx",
-        ]
-        spam_resources = check_links_against_patterns(links, spam_patterns)
+        spam_resources = check_links_against_patterns(links, patterns)
         print_formatted_result(spam_resources, classification="potential spam")
 
         # Not related to spam, but these are potentially useless resources.
