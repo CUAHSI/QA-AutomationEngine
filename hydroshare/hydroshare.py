@@ -1763,7 +1763,7 @@ class HydroshareSpamSuite(BaseTestSuite):
         if not self.base_url_arg:
             self.driver.get(BASE_URL)
         else:
-            self.driver.get(self.base_url_arg)self.driver.get(BASE_URL)
+            self.driver.get(self.base_url_arg)
         self.vision_client = vision.ImageAnnotatorClient()
 
     def send_record(self, data):
