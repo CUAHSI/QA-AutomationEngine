@@ -59,13 +59,17 @@ SPAM_DATA_STREAM_CONFIG = Config(
     region_name="us-east-2",
 )
 
+
 # Test cases definition
 class HydroshareTestSuite(BaseTestSuite):
     """Python unittest setup for functional tests"""
 
     def setUp(self):
         super(HydroshareTestSuite, self).setUp()
-        self.driver.get(BASE_URL)
+        if not self.base_url_arg:
+            self.driver.get(BASE_URL)
+        else:
+            self.driver.get(self.base_url_arg)
 
     def test_B_000001(self):
         """
@@ -1725,7 +1729,10 @@ class JupyterhubTestSuite(HydroshareTestSuite):
 
     def setUp(self):
         super(JupyterhubTestSuite, self).setUp()
-        self.driver.get(BASE_URL)
+        if not self.base_url_arg:
+            self.driver.get(BASE_URL)
+        else:
+            self.driver.get(self.base_url_arg)
 
     def test_000001(self):
         """Spawn and interact with a server"""
@@ -1753,7 +1760,10 @@ class HydroshareSpamSuite(BaseTestSuite):
 
     def setUp(self):
         super(HydroshareSpamSuite, self).setUp()
-        self.driver.get(BASE_URL)
+        if not self.base_url_arg:
+            self.driver.get(BASE_URL)
+        else:
+            self.driver.get(self.base_url_arg)self.driver.get(BASE_URL)
         self.vision_client = vision.ImageAnnotatorClient()
 
     def send_record(self, data):
