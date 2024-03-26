@@ -26,7 +26,10 @@ class HydroclientTestSuite(BaseTest):
     def setUp(self):
         super(HydroclientTestSuite, self).setUp()
         self.driver.maximize_window()
-        self.driver.get(BASE_URL)
+        if not self.base_url_arg:
+            self.driver.get(BASE_URL)
+        else:
+            self.driver.get(self.base_url_arg)
 
     def test_A_000002(self):
         """Confirms Archbold service metadata is available through
