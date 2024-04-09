@@ -35,12 +35,7 @@ class SiteElement:
             wait.until(EC.visibility_of_element_located((self.by, self.locator)))
             target_el = wait.until(EC.element_to_be_clickable((self.by, self.locator)))
         except TimeoutException as e:
-            print(
-                "\nUnable to locate element by {}, "
-                "locator: '{}'".format(self.by, self.locator)
-            )
             raise e
-
         return target_el
 
     def loc_hidden(self, driver, silent=False):
@@ -59,7 +54,6 @@ class SiteElement:
                     "locator: '{}'".format(self.by, self.locator)
                 )
             raise e
-
         return target_el
 
     def exists(self, driver):
@@ -359,7 +353,7 @@ class SiteElement:
         element specification
         """
         target_el = self.loc_it(driver)
-        return len(target_el.find_elements_by_xpath("*"))
+        return len(target_el.find_elements(By.XPATH, "./*"))
 
     def get_class(self, driver):
         target_el = self.loc_it(driver)

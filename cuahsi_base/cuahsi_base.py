@@ -32,7 +32,7 @@ USER_COUNT = 1
 class BaseTestSuite(unittest.TestCase):
     grid_hub_ip = None
     resource = None
-    browser = "firefox"
+    browser = "chrome"
     records = None
     base_url_arg = None
     headless = False

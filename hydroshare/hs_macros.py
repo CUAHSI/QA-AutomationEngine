@@ -27,6 +27,10 @@ from timing import (
     EXTERNAL_PAGE_LOAD,
     KEYS_RESPONSE,
     RESOURCE_LANDING_PAGE_LOAD,
+    LOGIN_PAGE_LOAD,
+    LANDING_PAGE_LOAD,
+    MY_RESOURCES_PAGE_LOAD,
+    HOME_PAGE_LOAD,
 )
 
 
@@ -132,14 +136,19 @@ class Hydroshare(WebPage):
     @classmethod
     def to_home(self, driver):
         self.navigation_home.click(driver)
+        time.sleep(HOME_PAGE_LOAD)
 
     @classmethod
-    def to_my_resources(self, driver):
+    def to_my_resources(self, driver, username="", password=""):
         self.navigation_my_resources.click(driver)
+        time.sleep(MY_RESOURCES_PAGE_LOAD)
+        if Login.username.exists(driver):
+            Login.login(driver, username, password)
 
     @classmethod
     def to_discover(self, driver):
         self.navigation_discover.click(driver)
+        time.sleep(DISCOVER_TABLE_UPDATE)
 
     @classmethod
     def to_collaborate(self, driver):
@@ -165,6 +174,7 @@ class Hydroshare(WebPage):
     @classmethod
     def to_login(self, driver):
         self.navigation_login.click(driver)
+        time.sleep(LOGIN_PAGE_LOAD)
 
     @classmethod
     def to_profile(self, driver):
@@ -280,6 +290,10 @@ class LandingPage(Hydroshare):
     def hero_has_valid_img(self, driver, images):
         return self.hero.get_attribute(driver, "style") in images
 
+    @classmethod
+    def wait_for_load(self, driver):
+        time.sleep(LANDING_PAGE_LOAD)
+
 
 class Home(Hydroshare):
     get_started_toggle = SiteElement(By.ID, "id-getting-started-toggle")
@@ -350,6 +364,7 @@ class Home(Hydroshare):
     def check_recent_activity_resource(self, driver, row):
         link_title = self.recent_activity_resource(row).get_text(driver)
         self.recent_activity_resource(row).click(driver)
+        time.sleep(RESOURCE_LANDING_PAGE_LOAD)
         resource_title = Resource.title.get_text(driver)
         TestSystem.back(driver)
         return link_title, resource_title
@@ -375,10 +390,10 @@ class Home(Hydroshare):
 
 
 class Login(Hydroshare):
-    username = SiteElement(By.ID, "id_username")
-    password = SiteElement(By.ID, "id_password")
-    submit = SiteElement(By.CSS_SELECTOR, "input.btn.btn-primary[type='submit']")
-    error = SiteElement(By.CSS_SELECTOR, ".alert-danger")
+    username = SiteElement(By.ID, "username")
+    password = SiteElement(By.ID, "password")
+    submit = SiteElement(By.ID, "kc-login")
+    error = SiteElement(By.ID, "input-error")
     notification = SiteElement(
         By.CSS_SELECTOR, "div.page-tip-error.animated.slideInDown > div > div > div > p"
     )
@@ -393,9 +408,11 @@ class Login(Hydroshare):
 
     @classmethod
     def login(self, driver, username, password):
-        self.username.inject_text(driver, username)
-        self.password.inject_text(driver, password)
-        self.submit.click(driver)
+        if self.username.exists(driver):
+            self.username.inject_text(driver, username)
+            self.password.inject_text(driver, password)
+            self.submit.click(driver)
+            time.sleep(HOME_PAGE_LOAD)
 
 
 class Apps(Hydroshare):
@@ -455,7 +472,6 @@ class Discover(Hydroshare):
     list_tab = SiteElement(By.CSS_SELECTOR, 'a[href="#list-view"]')
     sort_order = SiteElement(By.ID, "id_sort_order")
     sort_direction = SiteElement(By.ID, "id_sort_direction")
-    col_headers = SiteElement(By.CSS_SELECTOR, "#items-discovered thead tr")
     legend = SiteElement(By.CSS_SELECTOR, "#headingLegend h4 a")
     legend_labels = SiteElement(
         By.CSS_SELECTOR,
@@ -483,6 +499,11 @@ class Discover(Hydroshare):
     map_mode = SiteElement(By.ID, "map-mode-button")
     page_left = SiteElement(By.ID, "page-left-upper")
     page_right = SiteElement(By.ID, "page-right-upper")
+    pagination_results_top = SiteElement(By.ID, "resultsdisp-upper")
+
+    @classmethod
+    def pagination_status(self, driver):
+        return self.pagination_results_top.get_attribute(driver, "innerText")
 
     @classmethod
     def column_header(index):
@@ -495,26 +516,26 @@ class Discover(Hydroshare):
         return SiteElement(By.XPATH, "//a[contains(text(), '{}')]".format(title))
 
     @classmethod
-    def col_header(self, col_index):
+    def col_header(self, col_class):
         """Return the column header element, given the index"""
         return SiteElement(
             By.CSS_SELECTOR,
-            "#items-discovered thead tr " "th:nth-of-type({})".format(col_index),
+            "." + col_class,
         )
 
     @classmethod
-    def cell(self, col, row):
+    def cell(self, column_class, row):
         """
         Return the cell in the discover table, given row and column indicies
         """
         return SiteElement(
             By.CSS_SELECTOR,
             "#items-discovered tbody tr:nth-of-type({}) "
-            "td:nth-of-type({}) span".format(row, col),
+            "td.{} span".format(row, column_class),
         )
 
     @classmethod
-    def cell_href(self, col, row):
+    def cell_href(self, column_class, row):
         """
         Return the cell's hyperlink in the discover table, given row and column
         indicies.
@@ -522,7 +543,7 @@ class Discover(Hydroshare):
         return SiteElement(
             By.CSS_SELECTOR,
             "#items-discovered tbody tr:nth-of-type({}) "
-            "td:nth-of-type({}) a".format(row, col),
+            "td.{} a".format(row, column_class),
         )
 
     @classmethod
@@ -552,10 +573,6 @@ class Discover(Hydroshare):
     @classmethod
     def filter_subject(self, subject):
         return SiteElement(By.ID, "subj-{}".format(subject))
-
-    @classmethod
-    def filter_resource_type(self, resource_type):
-        return SiteElement(By.ID, "type-{}".format(resource_type))
 
     @classmethod
     def filter_owner(self, owner):
@@ -655,8 +672,8 @@ class Discover(Hydroshare):
         time.sleep(DISCOVER_TABLE_UPDATE)
 
     @classmethod
-    def set_sort(self, driver, col_index):
-        self.col_header(col_index).click(driver)
+    def set_sort(self, driver, column_class):
+        self.col_header(column_class).click(driver)
 
     @classmethod
     def to_resource(self, driver, title):
@@ -667,12 +684,18 @@ class Discover(Hydroshare):
         num_windows_now = len(driver.window_handles)
         resource_found = False
         time.sleep(DISCOVER_TABLE_UPDATE)
+        pagination_status = self.pagination_status(driver)
         while not resource_found:
             try:
                 self.resource_link(title).click(driver)
                 resource_found = True
-            except TimeoutException:
+            except TimeoutException as e:
                 self.page_right.click(driver)
+                time.sleep(DISCOVER_TABLE_UPDATE)
+                if pagination_status == self.pagination_status(driver):
+                    raise e
+                else:
+                    pagination_status = self.pagination_status(driver)
         # Switch to new resource page
         External.switch_new_page(driver, num_windows_now, Resource.authors_locator)
 
@@ -682,20 +705,7 @@ class Discover(Hydroshare):
         self.user_modal_to_profile.click(driver)
 
     @classmethod
-    def col_index(self, driver, col_name):
-        """Indentify the index for a discover page column, given the
-        column name.  Indexes here start at one since the
-        end application here is xpath, and those indexes are 1 based
-        """
-        num_cols = self.col_headers.get_immediate_child_count(driver)
-        for i in range(1, num_cols + 1):
-            name_to_check = self.col_header(i).get_text(driver).replace("\n", " ")
-            if name_to_check == col_name:
-                return i
-        return 0
-
-    @classmethod
-    def check_sorting_multi(self, driver, column_name, ascend_or_descend):
+    def check_sorting_multi(self, driver, column_class, ascend_or_descend):
         """Check discover page rows are sorted correctly.  The automated
         testing system checks the first eight rows against the rows that
         are 1, 2, and 3 positions down, relative to the base row (a total
@@ -706,29 +716,23 @@ class Discover(Hydroshare):
         for i in range(1, baseline_rows):
             for j in range(1, 4):
                 if not self.check_sorting_single(
-                    driver, column_name, ascend_or_descend, i, i + j
+                    driver, column_class, ascend_or_descend, i, i + j
                 ):
                     all_pass = False
         return all_pass
 
     @classmethod
     def check_sorting_single(
-        self, driver, column_name, ascend_or_descend, row_one, row_two
+        self, driver, column_class, ascend_or_descend, row_one, row_two
     ):
         """Confirm that two rows are sorted correctly relative to
         eachother
         """
-        col_ind = self.col_index(driver, column_name)
-        if column_name == "Title":
-            first_element = self.cell_href(col_ind, row_one)
-            second_element = self.cell_href(col_ind, row_two)
-            first_two_vals = [
-                first_element.get_text(driver),
-                second_element.get_text(driver),
-            ]
-        elif column_name == "First Author":
-            first_element = self.cell_href(col_ind, row_one)
-            second_element = self.cell_href(col_ind, row_two)
+        if column_class == "tbl-col-title" or column_class == "tbl-col-authors":
+            first_element = self.cell_href(column_class, row_one)
+            second_element = self.cell_href(column_class, row_two)
+            first_element.scroll_to(driver)
+            second_element.scroll_to(driver)
             first_two_vals = [
                 first_element.get_text(driver),
                 second_element.get_text(driver),
@@ -736,13 +740,16 @@ class Discover(Hydroshare):
         else:
             first_element = self.cell(col_ind, row_one)
             second_element = self.cell(col_ind, row_two)
+            first_element.scroll_to(driver)
+            second_element.scroll_to(driver)
             first_two_vals = [
                 first_element.get_text(driver),
                 second_element.get_text(driver),
             ]
-        if ("Date" in column_name) or (column_name == "Last Modified"):
+        if column_class == "tbl-col-date":
             date_one = parser.parse(first_two_vals[0])
             date_two = parser.parse(first_two_vals[1])
+            print(date_one, date_two)
             if ascend_or_descend == "Descending":
                 return date_one >= date_two
             elif ascend_or_descend == "Ascending":
@@ -764,7 +771,6 @@ class Discover(Hydroshare):
         driver,
         author=None,
         subject=None,
-        resource_type=None,
         owner=None,
         variable=None,
         sample_medium=None,
@@ -806,13 +812,6 @@ class Discover(Hydroshare):
                 filter_el.javascript_click(driver)
         elif subject is not None:
             filter_el = self.filter_subject(subject)
-            filter_el.javascript_click(driver)
-        if type(resource_type) is list:
-            for resource_type_item in resource_type:
-                filter_el = self.filter_resource_type(resource_type_item)
-                filter_el.javascript_click(driver)
-        elif resource_type is not None:
-            filter_el = self.filter_resource_type(resource_type)
             filter_el.javascript_click(driver)
         if type(owner) is list:
             for owner_item in owner:
@@ -862,17 +861,17 @@ class Discover(Hydroshare):
         self.search_field.click(driver)
         self.search_field.clear_all_text(driver)
         self.search_field.inject_text(driver, text)
-        self.search_field.submit(driver)
+        self.search_field.submit_hidden(driver)
         time.sleep(DISCOVER_TABLE_UPDATE)
 
     @classmethod
-    def to_search_result_item(self, driver, col_ind, row_one):
-        self.cell_href(col_ind, row_one).click(driver)
+    def to_search_result_item(self, driver, column_class, row_one):
+        self.cell_href(column_class, row_one).click(driver)
 
     @classmethod
     def to_resource_by_index(self, driver, index):
         num_windows_now = len(driver.window_handles)
-        self.cell_href(2, index).click(driver)
+        self.cell_href("tbl-col-title", index).click(driver)
         External.switch_new_page(driver, num_windows_now, Resource.authors_locator)
 
     @classmethod
@@ -980,7 +979,7 @@ class Discover(Hydroshare):
     @classmethod
     def get_first_author_by_resource_index(self, driver, index):
         try:
-            first_author = self.cell_href(3, index).get_text(driver)
+            first_author = self.cell_href("tbl-col-authors", index).get_text(driver)
         except TimeoutException:
             first_author = self.cell(3, index).get_text(driver)
         return first_author
@@ -1368,13 +1367,14 @@ class Resource(Hydroshare):
     def grant_viewer(self, driver, username):
         self.access_management.click(driver)
         self.grant_input.inject_text(driver, username)
-        time.sleep(KEYS_RESPONSE)
+        time.sleep(10 * KEYS_RESPONSE)
         self.grant_input.inject_text(driver, Keys.ARROW_DOWN)
-        time.sleep(KEYS_RESPONSE)
+        time.sleep(10 * KEYS_RESPONSE)
         self.grant_input.inject_text(driver, Keys.ENTER)
-        time.sleep(KEYS_RESPONSE)
+        time.sleep(10 * KEYS_RESPONSE)
         self.access_add.click(driver)
         self.access_close.click(driver)
+        time.sleep(10 * KEYS_RESPONSE)
 
     @classmethod
     def grant_editor(self, driver, username):
@@ -1382,13 +1382,14 @@ class Resource(Hydroshare):
         self.access_type.click(driver)
         self.access_type_editor.click(driver)
         self.grant_input.inject_text(driver, username)
-        time.sleep(KEYS_RESPONSE)
+        time.sleep(10 * KEYS_RESPONSE)
         self.grant_input.inject_text(driver, Keys.ARROW_DOWN)
-        time.sleep(KEYS_RESPONSE)
+        time.sleep(10 * KEYS_RESPONSE)
         self.grant_input.inject_text(driver, Keys.ENTER)
-        time.sleep(KEYS_RESPONSE)
+        time.sleep(10 * KEYS_RESPONSE)
         self.access_add.click(driver)
         self.access_close.click(driver)
+        time.sleep(10 * KEYS_RESPONSE)
 
     @classmethod
     def grant_owner(self, driver, username):
@@ -1396,13 +1397,14 @@ class Resource(Hydroshare):
         self.access_type.click(driver)
         self.access_type_owner.click(driver)
         self.grant_input.inject_text(driver, username)
-        time.sleep(KEYS_RESPONSE)
+        time.sleep(10 * KEYS_RESPONSE)
         self.grant_input.inject_text(driver, Keys.ARROW_DOWN)
-        time.sleep(KEYS_RESPONSE)
+        time.sleep(10 * KEYS_RESPONSE)
         self.grant_input.inject_text(driver, Keys.ENTER)
-        time.sleep(KEYS_RESPONSE)
+        time.sleep(10 * KEYS_RESPONSE)
         self.access_add.click(driver)
         self.access_close.click(driver)
+        time.sleep(10 * KEYS_RESPONSE)
 
     @classmethod
     def get_user_access_count(self, driver):
@@ -1526,18 +1528,19 @@ class Resource(Hydroshare):
         self.add_author_other_person_input.click(driver)
         self.add_author_other_person_input.inject_text(driver, name)
         self.add_author_other_person_save.click(driver)
-        self.wait_on_author_save(driver, 3)
+        time.sleep(5)
 
     @classmethod
     def delete_author(self, driver, index):
         self.author(index).click(driver)
         self.author_remove.click(driver)
         self.author_remove_confirm.click(driver)
+        time.sleep(5)
 
     @classmethod
     def add_dup_authors(self, driver, username):
         for _ in range(2):
-            self.add_author_button.click(driver)
+            self.add_author_button.javascript_click(driver)
             # if self.author_remove.is_visible(driver):
             if self.add_author_input_clear.exists(driver):
                 self.add_author_input_clear.click(driver)
@@ -1545,17 +1548,7 @@ class Resource(Hydroshare):
             self.add_author_input.inject_text(driver, username)
             self.add_author_select.click(driver)
             self.add_author_save.click(driver)
-            self.wait_on_author_save(driver, 3)
-
-    @classmethod
-    def wait_on_author_save(self, driver, timeout):
-        waited = 0
-        while waited < timeout:
-            if self.add_author_button.is_visible(driver):
-                return
-            else:
-                time.sleep(1)
-                waited += 1
+            time.sleep(5)
 
     @classmethod
     def check_author_warning(self, driver):
@@ -1567,7 +1560,7 @@ class Resource(Hydroshare):
             return True
         if self.abstract.exists(driver):
             return True
-        if self.subject_keywords.exists(driver):
+        if self.subject_keyword_input.exists(driver):
             return True
         return False
 
@@ -1619,7 +1612,7 @@ class WebApp(Resource):
     @classmethod
     def remove_photo(self, driver):
         self.image_container.scroll_to(driver)
-        self.delete_image.click(driver)
+        self.delete_image.javascript_click(driver)
         self.image_file_button.scroll_to(driver)
         self.save_image.click(driver)
 
@@ -1774,14 +1767,14 @@ class Profile(Hydroshare):
     contributions_list = SiteElement(
         By.CSS_SELECTOR, "#contributions > .row > .col-md-9"
     )
-    password_change = SiteElement(By.XPATH, '//a[contains(text(), "Change password")]')
+    password_change = SiteElement(By.XPATH, '//a[contains(text(), "Change CUAHSI SSO password")]')
     current_password = SiteElement(By.CSS_SELECTOR, 'input[id="id_password"]')
     new_password = SiteElement(By.CSS_SELECTOR, 'input[id="id_password1"]')
     confirm_password = SiteElement(By.CSS_SELECTOR, 'input[id="id_password2"]')
     password_confirm = SiteElement(By.XPATH, '//button[contains(text(), "Confirm")]')
     description = SiteElement(By.CSS_SELECTOR, 'textarea[name="details"]')
-    country = SiteElement(By.CSS_SELECTOR, 'select[name="country"]')
-    province = SiteElement(By.CSS_SELECTOR, 'input[name="state"]')
+    country = SiteElement(By.ID, 'country')
+    state = SiteElement(By.ID, 'state')
     name = SiteElement(By.CSS_SELECTOR, "h2")
     phone1 = SiteElement(By.ID, "phone1")
     phone2 = SiteElement(By.ID, "phone2")
@@ -1900,11 +1893,10 @@ class Profile(Hydroshare):
     @classmethod
     def reset_password(self, driver, old_password, new_password):
         self.password_change.click(driver)
-        self.current_password.inject_text(driver, old_password)
-        self.new_password.inject_text(driver, new_password)
-        self.confirm_password.inject_text(driver, new_password)
-        self.password_confirm.scroll_to(driver)
-        self.password_confirm.click(driver)
+        Keycloak.password_update.click(driver)
+        Keycloak.new_password.inject_text(driver, new_password)
+        Keycloak.confirm_password.inject_text(driver, new_password)
+        Keycloak.submit.click(driver)
 
     @classmethod
     def queue_password_change(self, driver, old_password, new_password):
@@ -1914,14 +1906,12 @@ class Profile(Hydroshare):
         self.confirm_password.inject_text(driver, new_password)
 
     @classmethod
-    def update_about(self, driver, description, country, province):
+    def update_about(self, driver, description, country, state):
         self.description.click(driver)
         self.description.clear_all_text(driver)
         self.description.inject_text(driver, description)
         self.country.select_option_text(driver, country)
-        self.province.click(driver)
-        self.province.clear_all_text(driver)
-        self.province.inject_text(driver, province)
+        self.state.select_option_text(driver, state)
 
     @classmethod
     def update_contact(
@@ -2024,13 +2014,13 @@ class Collaborate(Hydroshare):
 
 class Groups(Hydroshare):
     group_creation = SiteElement(
-        By.CSS_SELECTOR, 'a[data-target="#create-group-dialog"]'
+        By.CSS_SELECTOR, 'a[data-target="#create-group-modal"]'
     )
     my_groups = SiteElement(By.CSS_SELECTOR, 'a[href="/my-groups/"]')
     title = SiteElement(By.CSS_SELECTOR, ".page-title")
-    name = SiteElement(By.CSS_SELECTOR, "fieldset.col-sm-12:nth-child(1) textarea")
-    purpose = SiteElement(By.CSS_SELECTOR, "fieldset.col-sm-12:nth-child(2) textarea")
-    about = SiteElement(By.CSS_SELECTOR, "fieldset.col-sm-12:nth-child(3) textarea")
+    name = SiteElement(By.CSS_SELECTOR, 'textarea[name="name"]')
+    purpose = SiteElement(By.CSS_SELECTOR, 'textarea[name="purpose"]')
+    about = SiteElement(By.CSS_SELECTOR, 'textarea[name="description"]')
     public = SiteElement(By.CSS_SELECTOR, 'input[value="public"]')
     discoverable = SiteElement(By.CSS_SELECTOR, 'input[value="discoverable"]')
     private = SiteElement(By.CSS_SELECTOR, 'input[value="private"]')
@@ -2089,7 +2079,7 @@ class MyResources(Hydroshare):
     )
     manage_labels = SiteElement(By.XPATH, '//li[@data-target="#modalManageLabels"]')
     remove_label = SiteElement(By.CSS_SELECTOR, ".btn-label-remove")
-    legend = SiteElement(By.CSS_SELECTOR, "#headingLegend h4 a")
+    legend = SiteElement(By.CSS_SELECTOR, "#headingLegend > h4 > a")
     legend_labels = SiteElement(
         By.CSS_SELECTOR,
         "#legend-collapse div:first-child div:first-child div.col-xs-12.col-sm-5",
@@ -2102,6 +2092,7 @@ class MyResources(Hydroshare):
         By.XPATH,
         '//div[contains(text(), "Your label contains HTML and cannot be saved.")]',
     )
+    page_title = SiteElement(By.CSS_SELECTOR, ".page-title")
 
     @classmethod
     def label_checkbox(self, label_name):
@@ -2143,7 +2134,7 @@ class MyResources(Hydroshare):
     def resource_author(self, index):
         return SiteElement(
             By.CSS_SELECTOR,
-            "#item-selectors > tbody > tr:nth-child({}) > td:nth-child(4)".format(
+            "#item-selectors > tbody > tr:nth-child({}) > td:nth-child(4) > a".format(
                 index
             ),
         )
@@ -2229,9 +2220,13 @@ class MyResources(Hydroshare):
 
     @classmethod
     def toggle_label(self, driver, label):
-        self.add_label.click(driver)
+        self.page_title.scroll_to(driver)
+        self.add_label.scroll_to(driver)
+        self.add_label.javascript_click(driver)
         self.label_checkbox(label).click(driver)
-        self.add_label.click(driver)
+        self.page_title.scroll_to(driver)
+        self.add_label.scroll_to(driver)
+        self.add_label.javascript_click(driver)
 
     @classmethod
     def check_label_applied(self, driver):
@@ -2239,6 +2234,8 @@ class MyResources(Hydroshare):
 
     @classmethod
     def delete_label(self, driver):
+        self.page_title.scroll_to(driver)
+        self.label.scroll_to(driver)
         self.label.click(driver)
         self.manage_labels.click(driver)
         self.remove_label.click(driver)
@@ -2459,3 +2456,10 @@ class Utilities:
     def run_speed_test(self, driver):
         self.run_test.click(driver)
         self.confirm_test.click(driver)
+
+
+class Keycloak:
+    password_update = SiteElement(By.ID, "password-update-182dd965")
+    new_password = SiteElement(By.ID, "password-new")
+    confirm_password = SiteElement(By.ID, "password-confirm")
+    submit = SiteElement(By.CSS_SELECTOR, "#kc-form-buttons > input")

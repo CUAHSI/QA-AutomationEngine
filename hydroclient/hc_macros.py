@@ -304,6 +304,26 @@ class Filter:
         FilterModal.to_workspace.click(driver)
         FilterModal.workspace.click(driver)
 
+    def to_file_cell_range(self, driver, first_row, last_row):
+        """Select a range of rows from the Filter Results modal"""
+        FilterModal.count.select_option(driver, "100")
+        FilterModal.cell(first_row, 3).scroll_to(driver)
+        FilterModal.cell(first_row, 3).click(driver)
+        FilterModal.cell(last_row, 3).scroll_to(driver)
+        FilterModal.cell(last_row, 3).range_click(driver)
+        FilterModal.action.click(driver)
+        FilterModal.to_file.scroll_to(driver)
+        FilterModal.to_file.click(driver)
+        FilterModal.workspace.click(driver)
+        FilterModal.to_exports.click(driver)
+
+    def export_finishes(self, driver):
+        # 5 minutes
+        for i in range(3000):
+            if FilterModal.tbody.get_immediate_child_count(driver) > 0:
+                time.sleep(0.1)
+        raise Exception
+
     def to_workspace_cell_multi(self, driver, rows):
         """Select multiple rows within Filter Results modal"""
         FilterModal.count.select_option(driver, "100")

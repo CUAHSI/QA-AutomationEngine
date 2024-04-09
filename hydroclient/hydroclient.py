@@ -14,13 +14,15 @@ from hc_macros import (
 )
 from hc_elements import ZendeskArticlePage
 
+import selenium
+
 from cuahsi_base.utils import External, TestSystem
-from cuahsi_base.cuahsi_base import BaseTest, parse_args_run_tests
+from cuahsi_base.cuahsi_base import BaseTestSuite, parse_args_run_tests
 from config import BASE_URL
 
 
 # Test cases definition
-class HydroclientTestSuite(BaseTest):
+class HydroclientTestSuite(BaseTestSuite):
     """Test suite for the HydroClient software system"""
 
     def setUp(self):
@@ -45,9 +47,13 @@ class HydroclientTestSuite(BaseTest):
 
         Search.search_location(self.driver, "Lake Annie Highlands County")
         Services.filters(self.driver, orgs="Archbold Biological Station")
+        Search.filter_dates(self.driver, "11/01/2010", "02/01/2011")
         Filter.open(self.driver)
-        Filter.to_workspace_cell(self.driver, 1, 1)
-        oracle()
+        Filter.to_file_cell_range(self.driver, 1, 50)
+        try:
+            Filter.export_finishes(self.driver)
+        except selenium.common.exceptions.TimeoutException:
+            print("DONE")
 
     def test_A_000003(self):
         """Confirms repeated search for Lake Annie data does not result

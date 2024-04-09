@@ -177,6 +177,9 @@ class FilterModal:
             By.CSS_SELECTOR, 'select[name="tblDetailedSearchResults_length"]'
         )
         self.to_workspace = SiteElement(By.ID, "anchorAddSelectionsToWorkspaceDSR")
+        self.to_file = SiteElement(By.ID, "anchorAllTimeseriesInOneFileDSR")
+        self.to_exports = SiteElement(By.ID, "liDownloadMgrPane")
+        self.tbody = SiteElement(By.CSS_SELECTOR, "#tblDownloadManager > tbody")
         self.exports = SiteElement(By.ID, "tableModal-DownloadMgrSearchSummary")
         self.workspace = SiteElement(By.ID, "tableModal-DataMgrSearchSummary")
         self.close = SiteElement(By.ID, "closeSearchSummary")
